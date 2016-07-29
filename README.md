@@ -72,7 +72,7 @@
 - `conversion` - конверсия (0 <= conversion <= 1)
 
 ##### `customers_rate_stat`
-Возвращает статистику по количеству плательщиков (агрегация по уникальным плательщкам):
+Возвращает статистику по количеству плательщиков (агрегация по уникальным плательщикам):
 
 - `unic_count` - количество уникальных плательщиков
 
@@ -100,14 +100,14 @@
 		"offset": 0,
 		"city_name": "Москва",
 		"currency_symbolic_code": "RUB",
-		"amount_with_commission": 9000,
-		"amount_without_commission": 10000
+		"amount_with_commission": "9000",
+		"amount_without_commission": "10000"
 	},
 	{
 		"offset": 0,
 		"city_name": "Ярославль",
 		"currency_symbolic_code": "RUB",
-		"amount_with_commission": 900,
+		"amount_with_commission": "900",
 		"amount_without_commission": 1000
 	},
 	{
@@ -138,8 +138,7 @@
 - `from_time`
 - `to_time`
 - `payment_status` - статус платежа, имена берем из thrift-интерфейса **domain.InvoicePaymentStatus**, к примеру: `succeeded`
-- `pan_mask` - маска в формате [\d*]+ где все символы `*` трактуются как любой символ
-
+- `pan_mask` - маска в формате [\d\*]+ где все символы `\*` трактуются как любой символ
 ##### `invoices` 
 Выборка по инвойсам. Параметры:
 
