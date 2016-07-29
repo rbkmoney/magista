@@ -97,32 +97,32 @@
 ```json
 [
 	{
-		"offset": 0,
+		"offset": "0",
 		"city_name": "Москва",
 		"currency_symbolic_code": "RUB",
 		"amount_with_commission": "9000",
 		"amount_without_commission": "10000"
 	},
 	{
-		"offset": 0,
+		"offset": "0",
 		"city_name": "Ярославль",
 		"currency_symbolic_code": "RUB",
 		"amount_with_commission": "900",
-		"amount_without_commission": 1000
+		"amount_without_commission": "1000"
 	},
 	{
-		"offset": 300,
+		"offset": "300",
 		"city_name": "Москва",
 		"currency_symbolic_code": "RUB",
-		"amount_with_commission": 18000,
-		"amount_without_commission": 19000
+		"amount_with_commission": "18000",
+		"amount_without_commission": "19000"
 	},
 	{
-		"offset": 300,
+		"offset": "300",
 		"city_name": "Ярославль",
 		"currency_symbolic_code": "RUB",
-		"amount_with_commission": 5000,
-		"amount_without_commission": 5100
+		"amount_with_commission": "5000",
+		"amount_without_commission": "5100"
 	}
 ]
 ```
@@ -138,7 +138,8 @@
 - `from_time`
 - `to_time`
 - `payment_status` - статус платежа, имена берем из thrift-интерфейса **domain.InvoicePaymentStatus**, к примеру: `succeeded`
-- `pan_mask` - маска в формате [\d\*]+ где все символы `\*` трактуются как любой символ
+- `pan_mask` - маска в формате [\d\*]+ где все символы * трактуются как любой символ
+
 ##### `invoices` 
 Выборка по инвойсам. Параметры:
 
