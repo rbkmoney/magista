@@ -55,16 +55,16 @@
 Возвращает статистику по обороту (сумма успешных платежей за вычетом комиссий) в виде набора, сгруппированного по представленным в выборке валютам:
 
 - `currency_symbolic_code` - символьный код валюты(ключ)
-- `amount_with_commission` - сумма с вычетом комиссий
-- `amount_without_commission` - сумма без вычета комиссий
+- `amount_with_fee` - сумма с вычетом комиссий
+- `amount_without_fee` - сумма без вычета комиссий
 
 ##### `payments_geo_stat`
 Возвращает статистику по географии платежей (агрегация сумм успешных платежей по городам) в виде набора, сгруппированного по представленным в выборке городам и валютам:
 
 - `city_name` - город, который определился для данной совокупности платежей(ключ)
 - `currency_symbolic_code` - символьный код валюты(ключ)
-- `amount_with_commission` - сумма с вычетом комиссий
-- `amount_without_commission` - сумма без вычета комиссий
+- `amount_with_fee` - сумма с вычетом комиссий
+- `amount_without_fee` - сумма без вычета комиссий
 
 ##### `payments_conversion_stat` 
 Возвращает статистику по конверсии (отношение количества успешных платежей к общему):
@@ -102,29 +102,29 @@
 		"offset": "0",
 		"city_name": "Москва",
 		"currency_symbolic_code": "RUB",
-		"amount_with_commission": "9000",
-		"amount_without_commission": "10000"
+		"amount_with_fee": "9000",
+		"amount_without_fee": "10000"
 	},
 	{
 		"offset": "0",
 		"city_name": "Ярославль",
 		"currency_symbolic_code": "RUB",
-		"amount_with_commission": "900",
-		"amount_without_commission": "1000"
+		"amount_with_fee": "900",
+		"amount_without_fee": "1000"
 	},
 	{
 		"offset": "300",
 		"city_name": "Москва",
 		"currency_symbolic_code": "RUB",
-		"amount_with_commission": "18000",
-		"amount_without_commission": "19000"
+		"amount_with_fee": "18000",
+		"amount_without_fee": "19000"
 	},
 	{
 		"offset": "300",
 		"city_name": "Ярославль",
 		"currency_symbolic_code": "RUB",
-		"amount_with_commission": "5000",
-		"amount_without_commission": "5100"
+		"amount_with_fee": "5000",
+		"amount_without_fee": "5100"
 	}
 ]
 ```
