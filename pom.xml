@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <description>Magista service (event statistics)</description>
+
+    <parent>
+        <groupId>com.rbkmoney</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.4.0.RELEASE</version>
+    </parent>
+
+    <groupId>com.rbkmoney.magista</groupId>
+    <artifactId>magista</artifactId>
+    <version>1.0.0</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <mst.db.url>jdbc:postgresql://localhost:5432/magista</mst.db.url>
+                <mst.db.user>postgres</mst.db.user>
+                <mst.db.password>postgres</mst.db.password>
+                <mst.db.schema>mst</mst.db.schema>
+                <flyway.db.url>${mst.db.url}</flyway.db.url>
+                <flyway.user>${mst.db.user}</flyway.user>
+                <flyway.password>${mst.db.password}</flyway.password>
+                <hg.pooling.url>http://localhost:8080</hg.pooling.url>
+                <hg.pooling.limit>10</hg.pooling.limit>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <mst.db.url>jdbc:postgresql://localhost:5432/magista_test</mst.db.url>
+                <mst.db.user>postgres</mst.db.user>
+                <mst.db.password>postgres</mst.db.password>
+                <mst.db.schema>mst</mst.db.schema>
+                <flyway.db.url>${mst.db.url}</flyway.db.url>
+                <flyway.user>${mst.db.user}</flyway.user>
+                <flyway.password>${mst.db.password}</flyway.password>
+                <hg.pooling.url>http://locahost:8080</hg.pooling.url>
+                <hg.pooling.limit>10</hg.pooling.limit>
+            </properties>
+        </profile>
+    </profiles>
+    <dependencies>
+        <!--Thrirdparty libs-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+        <!--RBK libs-->
+        <dependency>
+            <groupId>com.rbkmoney.dbinit</groupId>
+            <artifactId>dbinit</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney.woody</groupId>
+            <artifactId>woody-thrift</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>damsel</artifactId>
+            <version>cdbb383</version>
+        </dependency>
+    </dependencies>
+
+
+</project>
