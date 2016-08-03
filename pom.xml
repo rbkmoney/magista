@@ -34,8 +34,8 @@
                 <flyway.db.url>${mst.db.url}</flyway.db.url>
                 <flyway.user>${mst.db.user}</flyway.user>
                 <flyway.password>${mst.db.password}</flyway.password>
-                <hg.pooling.url>http://localhost:8080</hg.pooling.url>
-                <hg.pooling.limit>10</hg.pooling.limit>
+                <bm.pooling.url>http://localhost:8080</bm.pooling.url>
+                <bm.pooling.limit>10</bm.pooling.limit>
             </properties>
         </profile>
         <profile>
@@ -48,8 +48,8 @@
                 <flyway.db.url>${mst.db.url}</flyway.db.url>
                 <flyway.user>${mst.db.user}</flyway.user>
                 <flyway.password>${mst.db.password}</flyway.password>
-                <hg.pooling.url>http://locahost:8080</hg.pooling.url>
-                <hg.pooling.limit>10</hg.pooling.limit>
+                <bm.pooling.url>http://locahost:8080</bm.pooling.url>
+                <bm.pooling.limit>10</bm.pooling.limit>
             </properties>
         </profile>
     </profiles>
