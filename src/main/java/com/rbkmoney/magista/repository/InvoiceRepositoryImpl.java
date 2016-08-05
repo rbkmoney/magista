@@ -3,6 +3,7 @@ package com.rbkmoney.magista.repository;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.NestedRuntimeException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -23,7 +24,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     public void changeStatus(String invoiceId, InvoiceStatus._Fields status) throws DaoException {
         try {
             jdbcTemplate.update("update magista.invoice set status = ? where id = ?", status.getFieldName(), invoiceId);
-        } catch (RuntimeException ex) {
+        } catch (NestedRuntimeException ex) {
             throw new DaoException("Failed to change invoice status", ex);
         }
     }
@@ -32,7 +33,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     public void save(Invoice invoice) throws DaoException {
         try {
             jdbcTemplate.update("insert into magista.invoice (id, status, created_at) values (?, ?, ?)", invoice.getId(), invoice.getStatus().getFieldName(), invoice.getCreatedAt());
-        } catch (RuntimeException ex) {
+        } catch (NestedRuntimeException ex) {
             throw new DaoException("Failed to save invoice event", ex);
         }
     }

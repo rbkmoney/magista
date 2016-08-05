@@ -1,8 +1,8 @@
 package com.rbkmoney.magista.repository;
 
 import com.rbkmoney.magista.model.Payment;
-import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.NestedRuntimeException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -24,7 +24,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     public void save(Payment payment) throws DaoException {
         try {
             jdbcTemplate.update("insert into magista.payment (id, invoice_id, status, created_at) values (?, ?, ?, ?)", payment.getId(), payment.getInvoiceId(), payment.getStatus().getFieldName(), payment.getCreatedAt());
-        } catch (RuntimeException ex) {
+        } catch (NestedRuntimeException ex) {
             throw new DaoException("Failed to save payment event", ex);
         }
     }
