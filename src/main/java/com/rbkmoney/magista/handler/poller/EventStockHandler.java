@@ -6,6 +6,8 @@ import com.rbkmoney.magista.handler.Handler;
 import com.rbkmoney.magista.handler.InvoiceCreatedHandler;
 import com.rbkmoney.magista.handler.InvoiceStatusChangedHandler;
 import com.rbkmoney.magista.handler.PaymentStartedHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -17,6 +19,8 @@ import java.util.List;
 @Component
 public class EventStockHandler implements EventHandler<StockEvent> {
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     List<Handler> handlers = Arrays.asList(new Handler[]{
             new InvoiceCreatedHandler(),
             new InvoiceStatusChangedHandler(),
@@ -25,7 +29,12 @@ public class EventStockHandler implements EventHandler<StockEvent> {
 
     @Override
     public void handleEvent(StockEvent stockEvent, String subsKey) {
-        handlers.stream().filter(handler -> handler.accept(stockEvent)).findFirst().get().handle(stockEvent);
+        for (Handler handler : handlers) {
+            if (handler.accept(stockEvent)) {
+                handler.handle(stockEvent);
+                break;
+            }
+        }
     }
 
     @Override
