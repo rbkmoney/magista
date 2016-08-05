@@ -14,10 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class InvoiceStatusChangedHandler implements Handler<StockEvent> {
 
-    String path = "source_event.processing_event.payload.invoice_event.invoice_status_changed.status";
+    private String path = "source_event.processing_event.payload.invoice_event.invoice_status_changed.status";
 
     @Autowired
-    InvoiceRepository repository;
+    private InvoiceRepository repository;
+
+    private Filter filter;
+
+    public InvoiceStatusChangedHandler() {
+        filter = new PathConditionFilter(new PathConditionRule(path));
+    }
 
     @Override
     public void handle(StockEvent value) {
@@ -30,6 +36,6 @@ public class InvoiceStatusChangedHandler implements Handler<StockEvent> {
 
     @Override
     public Filter getFilter() {
-        return new PathConditionFilter(new PathConditionRule(path));
+        return filter;
     }
 }

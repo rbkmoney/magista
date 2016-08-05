@@ -12,7 +12,7 @@ import javax.sql.DataSource;
  */
 public class InvoiceRepositoryImpl implements InvoiceRepository {
 
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     public InvoiceRepositoryImpl(DataSource dataSource) {

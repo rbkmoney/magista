@@ -21,7 +21,13 @@ public class PaymentStartedHandler implements Handler<StockEvent> {
     @Autowired
     PaymentRepository repository;
 
-    String path = "source_event.processing_event.payload.invoice_event.invoice_payment_event.payment";
+    private Filter filter;
+
+    private String path = "source_event.processing_event.payload.invoice_event.invoice_payment_event.payment";
+
+    public PaymentStartedHandler() {
+        filter = new PathConditionFilter(new PathConditionRule(path));
+    }
 
     @Override
     public void handle(StockEvent value) {
@@ -40,6 +46,6 @@ public class PaymentStartedHandler implements Handler<StockEvent> {
 
     @Override
     public Filter getFilter() {
-        return new PathConditionFilter(new PathConditionRule(path));
+        return filter;
     }
 }

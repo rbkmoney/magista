@@ -17,10 +17,16 @@ import java.time.Instant;
  */
 public class InvoiceCreatedHandler implements Handler<StockEvent> {
 
-    String path = "source_event.processing_event.payload.invoice_event.invoice_created";
+    private String path = "source_event.processing_event.payload.invoice_event.invoice_created";
 
     @Autowired
-    InvoiceRepository repository;
+    private InvoiceRepository repository;
+
+    private Filter filter;
+
+    public InvoiceCreatedHandler() {
+        filter = new PathConditionFilter(new PathConditionRule(path));
+    }
 
     @Override
     public void handle(StockEvent value) {
@@ -36,6 +42,6 @@ public class InvoiceCreatedHandler implements Handler<StockEvent> {
 
     @Override
     public Filter getFilter() {
-        return new PathConditionFilter(new PathConditionRule(path));
+        return filter;
     }
 }
