@@ -137,7 +137,7 @@
                             <name>org.jooq.util.postgres.PostgresDatabase</name>
                             <includes>.*</includes>
                             <excludes/>
-                            <inputSchema>magista</inputSchema>
+                            <inputSchema>mst</inputSchema>
                         </database>
                         <target>
                             <packageName>com.rbkmoney.magista.domain</packageName>
