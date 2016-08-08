@@ -2,6 +2,7 @@ create schema if not exists mst;
 
 create table mst.invoice (
   id character varying not null,
+  event_id bigint not null,
   merchant_id character varying not null,
   shop_id character varying not null,
   status character varying not null,
@@ -13,6 +14,7 @@ create table mst.invoice (
 
 create table mst.payment (
   id character varying not null,
+  event_id bigint not null,
   invoice_id character varying not null,
   merchant_id character varying not null,
   shop_id character varying not null,
