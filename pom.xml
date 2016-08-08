@@ -81,10 +81,13 @@
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
+            <artifactId>eventstock-client</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
             <version>cdbb383</version>
         </dependency>
     </dependencies>
-
-
 </project>
