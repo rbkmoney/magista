@@ -17,7 +17,7 @@ create table mst.payment (
   merchant_id character varying not null,
   shop_id character varying not null,
   customer_id character varying,
-  masked_pan character varying,
+  masked_pan character varying not null,
   status character varying not null,
   amount bigint not null,
   currency_code character varying not null,
