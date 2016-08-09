@@ -35,9 +35,9 @@ public class GeoProviderIpm implements GeoProvider {
             String uri = GEO_API_URL + ip;
             FreeGeoIpResponse resp = restTemplate.getForObject(uri, FreeGeoIpResponse.class);
 
-            //Default city Moscow
+            //Default city Mirny
             if (!StringUtils.hasText(resp.getCity())) {
-                return "Moscow";
+                return "Mirny";
             }
             return resp.getCity();
         } catch (RestClientException e) {

@@ -33,8 +33,8 @@ public class GeoDataServiceTest {
     @Test
     public void getInfoFromService() {
         try {
-            String cityName = geoProvider.getCityName("2001:470:df50:1065:9034:1741:6551:f71d");
-            assertEquals("Moscow", cityName);
+            String cityName = geoProvider.getCityName("94.245.156.53");
+            assertEquals("Mirny", cityName);
         } catch (ProviderException e) {
             e.printStackTrace();
         }
