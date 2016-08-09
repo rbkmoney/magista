@@ -7,16 +7,23 @@ import java.util.Map;
 /**
  * Created by vpankrashkin on 05.08.16.
  */
-public abstract class FunctionBaseQuery extends BaseQuery implements FunctionQuery {
+public abstract class BaseFunction extends BaseQuery implements FunctionQuery {
     private final Class resultElementType;
+    private final String name;
 
-    public FunctionBaseQuery(Map<String, Object> params, Class resultElementType) {
+    public BaseFunction(Map<String, Object> params, Class resultElementType, String name) {
         super(params);
         this.resultElementType = resultElementType;
+        this.name = name;
     }
 
     @Override
     public Class getResultElementType() {
         return resultElementType;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

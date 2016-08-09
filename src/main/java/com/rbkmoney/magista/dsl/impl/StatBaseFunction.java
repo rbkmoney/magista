@@ -5,16 +5,16 @@ import java.util.Map;
 /**
  * Created by vpankrashkin on 08.08.16.
  */
-public abstract class StatFunctionBaseQuery extends ScopedFunctionBaseQuery {
+public abstract class StatBaseFunction extends ScopedBaseFunction {
 
     public static final String SPLIT_INTERVAL_PARAM = "split_interval";
 
-    public StatFunctionBaseQuery(Map<String, Object> params, Class resultElementType) {
-        super(params, resultElementType);
+    public StatBaseFunction(Map<String, Object> params, Class resultElementType, String name) {
+        super(params, resultElementType, name);
     }
 
     public int getSplitInterval() {
-        return getIntParameter(SPLIT_INTERVAL_PARAM);
+        return getIntParameter(SPLIT_INTERVAL_PARAM, false);
     }
 
     @Override
@@ -23,17 +23,19 @@ public abstract class StatFunctionBaseQuery extends ScopedFunctionBaseQuery {
     }
 
     protected boolean checkSplitInterval(boolean throwOnError) {
+        Integer val;
         try {
-            Integer val = getSplitInterval();
-            if (val == null) {
-                return checkParamsResult(throwOnError, true, SPLIT_INTERVAL_PARAM + " not found");
-            }
-            if (val <= 0) {
-                return checkParamsResult(throwOnError, true, SPLIT_INTERVAL_PARAM + " is not valid");
-            }
+            val = getSplitInterval();
         } catch (Exception e) {
             return checkParamsResult(throwOnError, true, SPLIT_INTERVAL_PARAM + ": " + e.getMessage());
         }
+        if (val == null) {
+            return checkParamsResult(throwOnError, true, SPLIT_INTERVAL_PARAM + " not found");
+        }
+        if (val <= 0) {
+            return checkParamsResult(throwOnError, true, SPLIT_INTERVAL_PARAM + " is not valid");
+        }
+
         return true;
     }
 

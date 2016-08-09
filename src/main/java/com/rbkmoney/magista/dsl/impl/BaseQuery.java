@@ -4,8 +4,6 @@ import com.rbkmoney.magista.dsl.Query;
 import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 
 import java.time.temporal.TemporalAccessor;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -13,11 +11,21 @@ import java.util.Map;
  * Created by vpankrashkin on 04.08.16.
  */
 public abstract class BaseQuery implements Query {
+    private final Query parentQuery;
     protected final Map<String, Object> params;
 
     public BaseQuery(Map<String, Object> params) {
-        validateParameters(params);
-        this.params = Collections.unmodifiableMap(new HashMap<>(params));
+        this(params, null);
+    }
+
+    public BaseQuery(Map<String, Object> params, Query parentQuery) {
+        this.params = params;
+        this.parentQuery = parentQuery;
+    }
+
+    @Override
+    public Query getParentQuery() {
+        return parentQuery;
     }
 
     @Override
@@ -25,8 +33,14 @@ public abstract class BaseQuery implements Query {
         return params.get(key);
     }
 
-    public Long getLongParameter(String key) {
+    @Override
+    public Object getNestedParameter(String key) {
         Object val = params.get(key);
+        return val != null ? val : parentQuery != null ? parentQuery.getNestedParameter(key) : null;
+    }
+
+    public Long getLongParameter(String key, boolean nested) {
+        Object val = nested ? getNestedParameter(key) : getParameter(key);
         if (val instanceof Number) {
             return ((Number) val).longValue();
         } else if (val instanceof String) {
@@ -36,23 +50,24 @@ public abstract class BaseQuery implements Query {
         }
     }
 
-    public Integer getIntParameter(String key) {
-        Object val = params.get(key);
+    public Integer getIntParameter(String key, boolean nested) {
+        Object val = nested ? getNestedParameter(key) : getParameter(key);
         if (val instanceof Number) {
             return ((Number) val).intValue();
         } else if (val instanceof String) {
-            return Integer.getInteger(val.toString());
+            return Integer.parseInt(val.toString());
         } else {
             return null;
         }
     }
 
-    public String getStringParameter(String key) {
-        return String.valueOf(params.get(key));
+    public String getStringParameter(String key, boolean nested) {
+        Object val =  (nested ? getNestedParameter(key) : getParameter(key));
+        return val != null ? val.toString() : null;
     }
 
-    public TemporalAccessor getTimeParameter(String key) {
-        Object val = params.get(key);
+    public TemporalAccessor getTimeParameter(String key, boolean nested) {
+        Object val = nested ? getNestedParameter(key) : getParameter(key);
         if (val instanceof TemporalAccessor) {
             return (TemporalAccessor) val;
         } else if (val instanceof String) {
@@ -62,19 +77,22 @@ public abstract class BaseQuery implements Query {
         }
     }
 
-    protected void validateParameters(Map<String, Object> params) {
+    void validateParameters() {
         checkParams(params, true);
     }
 
     protected boolean checkParams(Map<String, Object> params, boolean throwOnError) {
-        return checkParamsResult(throwOnError, true, null);
+        if (params == null) {
+            throw new IllegalArgumentException("Params're not defined");
+        }
+        return checkParamsResult(throwOnError, false, null);
     }
 
     public static boolean checkParamsResult(boolean throwOnError, boolean hasError, String msg) {
         if (throwOnError && hasError) {
             throw new IllegalArgumentException(msg);
         }
-        return hasError;
+        return !hasError;
     }
 
 

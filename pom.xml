@@ -68,6 +68,10 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
         <!--RBK libs-->
         <dependency>
             <groupId>com.rbkmoney.dbinit</groupId>
@@ -88,6 +92,11 @@
             <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
             <version>cdbb383</version>
+        </dependency>
+        <!--Test libs-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
 </project>
