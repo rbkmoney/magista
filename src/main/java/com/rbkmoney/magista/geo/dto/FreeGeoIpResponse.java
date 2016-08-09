@@ -1,5 +1,7 @@
 package com.rbkmoney.magista.geo.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Формат ответа сервиса
  * <p>
@@ -19,25 +21,38 @@ package com.rbkmoney.magista.geo.dto;
  */
 public class FreeGeoIpResponse {
 
+    @JsonProperty("ip")
     private String ip;
-    private String country_code;
-    private String country_name;
-    private String region_code;
-    private String region_name;
+
+    @JsonProperty("country_code")
+    private String countryCode;
+
+    @JsonProperty("country_name")
+    private String countryName;
+
+    @JsonProperty("region_code")
+    private String regionCode;
+
+    @JsonProperty("region_name")
+    private String regionName;
+
+    @JsonProperty("city")
     private String city;
-    private String zip_code;
-    private String time_zone;
+
+    @JsonProperty("zip_code")
+    private String zipCode;
+
+    @JsonProperty("time_zone")
+    private String timeZone;
+
+    @JsonProperty("latitude")
     private String latitude;
+
+    @JsonProperty("longitude")
     private String longitude;
-    private String metro_code;
-    public String getLatitude() {
-        return latitude;
-    }
 
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
-
+    @JsonProperty("metro_code")
+    private String metroCode;
 
     public String getIp() {
         return ip;
@@ -47,36 +62,36 @@ public class FreeGeoIpResponse {
         this.ip = ip;
     }
 
-    public String getCountry_code() {
-        return country_code;
+    public String getCountryCode() {
+        return countryCode;
     }
 
-    public void setCountry_code(String country_code) {
-        this.country_code = country_code;
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
     }
 
-    public String getCountry_name() {
-        return country_name;
+    public String getCountryName() {
+        return countryName;
     }
 
-    public void setCountry_name(String country_name) {
-        this.country_name = country_name;
+    public void setCountryName(String countryName) {
+        this.countryName = countryName;
     }
 
-    public String getRegion_code() {
-        return region_code;
+    public String getRegionCode() {
+        return regionCode;
     }
 
-    public void setRegion_code(String region_code) {
-        this.region_code = region_code;
+    public void setRegionCode(String regionCode) {
+        this.regionCode = regionCode;
     }
 
-    public String getRegion_name() {
-        return region_name;
+    public String getRegionName() {
+        return regionName;
     }
 
-    public void setRegion_name(String region_name) {
-        this.region_name = region_name;
+    public void setRegionName(String regionName) {
+        this.regionName = regionName;
     }
 
     public String getCity() {
@@ -87,20 +102,28 @@ public class FreeGeoIpResponse {
         this.city = city;
     }
 
-    public String getZip_code() {
-        return zip_code;
+    public String getZipCode() {
+        return zipCode;
     }
 
-    public void setZip_code(String zip_code) {
-        this.zip_code = zip_code;
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
     }
 
-    public String getTime_zone() {
-        return time_zone;
+    public String getTimeZone() {
+        return timeZone;
     }
 
-    public void setTime_zone(String time_zone) {
-        this.time_zone = time_zone;
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
     }
 
     public String getLongitude() {
@@ -111,11 +134,11 @@ public class FreeGeoIpResponse {
         this.longitude = longitude;
     }
 
-    public String getMetro_code() {
-        return metro_code;
+    public String getMetroCode() {
+        return metroCode;
     }
 
-    public void setMetro_code(String metro_code) {
-        this.metro_code = metro_code;
+    public void setMetroCode(String metroCode) {
+        this.metroCode = metroCode;
     }
 }

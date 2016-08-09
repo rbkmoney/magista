@@ -4,6 +4,7 @@ import com.rbkmoney.magista.geo.dto.FreeGeoIpResponse;
 import com.rbkmoney.magista.provider.GeoProvider;
 import com.rbkmoney.magista.provider.ProviderException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -35,7 +36,7 @@ public class GeoProviderIpm implements GeoProvider {
             FreeGeoIpResponse resp = restTemplate.getForObject(uri, FreeGeoIpResponse.class);
 
             //Default city Moscow
-            if (resp.getCity() == null || resp.getCity().equals("")) {
+            if (!StringUtils.hasText(resp.getCity())) {
                 return "Moscow";
             }
             return resp.getCity();

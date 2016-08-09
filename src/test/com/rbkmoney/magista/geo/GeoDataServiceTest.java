@@ -31,9 +31,8 @@ public class GeoDataServiceTest {
     GeoProvider geoProvider;
 
     @Test
-    //  @Ignore //сервис может не отвечать
     public void getInfoFromService() {
-        try {//2001:470:df50:1065:9034:1741:6551:f71d
+        try {
             String cityName = geoProvider.getCityName("2001:470:df50:1065:9034:1741:6551:f71d");
             assertEquals("Moscow", cityName);
         } catch (ProviderException e) {
