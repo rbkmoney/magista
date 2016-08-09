@@ -1,10 +1,8 @@
-package com.rbkmoney.magista.dsl.impl;
+package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.magista.dsl.CompositeQuery;
-import com.rbkmoney.magista.dsl.Query;
+import com.rbkmoney.magista.query.CompositeQuery;
+import com.rbkmoney.magista.query.Query;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

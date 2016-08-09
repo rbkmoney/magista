@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.dsl;
+package com.rbkmoney.magista.query;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.dsl;
+package com.rbkmoney.magista.query;
 
 /**
  * Created by vpankrashkin on 03.08.16.
@@ -11,5 +11,5 @@ public interface Query {
 
     Object getNestedParameter(String key);
 
-    QueryResult compute(QueryContext context);
+    QueryResult execute(QueryContext context) throws QueryExecutionException;
 }

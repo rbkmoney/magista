@@ -1,6 +1,6 @@
-package com.rbkmoney.magista.dsl.impl;
+package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.magista.dsl.FunctionQuery;
+import com.rbkmoney.magista.query.FunctionQuery;
 
 import java.util.Map;
 

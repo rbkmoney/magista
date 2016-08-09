@@ -1,8 +1,8 @@
-package com.rbkmoney.magista.dsl.impl;
+package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.domain.InvoicePayment;
-import com.rbkmoney.magista.dsl.QueryContext;
-import com.rbkmoney.magista.dsl.QueryResult;
+import com.rbkmoney.magista.query.QueryContext;
+import com.rbkmoney.magista.query.QueryResult;
 import org.springframework.util.StringUtils;
 
 import java.util.Map;
@@ -29,7 +29,7 @@ public class InvoicesFunction extends CursorScopedBaseFunction {
     }
 
     @Override
-    public QueryResult compute(QueryContext context) {
+    public QueryResult execute(QueryContext context) {
         return null;
     }
 

@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.dsl.impl;
+package com.rbkmoney.magista.query.impl;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,8 +9,8 @@ import static org.junit.Assert.*;
 /**
  * Created by vpankrashkin on 09.08.16.
  */
-public class JsonDSLParserTest {
-    JsonDSLParser parser = new JsonDSLParser() {
+public class JsonQueryParserTest {
+    JsonQueryParser parser = new JsonQueryParser() {
         @Override
         protected ObjectMapper getMapper() {
             ObjectMapper mapper = super.getMapper();

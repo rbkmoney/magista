@@ -1,6 +1,6 @@
-package com.rbkmoney.magista.dsl.impl;
+package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.magista.dsl.Query;
+import com.rbkmoney.magista.query.Query;
 import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 
 import java.time.temporal.TemporalAccessor;

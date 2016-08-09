@@ -1,9 +1,8 @@
-package com.rbkmoney.magista.dsl.impl;
+package com.rbkmoney.magista.query.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rbkmoney.magista.dsl.DSLParser;
-import com.rbkmoney.magista.dsl.FunctionQuery;
-import com.rbkmoney.magista.dsl.Query;
+import com.rbkmoney.magista.query.QueryParser;
+import com.rbkmoney.magista.query.Query;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,10 +12,10 @@ import java.util.function.Function;
 /**
  * Created by vpankrashkin on 09.08.16.
  */
-public class JsonDSLParser implements DSLParser<String> {
+public class JsonQueryParser implements QueryParser<String> {
     private final Map<String, Function<Map, BaseFunction>> functions;
 
-    public JsonDSLParser() {
+    public JsonQueryParser() {
         this(new HashMap<String, Function<Map, BaseFunction>>() {
             {
                 this.put(InvoicesFunction.FUNC_NAME, map -> new InvoicesFunction(map));
@@ -25,7 +24,7 @@ public class JsonDSLParser implements DSLParser<String> {
         });
     }
 
-    public JsonDSLParser(Map<String, Function<Map, BaseFunction>> functions) {
+    public JsonQueryParser(Map<String, Function<Map, BaseFunction>> functions) {
         this.functions = new HashMap<>(functions);
     }
 

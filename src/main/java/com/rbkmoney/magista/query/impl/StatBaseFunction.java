@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.dsl.impl;
+package com.rbkmoney.magista.query.impl;
 
 import java.util.Map;
 
