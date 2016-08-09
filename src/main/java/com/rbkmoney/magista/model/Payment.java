@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.model;
 
+import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 
 import java.time.Instant;
@@ -29,7 +30,7 @@ public class Payment {
 
     private String currencyCode;
 
-    private String paymentSystem;
+    private BankCardPaymentSystem paymentSystem;
 
     private String cityName;
 
@@ -117,11 +118,11 @@ public class Payment {
         this.currencyCode = currencyCode;
     }
 
-    public String getPaymentSystem() {
+    public BankCardPaymentSystem getPaymentSystem() {
         return paymentSystem;
     }
 
-    public void setPaymentSystem(String paymentSystem) {
+    public void setPaymentSystem(BankCardPaymentSystem paymentSystem) {
         this.paymentSystem = paymentSystem;
     }
 

@@ -35,13 +35,18 @@ public class InvoiceCreatedHandler implements Handler<StockEvent> {
 
     @Override
     public void handle(StockEvent value) {
+        long eventId = value.getSourceEvent().getProcessingEvent().getId();
         InvoiceCreated invoiceCreated = value.getSourceEvent().getProcessingEvent().getPayload().getInvoiceEvent().getInvoiceCreated();
 
         Invoice invoice = new Invoice();
         invoice.setId(invoiceCreated.getInvoice().getId());
+        invoice.setEventId(eventId);
+        //invoice.setShopId(invoiceCreated.getInvoice().get); WAIT PARTY MANAGEMENT
+        //invoice.setMerchantId(); WAIT PARTY MANAGEMENT
         invoice.setStatus(invoiceCreated.getInvoice().getStatus().getSetField());
         invoice.setCreatedAt(Instant.from(TemporalConverter.stringToTemporal(invoiceCreated.getInvoice().getCreatedAt())));
-
+        invoice.setAmount(invoiceCreated.getInvoice().getCost().getAmount());
+        invoice.setCurrencyCode(invoiceCreated.getInvoice().getCost().getCurrency().getSymbolicCode());
         try {
             repository.save(invoice);
         } catch (DaoException ex) {
