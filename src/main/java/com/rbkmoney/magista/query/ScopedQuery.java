@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.dsl;
+package com.rbkmoney.magista.query;
 
 /**
  * Created by vpankrashkin on 04.08.16.
