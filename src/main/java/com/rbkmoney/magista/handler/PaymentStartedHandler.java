@@ -6,6 +6,7 @@ import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.magista.model.Customer;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
+import com.rbkmoney.magista.provider.GeoProvider;
 import com.rbkmoney.magista.repository.CustomerRepository;
 import com.rbkmoney.magista.repository.InvoiceRepository;
 import com.rbkmoney.magista.repository.PaymentRepository;
@@ -37,6 +38,9 @@ public class PaymentStartedHandler implements Handler<StockEvent> {
     @Autowired
     CustomerRepository customerRepository;
 
+    @Autowired
+    GeoProvider geoProvider;
+
     private Filter filter;
 
     private String path = "source_event.processing_event.payload.invoice_event.invoice_payment_event.payment";
@@ -65,7 +69,8 @@ public class PaymentStartedHandler implements Handler<StockEvent> {
         ClientInfo clientInfo = payer.getClientInfo();
         payment.setCustomerId(clientInfo.getFingerprint());
         payment.setIp(clientInfo.getIpAddress());
-        payment.setCityName("");
+
+        payment.setCityName(geoProvider.getCityName(payment.getIp()));
 
         PaymentTool paymentTool = payer.getPaymentTool();
         payment.setMaskedPan(paymentTool.getBankCard().getMaskedPan());
