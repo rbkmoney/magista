@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.endpoint;
 
-import com.rbkmoney.damsel.event_stock.EventRepositorySrv;
 import com.rbkmoney.damsel.merch_stat.MerchantStatisticsSrv;
 import com.rbkmoney.woody.api.event.CompositeServiceEventListener;
 import com.rbkmoney.woody.thrift.impl.http.THServiceBuilder;
