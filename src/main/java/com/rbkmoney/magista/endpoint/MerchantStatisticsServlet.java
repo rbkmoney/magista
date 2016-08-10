@@ -15,7 +15,7 @@ import java.io.IOException;
  * Created by vpankrashkin on 30.06.16.
  */
 
-//@WebServlet("/stat")
+@WebServlet("/stat")
 public class MerchantStatisticsServlet extends GenericServlet {
 
     private Servlet thriftServlet;
