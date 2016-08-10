@@ -6,9 +6,9 @@ create table mst.invoice (
   merchant_id character varying not null,
   shop_id character varying not null,
   status character varying not null,
-  created_at timestamp not null,
   amount bigint not null,
   currency_code character varying not null,
+  created_at timestamp without time zone not null,
   constraint invoice_pkey primary key (id)
 );
 
@@ -26,7 +26,7 @@ create table mst.payment (
   payment_system character varying not null,
   city_name character varying,
   ip character varying,
-  created_at timestamp not null,
+  created_at timestamp without time zone not null,
   constraint payment_pkey primary key (id)
 );
 
@@ -34,7 +34,7 @@ create table mst.customer (
   id character varying not null,
   shop_id character varying not null,
   merchant_id character varying not null,
-  created_at timestamp,
+  created_at timestamp without time zone,
   constraint customer_pkey primary key (id, shop_id, merchant_id)
 );
 
