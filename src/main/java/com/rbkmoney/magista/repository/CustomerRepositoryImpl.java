@@ -33,7 +33,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
             params.put("shop_id", shopId);
             params.put("merchant_id", merchantId);
             customer = namedParameterJdbcTemplate.queryForObject(
-                    "SELECT id, merchant_id, shop_id, created_at from mst.consumer where id = :id and shop_id = :shop_id and merchant_id = :merchant_id",
+                    "SELECT id, merchant_id, shop_id, created_at from mst.customer where id = :id and shop_id = :shop_id and merchant_id = :merchant_id",
                     params,
                     BeanPropertyRowMapper.newInstance(Customer.class)
             );

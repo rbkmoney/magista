@@ -43,7 +43,7 @@ public class PaymentStartedHandler implements Handler<StockEvent> {
 
     private Filter filter;
 
-    private String path = "source_event.processing_event.payload.invoice_event.invoice_payment_event.payment";
+    private String path = "source_event.processing_event.payload.invoice_event.invoice_payment_event.invoice_payment_started.payment";
 
     public PaymentStartedHandler() {
         filter = new PathConditionFilter(new PathConditionRule(path));

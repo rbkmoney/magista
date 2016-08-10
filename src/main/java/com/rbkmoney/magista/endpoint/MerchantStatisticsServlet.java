@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.endpoint;
 
-import com.rbkmoney.damsel.event_stock.EventRepositorySrv;
 import com.rbkmoney.damsel.merch_stat.MerchantStatisticsSrv;
 import com.rbkmoney.woody.api.event.CompositeServiceEventListener;
 import com.rbkmoney.woody.thrift.impl.http.THServiceBuilder;
@@ -16,7 +15,7 @@ import java.io.IOException;
  * Created by vpankrashkin on 30.06.16.
  */
 
-@WebServlet("/stat")
+//@WebServlet("/stat")
 public class MerchantStatisticsServlet extends GenericServlet {
 
     private Servlet thriftServlet;

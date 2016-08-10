@@ -32,7 +32,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
             Map<String, Object> params = new HashMap<>();
             params.put("id", id);
             invoice = namedParameterJdbcTemplate.queryForObject(
-                    "SELECT id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, currency_code, payment_system, city_name, ip, created_at from mst.payment where id = :id",
+                    "SELECT id, event_id, merchant_id, shop_id, status, amount, currency_code, created_at from mst.invoice where id = :id",
                     params,
                     BeanPropertyRowMapper.newInstance(Invoice.class)
             );
@@ -48,12 +48,12 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("id", invoiceId);
-            params.put("status", status.getFieldName());
+            params.put("status", status.name());
             namedParameterJdbcTemplate.update(
                     "update mst.invoice set status = :status where id = :id",
                     params);
         } catch (NestedRuntimeException ex) {
-            String message = String.format("Failed to change invoice status to '%s', invoice id '%s'", status.getFieldName(), invoiceId);
+            String message = String.format("Failed to change invoice status to '%s', invoice id '%s'", status.name(), invoiceId);
             throw new DaoException(message, ex);
         }
     }
@@ -65,7 +65,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
         params.put("event_id", invoice.getEventId());
         params.put("merchant_id", invoice.getMerchantId());
         params.put("shop_id", invoice.getShopId());
-        params.put("status", invoice.getStatus().getFieldName());
+        params.put("status", invoice.getStatus().name());
         params.put("amount", invoice.getAmount());
         params.put("currency_code", invoice.getCurrencyCode());
         params.put("created_at", Timestamp.from(invoice.getCreatedAt()));
