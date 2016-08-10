@@ -5,6 +5,7 @@ import com.rbkmoney.magista.model.Payment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -34,7 +35,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
             invoice = namedParameterJdbcTemplate.queryForObject(
                     "SELECT id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, currency_code, payment_system, city_name, ip, created_at from mst.payment where id = :id",
                     params,
-                    BeanPropertyRowMapper.newInstance(Payment.class)
+                    getRowMapper()
             );
         } catch (NestedRuntimeException ex) {
             String message = String.format("Failed to find payment by id '%s'", id);
@@ -84,5 +85,9 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         } catch (NestedRuntimeException ex) {
             throw new DaoException("Failed to save payment event", ex);
         }
+    }
+
+    public static RowMapper<Payment> getRowMapper() {
+        return BeanPropertyRowMapper.newInstance(Payment.class);
     }
 }

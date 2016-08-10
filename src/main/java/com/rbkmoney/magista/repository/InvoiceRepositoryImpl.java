@@ -5,6 +5,7 @@ import com.rbkmoney.magista.model.Invoice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -34,7 +35,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
             invoice = namedParameterJdbcTemplate.queryForObject(
                     "SELECT id, event_id, merchant_id, shop_id, status, amount, currency_code, created_at from mst.invoice where id = :id",
                     params,
-                    BeanPropertyRowMapper.newInstance(Invoice.class)
+                    getRowMapper()
             );
         } catch (NestedRuntimeException ex) {
             String message = String.format("Failed to find invoice by id '%s'", id);
@@ -80,5 +81,8 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
         }
     }
 
+    public static RowMapper<Invoice> getRowMapper() {
+        return BeanPropertyRowMapper.newInstance(Invoice.class);
+    }
 
 }
