@@ -49,6 +49,8 @@ public class InvoiceCreatedHandler implements Handler<StockEvent> {
         invoice.setCreatedAt(Instant.from(TemporalConverter.stringToTemporal(invoiceCreated.getInvoice().getCreatedAt())));
         invoice.setAmount(invoiceCreated.getInvoice().getCost().getAmount());
         invoice.setCurrencyCode(invoiceCreated.getInvoice().getCost().getCurrency().getSymbolicCode());
+        invoice.setModel(invoiceCreated.getInvoice());
+
         try {
             invoiceRepository.save(invoice);
         } catch (DaoException ex) {

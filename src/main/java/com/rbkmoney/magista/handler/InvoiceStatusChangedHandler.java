@@ -3,6 +3,7 @@ package com.rbkmoney.magista.handler;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payment_processing.Event;
+import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.repository.DaoException;
 import com.rbkmoney.magista.repository.InvoiceRepository;
 import com.rbkmoney.thrift.filter.Filter;
@@ -38,7 +39,7 @@ public class InvoiceStatusChangedHandler implements Handler<StockEvent> {
         String invoiceId = event.getSource().getInvoice();
         InvoiceStatus status = event.getPayload().getInvoiceEvent().getInvoiceStatusChanged().getStatus();
         try {
-            repository.changeStatus(invoiceId, status.getSetField());
+            repository.changeStatus(invoiceId, status);
         } catch (DaoException ex) {
             log.error("Failed to change invoice status", ex);
         }

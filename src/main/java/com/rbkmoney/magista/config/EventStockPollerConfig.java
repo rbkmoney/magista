@@ -55,10 +55,6 @@ public class EventStockPollerConfig {
 
     public EventFilter eventFilter() {
         EventConstraint.EventIDRange eventIDRange = new EventConstraint.EventIDRange();
-        Long lastEventId = eventRepository.getLastEventId();
-        if (lastEventId != null) {
-            eventIDRange.setFromExclusive(lastEventId);
-        }
         return new EventFlowFilter(new EventConstraint(eventIDRange));
     }
 
