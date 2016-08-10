@@ -4,6 +4,7 @@ import com.rbkmoney.magista.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -33,9 +34,9 @@ public class CustomerRepositoryImpl implements CustomerRepository {
             params.put("shop_id", shopId);
             params.put("merchant_id", merchantId);
             customer = namedParameterJdbcTemplate.queryForObject(
-                    "SELECT id, merchant_id, shop_id, created_at from mst.consumer where id = :id and shop_id = :shop_id and merchant_id = :merchant_id",
+                    "SELECT id, merchant_id, shop_id, created_at from mst.customer where id = :id and shop_id = :shop_id and merchant_id = :merchant_id",
                     params,
-                    BeanPropertyRowMapper.newInstance(Customer.class)
+                    getRowMapper()
             );
         } catch (NestedRuntimeException ex) {
             String message = String.format("Failed to find consumer by fingerprint '%s'", id);
@@ -60,5 +61,9 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         } catch (NestedRuntimeException ex) {
             throw new DaoException("Failed to save customer", ex);
         }
+    }
+
+    public static RowMapper<Customer> getRowMapper() {
+        return BeanPropertyRowMapper.newInstance(Customer.class);
     }
 }

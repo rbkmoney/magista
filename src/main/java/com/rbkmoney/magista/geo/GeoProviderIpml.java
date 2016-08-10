@@ -14,7 +14,7 @@ import javax.annotation.PostConstruct;
  * Created by alexeysemenkov on 08.08.16.
  */
 @Component
-public class GeoProviderIpm implements GeoProvider {
+public class GeoProviderIpml implements GeoProvider {
     private RestTemplate restTemplate;
 
     private final String GEO_API_URL = "http://freegeoip.net/json/";

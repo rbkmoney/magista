@@ -1,8 +1,11 @@
 package com.rbkmoney.magista.repository;
 
+import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.model.Payment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -23,6 +26,38 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
+    @Override
+    public Payment findById(String id) throws DaoException {
+        Payment invoice;
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            invoice = namedParameterJdbcTemplate.queryForObject(
+                    "SELECT id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, currency_code, payment_system, city_name, ip, created_at from mst.payment where id = :id",
+                    params,
+                    getRowMapper()
+            );
+        } catch (NestedRuntimeException ex) {
+            String message = String.format("Failed to find payment by id '%s'", id);
+            throw new DaoException(message, ex);
+        }
+        return invoice;
+    }
+
+    @Override
+    public void changeStatus(String paymentId, InvoicePaymentStatus._Fields status) throws DaoException {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", paymentId);
+            params.put("status", status.name());
+            namedParameterJdbcTemplate.update(
+                    "update mst.payment set status = :status where id = :id",
+                    params);
+        } catch (NestedRuntimeException ex) {
+            String message = String.format("Failed to change payment status to '%s', payment id '%s'", status.name(), paymentId);
+            throw new DaoException(message, ex);
+        }
+    }
 
     @Override
     public void save(Payment payment) throws DaoException {
@@ -34,21 +69,25 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         params.put("shop_id", payment.getShopId());
         params.put("customer_id", payment.getCustomerId());
         params.put("masked_pan", payment.getMaskedPan());
-        params.put("status", payment.getStatus().getFieldName());
+        params.put("status", payment.getStatus().name());
         params.put("amount", payment.getAmount());
         params.put("currency_code", payment.getCurrencyCode());
-        params.put("payment_system", payment.getPaymentSystem());
+        params.put("payment_system", payment.getPaymentSystem().name());
         params.put("city_name", payment.getCityName());
         params.put("ip", payment.getIp());
         params.put("created_at", Timestamp.from(payment.getCreatedAt()));
 
         try {
             namedParameterJdbcTemplate.update(
-                    "insert into magista.payment (id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, currency_code, payment_system, city_name, ip, created_at) " +
+                    "insert into mst.payment (id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, currency_code, payment_system, city_name, ip, created_at) " +
                             "values (:id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :currency_code, :payment_system, :city_name, :ip, :created_at)",
                     params);
         } catch (NestedRuntimeException ex) {
             throw new DaoException("Failed to save payment event", ex);
         }
+    }
+
+    public static RowMapper<Payment> getRowMapper() {
+        return BeanPropertyRowMapper.newInstance(Payment.class);
     }
 }
