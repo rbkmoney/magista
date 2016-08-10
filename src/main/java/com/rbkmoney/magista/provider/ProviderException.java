@@ -3,7 +3,7 @@ package com.rbkmoney.magista.provider;
 /**
  * Created by tolkonepiu on 08.08.16.
  */
-public class ProviderException extends Exception {
+public class ProviderException extends RuntimeException {
 
     public ProviderException() {
         super();
