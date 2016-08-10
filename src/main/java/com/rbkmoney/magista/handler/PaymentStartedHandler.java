@@ -7,7 +7,6 @@ import com.rbkmoney.magista.model.Customer;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.repository.CustomerRepository;
-import com.rbkmoney.magista.repository.DaoException;
 import com.rbkmoney.magista.repository.InvoiceRepository;
 import com.rbkmoney.magista.repository.PaymentRepository;
 import com.rbkmoney.thrift.filter.Filter;
@@ -17,13 +16,14 @@ import com.rbkmoney.thrift.filter.rule.PathConditionRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.function.Consumer;
 
 /**
  * Created by tolkonepiu on 04.08.16.
  */
+@Component
 public class PaymentStartedHandler implements Handler<StockEvent> {
 
     Logger log = LoggerFactory.getLogger(this.getClass());

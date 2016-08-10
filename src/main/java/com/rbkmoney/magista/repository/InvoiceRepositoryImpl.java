@@ -5,10 +5,10 @@ import com.rbkmoney.magista.model.Invoice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,12 +60,21 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
 
     @Override
     public void save(Invoice invoice) throws DaoException {
-        BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(invoice);
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", invoice.getId());
+        params.put("event_id", invoice.getEventId());
+        params.put("merchant_id", invoice.getMerchantId());
+        params.put("shop_id", invoice.getShopId());
+        params.put("status", invoice.getStatus().getFieldName());
+        params.put("amount", invoice.getAmount());
+        params.put("currency_code", invoice.getCurrencyCode());
+        params.put("created_at", Timestamp.from(invoice.getCreatedAt()));
+
         try {
             namedParameterJdbcTemplate.update(
-                    "insert into mst.invoice (id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, currency_code, payment_system, city_name, ip, created_at) " +
-                            "values (:id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :currency_code, :payment_system, :city_name, :ip, :created_at)",
-                    parameterSource);
+                    "insert into mst.invoice (id, event_id, merchant_id, shop_id, status, amount, currency_code, created_at) " +
+                            "values (:id, :event_id, :merchant_id, :shop_id, :status, :amount, :currency_code, :created_at)",
+                    params);
         } catch (NestedRuntimeException ex) {
             throw new DaoException("Failed to save invoice event", ex);
         }

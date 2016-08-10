@@ -11,10 +11,12 @@ import com.rbkmoney.thrift.filter.rule.PathConditionRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by tolkonepiu on 03.08.16.
  */
+@Component
 public class InvoiceStatusChangedHandler implements Handler<StockEvent> {
 
     Logger log = LoggerFactory.getLogger(this.getClass());

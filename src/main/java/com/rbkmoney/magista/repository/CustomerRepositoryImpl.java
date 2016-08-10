@@ -1,14 +1,13 @@
 package com.rbkmoney.magista.repository;
 
 import com.rbkmoney.magista.model.Customer;
-import com.rbkmoney.magista.model.Invoice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,12 +46,17 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public void save(Customer customer) throws DaoException {
-        BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(customer);
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", customer.getId());
+        params.put("merchant_id", customer.getMerchantId());
+        params.put("shop_id", customer.getShopId());
+        params.put("created_at", Timestamp.from(customer.getCreatedAt()));
+
         try {
             namedParameterJdbcTemplate.update(
                     "insert into mst.customer (id, shop_id, merchant_id, created_at) " +
                             "values (:id, :shop_id, :merchant_id, :created_at)",
-                    parameterSource);
+                    params);
         } catch (NestedRuntimeException ex) {
             throw new DaoException("Failed to save customer", ex);
         }

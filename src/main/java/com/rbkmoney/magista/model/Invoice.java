@@ -19,11 +19,11 @@ public class Invoice {
 
     private InvoiceStatus._Fields status;
 
-    private Instant createdAt;
-
     private long amount;
 
     private String currencyCode;
+
+    private Instant createdAt;
 
     public String getId() {
         return id;
@@ -65,14 +65,6 @@ public class Invoice {
         this.status = status;
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public long getAmount() {
         return amount;
     }
@@ -87,6 +79,14 @@ public class Invoice {
 
     public void setCurrencyCode(String currencyCode) {
         this.currencyCode = currencyCode;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
     @Override
