@@ -25,6 +25,8 @@ public class Invoice {
 
     private Instant createdAt;
 
+    private com.rbkmoney.damsel.domain.Invoice model;
+
     public String getId() {
         return id;
     }
@@ -87,6 +89,14 @@ public class Invoice {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public com.rbkmoney.damsel.domain.Invoice getModel() {
+        return model;
+    }
+
+    public void setModel(com.rbkmoney.damsel.domain.Invoice model) {
+        this.model = model;
     }
 
     @Override

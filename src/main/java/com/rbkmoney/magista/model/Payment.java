@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.model;
 
 import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
+import com.rbkmoney.damsel.domain.InvoicePayment;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 
 import java.time.Instant;
@@ -37,6 +38,8 @@ public class Payment {
     private String ip;
 
     private Instant createdAt;
+
+    private InvoicePayment model;
 
     public String getId() {
         return id;
@@ -150,6 +153,14 @@ public class Payment {
         this.createdAt = createdAt;
     }
 
+    public InvoicePayment getModel() {
+        return model;
+    }
+
+    public void setModel(InvoicePayment model) {
+        this.model = model;
+    }
+
     @Override
     public String toString() {
         return "Payment{" +
@@ -163,7 +174,7 @@ public class Payment {
                 ", status=" + status +
                 ", amount=" + amount +
                 ", currencyCode='" + currencyCode + '\'' +
-                ", paymentSystem='" + paymentSystem + '\'' +
+                ", paymentSystem=" + paymentSystem +
                 ", cityName='" + cityName + '\'' +
                 ", ip='" + ip + '\'' +
                 ", createdAt=" + createdAt +
