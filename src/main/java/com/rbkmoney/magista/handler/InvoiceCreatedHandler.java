@@ -24,7 +24,7 @@ public class InvoiceCreatedHandler implements Handler<StockEvent> {
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private String path = "source_event.processing_event.payload.invoice_event.invoice_created";
+    private String path = "source_event.processing_event.payload.invoice_event.invoice_created.invoice";
 
     @Autowired
     private InvoiceRepository invoiceRepository;
