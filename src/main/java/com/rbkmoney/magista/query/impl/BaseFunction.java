@@ -1,6 +1,9 @@
 package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.magista.query.FunctionQuery;
+import com.rbkmoney.magista.query.QueryContext;
+import com.rbkmoney.magista.query.QueryExecutionException;
+import com.rbkmoney.magista.query.QueryResult;
 
 import java.util.Map;
 
@@ -26,4 +29,15 @@ public abstract class BaseFunction extends BaseQuery implements FunctionQuery {
     public String getName() {
         return name;
     }
+
+    @Override
+    public QueryResult execute(QueryContext context) throws QueryExecutionException {
+        if (context instanceof FunctionQueryContext) {
+            return execute((FunctionQueryContext) context);
+        } else {
+            throw new QueryExecutionException("Wrong context type");
+        }
+    }
+
+    protected abstract QueryResult execute(FunctionQueryContext context);
 }

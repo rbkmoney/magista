@@ -22,7 +22,7 @@ public abstract class ScopedBaseFunction extends BaseFunction {
         return getTimeParameter(FROM_TIME_PARAM, false);
     }
 
-    public TemporalAccessor getToTIme() {
+    public TemporalAccessor getToTime() {
         return getTimeParameter(TO_TIME_PARAM, false);
     }
 

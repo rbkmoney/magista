@@ -4,6 +4,8 @@ import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.repository.DaoException;
+import com.rbkmoney.magista.repository.InvoiceRepositoryImpl;
+import com.rbkmoney.magista.repository.PaymentRepositoryImpl;
 import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +48,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             addCondition(head, "id", invoiceId.isPresent());
             addCondition(head, "status", invoiceStatus.isPresent());
             addCondition(head, "created_at", "from_time", ">=", fromTime.isPresent());
-            addCondition(head, "created_at",, "to_time", "<", toTime.isPresent());
+            addCondition(head, "created_at", "to_time", "<", toTime.isPresent());
             return head;
         };
 
@@ -69,7 +71,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("to_time", toTime.orElse(null));
 
         try {
-            List<Invoice> invoices = getNamedParameterJdbcTemplate().query(dataSql, params, );
+            List<Invoice> invoices = getNamedParameterJdbcTemplate().query(dataSql, params, InvoiceRepositoryImpl.getRowMapper());
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
             return new Pair<>(count.intValue(), invoices);
         } catch (NestedRuntimeException e) {
@@ -101,7 +103,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
                 head.append(" masked_pan like :masked_pan ");
             }
             addCondition(head, "created_at", "from_time", ">=", fromTime.isPresent());
-            addCondition(head, "created_at",, "to_time", "<", toTime.isPresent());
+            addCondition(head, "created_at", "to_time", "<", toTime.isPresent());
             return head;
         };
 
@@ -121,12 +123,12 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("invoice_id", invoiceId.orElse(null));
         params.addValue("id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
-        params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("*", "_"));
+        params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
         params.addValue("from_time", fromTime.orElse(null));
         params.addValue("to_time", toTime.orElse(null));
 
         try {
-            List<Payment> payments = getNamedParameterJdbcTemplate().query(dataSql, params, );
+            List<Payment> payments = getNamedParameterJdbcTemplate().query(dataSql, params, PaymentRepositoryImpl.getRowMapper());
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
             return new Pair<>(count.intValue(), payments);
         } catch (NestedRuntimeException e) {

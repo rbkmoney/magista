@@ -45,7 +45,7 @@ public class JsonQueryParserTest {
         assertEquals("A", query.getInvoiceId());
         assertEquals("paid", query.getInvocieStatus());
         assertEquals("2016-03-22T00:12:00Z", TemporalConverter.temporalToString(query.getFromTime()));
-        assertEquals("2016-03-22T01:12:00Z", TemporalConverter.temporalToString(query.getToTIme()));
+        assertEquals("2016-03-22T01:12:00Z", TemporalConverter.temporalToString(query.getToTime()));
         assertEquals((Integer)1, query.getFrom());
         assertEquals(2, query.getSize().intValue());
     }
@@ -60,6 +60,6 @@ public class JsonQueryParserTest {
         assertEquals("B", query.getPaymentId());
         assertEquals("12**12", query.getPanMask());
         assertEquals("2016-03-22T00:12:00Z", TemporalConverter.temporalToString(query.getFromTime()));
-        assertEquals("2016-03-22T01:12:00Z", TemporalConverter.temporalToString(query.getToTIme()));
+        assertEquals("2016-03-22T01:12:00Z", TemporalConverter.temporalToString(query.getToTime()));
     }
 }

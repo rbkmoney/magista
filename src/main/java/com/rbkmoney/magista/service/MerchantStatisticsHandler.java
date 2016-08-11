@@ -27,6 +27,11 @@ public class MerchantStatisticsHandler implements Iface {
     private QueryParser queryParser;
     private QueryContextBuilder contextBuilder;
 
+    public MerchantStatisticsHandler(QueryParser queryParser, QueryContextBuilder contextBuilder) {
+        this.queryParser = queryParser;
+        this.contextBuilder = contextBuilder;
+    }
+
     @Override
     public StatResponse getPayments(StatRequest statRequest) throws InvalidRequest, DatasetTooBig, TException {
         return getStatResponse(statRequest);
