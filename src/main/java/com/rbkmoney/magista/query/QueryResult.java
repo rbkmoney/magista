@@ -5,12 +5,12 @@ import java.util.stream.Stream;
 /**
  * Created by vpankrashkin on 03.08.16.
  */
-public abstract class QueryResult<T, AT> {
-    public abstract int expectedTotalCount();
+public interface QueryResult<T, AT> {
+    int expectedTotalCount();
 
-    public abstract Stream<T> getDataStream();
+    Stream<T> getDataStream();
 
-    public abstract AT getCollectedStream();
+    AT getCollectedStream();
 
 }
 

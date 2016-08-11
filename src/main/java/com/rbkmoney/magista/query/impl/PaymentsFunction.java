@@ -1,10 +1,24 @@
 package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.domain.InvoicePayment;
-import com.rbkmoney.magista.query.QueryContext;
+import com.rbkmoney.damsel.merch_stat.GeoInfo;
+import com.rbkmoney.damsel.merch_stat.StatPayment;
+import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.magista.model.Payment;
+import com.rbkmoney.magista.query.QueryExecutionException;
 import com.rbkmoney.magista.query.QueryResult;
+import com.rbkmoney.magista.repository.DaoException;
+import javafx.util.Pair;
 
+import java.time.Instant;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by vpankrashkin on 03.08.16.
@@ -37,9 +51,38 @@ public class PaymentsFunction extends CursorScopedBaseFunction {
         return getStringParameter(PAN_MASK_PARAM, false);
     }
 
+    private BiFunction<Stream<Payment>, QueryResult, Supplier<StatResponse>> dataCollectorFunction = (st, qr) -> {
+        StatResponseData statResponseData = StatResponseData.payments(st.map(payment -> {
+            StatPayment statPayment = new StatPayment(payment.getInvoiceId(), payment.getModel());
+            GeoInfo geoInfo = new GeoInfo();
+            geoInfo.setCityName(payment.getCityName());
+            statPayment.setGeoInfo(geoInfo);
+            return statPayment;
+        }).collect(Collectors.toList()));
+        StatResponse statResponse = new StatResponse(statResponseData);
+        statResponse.setTotalCount((qr).expectedTotalCount());
+        return () -> statResponse;
+    };
+
     @Override
-    public QueryResult execute(QueryContext context) {
-        return null;
+    public QueryResult execute(FunctionQueryContext context) throws QueryExecutionException {
+        try {
+            Pair<Integer, Collection<Payment>> result = context.getDao().getPayments(
+                    getMerchantId(),
+                    getShopId(),
+                    Optional.ofNullable(getInvoiceId()),
+                    Optional.ofNullable(getPaymentId()),
+                    Optional.ofNullable(getPaymentStats()),
+                    Optional.ofNullable(getPanMask()),
+                    Optional.ofNullable(Instant.from(getFromTime())),
+                    Optional.ofNullable(Instant.from(getToTime())),
+                    Optional.ofNullable(getSize() == null ? null : getSize()),
+                    Optional.ofNullable(getFrom() == null ? null : getFrom())
+                    );
+            return new BaseQueryResult<>(result.getKey(), () -> result.getValue().stream(), dataCollectorFunction);
+        } catch (DaoException e) {
+            throw new QueryExecutionException(e);
+        }
     }
 
     @Override

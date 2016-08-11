@@ -20,6 +20,10 @@ public class JsonQueryParser implements QueryParser<String> {
             {
                 this.put(InvoicesFunction.FUNC_NAME, map -> new InvoicesFunction(map));
                 this.put(PaymentsFunction.FUNC_NAME, map -> new PaymentsFunction(map));
+                this.put(PaymentsTurnoverFunction.FUNC_NAME, map -> new PaymentsTurnoverFunction(map));
+                this.put(PaymentsGeoStatFunction.FUNC_NAME, map -> new PaymentsGeoStatFunction(map));
+                this.put(PaymentsConverstionStatFunction.FUNC_NAME, map -> new PaymentsConverstionStatFunction(map));
+                this.put(CustomersRateStat.FUNC_NAME, map -> new CustomersRateStat(map));
             }
         });
     }
