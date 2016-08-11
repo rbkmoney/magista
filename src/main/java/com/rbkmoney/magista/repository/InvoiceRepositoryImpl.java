@@ -60,14 +60,14 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
 
             Map<String, Object> params = new HashMap<>();
             params.put("id", invoiceId);
-            params.put("status", status.getSetField().name());
+            params.put("status", status.getSetField().getFieldName());
             params.put("model", new TSerializer(new TJSONProtocol.Factory()).toString(model, StandardCharsets.UTF_8.name()));
 
             namedParameterJdbcTemplate.update(
                     "update mst.invoice set status = :status, model = :model where id = :id",
                     params);
         } catch (TException | NestedRuntimeException ex) {
-            String message = String.format("Failed to change invoice status to '%s', invoice id '%s'", status.getSetField().name(), invoiceId);
+            String message = String.format("Failed to change invoice status to '%s', invoice id '%s'", status.getSetField().getFieldName(), invoiceId);
             throw new DaoException(message, ex);
         }
     }
@@ -80,7 +80,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
             params.put("event_id", invoice.getEventId());
             params.put("merchant_id", invoice.getMerchantId());
             params.put("shop_id", invoice.getShopId());
-            params.put("status", invoice.getStatus().name());
+            params.put("status", invoice.getStatus().getFieldName());
             params.put("amount", invoice.getAmount());
             params.put("currency_code", invoice.getCurrencyCode());
             params.put("created_at", Timestamp.from(invoice.getCreatedAt()));
@@ -102,7 +102,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
             invoice.setEventId(rs.getLong("event_id"));
             invoice.setMerchantId(rs.getString("merchant_id"));
             invoice.setShopId(rs.getString("shop_id"));
-            invoice.setStatus(InvoiceStatus._Fields.valueOf(rs.getString("status")));
+            invoice.setStatus(InvoiceStatus._Fields.findByName(rs.getString("status")));
             invoice.setAmount(rs.getLong("amount"));
             invoice.setCurrencyCode(rs.getString("currency_code"));
             invoice.setCreatedAt(rs.getTimestamp("created_at").toInstant());

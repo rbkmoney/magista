@@ -57,8 +57,8 @@ public class MerchantStatisticsHandler implements Iface {
         try {
             Query query = queryParser.parse(statRequest.getDsl());
             QueryContext context = contextBuilder.getQueryContext(query);
-            QueryResult<?, StatResponseData> qResult = query.execute(context);
-            StatResponse statResponse = new StatResponse(qResult.getCollectedStream());
+            QueryResult<?, StatResponse> qResult = query.execute(context);
+            StatResponse statResponse = qResult.getCollectedStream();
             log.debug("Stat response: {}", statRequest);
             return statResponse;
         } catch (Exception e) {

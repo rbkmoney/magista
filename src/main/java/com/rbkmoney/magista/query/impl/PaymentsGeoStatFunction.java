@@ -36,7 +36,7 @@ public class PaymentsGeoStatFunction extends StatBaseFunction {
     @Override
     public QueryResult execute(FunctionQueryContext context) throws QueryExecutionException {
         try {
-            Collection<Map<String, String>> result = context.getDao().getCustomersRateStat(
+            Collection<Map<String, String>> result = context.getDao().getPaymentsGeoStat(
                     getMerchantId(),
                     getShopId(),
                     Instant.from(getFromTime()),
