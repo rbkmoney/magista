@@ -42,7 +42,7 @@ public class InvoicesFunction extends CursorScopedBaseFunction {
     }
 
     private BiFunction<Stream<Invoice>, QueryResult, Supplier<StatResponse>> dataCollectorFunction = (st, qr) -> {
-        StatResponseData statResponseData = StatResponseData.invoices(st.map(invoice -> new StatInvoice(invoice.get)).collect(Collectors.toList()));
+        StatResponseData statResponseData = StatResponseData.invoices(st.map(invoice -> new StatInvoice(invoice.getModel())).collect(Collectors.toList()));
         StatResponse statResponse = new StatResponse(statResponseData);
         statResponse.setTotalCount((qr).expectedTotalCount());
         return () -> statResponse;

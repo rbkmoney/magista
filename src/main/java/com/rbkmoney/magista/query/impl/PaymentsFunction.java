@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,7 +53,7 @@ public class PaymentsFunction extends CursorScopedBaseFunction {
 
     private BiFunction<Stream<Payment>, QueryResult, Supplier<StatResponse>> dataCollectorFunction = (st, qr) -> {
         StatResponseData statResponseData = StatResponseData.payments(st.map(payment -> {
-            StatPayment statPayment = new StatPayment(payment.getInvoiceId(), payment.get);
+            StatPayment statPayment = new StatPayment(payment.getInvoiceId(), payment.getModel());
             GeoInfo geoInfo = new GeoInfo();
             geoInfo.setCityName(payment.getCityName());
             statPayment.setGeoInfo(geoInfo);
@@ -62,7 +61,7 @@ public class PaymentsFunction extends CursorScopedBaseFunction {
         }).collect(Collectors.toList()));
         StatResponse statResponse = new StatResponse(statResponseData);
         statResponse.setTotalCount((qr).expectedTotalCount());
-        return statResponse;
+        return () -> statResponse;
     };
 
     @Override
