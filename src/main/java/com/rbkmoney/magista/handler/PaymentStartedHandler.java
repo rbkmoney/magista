@@ -70,8 +70,9 @@ public class PaymentStartedHandler implements Handler<StockEvent> {
         payment.setCustomerId(clientInfo.getFingerprint());
         payment.setIp(clientInfo.getIpAddress());
 
-        payment.setCityName(geoProvider.getCityName(payment.getIp()));
-
+        if (payment.getIp() != null) {
+            payment.setCityName(geoProvider.getCityName(payment.getIp()));
+        }
         PaymentTool paymentTool = payer.getPaymentTool();
         payment.setMaskedPan(paymentTool.getBankCard().getMaskedPan());
         payment.setPaymentSystem(paymentTool.getBankCard().getPaymentSystem());
@@ -87,7 +88,7 @@ public class PaymentStartedHandler implements Handler<StockEvent> {
 
         paymentRepository.save(payment);
 
-        if (customerRepository.findByIds(payment.getCustomerId(), payment.getShopId(), payment.getMerchantId()) == null) {
+        if (payment.getCustomerId() != null && customerRepository.findByIds(payment.getCustomerId(), payment.getShopId(), payment.getMerchantId()) == null) {
             Customer customer = new Customer();
             customer.setId(payment.getCustomerId());
             customer.setShopId(payment.getShopId());
