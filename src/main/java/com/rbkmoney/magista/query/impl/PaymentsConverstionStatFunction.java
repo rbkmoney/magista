@@ -36,7 +36,7 @@ public class PaymentsConverstionStatFunction extends StatBaseFunction {
     @Override
     public QueryResult execute(FunctionQueryContext context) throws QueryExecutionException {
         try {
-            Collection<Map<String, String>> result = context.getDao().getCustomersRateStat(
+            Collection<Map<String, String>> result = context.getDao().getPaymentsConversionStat(
                     getMerchantId(),
                     getShopId(),
                     Instant.from(getFromTime()),

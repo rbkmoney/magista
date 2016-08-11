@@ -1,19 +1,14 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
-import com.rbkmoney.magista.model.Invoice;
-import com.rbkmoney.magista.query.QueryContext;
 import com.rbkmoney.magista.query.QueryExecutionException;
 import com.rbkmoney.magista.query.QueryResult;
 import com.rbkmoney.magista.repository.DaoException;
-import javafx.util.Pair;
 
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -25,7 +20,7 @@ import java.util.stream.Stream;
 public class CustomersRateStat extends StatBaseFunction {
 
 
-    public static final String FUNC_NAME = "payments_conversion_stat";
+    public static final String FUNC_NAME = "customers_rate_stat";
 
     public CustomersRateStat(Map<String, Object> params) {
         super(params, Map.class, FUNC_NAME);

@@ -60,7 +60,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
             invoicePayment.setStatus(status);
 
             Map<String, Object> params = new HashMap<>();
-            params.put("status", status.getSetField().name());
+            params.put("status", status.getSetField().getFieldName());
             params.put("model", new TSerializer(new TJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()));
             params.put("id", paymentId);
 
@@ -68,7 +68,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
                     "update mst.payment set status = :status, model = :model where id = :id",
                     params);
         } catch (TException | NestedRuntimeException ex) {
-            String message = String.format("Failed to change payment status to '%s', payment id '%s'", status.getSetField().name(), paymentId);
+            String message = String.format("Failed to change payment status to '%s', payment id '%s'", status.getSetField().getFieldName(), paymentId);
             throw new DaoException(message, ex);
         }
     }
@@ -84,7 +84,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
             params.put("shop_id", payment.getShopId());
             params.put("customer_id", payment.getCustomerId());
             params.put("masked_pan", payment.getMaskedPan());
-            params.put("status", payment.getStatus().name());
+            params.put("status", payment.getStatus().getFieldName());
             params.put("amount", payment.getAmount());
             params.put("currency_code", payment.getCurrencyCode());
             params.put("payment_system", payment.getPaymentSystem().name());
@@ -112,7 +112,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
             payment.setShopId(rs.getString("shop_id"));
             payment.setCustomerId(rs.getString("customer_id"));
             payment.setMaskedPan(rs.getString("masked_pan"));
-            payment.setStatus(InvoicePaymentStatus._Fields.valueOf(rs.getString("status")));
+            payment.setStatus(InvoicePaymentStatus._Fields.findByName(rs.getString("status")));
             payment.setAmount(rs.getLong("amount"));
             payment.setCurrencyCode(rs.getString("currency_code"));
             payment.setPaymentSystem(BankCardPaymentSystem.valueOf(rs.getString("payment_system")));

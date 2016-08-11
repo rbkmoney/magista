@@ -68,22 +68,17 @@ public class InvoicesFunction extends CursorScopedBaseFunction {
     }
 
     @Override
-    public QueryResult execute(QueryContext context) {
-        return null;
-    }
-
-    @Override
     protected boolean checkParams(Map<String, Object> params, boolean throwOnError) {
         if (!super.checkParams(params, throwOnError)) {
             return false;
         }
-        if (!StringUtils.hasLength(getStringParameter(INVOICE_ID_PARAM, false))) {
-            checkParamsResult(throwOnError, true, INVOICE_ID_PARAM +" not found");
-        }
-
-        if (!StringUtils.hasLength(getStringParameter(INVOICE_STATUS_PARAM, false))) {
-            checkParamsResult(throwOnError, true, INVOICE_STATUS_PARAM +" not found");
-        }
+//        if (!StringUtils.hasLength(getStringParameter(INVOICE_ID_PARAM, false))) {
+//            checkParamsResult(throwOnError, true, INVOICE_ID_PARAM +" not found");
+//        }
+//
+//        if (!StringUtils.hasLength(getStringParameter(INVOICE_STATUS_PARAM, false))) {
+//            checkParamsResult(throwOnError, true, INVOICE_STATUS_PARAM +" not found");
+//        }
         return true;
     }
 

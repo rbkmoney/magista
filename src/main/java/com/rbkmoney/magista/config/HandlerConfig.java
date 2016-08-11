@@ -1,5 +1,7 @@
 package com.rbkmoney.magista.config;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.damsel.merch_stat.MerchantStatisticsSrv;
 import com.rbkmoney.magista.query.impl.JsonQueryParser;
 import com.rbkmoney.magista.query.impl.QueryContextBuilder;
@@ -16,6 +18,13 @@ public class HandlerConfig {
 
     @Bean
     public MerchantStatisticsSrv.Iface merchantStatisticsHandler(StatisticsDao statisticsDao) {
-        return new MerchantStatisticsHandler(new JsonQueryParser(), new QueryContextBuilder(statisticsDao));
+        return new MerchantStatisticsHandler(new JsonQueryParser() {
+            @Override
+            protected ObjectMapper getMapper() {
+                ObjectMapper mapper = super.getMapper();
+                mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+                return mapper;
+            }
+        }, new QueryContextBuilder(statisticsDao));
     }
 }
