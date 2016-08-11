@@ -11,7 +11,7 @@ public interface InvoiceRepository {
 
     Invoice findById(String id) throws DaoException;
 
-    void changeStatus(String invoiceId, InvoiceStatus._Fields status) throws DaoException;
+    void changeStatus(String invoiceId, InvoiceStatus status) throws DaoException;
 
     void save(Invoice invoice) throws DaoException;
 

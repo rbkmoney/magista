@@ -83,6 +83,7 @@ public class PaymentStartedHandler implements Handler<StockEvent> {
         payment.setCurrencyCode(cost.getCurrency().getSymbolicCode());
 
         payment.setCreatedAt(Instant.from(TemporalConverter.stringToTemporal(invoicePayment.getCreatedAt())));
+        payment.setModel(invoicePayment);
 
         paymentRepository.save(payment);
 
