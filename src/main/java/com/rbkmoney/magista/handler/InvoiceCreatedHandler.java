@@ -43,8 +43,8 @@ public class InvoiceCreatedHandler implements Handler<StockEvent> {
         Invoice invoice = new Invoice();
         invoice.setId(invoiceCreated.getInvoice().getId());
         invoice.setEventId(eventId);
-        invoice.setShopId("123"); //WAIT PARTY MANAGEMENT
-        invoice.setMerchantId("123"); //WAIT PARTY MANAGEMENT
+        invoice.setShopId(invoiceCreated.getInvoice().getShopId());
+        invoice.setMerchantId(invoiceCreated.getInvoice().getOwner().getId());
         invoice.setStatus(invoiceCreated.getInvoice().getStatus().getSetField());
         invoice.setCreatedAt(Instant.from(TemporalConverter.stringToTemporal(invoiceCreated.getInvoice().getCreatedAt())));
         invoice.setAmount(invoiceCreated.getInvoice().getCost().getAmount());
