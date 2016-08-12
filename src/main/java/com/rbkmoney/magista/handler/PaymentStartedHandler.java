@@ -90,7 +90,7 @@ public class PaymentStartedHandler implements Handler<StockEvent> {
 
         paymentRepository.save(payment);
 
-        if (customerRepository.findByIds(payment.getCustomerId(), payment.getShopId(), payment.getMerchantId()) == null) {
+        if (payment.getCustomerId() != null && customerRepository.findByIds(payment.getCustomerId(), payment.getShopId(), payment.getMerchantId()) == null) {
             Customer customer = new Customer();
             customer.setId(payment.getCustomerId());
             customer.setShopId(payment.getShopId());
