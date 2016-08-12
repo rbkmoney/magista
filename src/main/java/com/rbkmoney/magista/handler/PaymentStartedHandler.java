@@ -72,6 +72,8 @@ public class PaymentStartedHandler implements Handler<StockEvent> {
 
         if (payment.getIp() != null) {
             payment.setCityName(geoProvider.getCityName(payment.getIp()));
+        } else {
+            payment.setCityName("UNKNOWN");
         }
         PaymentTool paymentTool = payer.getPaymentTool();
         payment.setMaskedPan(paymentTool.getBankCard().getMaskedPan());
