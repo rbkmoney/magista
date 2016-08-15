@@ -55,7 +55,9 @@ public class JsonQueryParser implements QueryParser<String> {
         if (!(funcParams instanceof Map)) {
             throw new IllegalArgumentException("Query Parameters not found");
         }
-
+        Map funcParamsMap = (Map) funcParams;
+        funcParamsMap.put("size", jsonMap.get("size"));
+        funcParamsMap.put("from", jsonMap.get("from"));
         BaseFunction query = getFunction(funcName, (Map) funcParams);
         if (query == null) {
             throw new IllegalArgumentException("Function not found: "+ funcName);

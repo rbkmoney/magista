@@ -34,7 +34,7 @@
                 <flyway.db.url>${mst.db.url}</flyway.db.url>
                 <flyway.user>${mst.db.user}</flyway.user>
                 <flyway.password>${mst.db.password}</flyway.password>
-                <bm.pooling.url>http://localhost:8080</bm.pooling.url>
+                <bm.pooling.url>http://localhost:8081/repo</bm.pooling.url>
                 <bm.pooling.limit>10</bm.pooling.limit>
             </properties>
         </profile>
@@ -80,10 +80,7 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
+
         <!--RBK libs-->
         <dependency>
             <groupId>com.rbkmoney.dbinit</groupId>
@@ -109,6 +106,10 @@
             <groupId>javafx</groupId>
             <artifactId>jfxrt</artifactId>
             <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <!--Test libs-->
         <dependency>
