@@ -20,11 +20,11 @@ public class JsonQueryParserTest {
     };
     @Test
     public void testParse() throws Exception {
-        String json = "{'query': {'payments_geo_stat': {}}}";
+        String json = "{'query': {'payments_geo_stat1': {}}}";
         try {
             parser.parse(json);
         } catch (Exception e) {
-            assertEquals("No such function", "Function not found: payments_geo_stat", e.getMessage());
+            assertEquals("No such function", "Function not found: payments_geo_stat1", e.getMessage());
         }
         json = "{'query': {'invoices': {}}}";
         try {

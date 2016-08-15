@@ -6,7 +6,7 @@ import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.repository.DaoException;
 import com.rbkmoney.magista.repository.InvoiceRepositoryImpl;
 import com.rbkmoney.magista.repository.PaymentRepositoryImpl;
-import javafx.util.Pair;
+import com.rbkmoney.magista.query.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;

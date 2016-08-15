@@ -9,6 +9,7 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
@@ -24,6 +25,7 @@ import java.util.Map;
  * Created by tolkonepiu on 04.08.16.
  */
 @Repository
+@DependsOn("dbInitializer")
 public class PaymentRepositoryImpl implements PaymentRepository {
 
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;

@@ -2,6 +2,7 @@ package com.rbkmoney.magista.geo;
 
 import com.rbkmoney.magista.provider.GeoProvider;
 import com.rbkmoney.magista.provider.ProviderException;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by alexeysemenkov on 08.08.16.
  */
-
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class GeoDataServiceTest {
