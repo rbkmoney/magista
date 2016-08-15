@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
  * Created by tolkonepiu on 10.08.16.
  */
 @Repository
+@DependsOn("dbInitializer")
 public class EnvetRepositoryImpl implements EventRepository {
 
     private JdbcTemplate jdbcTemplate;

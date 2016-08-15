@@ -2,8 +2,8 @@ package com.rbkmoney.magista.repository.dao;
 
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
+import com.rbkmoney.magista.query.Pair;
 import com.rbkmoney.magista.repository.DaoException;
-import javafx.util.Pair;
 
 import java.time.Instant;
 import java.util.Collection;

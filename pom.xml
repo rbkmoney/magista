@@ -105,6 +105,11 @@
             <artifactId>damsel</artifactId>
             <version>fb43ca0</version>
         </dependency>
+        <dependency>
+            <groupId>javafx</groupId>
+            <artifactId>jfxrt</artifactId>
+            <version>2.0</version>
+        </dependency>
         <!--Test libs-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -112,6 +117,18 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>${project.name}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+
 
 
 </project>

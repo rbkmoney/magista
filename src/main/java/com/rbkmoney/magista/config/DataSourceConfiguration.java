@@ -2,6 +2,8 @@ package com.rbkmoney.magista.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.jooq.Schema;
+import org.jooq.impl.SchemaImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +45,10 @@ public class DataSourceConfiguration {
         dataSource.setMaximumPoolSize(poolSize);
         dataSource.setIdleTimeout(idleTimeoutMs);
         return dataSource;
+    }
+    @Bean
+    public Schema dbSchema() {
+        return new SchemaImpl("mst");
     }
 
 }

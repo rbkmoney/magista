@@ -1,15 +1,14 @@
 package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.domain.InvoicePayment;
-import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.damsel.merch_stat.StatInvoice;
+import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.magista.model.Invoice;
-import com.rbkmoney.magista.model.Payment;
-import com.rbkmoney.magista.query.QueryContext;
+import com.rbkmoney.magista.query.Pair;
 import com.rbkmoney.magista.query.QueryExecutionException;
 import com.rbkmoney.magista.query.QueryResult;
 import com.rbkmoney.magista.repository.DaoException;
-import javafx.util.Pair;
-import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.Collection;
