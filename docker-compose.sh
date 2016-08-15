@@ -8,7 +8,7 @@ services:
       - .:/code
       - $SETTINGSXML_HOST_PATH:$SETTINGSXML_CONT_PATH
     working_dir: /code
-    command: --db.jdbc.url=jdbc:postgresql://mst_db:5432/${SERVICE_NAME} --db.username=postgres --db.password=postgres
+    command: --db.jdbc.url=jdbc:postgresql://mst_db:5432/${SERVICE_NAME} --db.username=postgres --db.password=postgres --bm.pooling.url=http://localhost:8080/repo
     depends_on:
       - mst_db
 
