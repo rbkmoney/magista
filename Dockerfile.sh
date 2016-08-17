@@ -4,7 +4,7 @@ FROM $BASE_IMAGE
 MAINTAINER Vladimir Pankrashkin <v.pankrashikn@rbkmoney.com>
 
 COPY target/$SERVICE_NAME.jar /opt/$SERVICE_NAME/$SERVICE_NAME.jar
-ENTRYPOINT ["java", "-jar", "/opt/$SERVICE_NAME/$SERVICE_NAME.jar"]
+ENTRYPOINT ["java", "-Xmx512m", "-jar", "/opt/$SERVICE_NAME/$SERVICE_NAME.jar"]
 
 LABEL base_image_tag=$BASE_IMAGE_TAG
 LABEL build_image_tag=$BUILD_IMAGE_TAG

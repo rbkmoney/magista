@@ -3,10 +3,10 @@ package com.rbkmoney.magista.repository.dao;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
+import com.rbkmoney.magista.query.Pair;
 import com.rbkmoney.magista.repository.DaoException;
 import com.rbkmoney.magista.repository.InvoiceRepositoryImpl;
 import com.rbkmoney.magista.repository.PaymentRepositoryImpl;
-import com.rbkmoney.magista.query.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -58,7 +58,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         StringBuilder countSb = new StringBuilder("select count(*) from mst.invoice");
 
         dataSb = func.apply(dataSb);
-        addPagination(dataSb, "event_id", limit, offset);
+        addPagination(dataSb, "event_id desc", limit, offset);
 
         countSb = func.apply(countSb);
 
@@ -113,7 +113,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         StringBuilder countSb = new StringBuilder("select count(*) from mst.payment");
 
         dataSb = func.apply(dataSb);
-        addPagination(dataSb, "event_id", limit, offset);
+        addPagination(dataSb, "event_id desc", limit, offset);
 
         countSb = func.apply(countSb);
 
