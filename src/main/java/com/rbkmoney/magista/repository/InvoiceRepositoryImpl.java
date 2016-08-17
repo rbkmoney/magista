@@ -36,6 +36,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
 
     @Override
     public Invoice findById(String id) throws DaoException {
+        //TODO: Возвращать null, если пустой ResultSet
         Invoice invoice;
         try {
             Map<String, Object> params = new HashMap<>();

@@ -4,6 +4,7 @@ import com.rbkmoney.magista.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.NestedRuntimeException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -40,6 +41,8 @@ public class CustomerRepositoryImpl implements CustomerRepository {
                     params,
                     getRowMapper()
             );
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
         } catch (NestedRuntimeException ex) {
             String message = String.format("Failed to find consumer by fingerprint '%s'", id);
             throw new DaoException(message, ex);
