@@ -2,10 +2,9 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
-import com.rbkmoney.magista.query.QueryContext;
 import com.rbkmoney.magista.query.QueryExecutionException;
 import com.rbkmoney.magista.query.QueryResult;
-import com.rbkmoney.magista.repository.DaoException;
+import com.rbkmoney.magista.exception.StorageException;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -44,7 +43,7 @@ public class PaymentsTurnoverFunction extends StatBaseFunction {
                     getSplitInterval()
             );
             return new BaseQueryResult<>(() -> result.stream(), dataCollectorFunction);
-        } catch (DaoException e) {
+        } catch (StorageException e) {
             throw new QueryExecutionException(e);
         }
     }

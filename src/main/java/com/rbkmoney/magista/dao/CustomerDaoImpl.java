@@ -1,39 +1,38 @@
-package com.rbkmoney.magista.repository;
+package com.rbkmoney.magista.dao;
 
+import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Customer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.NestedRuntimeException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by tolkonepiu on 09.08.16.
+ * Created by tolkonepiu on 23.08.16.
  */
-@Repository
-@DependsOn("dbInitializer")
-public class CustomerRepositoryImpl implements CustomerRepository {
+public class CustomerDaoImpl implements CustomerDao {
 
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    public CustomerRepositoryImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    }
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
-    public Customer findByIds(String id, String shopId, String merchantId) throws DaoException {
+    public Customer findByIds(String customerId, String shopId, String merchantId) throws DataAccessException {
         Customer customer;
         try {
             Map<String, Object> params = new HashMap<>();
-            params.put("id", id);
+            params.put("id", customerId);
             params.put("shop_id", shopId);
             params.put("merchant_id", merchantId);
             customer = namedParameterJdbcTemplate.queryForObject(
@@ -44,27 +43,32 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         } catch (EmptyResultDataAccessException ex) {
             return null;
         } catch (NestedRuntimeException ex) {
-            String message = String.format("Failed to find consumer by fingerprint '%s'", id);
-            throw new DaoException(message, ex);
+            throw new DaoException(ex);
         }
         return customer;
     }
 
     @Override
-    public void save(Customer customer) throws DaoException {
+    public void insert(Customer customer) throws DataAccessException {
         Map<String, Object> params = new HashMap<>();
         params.put("id", customer.getId());
         params.put("merchant_id", customer.getMerchantId());
         params.put("shop_id", customer.getShopId());
         params.put("created_at", Timestamp.from(customer.getCreatedAt()));
 
+        String updateSql = "insert into mst.customer (id, shop_id, merchant_id, created_at) " +
+                "values (:id, :shop_id, :merchant_id, :created_at)";
+
         try {
-            namedParameterJdbcTemplate.update(
-                    "insert into mst.customer (id, shop_id, merchant_id, created_at) " +
-                            "values (:id, :shop_id, :merchant_id, :created_at)",
-                    params);
+            log.trace("SQL: {}, Params: {}", updateSql, params);
+            int rowsAffected = namedParameterJdbcTemplate.update(updateSql, params);
+
+            if (rowsAffected != 1) {
+                throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(updateSql, 1, rowsAffected);
+            }
+
         } catch (NestedRuntimeException ex) {
-            throw new DaoException("Failed to save customer", ex);
+            throw new DaoException(ex);
         }
     }
 

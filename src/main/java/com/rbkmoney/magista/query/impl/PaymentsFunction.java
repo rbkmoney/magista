@@ -8,7 +8,7 @@ import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.query.QueryExecutionException;
 import com.rbkmoney.magista.query.QueryResult;
-import com.rbkmoney.magista.repository.DaoException;
+import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.query.Pair;
 
 import java.time.Instant;
@@ -80,7 +80,7 @@ public class PaymentsFunction extends CursorScopedBaseFunction {
                     Optional.ofNullable(getFrom() == null ? null : getFrom())
                     );
             return new BaseQueryResult<>(result.getKey(), () -> result.getValue().stream(), dataCollectorFunction);
-        } catch (DaoException e) {
+        } catch (StorageException e) {
             throw new QueryExecutionException(e);
         }
     }

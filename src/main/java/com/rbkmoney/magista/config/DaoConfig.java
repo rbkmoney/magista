@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.config;
 
-import com.rbkmoney.magista.repository.dao.StatisticsDao;
-import com.rbkmoney.magista.repository.dao.StatisticsDaoImpl;
+import com.rbkmoney.magista.dao.StatisticsDao;
+import com.rbkmoney.magista.dao.StatisticsDaoImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;

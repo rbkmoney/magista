@@ -1,11 +1,11 @@
-package com.rbkmoney.magista.repository.dao;
+package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
-import com.rbkmoney.magista.repository.DaoException;
-import com.rbkmoney.magista.repository.InvoiceRepositoryImpl;
-import com.rbkmoney.magista.repository.PaymentRepositoryImpl;
+import com.rbkmoney.magista.exception.DaoException;
+import com.rbkmoney.magista.dao.InvoiceDaoImpl;
+import com.rbkmoney.magista.dao.PaymentDaoImpl;
 import com.rbkmoney.magista.query.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +14,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
@@ -73,7 +71,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()): null);
 
         try {
-            List<Invoice> invoices = getNamedParameterJdbcTemplate().query(dataSql, params, InvoiceRepositoryImpl.getRowMapper());
+            List<Invoice> invoices = getNamedParameterJdbcTemplate().query(dataSql, params, InvoiceDaoImpl.getRowMapper());
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
             return new Pair<>(count.intValue(), invoices);
         } catch (NestedRuntimeException e) {
@@ -130,7 +128,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()): null);
 
         try {
-            List<Payment> payments = getNamedParameterJdbcTemplate().query(dataSql, params, PaymentRepositoryImpl.getRowMapper());
+            List<Payment> payments = getNamedParameterJdbcTemplate().query(dataSql, params, PaymentDaoImpl.getRowMapper());
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
             return new Pair<>(count.intValue(), payments);
         } catch (NestedRuntimeException e) {

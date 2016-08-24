@@ -3,9 +3,7 @@ package com.rbkmoney.magista.handler;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payment_processing.Event;
-import com.rbkmoney.magista.model.Invoice;
-import com.rbkmoney.magista.repository.DaoException;
-import com.rbkmoney.magista.repository.InvoiceRepository;
+import com.rbkmoney.magista.service.InvoiceService;
 import com.rbkmoney.thrift.filter.Filter;
 import com.rbkmoney.thrift.filter.PathConditionFilter;
 import com.rbkmoney.thrift.filter.rule.PathConditionRule;
@@ -25,7 +23,7 @@ public class InvoiceStatusChangedHandler implements Handler<StockEvent> {
     private String path = "source_event.processing_event.payload.invoice_event.invoice_status_changed.status";
 
     @Autowired
-    private InvoiceRepository repository;
+    private InvoiceService invoiceService;
 
     private Filter filter;
 
@@ -36,13 +34,11 @@ public class InvoiceStatusChangedHandler implements Handler<StockEvent> {
     @Override
     public void handle(StockEvent value) {
         Event event = value.getSourceEvent().getProcessingEvent();
+        long eventId = event.getId();
         String invoiceId = event.getSource().getInvoice();
         InvoiceStatus status = event.getPayload().getInvoiceEvent().getInvoiceStatusChanged().getStatus();
-        try {
-            repository.changeStatus(invoiceId, status);
-        } catch (DaoException ex) {
-            log.error("Failed to change invoice status", ex);
-        }
+
+        invoiceService.changeInvoiceStatus(invoiceId, eventId, status);
     }
 
     @Override

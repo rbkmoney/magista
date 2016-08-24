@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.magista.query.Query;
-import com.rbkmoney.magista.repository.dao.StatisticsDao;
+import com.rbkmoney.magista.dao.StatisticsDao;
 
 /**
  * Created by vpankrashkin on 09.08.16.
