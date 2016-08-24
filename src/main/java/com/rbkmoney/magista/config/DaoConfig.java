@@ -21,19 +21,25 @@ public class DaoConfig {
 
     @Bean
     @DependsOn("dbInitializer")
-    public InvoiceDaoImpl invoiceDao(DataSource ds) {
+    public InvoiceDao invoiceDao(DataSource ds) {
         return new InvoiceDaoImpl(ds);
     }
 
     @Bean
     @DependsOn("dbInitializer")
-    public PaymentDaoImpl paymentDao(DataSource ds) {
+    public PaymentDao paymentDao(DataSource ds) {
         return new PaymentDaoImpl(ds);
     }
 
     @Bean
     @DependsOn("dbInitializer")
-    public CustomerDaoImpl customerDao(DataSource ds) {
+    public CustomerDao customerDao(DataSource ds) {
         return new CustomerDaoImpl(ds);
+    }
+
+    @Bean
+    @DependsOn("dbInitializer")
+    public EventDao eventDao(DataSource ds) {
+        return new EventDaoImpl(ds);
     }
 }

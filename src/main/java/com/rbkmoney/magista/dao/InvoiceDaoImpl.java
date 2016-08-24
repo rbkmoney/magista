@@ -37,7 +37,8 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
 
     @Override
     public Invoice findById(String id) throws DaoException {
-        String sql = "SELECT id, event_id, merchant_id, shop_id, status, amount, currency_code, created_at, model from mst.invoice where id = :id";
+        String sql = "SELECT id, event_id, merchant_id, shop_id, status, amount, currency_code, created_at, model " +
+                "from mst.invoice where id = :id";
 
         Invoice invoice;
 
