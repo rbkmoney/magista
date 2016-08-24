@@ -11,14 +11,14 @@ import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
+import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -28,12 +28,13 @@ import java.util.Map;
 /**
  * Created by tolkonepiu on 23.08.16.
  */
-public class PaymentDaoImpl implements PaymentDao {
+public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements PaymentDao {
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    public PaymentDaoImpl(DataSource ds) {
+        setDataSource(ds);
+    }
 
     @Override
     public Payment findById(String id) throws DaoException {
@@ -46,7 +47,7 @@ public class PaymentDaoImpl implements PaymentDao {
             Map<String, Object> params = new HashMap<>();
             params.put("id", id);
             log.trace("SQL: {}, Params: {}", sql, params);
-            invoice = namedParameterJdbcTemplate.queryForObject(
+            invoice = getNamedParameterJdbcTemplate().queryForObject(
                     sql,
                     params,
                     getRowMapper()
@@ -77,7 +78,7 @@ public class PaymentDaoImpl implements PaymentDao {
     public void execute(String updateSql, SqlParameterSource source) throws DaoException {
         try {
             log.trace("SQL: {}, Params: {}", updateSql, source);
-            int rowsAffected = namedParameterJdbcTemplate.update(updateSql, source);
+            int rowsAffected = getNamedParameterJdbcTemplate().update(updateSql, source);
 
             if (rowsAffected != 1) {
                 throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(updateSql, 1, rowsAffected);

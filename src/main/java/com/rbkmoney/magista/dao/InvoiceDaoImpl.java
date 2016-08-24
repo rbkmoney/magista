@@ -9,15 +9,15 @@ import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
+import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -27,22 +27,26 @@ import java.util.Map;
 /**
  * Created by tolkonepiu on 23.08.16.
  */
-public class InvoiceDaoImpl implements InvoiceDao {
+public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements InvoiceDao {
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    public InvoiceDaoImpl(DataSource ds) {
+        setDataSource(ds);
+    }
 
     @Override
     public Invoice findById(String id) throws DaoException {
+        String sql = "SELECT id, event_id, merchant_id, shop_id, status, amount, currency_code, created_at, model from mst.invoice where id = :id";
+
         Invoice invoice;
 
         Map<String, Object> params = new HashMap<>();
         params.put("id", id);
         try {
-            invoice = namedParameterJdbcTemplate.queryForObject(
-                    "SELECT id, event_id, merchant_id, shop_id, status, amount, currency_code, created_at, model from mst.invoice where id = :id",
+            log.trace("SQL: {}, Params: {}", sql, params);
+            invoice = getNamedParameterJdbcTemplate().queryForObject(
+                    sql,
                     params,
                     getRowMapper()
             );
@@ -76,7 +80,7 @@ public class InvoiceDaoImpl implements InvoiceDao {
     public void execute(String updateSql, SqlParameterSource source) throws DaoException {
         try {
             log.trace("SQL: {}, Params: {}", updateSql, source);
-            int rowsAffected = namedParameterJdbcTemplate.update(updateSql, source);
+            int rowsAffected = getNamedParameterJdbcTemplate().update(updateSql, source);
 
             if (rowsAffected != 1) {
                 throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(updateSql, 1, rowsAffected);
