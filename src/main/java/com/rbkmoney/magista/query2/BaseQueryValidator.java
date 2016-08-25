@@ -1,0 +1,32 @@
+package com.rbkmoney.magista.query2;
+
+/**
+ * Created by vpankrashkin on 23.08.16.
+ */
+public abstract class BaseQueryValidator implements QueryValidator {
+    @Override
+    public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
+        if (parameters == null) {
+            checkParamsResult(true, "Parameters're not defined");
+        }
+    }
+
+    protected <T extends QueryParameters> T checkParamsType(QueryParameters parameters, Class<? extends QueryParameters> expectedType) {
+        if (!expectedType.isAssignableFrom(parameters.getClass())) {
+            checkParamsResult(true, "Parameters has wrong type:"+parameters.getClass() +", expected: "+expectedType);
+        }
+        return (T) parameters;
+    }
+
+    protected void checkParamsResult(boolean hasError, String msg) {
+        if (hasError) {
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void checkParamsResult(boolean hasError, String fieldName, String msg) {
+        if (hasError) {
+            checkParamsResult(hasError, "Validation failed for field:"+fieldName+ ": "+msg);
+        }
+    }
+}
