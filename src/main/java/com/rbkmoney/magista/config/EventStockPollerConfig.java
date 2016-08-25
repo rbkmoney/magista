@@ -6,7 +6,6 @@ import com.rbkmoney.eventstock.client.poll.PollingEventPublisherBuilder;
 import com.rbkmoney.magista.handler.Handler;
 import com.rbkmoney.magista.handler.poller.EventStockErrorHandler;
 import com.rbkmoney.magista.handler.poller.EventStockHandler;
-import com.rbkmoney.magista.repository.EventRepository;
 import com.rbkmoney.magista.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

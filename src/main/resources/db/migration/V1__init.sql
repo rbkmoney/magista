@@ -9,7 +9,9 @@ create table mst.invoice (
   amount bigint not null,
   currency_code character varying not null,
   created_at timestamp without time zone not null,
+  changed_at timestamp without time zone,
   model character varying not null,
+  data jsonb not null,
   constraint invoice_pkey primary key (id)
 );
 
@@ -28,7 +30,9 @@ create table mst.payment (
   city_name character varying,
   ip character varying,
   created_at timestamp without time zone not null,
+  changed_at timestamp without time zone,
   model character varying not null,
+  data jsonb not null,
   constraint payment_pkey primary key (id)
 );
 

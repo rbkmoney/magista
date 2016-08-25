@@ -9,6 +9,8 @@ import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TJSONProtocol;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -22,6 +24,7 @@ import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,8 +63,8 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
 
     @Override
     public void insert(Payment payment) throws DaoException {
-        String updateSql = "insert into mst.payment (id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, currency_code, payment_system, city_name, ip, created_at, model) " +
-                "values (:id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :currency_code, :payment_system, :city_name, :ip, :created_at, :model)";
+        String updateSql = "insert into mst.payment (id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, currency_code, payment_system, city_name, ip, created_at, model, data) " +
+                "values (:id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :currency_code, :payment_system, :city_name, :ip, :created_at, :model, :data)";
         execute(updateSql, createSqlParameterSource(payment));
     }
 
@@ -71,7 +74,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                 "id = :id, event_id = :event_id, invoice_id = :invoice_id, merchant_id = :merchant_id, " +
                 "shop_id = :shop_id, customer_id = :customer_id, masked_pan = :masked_pan, status = :status, " +
                 "amount = :amount, currency_code = :currency_code, payment_system = :payment_system, " +
-                "city_name = :city_name, ip = :ip, created_at = :created_at, model = :model";
+                "city_name = :city_name, ip = :ip, created_at = :created_at, model = :model and data = :data";
         execute(updateSql, createSqlParameterSource(payment));
     }
 
@@ -90,7 +93,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
 
     private SqlParameterSource createSqlParameterSource(Payment payment) {
         try {
-            return new MapSqlParameterSource()
+            MapSqlParameterSource source = new MapSqlParameterSource()
                     .addValue("id", payment.getId())
                     .addValue("event_id", payment.getEventId())
                     .addValue("invoice_id", payment.getInvoiceId())
@@ -106,7 +109,21 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                     .addValue("ip", payment.getIp())
                     .addValue("created_at", Timestamp.from(payment.getCreatedAt()))
                     .addValue("model", new TSerializer(new TJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()));
-        } catch (TException ex) {
+
+            if (payment.getChangedAt() != null) {
+                source.addValue("changed_at", Timestamp.from(payment.getCreatedAt()));
+            } else {
+                source.addValue("changed_at", null, Types.TIMESTAMP);
+            }
+
+            PGobject data = new PGobject();
+            data.setType("json");
+            data.setValue(new TSerializer(new TSimpleJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()));
+            source.addValue("data", data, Types.OTHER);
+
+            return source;
+
+        } catch (SQLException | TException ex) {
             throw new DaoException("Failed to serialize payment model", ex);
         }
     }
@@ -129,6 +146,9 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                 payment.setCityName(rs.getString("city_name"));
                 payment.setIp(rs.getString("ip"));
                 payment.setCreatedAt(rs.getTimestamp("created_at").toInstant());
+                if (rs.getTimestamp("changed_at") != null) {
+                    payment.setCreatedAt(rs.getTimestamp("changed_at").toInstant());
+                }
                 InvoicePayment model = new InvoicePayment();
                 new TDeserializer(new TJSONProtocol.Factory()).deserialize(model, rs.getBytes("model"));
 

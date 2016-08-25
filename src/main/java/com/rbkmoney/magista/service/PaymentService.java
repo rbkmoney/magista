@@ -38,7 +38,7 @@ public class PaymentService {
     CustomerDao customerDao;
 
     @Transactional
-    public void changePaymentStatus(String paymentId, String invoiceId, long eventId, InvoicePaymentStatus status) throws NotFoundException, DataAccessException {
+    public void changePaymentStatus(String paymentId, String invoiceId, long eventId, InvoicePaymentStatus status, Instant changedAt) throws NotFoundException, DataAccessException {
         log.trace("Change payment status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'", paymentId, invoiceId, eventId, status.getSetField().getFieldName());
 
         try {
@@ -48,6 +48,7 @@ public class PaymentService {
             }
 
             payment.setStatus(status.getSetField());
+            payment.setChangedAt(changedAt);
             payment.getModel().setStatus(status);
 
             paymentDao.update(payment);

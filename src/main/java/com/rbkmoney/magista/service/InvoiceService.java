@@ -26,7 +26,7 @@ public class InvoiceService {
     @Autowired
     InvoiceDao invoiceDao;
 
-    public void changeInvoiceStatus(String invoiceId, long eventId, InvoiceStatus status) throws NotFoundException, StorageException {
+    public void changeInvoiceStatus(String invoiceId, long eventId, InvoiceStatus status, Instant changedAt) throws NotFoundException, StorageException {
         log.trace("Change invoice status, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceId, eventId, status.getSetField().getFieldName());
 
         try {
@@ -36,6 +36,7 @@ public class InvoiceService {
             }
 
             invoice.setStatus(status.getSetField());
+            invoice.setChangedAt(changedAt);
             invoice.getModel().setStatus(status);
 
             invoiceDao.update(invoice);

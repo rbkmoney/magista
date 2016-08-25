@@ -6,11 +6,14 @@ import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.magista.service.InvoiceService;
 import com.rbkmoney.thrift.filter.Filter;
 import com.rbkmoney.thrift.filter.PathConditionFilter;
+import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import com.rbkmoney.thrift.filter.rule.PathConditionRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
 
 /**
  * Created by tolkonepiu on 03.08.16.
@@ -36,9 +39,10 @@ public class InvoiceStatusChangedHandler implements Handler<StockEvent> {
         Event event = value.getSourceEvent().getProcessingEvent();
         long eventId = event.getId();
         String invoiceId = event.getSource().getInvoice();
+        Instant changedAt = Instant.from(TemporalConverter.stringToTemporal(event.getCreatedAt()));
         InvoiceStatus status = event.getPayload().getInvoiceEvent().getInvoiceStatusChanged().getStatus();
 
-        invoiceService.changeInvoiceStatus(invoiceId, eventId, status);
+        invoiceService.changeInvoiceStatus(invoiceId, eventId, status, changedAt);
     }
 
     @Override

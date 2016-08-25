@@ -24,9 +24,8 @@ public class EventService {
         try {
             log.trace("Get last event id");
             lastEventId = eventDao.getLastEventId();
-            log.info("Last event id '{}'", lastEventId);
         } catch (DaoException ex) {
-            throw new StorageException("Failed to get last evet id");
+            throw new StorageException("Failed to get last event id");
         }
         return lastEventId;
     }
