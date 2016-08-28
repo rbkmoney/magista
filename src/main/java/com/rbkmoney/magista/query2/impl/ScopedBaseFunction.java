@@ -2,7 +2,6 @@ package com.rbkmoney.magista.query2.impl;
 
 import com.rbkmoney.magista.query2.BaseFunction;
 import com.rbkmoney.magista.query2.BaseQueryValidator;
-import com.rbkmoney.magista.query2.Query;
 import com.rbkmoney.magista.query2.QueryParameters;
 import org.springframework.util.StringUtils;
 
@@ -16,17 +15,19 @@ import static com.rbkmoney.magista.query2.impl.Parameters.SHOP_ID_PARAM;
  */
 public abstract class ScopedBaseFunction extends BaseFunction {
 
-    private final ScopedBaseParameters parameters;
-
-    public ScopedBaseFunction(QueryParameters params, Query parentQuery, String name) {
-        super(params, parentQuery, name);
-        this.parameters = new ScopedBaseParameters(params, extractParameters(parentQuery));
+    public ScopedBaseFunction(Object descriptor, QueryParameters params, String name) {
+        super(descriptor, params, name);
 
     }
 
     @Override
     public ScopedBaseParameters getQueryParameters() {
-        return parameters;
+        return (ScopedBaseParameters) super.getQueryParameters();
+    }
+
+    @Override
+    protected QueryParameters createQueryParameters(QueryParameters parameters, QueryParameters derivedParameters) {
+        return new ScopedBaseParameters(parameters, derivedParameters);
     }
 
     public static class ScopedBaseParameters extends QueryParameters {

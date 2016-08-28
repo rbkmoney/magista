@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.query2.impl;
+package com.rbkmoney.magista.query2.impl.parser;
 
 import com.rbkmoney.magista.query2.QueryParameters;
 import com.rbkmoney.magista.query2.QueryValidator;

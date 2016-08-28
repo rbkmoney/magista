@@ -7,13 +7,8 @@ package com.rbkmoney.magista.query2;
 public abstract class BaseFunction extends BaseQuery implements FunctionQuery {
     private final String name;
 
-    public BaseFunction(QueryParameters params, String name) {
-        super(params);
-        this.name = name;
-    }
-
-    public BaseFunction(QueryParameters params, Query parentQuery, String name) {
-        super(params, parentQuery);
+    public BaseFunction(Object descriptor, QueryParameters params, String name) {
+        super(descriptor, params);
         this.name = name;
     }
 

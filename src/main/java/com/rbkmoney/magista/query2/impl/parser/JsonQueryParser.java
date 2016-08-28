@@ -19,14 +19,14 @@ public class JsonQueryParser implements QueryParser<String> {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final QueryParser<Map<String, Object>> parser;
+    private final QueryParser<Map<String, Object>> queryPartParser;
 
     public JsonQueryParser() {
         this(new QueryParserImpl());
     }
 
-    public JsonQueryParser(QueryParser<Map<String, Object>> parser) {
-        this.parser = parser;
+    public JsonQueryParser(QueryParser<Map<String, Object>> queryPartParser) {
+        this.queryPartParser = queryPartParser;
     }
 
 
@@ -39,17 +39,17 @@ public class JsonQueryParser implements QueryParser<String> {
         try {
             log.info("Received json string request: {}", source);
             Map<String, Object> jsonMap = parseJsonMap(source);
-            return parser.parseQuery(jsonMap, parent);
+            return queryPartParser.parseQuery(jsonMap, parent);
 
         } catch (IOException e) {
-            throw new QueryParserException("Failed to parse received json request", e);
+            throw new QueryParserException("Failed to parse received json request: "+e.getMessage(), e);
         }
     }
 
 
     @Override
     public boolean apply(String source, QueryPart parent) {
-        return false;
+        return true;
     }
 
     protected ObjectMapper getMapper() {

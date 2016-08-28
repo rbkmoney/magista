@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.query2.parser;
+package com.rbkmoney.magista.query2.builder;
 
 /**
  * Created by vpankrashkin on 24.08.16.

@@ -3,6 +3,10 @@ package com.rbkmoney.magista.query2.impl;
 
 import com.rbkmoney.magista.query2.Query;
 import com.rbkmoney.magista.query2.QueryParameters;
+import com.rbkmoney.magista.query2.builder.QueryBuilder;
+import com.rbkmoney.magista.query2.builder.QueryBuilderException;
+import com.rbkmoney.magista.query2.impl.builder.AbstractQueryBuilder;
+import com.rbkmoney.magista.query2.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query2.parser.QueryParserException;
 import com.rbkmoney.magista.query2.parser.QueryPart;
 
@@ -12,25 +16,25 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbkmoney.magista.query2.impl.Parameters.FROM_TIME_PARAM;
-import static com.rbkmoney.magista.query2.impl.Parameters.SPLIT_INTERVAL_PARAM;
-import static com.rbkmoney.magista.query2.impl.Parameters.TO_TIME_PARAM;
+import static com.rbkmoney.magista.query2.impl.Parameters.*;
 
 /**
  * Created by vpankrashkin on 08.08.16.
  */
 public abstract class StatBaseFunction extends ScopedBaseFunction {
 
-    private final StatBaseParameters parameters;
-
-    public StatBaseFunction(QueryParameters params, Query parentQuery, String name) {
-        super(params, parentQuery, name);
-        this.parameters = new StatBaseParameters(params, extractParameters(parentQuery));
+    public StatBaseFunction(Object descriptor, QueryParameters params, String name) {
+        super(descriptor, params, name);
     }
 
     @Override
     public StatBaseParameters getQueryParameters() {
-        return parameters;
+        return (StatBaseParameters) super.getQueryParameters();
+    }
+
+    @Override
+    protected QueryParameters createQueryParameters(QueryParameters parameters, QueryParameters derivedParameters) {
+        return new StatBaseParameters(parameters, derivedParameters);
     }
 
     public static class StatBaseParameters extends ScopedBaseParameters {
@@ -104,5 +108,27 @@ public abstract class StatBaseFunction extends ScopedBaseFunction {
                     && (source.get(funcName) instanceof Map);
         }
     }
+
+    public abstract static class StatBaseBuilder extends AbstractQueryBuilder {
+        private StatBaseValidator validator = new StatBaseValidator();
+
+        @Override
+        public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildAndWrapQueries(getDescriptor(queryParts), queryParts, queryPart -> createQuery(queryPart), getParameters(parentQueryPart));
+            validator.validateQuery(resultQuery);
+            return resultQuery;
+        }
+
+        @Override
+        public boolean apply(List<QueryPart> queryParts, QueryPart parent) {
+            return getMatchedPartsStream(getDescriptor(queryParts), queryParts).findFirst().isPresent();
+        }
+
+        protected abstract Query createQuery(QueryPart queryPart);
+
+        protected abstract Object getDescriptor(List<QueryPart> queryParts);
+
+    }
+
 
 }

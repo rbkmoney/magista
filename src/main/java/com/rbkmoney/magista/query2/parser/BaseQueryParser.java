@@ -19,21 +19,27 @@ public abstract class BaseQueryParser implements QueryParser<Map<String, Object>
 
     @Override
     public List<QueryPart> parseQuery(Map<String, Object> source, QueryPart parent) throws QueryParserException {
-        return source.isEmpty() ? Collections.emptyList() : parsers.stream()
-                .filter(
-                        parser -> parser.apply(source, parent))
-                .flatMap(
-                        parser -> parser.parseQuery(source, parent).stream()
-                )
-                .peek(
-                        queryPart -> queryPart.setChildren(
-                                parseQuery(queryPart.getParameters().getParametersMap(), queryPart)
-                        )
-                )
-                .filter(
-                        queryPart -> !queryPart.isEmpty()
-                )
-                .collect(Collectors.toList());
+        try {
+            return source.isEmpty() ? Collections.emptyList() : parsers.stream()
+                    .filter(
+                            parser -> parser.apply(source, parent))
+                    .flatMap(
+                            parser -> parser.parseQuery(source, parent).stream()
+                    )
+                    .peek(
+                            queryPart -> queryPart.setChildren(
+                                    parseQuery(queryPart.getParameters().getParametersMap(), queryPart)
+                            )
+                    )
+                    .filter(
+                            queryPart -> !queryPart.isEmpty()
+                    )
+                    .collect(Collectors.toList());
+        } catch (QueryParserException e) {
+            throw e;
+        } catch (IllegalArgumentException iae) {
+            throw new QueryParserException(iae.getMessage(), iae);
+        }
     }
 
 }

@@ -1,13 +1,17 @@
 package com.rbkmoney.magista.query2.impl;
 
-import com.rbkmoney.magista.query2.BaseQuery;
-import com.rbkmoney.magista.query2.BaseQueryValidator;
-import com.rbkmoney.magista.query2.QueryParameters;
+import com.rbkmoney.magista.query2.*;
+import com.rbkmoney.magista.query2.builder.QueryBuilder;
+import com.rbkmoney.magista.query2.builder.QueryBuilderException;
+import com.rbkmoney.magista.query2.impl.builder.AbstractQueryBuilder;
+import com.rbkmoney.magista.query2.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query2.parser.QueryParserException;
 import com.rbkmoney.magista.query2.parser.QueryPart;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,8 +21,10 @@ import static com.rbkmoney.magista.query2.impl.Parameters.QUERY_PARAMETER;
  * Created by vpankrashkin on 23.08.16.
  */
 public class RootQuery extends BaseQuery {
-    public RootQuery(QueryParameters params) {
-        super(params);
+    private final Query childQuery;
+    public RootQuery(Object descriptor, QueryParameters params, Query childQuery) {
+        super(descriptor, params);
+        this.childQuery = childQuery;
     }
 
     public static class RootParameters extends QueryParameters {
@@ -51,6 +57,24 @@ public class RootQuery extends BaseQuery {
                 checkParamsResult(true, QUERY_PARAMETER, DEFAULT_ERR_MSG_STRING);
             }
         }
+
+        @Override
+        public void validateQuery(Query query) throws IllegalArgumentException {
+            if (query instanceof RootQuery) {
+                Query childQuery = ((RootQuery) query).childQuery;
+                if (childQuery instanceof CompositeQuery) {
+                    Optional<? extends Collection> childQueries = Optional.ofNullable(((CompositeQuery) childQuery).getChildQueries());
+                    checkParamsResult(
+                            childQueries.isPresent() ? childQueries.get().isEmpty() : true,
+                            "Request must contain at least one query"
+                    );
+                }
+            } else if (query instanceof CompositeQuery){
+                checkParamsResult(true, "Request can't hold more than one query, received count: "+((CompositeQuery) query).getChildQueries().size());
+            } else {
+                assert false : "No other types expected here";
+            }
+        }
     }
 
     public static class RootParser extends AbstractQueryParser {
@@ -74,5 +98,29 @@ public class RootQuery extends BaseQuery {
         public static String getMainDescriptor() {
             return QUERY_PARAMETER;
         }
+    }
+
+    public static class RootBuilder extends AbstractQueryBuilder {
+        private RootValidator validator = new RootValidator();
+
+        @Override
+        public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildAndWrapQueries(RootParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, baseBuilder), getParameters(parentQueryPart));
+            validator.validateQuery(resultQuery);
+            return resultQuery;
+        }
+
+        private RootQuery createQuery(QueryPart queryPart, QueryBuilder baseBuilder) {
+            Query childQuery = baseBuilder.buildQuery(queryPart.getChildren(), queryPart, baseBuilder);
+            RootQuery rootQuery = new RootQuery(queryPart.getDescriptor(), queryPart.getParameters(), childQuery);
+            childQuery.setParentQuery(rootQuery);
+            return rootQuery;
+        }
+
+        @Override
+        public boolean apply(List<QueryPart> queryParts, QueryPart parent) {
+            return getMatchedPartsStream(RootParser.getMainDescriptor(), queryParts).findFirst().isPresent();
+        }
+
     }
 }

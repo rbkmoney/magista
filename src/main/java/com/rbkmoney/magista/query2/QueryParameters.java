@@ -85,6 +85,10 @@ public class QueryParameters {
         }
     }
 
+    public QueryParameters getDerivedParameters() {
+        return derivedParameters;
+    }
+
     public Map<String, Object> getParametersMap() {
         return parameters;
     }
