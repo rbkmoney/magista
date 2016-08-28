@@ -14,28 +14,28 @@ import static com.rbkmoney.magista.query2.impl.Parameters.SHOP_ID_PARAM;
 /**
  * Created by vpankrashkin on 08.08.16.
  */
-public abstract class ScopedFunction extends BaseFunction {
+public abstract class ScopedBaseFunction extends BaseFunction {
 
-    private final ScopedParameters parameters;
+    private final ScopedBaseParameters parameters;
 
-    public ScopedFunction(QueryParameters params, Query parentQuery, String name) {
+    public ScopedBaseFunction(QueryParameters params, Query parentQuery, String name) {
         super(params, parentQuery, name);
-        this.parameters = new ScopedParameters(params, extractParameters(parentQuery));
+        this.parameters = new ScopedBaseParameters(params, extractParameters(parentQuery));
 
     }
 
     @Override
-    public ScopedParameters getQueryParameters() {
+    public ScopedBaseParameters getQueryParameters() {
         return parameters;
     }
 
-    public static class ScopedParameters extends QueryParameters {
+    public static class ScopedBaseParameters extends QueryParameters {
 
-        public ScopedParameters(Map<String, Object> parameters, QueryParameters derivedParameters) {
+        public ScopedBaseParameters(Map<String, Object> parameters, QueryParameters derivedParameters) {
             super(parameters, derivedParameters);
         }
 
-        public ScopedParameters(QueryParameters parameters, QueryParameters derivedParameters) {
+        public ScopedBaseParameters(QueryParameters parameters, QueryParameters derivedParameters) {
             super(parameters, derivedParameters);
         }
 
@@ -49,18 +49,18 @@ public abstract class ScopedFunction extends BaseFunction {
 
     }
 
-    public static class ScopedValidator extends BaseQueryValidator {
+    public static class ScopedBaseValidator extends BaseQueryValidator {
         @Override
         public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
             super.validateParameters(parameters);
-            ScopedParameters scopedParameters = super.checkParamsType(parameters, ScopedParameters.class);
+            ScopedBaseParameters scopedParameters = super.checkParamsType(parameters, ScopedBaseParameters.class);
 
             if (!StringUtils.hasLength(scopedParameters.getMerchantId())) {
-                checkParamsResult(true, MERCHANT_ID_PARAM, RootQuery.RootValidator.DEFAULT_MSG_STRING);
+                checkParamsResult(true, MERCHANT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
             if (!StringUtils.hasLength(scopedParameters.getShopId())) {
-                checkParamsResult(true, SHOP_ID_PARAM,  RootQuery.RootValidator.DEFAULT_MSG_STRING);
+                checkParamsResult(true, SHOP_ID_PARAM,  RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
         }

@@ -11,27 +11,27 @@ import static com.rbkmoney.magista.query2.impl.Parameters.SIZE_PARAMETER;
 /**
  * Created by vpankrashkin on 23.08.16.
  */
-public abstract class PagedDataFunction extends ScopedFunction {
-    private final PagedDataParameters parameters;
+public abstract class PagedBaseFunction extends ScopedBaseFunction {
+    private final PagedBaseParameters parameters;
 
-    public PagedDataFunction(QueryParameters params, Query parentQuery, String name) {
+    public PagedBaseFunction(QueryParameters params, Query parentQuery, String name) {
         super(params, parentQuery, name);
-        this.parameters = new PagedDataParameters(params, extractParameters(parentQuery));
+        this.parameters = new PagedBaseParameters(params, extractParameters(parentQuery));
 
     }
 
     @Override
-    public PagedDataParameters getQueryParameters() {
+    public PagedBaseParameters getQueryParameters() {
         return parameters;
     }
 
-    public static class PagedDataParameters extends ScopedParameters {
+    public static class PagedBaseParameters extends ScopedBaseParameters {
 
-        public PagedDataParameters(Map<String, Object> parameters, QueryParameters derivedParameters) {
+        public PagedBaseParameters(Map<String, Object> parameters, QueryParameters derivedParameters) {
             super(parameters, derivedParameters);
         }
 
-        public PagedDataParameters(QueryParameters parameters, QueryParameters derivedParameters) {
+        public PagedBaseParameters(QueryParameters parameters, QueryParameters derivedParameters) {
             super(parameters, derivedParameters);
         }
 
@@ -45,7 +45,7 @@ public abstract class PagedDataFunction extends ScopedFunction {
 
     }
 
-    public static class PagedDataValidator extends ScopedValidator {
+    public static class PagedBaseValidator extends ScopedBaseValidator {
 
     }
 }

@@ -2,9 +2,7 @@ package com.rbkmoney.magista.query.impl.parser;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rbkmoney.magista.query2.impl.InvoicesFunction;
-import com.rbkmoney.magista.query2.impl.PaymentsFunction;
-import com.rbkmoney.magista.query2.impl.RootQuery;
+import com.rbkmoney.magista.query2.impl.*;
 import com.rbkmoney.magista.query2.impl.parser.JsonQueryParser;
 import com.rbkmoney.magista.query2.parser.QueryParserException;
 import com.rbkmoney.magista.query2.parser.QueryPart;
@@ -13,8 +11,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 /**
  * Created by vpankrashkin on 26.08.16.
@@ -29,6 +26,22 @@ public class JsonQueryParserTest {
             return mapper;
         }
     };
+
+    @Test
+    public void testNoFunctionParse() throws Exception {
+        String json = "{'query': {'payments_geo_stat1': {}}}";
+            List<QueryPart> queryParts = parser.parseQuery(json);
+        assertEquals("root query", 1, queryParts.size());
+        assertEquals("root query has 0 parameter - no recognized function names", 0, queryParts.get(0).getChildren().size());
+
+    }
+
+    @Test(expected = QueryParserException.class)
+    public void testNoQueryParse () {
+        String json = "{'query1': {'invoices': {}}}";
+        List<QueryPart>  queryParts = parser.parseQuery(json);
+        fail("no root query, should not reach this point");
+    }
 
     @Test
     public  void  testPaymentsParse() throws Exception {
@@ -176,6 +189,46 @@ public class JsonQueryParserTest {
         } catch (QueryParserException e) {
             e.printStackTrace();
             throw e;
+        }
+    }
+
+    @Test
+    public  void  testCustomersRateStatParse() throws Exception {
+        String json = "{'query': {'customers_rate_stat': {'merchant_id': '1','shop_id': '2', 'split_interval':'1','from_time': '2016-03-22T00:12:00Z', 'to_time': '2016-03-22T01:00:00Z'}}}";
+        List<QueryPart> queryParts = parser.parseQuery(json);
+        assertEquals("root query", 1, queryParts.size());
+        assertEquals("root query has 1 parameter - function name", 1, queryParts.get(0).getParameters().getParametersMap().size());
+        assertEquals("child payments function", 1, queryParts.get(0).getChildren().size());
+        assertEquals("payments function has no children", 0, queryParts.get(0).getChildren().get(0).getChildren().size());
+        assertEquals("payments function has 5 parameters", 5, queryParts.get(0).getChildren().get(0).getParameters().getParametersMap().size());
+
+        assertEquals(RootQuery.RootParser.getMainDescriptor(), queryParts.get(0).getDescriptor());
+        assertEquals(queryParts.get(0).getChildren().get(0).getDescriptor(), CustomersRateStatFunction.CustomersRateStatParser.getMainDescriptor());
+
+        StatBaseFunction.StatBaseParameters parameters = (StatBaseFunction.StatBaseParameters) queryParts.get(0).getChildren().get(0).getParameters();
+        assertEquals("1", parameters.getMerchantId());
+        assertEquals("2", parameters.getShopId());
+        assertEquals((Integer)1, parameters.getSplitInterval());
+        assertEquals("2016-03-22T00:12:00Z", TemporalConverter.temporalToString(parameters.getFromTime()));
+        assertEquals("2016-03-22T01:00:00Z", TemporalConverter.temporalToString(parameters.getToTime()));
+    }
+
+    @Test
+    public  void  testStatFunctionsMatch() throws Exception {
+        String functionNames[] = {
+                CustomersRateStatFunction.CustomersRateStatParser.getMainDescriptor(),
+                PaymentsConversionStatFunction.PaymentsConversionStatParser.getMainDescriptor(),
+                PaymentsGeoStatFunction.PaymentsGeoStatParser.getMainDescriptor(),
+                PaymentsTurnoverStatFunction.PaymentsTurnoverStatParser.getMainDescriptor()
+
+        };
+        String json =  "{'query': {'%fname%': {'merchant_id': '1','shop_id': '2', 'split_interval':'1','from_time': '2016-03-22T00:12:00Z', 'to_time': '2016-03-22T01:00:00Z'}}}";
+
+        for (String name: functionNames) {
+            List<QueryPart> queryParts = parser.parseQuery(json.replaceAll("%fname%", name));
+            assertEquals(RootQuery.RootParser.getMainDescriptor(), queryParts.get(0).getDescriptor());
+            assertEquals(queryParts.get(0).getChildren().get(0).getDescriptor(), name);
+
         }
     }
 }

@@ -22,5 +22,7 @@ public class Parameters {
     public static final String PAYMENT_STATUS_PARAM = "payment_status";
     public static final String PAN_MASK_PARAM = "pan_mask";
 
+    public static final String SPLIT_INTERVAL_PARAM = "split_interval";
+
 
 }

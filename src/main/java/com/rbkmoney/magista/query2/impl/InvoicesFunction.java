@@ -16,7 +16,7 @@ import static com.rbkmoney.magista.query2.impl.Parameters.*;
 /**
  * Created by vpankrashkin on 03.08.16.
  */
-public class InvoicesFunction extends PagedDataFunction {
+public class InvoicesFunction extends PagedBaseFunction {
 
     public static final String FUNC_NAME = "invoices";
 
@@ -33,7 +33,7 @@ public class InvoicesFunction extends PagedDataFunction {
     }
 
 
-    public static class InvoicesParameters extends PagedDataParameters {
+    public static class InvoicesParameters extends PagedBaseParameters {
 
         public InvoicesParameters(Map<String, Object> parameters, QueryParameters derivedParameters) {
             super(parameters, derivedParameters);
@@ -61,7 +61,7 @@ public class InvoicesFunction extends PagedDataFunction {
 
     }
 
-    public static class InvoicesValidator extends PagedDataValidator {
+    public static class InvoicesValidator extends PagedBaseValidator {
 
         @Override
         public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {

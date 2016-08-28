@@ -41,14 +41,14 @@ public class RootQuery extends BaseQuery {
     }
 
     public static class RootValidator extends BaseQueryValidator {
-        public static final String DEFAULT_MSG_STRING = "invalid or not found";
+        public static final String DEFAULT_ERR_MSG_STRING = "invalid or not found";
 
         @Override
         public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
             super.validateParameters(parameters);
             RootParameters rootParameters = super.checkParamsType(parameters, RootParameters.class);
             if (rootParameters.getQuery() == null) {
-                checkParamsResult(true, QUERY_PARAMETER, DEFAULT_MSG_STRING);
+                checkParamsResult(true, QUERY_PARAMETER, DEFAULT_ERR_MSG_STRING);
             }
         }
     }

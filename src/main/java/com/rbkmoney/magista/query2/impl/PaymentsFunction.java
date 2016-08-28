@@ -16,7 +16,7 @@ import static com.rbkmoney.magista.query2.impl.Parameters.*;
 /**
  * Created by vpankrashkin on 03.08.16.
  */
-public class PaymentsFunction extends PagedDataFunction {
+public class PaymentsFunction extends PagedBaseFunction {
 
     public static final String FUNC_NAME = "payments";
 
@@ -32,7 +32,7 @@ public class PaymentsFunction extends PagedDataFunction {
         return parameters;
     }
 
-    public static class PaymentsParameters extends PagedDataParameters {
+    public static class PaymentsParameters extends PagedBaseParameters {
 
         public PaymentsParameters(Map<String, Object> parameters, QueryParameters derivedParameters) {
             super(parameters, derivedParameters);
@@ -67,7 +67,7 @@ public class PaymentsFunction extends PagedDataFunction {
         }
     }
 
-    public static class PaymentsValidator extends PagedDataValidator {
+    public static class PaymentsValidator extends PagedBaseValidator {
 
         @Override
         public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
@@ -76,7 +76,7 @@ public class PaymentsFunction extends PagedDataFunction {
 
             String val = paymentsParameters.getPanMask();
             if (val != null && !val.matches("[\\d*]+")) {
-                checkParamsResult(true, PAN_MASK_PARAM, RootQuery.RootValidator.DEFAULT_MSG_STRING);
+                checkParamsResult(true, PAN_MASK_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
             validateTimePeriod(paymentsParameters.getFromTime(), paymentsParameters.getToTime());
         }
