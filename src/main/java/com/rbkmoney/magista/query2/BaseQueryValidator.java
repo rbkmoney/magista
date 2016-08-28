@@ -1,5 +1,8 @@
 package com.rbkmoney.magista.query2;
 
+import java.time.Instant;
+import java.time.temporal.TemporalAccessor;
+
 /**
  * Created by vpankrashkin on 23.08.16.
  */
@@ -8,6 +11,16 @@ public abstract class BaseQueryValidator implements QueryValidator {
     public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
         if (parameters == null) {
             checkParamsResult(true, "Parameters're not defined");
+        }
+    }
+
+    protected void validateTimePeriod(TemporalAccessor from, TemporalAccessor to) throws IllegalArgumentException {
+        if (from != null && to != null) {
+            Instant fromInstant = Instant.from(from);
+            Instant toInstant = Instant.from(to);
+            if (fromInstant.compareTo(toInstant) > 0) {
+                checkParamsResult(true, "TimeRange is not valid [from: "+fromInstant+", to: "+toInstant+"]");
+            }
         }
     }
 
@@ -26,7 +39,7 @@ public abstract class BaseQueryValidator implements QueryValidator {
 
     protected void checkParamsResult(boolean hasError, String fieldName, String msg) {
         if (hasError) {
-            checkParamsResult(hasError, "Validation failed for field:"+fieldName+ ": "+msg);
+            checkParamsResult(hasError, "Validation failed for field: "+fieldName+ ": "+msg);
         }
     }
 }

@@ -23,7 +23,7 @@ public abstract class AbstractQueryParser implements QueryParser<Map<String, Obj
             validator.validateParameters(parameters);
             return parameters;
         } catch (IllegalArgumentException e) {
-            throw new QueryParserException(e);
+            throw new QueryParserException(e.getMessage(), e);
         }
     }
 }

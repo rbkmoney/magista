@@ -21,4 +21,6 @@ public class Parameters {
     public static final String PAYMENT_ID_PARAM = "payment_id";
     public static final String PAYMENT_STATUS_PARAM = "payment_status";
     public static final String PAN_MASK_PARAM = "pan_mask";
+
+
 }

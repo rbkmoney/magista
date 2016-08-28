@@ -38,24 +38,32 @@ public class QueryParameters {
         return parametersRef.newInstance(newParameters, derivedParameters);
     }
 
-    public Long getLongParameter(String key, boolean deepSearch) {
+    public Long getLongParameter(String key, boolean deepSearch) throws IllegalArgumentException {
 
         Object val = getParameter(key, deepSearch);
         if (val instanceof Number) {
             return ((Number) val).longValue();
         } else if (val instanceof String) {
-            return Long.getLong(val.toString());
+            try {
+                return Long.parseLong(val.toString());
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Field:"+key +" has incorrect value", e);
+            }
         } else {
             return null;
         }
     }
 
-    public Integer getIntParameter(String key, boolean deepSearch) {
+    public Integer getIntParameter(String key, boolean deepSearch) throws IllegalArgumentException {
         Object val = getParameter(key, deepSearch);
         if (val instanceof Number) {
             return ((Number) val).intValue();
         } else if (val instanceof String) {
-            return Integer.parseInt(val.toString());
+            try {
+                return Integer.parseInt(val.toString());
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Field:"+key +" has incorrect value", e);
+            }
         } else {
             return null;
         }
@@ -66,7 +74,7 @@ public class QueryParameters {
         return val != null ? val.toString() : null;
     }
 
-    public TemporalAccessor getTimeParameter(String key, boolean deepSearch) {
+    public TemporalAccessor getTimeParameter(String key, boolean deepSearch) throws IllegalArgumentException {
         Object val = getParameter(key, deepSearch);
         if (val instanceof TemporalAccessor) {
             return (TemporalAccessor) val;
@@ -79,5 +87,13 @@ public class QueryParameters {
 
     public Map<String, Object> getParametersMap() {
         return parameters;
+    }
+
+    @Override
+    public String toString() {
+        return "QueryParameters{" +
+                "parameters=" + parameters +
+                ", derivedParameters=" + (derivedParameters == null ? "null" : "notnull") +
+                '}';
     }
 }

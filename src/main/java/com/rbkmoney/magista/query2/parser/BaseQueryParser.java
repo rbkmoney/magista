@@ -30,6 +30,9 @@ public abstract class BaseQueryParser implements QueryParser<Map<String, Object>
                                 parseQuery(queryPart.getParameters().getParametersMap(), queryPart)
                         )
                 )
+                .filter(
+                        queryPart -> !queryPart.isEmpty()
+                )
                 .collect(Collectors.toList());
     }
 

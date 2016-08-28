@@ -62,7 +62,7 @@ public class RootQuery extends BaseQuery {
 
             return Stream.of(
                     new QueryPart(getMainDescriptor(), new QueryParameters(parameters.getQuery(), parameters), parent),
-                    new QueryPart(null, parameters.getRestParameters(), parent))
+                    new QueryPart(QueryPart.DEFAULT_DESCRIPTOR, parameters.getRestParameters(), parent))
                     .collect(Collectors.toList());
         }
 

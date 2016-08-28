@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.query2.impl.parser;
 
+import com.rbkmoney.magista.query2.impl.InvoicesFunction;
 import com.rbkmoney.magista.query2.impl.PaymentsFunction;
 import com.rbkmoney.magista.query2.impl.RootQuery;
 import com.rbkmoney.magista.query2.parser.BaseQueryParser;
@@ -19,7 +20,8 @@ public class QueryParserImpl extends BaseQueryParser {
         this(
                 Arrays.asList(
                         new RootQuery.RootParser(),
-                        new PaymentsFunction.PaymentsParser()
+                        new PaymentsFunction.PaymentsParser(),
+                        new InvoicesFunction.InvoicesParser()
                 )
         );
     }

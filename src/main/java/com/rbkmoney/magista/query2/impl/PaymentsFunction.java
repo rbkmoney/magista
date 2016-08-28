@@ -1,11 +1,11 @@
 package com.rbkmoney.magista.query2.impl;
 
-import com.rbkmoney.magista.query2.BaseQueryValidator;
 import com.rbkmoney.magista.query2.Query;
 import com.rbkmoney.magista.query2.QueryParameters;
 import com.rbkmoney.magista.query2.parser.QueryParserException;
 import com.rbkmoney.magista.query2.parser.QueryPart;
 
+import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,6 +33,7 @@ public class PaymentsFunction extends PagedDataFunction {
     }
 
     public static class PaymentsParameters extends PagedDataParameters {
+
         public PaymentsParameters(Map<String, Object> parameters, QueryParameters derivedParameters) {
             super(parameters, derivedParameters);
         }
@@ -49,8 +50,16 @@ public class PaymentsFunction extends PagedDataFunction {
             return getStringParameter(PAYMENT_ID_PARAM, false);
         }
 
-        public String getPaymentStats() {
+        public String getPaymentStatus() {
             return getStringParameter(PAYMENT_STATUS_PARAM, false);
+        }
+
+        public TemporalAccessor getFromTime() {
+            return getTimeParameter(FROM_TIME_PARAM, false);
+        }
+
+        public TemporalAccessor getToTime() {
+            return getTimeParameter(TO_TIME_PARAM, false);
         }
 
         public String getPanMask() {
@@ -58,7 +67,7 @@ public class PaymentsFunction extends PagedDataFunction {
         }
     }
 
-    public static class PaymentsValidator extends BaseQueryValidator {
+    public static class PaymentsValidator extends PagedDataValidator {
 
         @Override
         public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
@@ -69,6 +78,7 @@ public class PaymentsFunction extends PagedDataFunction {
             if (val != null && !val.matches("[\\d*]+")) {
                 checkParamsResult(true, PAN_MASK_PARAM, RootQuery.RootValidator.DEFAULT_MSG_STRING);
             }
+            validateTimePeriod(paymentsParameters.getFromTime(), paymentsParameters.getToTime());
         }
     }
 
@@ -91,6 +101,10 @@ public class PaymentsFunction extends PagedDataFunction {
             return parent != null
                     && RootQuery.RootParser.getMainDescriptor().equals(parent.getDescriptor())
                     && (source.get(FUNC_NAME) instanceof Map);
+        }
+
+        public static String getMainDescriptor() {
+            return FUNC_NAME;
         }
     }
 }

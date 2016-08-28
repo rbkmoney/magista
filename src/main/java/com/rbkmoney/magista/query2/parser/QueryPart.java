@@ -8,6 +8,7 @@ import java.util.List;
  * Created by vpankrashkin on 24.08.16.
  */
 public class QueryPart {
+    public static final Object DEFAULT_DESCRIPTOR = "default_descriptor";
     private final Object descriptor;
     private final QueryParameters parameters;
     private List<QueryPart> children;
@@ -18,7 +19,7 @@ public class QueryPart {
     }
 
     public QueryPart(Object descriptor, QueryParameters parameters, QueryPart parent) {
-        if (parameters == null) {
+        if (descriptor == null || parameters == null) {
             throw new NullPointerException("Null arguments're not allowed");
         }
         this.descriptor = descriptor;
@@ -44,6 +45,10 @@ public class QueryPart {
 
     public QueryPart getParent() {
         return parent;
+    }
+
+    public boolean isEmpty() {
+        return descriptor.equals(DEFAULT_DESCRIPTOR) && parameters.getParametersMap().isEmpty() && (children == null || children.isEmpty());
     }
 
     @Override
