@@ -1,11 +1,11 @@
-package com.rbkmoney.magista.query2.impl;
+package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.magista.query2.QueryParameters;
+import com.rbkmoney.magista.query.QueryParameters;
 
 import java.util.Map;
 
-import static com.rbkmoney.magista.query2.impl.Parameters.FROM_PARAMETER;
-import static com.rbkmoney.magista.query2.impl.Parameters.SIZE_PARAMETER;
+import static com.rbkmoney.magista.query.impl.Parameters.FROM_PARAMETER;
+import static com.rbkmoney.magista.query.impl.Parameters.SIZE_PARAMETER;
 
 /**
  * Created by vpankrashkin on 23.08.16.

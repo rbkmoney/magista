@@ -2,10 +2,9 @@ package com.rbkmoney.magista.query.impl.parser;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rbkmoney.magista.query2.impl.*;
-import com.rbkmoney.magista.query2.impl.parser.JsonQueryParser;
-import com.rbkmoney.magista.query2.parser.QueryParserException;
-import com.rbkmoney.magista.query2.parser.QueryPart;
+import com.rbkmoney.magista.query.impl.*;
+import com.rbkmoney.magista.query.parser.QueryParserException;
+import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.junit.Test;
 

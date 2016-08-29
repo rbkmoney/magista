@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.query2;
+package com.rbkmoney.magista.query;
 
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;

@@ -5,7 +5,7 @@ import com.rbkmoney.damsel.merch_stat.DatasetTooBig;
 import com.rbkmoney.damsel.merch_stat.MerchantStatisticsSrv.Iface;
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.query2.QueryProcessor;
+import com.rbkmoney.magista.query.QueryProcessor;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

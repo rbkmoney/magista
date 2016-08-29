@@ -1,6 +1,6 @@
-package com.rbkmoney.magista.query2.parser;
+package com.rbkmoney.magista.query.parser;
 
-import com.rbkmoney.magista.query2.QueryParameters;
+import com.rbkmoney.magista.query.QueryParameters;
 
 import java.util.List;
 

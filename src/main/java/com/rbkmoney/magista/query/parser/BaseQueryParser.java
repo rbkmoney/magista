@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.query2.parser;
+package com.rbkmoney.magista.query.parser;
 
 import java.util.ArrayList;
 import java.util.Collections;

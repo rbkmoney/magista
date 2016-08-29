@@ -2,13 +2,12 @@ package com.rbkmoney.magista.query.impl.builder;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rbkmoney.magista.query2.Query;
-import com.rbkmoney.magista.query2.builder.QueryBuilder;
-import com.rbkmoney.magista.query2.builder.QueryBuilderException;
-import com.rbkmoney.magista.query2.impl.RootQuery;
-import com.rbkmoney.magista.query2.impl.builder.QueryBuilderImpl;
-import com.rbkmoney.magista.query2.impl.parser.JsonQueryParser;
-import com.rbkmoney.magista.query2.parser.QueryPart;
+import com.rbkmoney.magista.query.Query;
+import com.rbkmoney.magista.query.builder.QueryBuilder;
+import com.rbkmoney.magista.query.builder.QueryBuilderException;
+import com.rbkmoney.magista.query.impl.RootQuery;
+import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
+import com.rbkmoney.magista.query.parser.QueryPart;
 import org.junit.Test;
 
 import java.util.List;

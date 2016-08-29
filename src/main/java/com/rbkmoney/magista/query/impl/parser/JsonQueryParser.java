@@ -1,10 +1,10 @@
-package com.rbkmoney.magista.query2.impl.parser;
+package com.rbkmoney.magista.query.impl.parser;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rbkmoney.magista.query2.parser.QueryParser;
-import com.rbkmoney.magista.query2.parser.QueryParserException;
-import com.rbkmoney.magista.query2.parser.QueryPart;
+import com.rbkmoney.magista.query.parser.QueryParser;
+import com.rbkmoney.magista.query.parser.QueryParserException;
+import com.rbkmoney.magista.query.parser.QueryPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

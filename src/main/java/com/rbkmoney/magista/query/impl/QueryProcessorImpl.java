@@ -1,12 +1,12 @@
-package com.rbkmoney.magista.query2.impl;
+package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.query2.*;
-import com.rbkmoney.magista.query2.builder.QueryBuilder;
-import com.rbkmoney.magista.query2.impl.builder.QueryBuilderImpl;
-import com.rbkmoney.magista.query2.impl.parser.JsonQueryParser;
-import com.rbkmoney.magista.query2.parser.QueryParser;
-import com.rbkmoney.magista.query2.parser.QueryPart;
+import com.rbkmoney.magista.query.*;
+import com.rbkmoney.magista.query.builder.QueryBuilder;
+import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
+import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
+import com.rbkmoney.magista.query.parser.QueryParser;
+import com.rbkmoney.magista.query.parser.QueryPart;
 
 import java.util.List;
 

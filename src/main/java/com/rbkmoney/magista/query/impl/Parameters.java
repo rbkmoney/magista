@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.query2.impl;
+package com.rbkmoney.magista.query.impl;
 
 /**
  * Created by vpankrashkin on 23.08.16.

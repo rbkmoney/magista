@@ -1,6 +1,6 @@
-package com.rbkmoney.magista.query2.builder;
+package com.rbkmoney.magista.query.builder;
 
-import com.rbkmoney.magista.query2.QueryProcessingException;
+import com.rbkmoney.magista.query.QueryProcessingException;
 
 /**
  * Created by vpankrashkin on 24.08.16.

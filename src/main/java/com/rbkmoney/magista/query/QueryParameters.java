@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.query2;
+package com.rbkmoney.magista.query;
 
 import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 

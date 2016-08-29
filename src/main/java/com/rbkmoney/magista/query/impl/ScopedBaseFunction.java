@@ -1,12 +1,12 @@
-package com.rbkmoney.magista.query2.impl;
+package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.magista.query2.*;
+import com.rbkmoney.magista.query.*;
 import org.springframework.util.StringUtils;
 
 import java.util.Map;
 
-import static com.rbkmoney.magista.query2.impl.Parameters.MERCHANT_ID_PARAM;
-import static com.rbkmoney.magista.query2.impl.Parameters.SHOP_ID_PARAM;
+import static com.rbkmoney.magista.query.impl.Parameters.MERCHANT_ID_PARAM;
+import static com.rbkmoney.magista.query.impl.Parameters.SHOP_ID_PARAM;
 
 /**
  * Created by vpankrashkin on 08.08.16.

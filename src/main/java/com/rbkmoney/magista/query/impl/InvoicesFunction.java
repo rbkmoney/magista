@@ -1,17 +1,17 @@
-package com.rbkmoney.magista.query2.impl;
+package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Invoice;
-import com.rbkmoney.magista.query2.*;
-import com.rbkmoney.magista.query2.builder.QueryBuilder;
-import com.rbkmoney.magista.query2.builder.QueryBuilderException;
-import com.rbkmoney.magista.query2.impl.builder.AbstractQueryBuilder;
-import com.rbkmoney.magista.query2.impl.parser.AbstractQueryParser;
-import com.rbkmoney.magista.query2.parser.QueryParserException;
-import com.rbkmoney.magista.query2.parser.QueryPart;
+import com.rbkmoney.magista.query.*;
+import com.rbkmoney.magista.query.builder.QueryBuilder;
+import com.rbkmoney.magista.query.builder.QueryBuilderException;
+import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
+import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
+import com.rbkmoney.magista.query.parser.QueryParserException;
+import com.rbkmoney.magista.query.parser.QueryPart;
 
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbkmoney.magista.query2.impl.Parameters.*;
+import static com.rbkmoney.magista.query.impl.Parameters.*;
 
 /**
  * Created by vpankrashkin on 03.08.16.

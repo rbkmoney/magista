@@ -1,10 +1,10 @@
-package com.rbkmoney.magista.query2.impl.parser;
+package com.rbkmoney.magista.query.impl.parser;
 
-import com.rbkmoney.magista.query2.QueryParameters;
-import com.rbkmoney.magista.query2.QueryValidator;
-import com.rbkmoney.magista.query2.parser.QueryParser;
-import com.rbkmoney.magista.query2.parser.QueryParserException;
-import com.rbkmoney.magista.query2.parser.QueryPart;
+import com.rbkmoney.magista.query.QueryParameters;
+import com.rbkmoney.magista.query.QueryValidator;
+import com.rbkmoney.magista.query.parser.QueryParser;
+import com.rbkmoney.magista.query.parser.QueryParserException;
+import com.rbkmoney.magista.query.parser.QueryPart;
 
 import java.util.Map;
 

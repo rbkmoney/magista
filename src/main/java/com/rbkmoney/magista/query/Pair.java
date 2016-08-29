@@ -1,5 +1,5 @@
 
-package com.rbkmoney.magista.query2;
+package com.rbkmoney.magista.query;
 
 
 public class Pair<K, V> {

@@ -1,6 +1,6 @@
-package com.rbkmoney.magista.query2.parser;
+package com.rbkmoney.magista.query.parser;
 
-import com.rbkmoney.magista.query2.QueryExecutionException;
+import com.rbkmoney.magista.query.QueryExecutionException;
 
 /**
  * Created by vpankrashkin on 24.08.16.

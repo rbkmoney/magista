@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.query2;
+package com.rbkmoney.magista.query;
 
 import java.util.function.Supplier;
 import java.util.stream.Stream;
