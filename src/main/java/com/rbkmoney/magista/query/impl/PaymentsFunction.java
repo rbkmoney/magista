@@ -4,6 +4,7 @@ import com.rbkmoney.damsel.merch_stat.GeoInfo;
 import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.query2.*;
 import com.rbkmoney.magista.query2.builder.QueryBuilder;
@@ -12,7 +13,6 @@ import com.rbkmoney.magista.query2.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query2.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query2.parser.QueryParserException;
 import com.rbkmoney.magista.query2.parser.QueryPart;
-import com.rbkmoney.magista.repository.DaoException;
 
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;

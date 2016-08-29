@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.repository;
+package com.rbkmoney.magista.exception;
 
 /**
  * Created by tolkonepiu on 05.08.16.

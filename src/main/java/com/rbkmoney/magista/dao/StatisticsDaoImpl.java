@@ -1,12 +1,10 @@
-package com.rbkmoney.magista.repository.dao;
+package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
+import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.query2.Pair;
-import com.rbkmoney.magista.repository.DaoException;
-import com.rbkmoney.magista.repository.InvoiceRepositoryImpl;
-import com.rbkmoney.magista.repository.PaymentRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -71,7 +69,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()): null);
 
         try {
-            List<Invoice> invoices = getNamedParameterJdbcTemplate().query(dataSql, params, InvoiceRepositoryImpl.getRowMapper());
+            List<Invoice> invoices = getNamedParameterJdbcTemplate().query(dataSql, params, InvoiceDaoImpl.getRowMapper());
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
             return new Pair<>(count.intValue(), invoices);
         } catch (NestedRuntimeException e) {
@@ -128,7 +126,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()): null);
 
         try {
-            List<Payment> payments = getNamedParameterJdbcTemplate().query(dataSql, params, PaymentRepositoryImpl.getRowMapper());
+            List<Payment> payments = getNamedParameterJdbcTemplate().query(dataSql, params, PaymentDaoImpl.getRowMapper());
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
             return new Pair<>(count.intValue(), payments);
         } catch (NestedRuntimeException e) {

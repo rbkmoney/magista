@@ -46,6 +46,7 @@ public class DataSourceConfiguration {
         dataSource.setIdleTimeout(idleTimeoutMs);
         return dataSource;
     }
+
     @Bean
     public Schema dbSchema() {
         return new SchemaImpl("mst");

@@ -39,6 +39,8 @@ public class Payment {
 
     private Instant createdAt;
 
+    private Instant changedAt;
+
     private InvoicePayment model;
 
     public String getId() {
@@ -153,6 +155,14 @@ public class Payment {
         this.createdAt = createdAt;
     }
 
+    public Instant getChangedAt() {
+        return changedAt;
+    }
+
+    public void setChangedAt(Instant changedAt) {
+        this.changedAt = changedAt;
+    }
+
     public InvoicePayment getModel() {
         return model;
     }
@@ -178,6 +188,7 @@ public class Payment {
                 ", cityName='" + cityName + '\'' +
                 ", ip='" + ip + '\'' +
                 ", createdAt=" + createdAt +
+                ", changedAt=" + changedAt +
                 '}';
     }
 }

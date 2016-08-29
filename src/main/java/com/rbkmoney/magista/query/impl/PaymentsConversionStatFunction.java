@@ -4,7 +4,7 @@ import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.magista.query2.*;
 import com.rbkmoney.magista.query2.parser.QueryPart;
-import com.rbkmoney.magista.repository.DaoException;
+import com.rbkmoney.magista.exception.DaoException;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -15,18 +15,18 @@ import java.util.stream.Collectors;
 /**
  * Created by vpankrashkin on 09.08.16.
  */
-public class PaymentsTurnoverStatFunction extends StatBaseFunction {
+public class PaymentsConversionStatFunction extends StatBaseFunction {
 
-    public static final String FUNC_NAME = "payments_turnover";
+    public static final String FUNC_NAME = "payments_conversion_stat";
 
-    private PaymentsTurnoverStatFunction(Object descriptor, QueryParameters params) {
+    private PaymentsConversionStatFunction(Object descriptor, QueryParameters params) {
         super(descriptor, params, FUNC_NAME);
     }
 
     @Override
     public QueryResult<Map<String, String>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
         try {
-            Collection<Map<String, String>> result = getContext(context).getDao().getPaymentsTurnoverStat(
+            Collection<Map<String, String>> result = getContext(context).getDao().getPaymentsConversionStat(
                     getQueryParameters().getMerchantId(),
                     getQueryParameters().getShopId(),
                     Instant.from(getQueryParameters().getFromTime()),
@@ -39,9 +39,9 @@ public class PaymentsTurnoverStatFunction extends StatBaseFunction {
         }
     }
 
-    public static class PaymentsTurnoverStatParser extends StatBaseParser {
+    public static class PaymentsConversionStatParser extends StatBaseParser {
 
-        public PaymentsTurnoverStatParser() {
+        public PaymentsConversionStatParser() {
             super(FUNC_NAME);
         }
 
@@ -50,16 +50,16 @@ public class PaymentsTurnoverStatFunction extends StatBaseFunction {
         }
     }
 
-    public static class PaymentsTurnoverStatBuilder extends StatBaseBuilder {
+    public static class PaymentsConversionStatBuilder extends StatBaseBuilder {
 
         @Override
         protected Query createQuery(QueryPart queryPart) {
-            return new PaymentsTurnoverStatFunction(queryPart.getDescriptor(), queryPart.getParameters());
+            return new PaymentsConversionStatFunction(queryPart.getDescriptor(), queryPart.getParameters());
         }
 
         @Override
         protected Object getDescriptor(List<QueryPart> queryParts) {
-            return PaymentsTurnoverStatParser.getMainDescriptor();
+            return PaymentsConversionStatParser.getMainDescriptor();
         }
     }
 
