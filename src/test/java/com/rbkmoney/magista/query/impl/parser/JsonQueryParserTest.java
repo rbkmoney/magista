@@ -17,14 +17,7 @@ import static org.junit.Assert.*;
  */
 public class JsonQueryParserTest {
 
-    JsonQueryParser parser = new JsonQueryParser() {
-        @Override
-        protected ObjectMapper getMapper() {
-            ObjectMapper mapper = super.getMapper();
-            mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-            return mapper;
-        }
-    };
+    JsonQueryParser parser = JsonQueryParser.newWeakJsonQueryParser();
 
     @Test
     public void testNoFunctionParse() throws Exception {

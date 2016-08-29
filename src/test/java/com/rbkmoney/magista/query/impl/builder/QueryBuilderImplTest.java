@@ -19,14 +19,8 @@ import static org.junit.Assert.fail;
  * Created by vpankrashkin on 28.08.16.
  */
 public class QueryBuilderImplTest {
-    JsonQueryParser parser = new JsonQueryParser() {
-        @Override
-        protected ObjectMapper getMapper() {
-            ObjectMapper mapper = super.getMapper();
-            mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-            return mapper;
-        }
-    };
+    JsonQueryParser parser = JsonQueryParser.newWeakJsonQueryParser();
+
     private QueryBuilder builder = new QueryBuilderImpl();
 
     @Test

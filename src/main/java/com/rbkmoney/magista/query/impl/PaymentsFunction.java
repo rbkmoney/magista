@@ -212,7 +212,7 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
             FunctionQueryContext functionContext = getContext(context);
             PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Pair<Integer, Collection<Payment>> result = functionContext.getDao().getPayments(
+                Collection<Payment> result = functionContext.getDao().getPayments(
                         parameters.getMerchantId(),
                         parameters.getShopId(),
                         Optional.ofNullable(parameters.getInvoiceId()),
@@ -224,7 +224,7 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
                         Optional.ofNullable(parameters.getSize()),
                         Optional.ofNullable(parameters.getFrom())
                 );
-                return new BaseQueryResult<>(() -> result.getValue().stream(), () -> result.getValue());
+                return new BaseQueryResult<>(() -> result.stream(), () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }
@@ -243,7 +243,7 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
             FunctionQueryContext functionContext = getContext(context);
             PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Pair<Integer, Collection<Payment>> result = functionContext.getDao().getPayments(
+                Integer result = functionContext.getDao().getPaymentsCount(
                         parameters.getMerchantId(),
                         parameters.getShopId(),
                         Optional.ofNullable(parameters.getInvoiceId()),
@@ -255,7 +255,7 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
                         Optional.ofNullable(parameters.getSize()),
                         Optional.ofNullable(parameters.getFrom())
                 );
-                return new BaseQueryResult<>(() -> Stream.of(result.getKey()), () -> result.getKey());
+                return new BaseQueryResult<>(() -> Stream.of(result), () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }

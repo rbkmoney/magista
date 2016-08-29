@@ -14,7 +14,7 @@ import java.util.Optional;
  * Created by vpankrashkin on 10.08.16.
  */
 public interface StatisticsDao {
-    Pair<Integer, Collection<Invoice>> getInvoices(
+    Collection<Invoice> getInvoices(
             String merchantId,
             String shopId,
             Optional<String> invoiceId,
@@ -24,7 +24,30 @@ public interface StatisticsDao {
             Optional<Integer> limit,
             Optional<Integer> offset
     ) throws DaoException;
-    Pair<Integer, Collection<Payment>> getPayments(
+
+    int getInvoicesCount(String merchantId,
+                         String shopId,
+                         Optional<String> invoiceId,
+                         Optional<String> invoiceStatus,
+                         Optional<Instant> fromTime,
+                         Optional<Instant> toTime,
+                         Optional<Integer> limit,
+                         Optional<Integer> offset) throws DaoException;
+
+    Collection<Payment> getPayments(
+            String merchantId,
+            String shopId,
+            Optional<String> invoiceId,
+            Optional<String> paymentId,
+            Optional<String> paymentStatus,
+            Optional<String> panMask,
+            Optional<Instant> fromTime,
+            Optional<Instant> toTime,
+            Optional<Integer> limit,
+            Optional<Integer> offset
+    ) throws DaoException;
+
+    Integer getPaymentsCount(
             String merchantId,
             String shopId,
             Optional<String> invoiceId,

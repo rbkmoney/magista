@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.query.impl.parser;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.magista.query.parser.QueryParser;
@@ -20,6 +21,17 @@ public class JsonQueryParser implements QueryParser<String> {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final QueryParser<Map<String, Object>> queryPartParser;
+
+    public static JsonQueryParser newWeakJsonQueryParser() {
+       return new JsonQueryParser() {
+            @Override
+            protected ObjectMapper getMapper() {
+                ObjectMapper mapper = super.getMapper();
+                mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+                return mapper;
+            }
+        };
+    }
 
     public JsonQueryParser() {
         this(new QueryParserImpl());
