@@ -94,7 +94,10 @@ public class PaymentService {
             payment.setAmount(cost.getAmount());
             payment.setCurrencyCode(cost.getCurrency().getSymbolicCode());
 
-            payment.setCreatedAt(Instant.from(TemporalConverter.stringToTemporal(invoicePayment.getCreatedAt())));
+            Instant createdAt = Instant.from(TemporalConverter.stringToTemporal(invoicePayment.getCreatedAt()));
+            payment.setCreatedAt(createdAt);
+            payment.setChangedAt(createdAt);
+
             payment.setModel(invoicePayment);
 
             if (payment.getCustomerId() != null && customerDao.findByIds(payment.getCustomerId(), payment.getShopId(), payment.getMerchantId()) == null) {
