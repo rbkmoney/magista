@@ -6,15 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 import javax.sql.DataSource;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by tolkonepiu on 23.08.16.
@@ -30,14 +28,17 @@ public class CustomerDaoImpl extends NamedParameterJdbcDaoSupport implements Cus
     @Override
     public Customer findByIds(String customerId, String shopId, String merchantId) throws DaoException {
         Customer customer;
+        MapSqlParameterSource source = new MapSqlParameterSource()
+                .addValue("id", customerId)
+                .addValue("shop_id", shopId)
+                .addValue("merchant_id", merchantId);
+
+        String sql = "SELECT id, merchant_id, shop_id, created_at from mst.customer where id = :id and shop_id = :shop_id and merchant_id = :merchant_id";
+        log.trace("SQL: {}, Params: {}", sql, source.getValues());
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("id", customerId);
-            params.put("shop_id", shopId);
-            params.put("merchant_id", merchantId);
             customer = getNamedParameterJdbcTemplate().queryForObject(
-                    "SELECT id, merchant_id, shop_id, created_at from mst.customer where id = :id and shop_id = :shop_id and merchant_id = :merchant_id",
-                    params,
+                    sql,
+                    source,
                     getRowMapper()
             );
         } catch (EmptyResultDataAccessException ex) {
@@ -50,22 +51,18 @@ public class CustomerDaoImpl extends NamedParameterJdbcDaoSupport implements Cus
 
     @Override
     public void insert(Customer customer) throws DaoException {
-        Map<String, Object> params = new HashMap<>();
-        params.put("id", customer.getId());
-        params.put("merchant_id", customer.getMerchantId());
-        params.put("shop_id", customer.getShopId());
-        params.put("created_at", Timestamp.from(customer.getCreatedAt()));
+        MapSqlParameterSource source = new MapSqlParameterSource()
+                .addValue("id", customer.getId())
+                .addValue("merchant_id", customer.getMerchantId())
+                .addValue("shop_id", customer.getShopId())
+                .addValue("created_at", Timestamp.from(customer.getCreatedAt()));
 
         String updateSql = "insert into mst.customer (id, shop_id, merchant_id, created_at) " +
                 "values (:id, :shop_id, :merchant_id, :created_at)";
 
         try {
-            log.trace("SQL: {}, Params: {}", updateSql, params);
-            int rowsAffected = getNamedParameterJdbcTemplate().update(updateSql, params);
-
-            if (rowsAffected != 1) {
-                throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(updateSql, 1, rowsAffected);
-            }
+            log.trace("SQL: {}, Params: {}", updateSql, source.getValues());
+            getNamedParameterJdbcTemplate().update(updateSql, source);
 
         } catch (NestedRuntimeException ex) {
             throw new DaoException(ex);
