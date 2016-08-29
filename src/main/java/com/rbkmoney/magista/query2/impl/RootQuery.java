@@ -22,9 +22,14 @@ import static com.rbkmoney.magista.query2.impl.Parameters.QUERY_PARAMETER;
  */
 public class RootQuery extends BaseQuery {
     private final Query childQuery;
-    public RootQuery(Object descriptor, QueryParameters params, Query childQuery) {
+    private RootQuery(Object descriptor, QueryParameters params, Query childQuery) {
         super(descriptor, params);
         this.childQuery = childQuery;
+    }
+
+    @Override
+    public QueryResult execute(QueryContext context) throws QueryExecutionException {
+        return childQuery.execute(context);
     }
 
     public static class RootParameters extends QueryParameters {
@@ -105,7 +110,7 @@ public class RootQuery extends BaseQuery {
 
         @Override
         public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildAndWrapQueries(RootParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, baseBuilder), getParameters(parentQueryPart));
+            Query resultQuery = buildSingleQuery(RootParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, baseBuilder));
             validator.validateQuery(resultQuery);
             return resultQuery;
         }

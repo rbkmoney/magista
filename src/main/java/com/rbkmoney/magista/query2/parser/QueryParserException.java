@@ -1,9 +1,11 @@
 package com.rbkmoney.magista.query2.parser;
 
+import com.rbkmoney.magista.query2.QueryExecutionException;
+
 /**
  * Created by vpankrashkin on 24.08.16.
  */
-public class QueryParserException extends RuntimeException {
+public class QueryParserException extends QueryExecutionException {
     public QueryParserException() {
     }
 

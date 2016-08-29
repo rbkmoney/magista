@@ -1,19 +1,21 @@
 package com.rbkmoney.magista.query2.impl;
 
-import com.rbkmoney.magista.query2.CompositeQuery;
-import com.rbkmoney.magista.query2.Query;
-import com.rbkmoney.magista.query2.QueryParameters;
+import com.rbkmoney.damsel.merch_stat.StatInvoice;
+import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.magista.model.Invoice;
+import com.rbkmoney.magista.query2.*;
 import com.rbkmoney.magista.query2.builder.QueryBuilder;
 import com.rbkmoney.magista.query2.builder.QueryBuilderException;
 import com.rbkmoney.magista.query2.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query2.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query2.parser.QueryParserException;
 import com.rbkmoney.magista.query2.parser.QueryPart;
+import com.rbkmoney.magista.repository.DaoException;
 
+import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,11 +24,11 @@ import static com.rbkmoney.magista.query2.impl.Parameters.*;
 /**
  * Created by vpankrashkin on 03.08.16.
  */
-public class InvoicesFunction extends PagedBaseFunction implements CompositeQuery {
+public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> implements CompositeQuery<Invoice, StatResponse> {
 
     public static final String FUNC_NAME = "invoices";
 
-    private final CompositeQuery subquery;
+    private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
     private InvoicesFunction(Object descriptor, QueryParameters params, CompositeQuery subquery) {
         super(descriptor, params, FUNC_NAME);
@@ -34,6 +36,33 @@ public class InvoicesFunction extends PagedBaseFunction implements CompositeQuer
     }
 
     @Override
+    public QueryResult<Invoice, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+        QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
+
+        return execute(context, collectedResults.getCollectedStream());
+    }
+
+    @Override
+    public QueryResult<Invoice, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
+        if (collectedResults.size() != 2) {
+            throw new QueryExecutionException("Wrong query results count:"+collectedResults.size());
+        }
+
+        QueryResult<Invoice, List<Invoice>> invoicesResult = (QueryResult<Invoice, List<Invoice>>) collectedResults.get(0);
+        QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
+
+        return new BaseQueryResult<>(
+                () ->invoicesResult.getDataStream(),
+                () -> {
+                    StatResponseData statResponseData = StatResponseData.invoices(invoicesResult.getDataStream().map(invoice -> new StatInvoice(invoice.getModel())).collect(Collectors.toList()));
+                    StatResponse statResponse = new StatResponse(statResponseData);
+                    statResponse.setTotalCount(countResult.getCollectedStream());
+                    return statResponse;
+                });
+    }
+
+
+        @Override
     public InvoicesParameters getQueryParameters() {
         return (InvoicesParameters) super.getQueryParameters();
     }
@@ -46,11 +75,6 @@ public class InvoicesFunction extends PagedBaseFunction implements CompositeQuer
     @Override
     public List<Query> getChildQueries() {
         return subquery.getChildQueries();
-    }
-
-    @Override
-    public void setChildQueries(List<Query> queries, boolean parallel) {
-        subquery.setChildQueries(queries, parallel);
     }
 
     @Override
@@ -129,7 +153,7 @@ public class InvoicesFunction extends PagedBaseFunction implements CompositeQuer
 
         @Override
         public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildAndWrapQueries(InvoicesParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart), getParameters(parentQueryPart));
+            Query resultQuery = buildSingleQuery(InvoicesParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart));
             validator.validateQuery(resultQuery);
             return resultQuery;
         }
@@ -139,7 +163,11 @@ public class InvoicesFunction extends PagedBaseFunction implements CompositeQuer
                     new GetDataFunction(queryPart.getDescriptor() + ":"+GetDataFunction.FUNC_NAME, queryPart.getParameters()),
                     new GetCountFunction(queryPart.getDescriptor() + ":" +GetCountFunction.FUNC_NAME, queryPart.getParameters())
             );
-            CompositeQuery compositeQuery = createCompositeQuery(queryPart.getDescriptor(), getParameters(queryPart.getParent()), queries, false);
+            CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
+                    queryPart.getDescriptor(),
+                    getParameters(queryPart.getParent()),
+                    queries
+                    );
             return createInvoicesFunction(queryPart.getDescriptor(), queryPart.getParameters(), compositeQuery);
         }
 
@@ -150,7 +178,7 @@ public class InvoicesFunction extends PagedBaseFunction implements CompositeQuer
 
     }
 
-    private static InvoicesFunction createInvoicesFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery subquery) {
+    private static InvoicesFunction createInvoicesFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
         InvoicesFunction invoicesFunction = new InvoicesFunction(descriptor, queryParameters, subquery);
         subquery.setParentQuery(invoicesFunction);
         return invoicesFunction;
@@ -162,13 +190,55 @@ public class InvoicesFunction extends PagedBaseFunction implements CompositeQuer
         public GetDataFunction(Object descriptor, QueryParameters params) {
             super(descriptor, params, FUNC_NAME);
         }
+
+        @Override
+        public QueryResult<Invoice, Collection<Invoice>> execute(QueryContext context) throws QueryExecutionException {
+            FunctionQueryContext functionContext = getContext(context);
+            InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
+            try {
+                Pair<Integer, Collection<Invoice>> result = functionContext.getDao().getInvoices(
+                        parameters.getMerchantId(),
+                        parameters.getShopId(),
+                        Optional.ofNullable(parameters.getInvoiceId()),
+                        Optional.ofNullable(parameters.getInvoiceStatus()),
+                        Optional.ofNullable(Instant.from(parameters.getFromTime())),
+                        Optional.ofNullable(Instant.from(parameters.getToTime())),
+                        Optional.ofNullable(parameters.getSize()),
+                        Optional.ofNullable(parameters.getFrom())
+                );
+                return new BaseQueryResult<>(() -> result.getValue().stream(), () -> result.getValue());
+            } catch (DaoException e) {
+                throw new QueryExecutionException(e);
+            }
+        }
     }
 
-    private static class GetCountFunction extends ScopedBaseFunction {
+    private static class GetCountFunction extends ScopedBaseFunction<Integer, Integer> {
         private static final String FUNC_NAME = PaymentsFunction.FUNC_NAME + "_count";
 
         public GetCountFunction(Object descriptor, QueryParameters params) {
             super(descriptor, params, FUNC_NAME);
+        }
+
+        @Override
+        public QueryResult<Integer, Integer> execute(QueryContext context) throws QueryExecutionException {
+            FunctionQueryContext functionContext = getContext(context);
+            InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
+            try {
+                Pair<Integer, Collection<Invoice>> result = functionContext.getDao().getInvoices(
+                        parameters.getMerchantId(),
+                        parameters.getShopId(),
+                        Optional.ofNullable(parameters.getInvoiceId()),
+                        Optional.ofNullable(parameters.getInvoiceStatus()),
+                        Optional.ofNullable(Instant.from(parameters.getFromTime())),
+                        Optional.ofNullable(Instant.from(parameters.getToTime())),
+                        Optional.ofNullable(parameters.getSize()),
+                        Optional.ofNullable(parameters.getFrom())
+                );
+                return new BaseQueryResult<>(() -> Stream.of(result.getKey()), () -> result.getKey());
+            } catch (DaoException e) {
+                throw new QueryExecutionException(e);
+            }
         }
     }
 }

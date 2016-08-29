@@ -3,7 +3,7 @@ package com.rbkmoney.magista.repository.dao;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
-import com.rbkmoney.magista.query.Pair;
+import com.rbkmoney.magista.query2.Pair;
 import com.rbkmoney.magista.repository.DaoException;
 import com.rbkmoney.magista.repository.InvoiceRepositoryImpl;
 import com.rbkmoney.magista.repository.PaymentRepositoryImpl;
@@ -14,8 +14,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;

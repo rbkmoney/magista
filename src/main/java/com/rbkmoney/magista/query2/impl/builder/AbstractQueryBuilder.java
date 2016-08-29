@@ -1,14 +1,13 @@
 package com.rbkmoney.magista.query2.impl.builder;
 
-import com.rbkmoney.magista.query2.BaseCompositeQuery;
-import com.rbkmoney.magista.query2.CompositeQuery;
-import com.rbkmoney.magista.query2.Query;
-import com.rbkmoney.magista.query2.QueryParameters;
+import com.rbkmoney.magista.query2.*;
 import com.rbkmoney.magista.query2.builder.QueryBuilder;
+import com.rbkmoney.magista.query2.builder.QueryBuilderException;
 import com.rbkmoney.magista.query2.parser.QueryPart;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,15 +22,42 @@ public abstract class AbstractQueryBuilder implements QueryBuilder {
     }
 
 
-    protected CompositeQuery createCompositeQuery(Object descriptor, QueryParameters derivedParameters, List<Query> childQueries, boolean parallel) {
-        BaseCompositeQuery query = new BaseCompositeQuery(descriptor, new QueryParameters(Collections.emptyMap(), derivedParameters));
-        query.setChildQueries(childQueries, parallel);
-        return query;
+    protected <T, CT> CompositeQuery<T, CT> createCompositeQuery(
+            Object descriptor,
+            QueryParameters derivedParameters,
+            List<Query> childQueries,
+            Function<QueryContext, QueryResult<T, CT>> execFunction,
+            BiFunction<QueryContext, List<QueryResult>, QueryResult<T, CT>> parallelExecFunction
+    ) {
+        return BaseCompositeQuery.newInstance(descriptor, new QueryParameters(Collections.emptyMap(), derivedParameters), childQueries, execFunction, parallelExecFunction);
     }
 
-    protected CompositeQuery createCompositeQuery(Object descriptor, List<Query> childQueries, boolean parallel) {
-        return createCompositeQuery(descriptor, new QueryParameters(Collections.emptyMap(), null), childQueries, parallel);
+    protected CompositeQuery createCompositeQuery(
+            Object descriptor,
+            QueryParameters derivedParameters,
+            List<Query> childQueries
+    ) {
+        return createCompositeQuery(
+                descriptor, derivedParameters, childQueries,
+                context -> new BaseQueryResult<>(
+                        () -> childQueries.stream().map(query -> query.execute(context)),
+                        () -> childQueries.stream().map(query -> query.execute(context)).collect(Collectors.toList())
+                ),
+                (context, queryResults) -> new BaseQueryResult<>(
+                        () -> queryResults.stream(),
+                        () -> queryResults
+                )
 
+        );
+    }
+
+    protected <T, CT> CompositeQuery<T, CT> createCompositeQuery(
+            Object descriptor,
+            List<Query> childQueries,
+            Function<QueryContext, QueryResult<T, CT>> execFunction,
+            BiFunction<QueryContext, List<QueryResult>, QueryResult<T, CT>> parallelExecFunction
+    ) {
+        return createCompositeQuery(descriptor, new QueryParameters(Collections.emptyMap(), null), childQueries, execFunction, parallelExecFunction);
     }
 
     protected QueryParameters getParameters(QueryPart queryPart) {
@@ -43,9 +69,26 @@ public abstract class AbstractQueryBuilder implements QueryBuilder {
         return matchedParts.stream().map(queryPart -> queryCreator.apply(queryPart)).collect(Collectors.toList());
     }
 
-    protected Query buildAndWrapQueries(Object matchDescriptor, List<QueryPart> queryParts, Function<QueryPart, Query> queryCreator, QueryParameters parentParameters) {
+    protected Query buildSingleQuery(Object matchDescriptor, List<QueryPart> queryParts, Function<QueryPart, Query> queryCreator) {
         List<Query> queries = buildQueries(matchDescriptor, queryParts, queryCreator);
-        Query resultQuery = queries.size() > 1 ? createCompositeQuery(queries.get(0).getDescriptor(), parentParameters, queries, false) : queries.get(0);
-        return resultQuery;
+        if (queries.size() == 0) {
+            throw new QueryBuilderException("No queries found in referred data");
+        } else if (queries.size() > 1) {
+            throw new QueryBuilderException("Only one query expected");
+        } else {
+            return queries.get(0);
+        }
+    }
+
+    protected <T, CT> Query<T, CT> buildAndWrapQueries(
+            Object matchDescriptor,
+            List<QueryPart> queryParts,
+            Function<QueryPart, Query> queryCreator,
+            QueryParameters parentParameters,
+            Function<QueryContext, QueryResult<T, CT>> execFunction,
+            BiFunction<QueryContext, List<QueryResult>, QueryResult<T, CT>> parallelExecFunction
+    ) {
+        List<Query> queries = buildQueries(matchDescriptor, queryParts, queryCreator);
+        return createCompositeQuery(queries.get(0).getDescriptor(), parentParameters, queries, execFunction, parallelExecFunction);
     }
 }

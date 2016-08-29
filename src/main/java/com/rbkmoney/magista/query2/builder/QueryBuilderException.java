@@ -1,9 +1,11 @@
 package com.rbkmoney.magista.query2.builder;
 
+import com.rbkmoney.magista.query2.QueryProcessingException;
+
 /**
  * Created by vpankrashkin on 24.08.16.
  */
-public class QueryBuilderException extends RuntimeException {
+public class QueryBuilderException extends QueryProcessingException {
     public QueryBuilderException() {
     }
 

@@ -2,7 +2,7 @@ package com.rbkmoney.magista.repository.dao;
 
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
-import com.rbkmoney.magista.query.Pair;
+import com.rbkmoney.magista.query2.Pair;
 import com.rbkmoney.magista.repository.DaoException;
 
 import java.time.Instant;

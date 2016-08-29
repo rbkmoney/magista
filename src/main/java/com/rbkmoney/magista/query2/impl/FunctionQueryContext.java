@@ -1,6 +1,6 @@
-package com.rbkmoney.magista.query.impl;
+package com.rbkmoney.magista.query2.impl;
 
-import com.rbkmoney.magista.query.QueryContext;
+import com.rbkmoney.magista.query2.QueryContext;
 import com.rbkmoney.magista.repository.dao.StatisticsDao;
 
 /**

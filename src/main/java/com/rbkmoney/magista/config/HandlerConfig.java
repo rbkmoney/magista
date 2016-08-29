@@ -3,8 +3,10 @@ package com.rbkmoney.magista.config;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.damsel.merch_stat.MerchantStatisticsSrv;
-import com.rbkmoney.magista.query.impl.JsonQueryParser;
-import com.rbkmoney.magista.query.impl.QueryContextBuilder;
+import com.rbkmoney.magista.query2.impl.QueryContextFactoryImpl;
+import com.rbkmoney.magista.query2.impl.QueryProcessorImpl;
+import com.rbkmoney.magista.query2.impl.builder.QueryBuilderImpl;
+import com.rbkmoney.magista.query2.impl.parser.JsonQueryParser;
 import com.rbkmoney.magista.repository.dao.StatisticsDao;
 import com.rbkmoney.magista.service.MerchantStatisticsHandler;
 import org.springframework.context.annotation.Bean;
@@ -18,13 +20,13 @@ public class HandlerConfig {
 
     @Bean
     public MerchantStatisticsSrv.Iface merchantStatisticsHandler(StatisticsDao statisticsDao) {
-        return new MerchantStatisticsHandler(new JsonQueryParser() {
+        return new MerchantStatisticsHandler(new QueryProcessorImpl(new JsonQueryParser() {
             @Override
             protected ObjectMapper getMapper() {
                 ObjectMapper mapper = super.getMapper();
                 mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
                 return mapper;
             }
-        }, new QueryContextBuilder(statisticsDao));
+        }, new QueryBuilderImpl(), new QueryContextFactoryImpl(statisticsDao)));
     }
 }

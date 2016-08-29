@@ -5,11 +5,15 @@ import java.util.List;
 /**
  * Created by vpankrashkin on 28.08.16.
  */
-public interface CompositeQuery extends Query {
+public interface CompositeQuery<T, CT> extends Query<T, CT> {
     List<Query> getChildQueries();
 
-    void setChildQueries(List<Query> queries, boolean parallel);
+    default boolean isParallel() {
+        return false;
+    }
 
-    boolean isParallel();
-    //Object execute(List<Object> results, Object context);
+    default QueryResult<T, CT> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
+        throw new UnsupportedOperationException("Explicit implementation required");
+    }
+
 }

@@ -1,19 +1,22 @@
 package com.rbkmoney.magista.query2.impl;
 
-import com.rbkmoney.magista.query2.CompositeQuery;
-import com.rbkmoney.magista.query2.Query;
-import com.rbkmoney.magista.query2.QueryParameters;
+import com.rbkmoney.damsel.merch_stat.GeoInfo;
+import com.rbkmoney.damsel.merch_stat.StatPayment;
+import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.magista.model.Payment;
+import com.rbkmoney.magista.query2.*;
 import com.rbkmoney.magista.query2.builder.QueryBuilder;
 import com.rbkmoney.magista.query2.builder.QueryBuilderException;
 import com.rbkmoney.magista.query2.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query2.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query2.parser.QueryParserException;
 import com.rbkmoney.magista.query2.parser.QueryPart;
+import com.rbkmoney.magista.repository.DaoException;
 
+import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,15 +25,48 @@ import static com.rbkmoney.magista.query2.impl.Parameters.*;
 /**
  * Created by vpankrashkin on 03.08.16.
  */
-public class PaymentsFunction extends PagedBaseFunction implements CompositeQuery {
+public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> implements CompositeQuery<Payment, StatResponse> {
 
     public static final String FUNC_NAME = "payments";
 
-    private final CompositeQuery subquery;
+    private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
-    private PaymentsFunction(Object descriptor, QueryParameters params, CompositeQuery subquery) {
+    private PaymentsFunction(Object descriptor, QueryParameters params, CompositeQuery<QueryResult, List<QueryResult>>  subquery) {
         super(descriptor, params, FUNC_NAME);
         this.subquery = subquery;
+    }
+
+    @Override
+    public QueryResult<Payment, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+        QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
+
+        return execute(context, collectedResults.getCollectedStream());
+    }
+
+    @Override
+    public QueryResult<Payment, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
+        if (collectedResults.size() != 2) {
+            throw new QueryExecutionException("Wrong query results count:"+collectedResults.size());
+        }
+
+        QueryResult<Payment, List<Payment>> paymentsResult = (QueryResult<Payment, List<Payment>>) collectedResults.get(0);
+        QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
+
+        return new BaseQueryResult<>(
+                () ->paymentsResult.getDataStream(),
+                () -> {
+                    StatResponseData statResponseData = StatResponseData.payments(paymentsResult.getDataStream().map(payment -> {
+                        StatPayment statPayment = new StatPayment(payment.getInvoiceId(), payment.getModel());
+                        GeoInfo geoInfo = new GeoInfo();
+                        geoInfo.setCityName(payment.getCityName());
+                        statPayment.setGeoInfo(geoInfo);
+                        return statPayment;
+                    }).collect(Collectors.toList()));
+                    StatResponse statResponse = new StatResponse(statResponseData);
+                    statResponse.setTotalCount(countResult.getCollectedStream());
+                    return statResponse;
+                }
+        );
     }
 
     @Override
@@ -46,11 +82,6 @@ public class PaymentsFunction extends PagedBaseFunction implements CompositeQuer
     @Override
     public List<Query> getChildQueries() {
         return subquery.getChildQueries();
-    }
-
-    @Override
-    public void setChildQueries(List<Query> queries, boolean parallel) {
-        subquery.setChildQueries(queries, parallel);
     }
 
     @Override
@@ -139,7 +170,7 @@ public class PaymentsFunction extends PagedBaseFunction implements CompositeQuer
 
         @Override
         public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildAndWrapQueries(PaymentsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart), getParameters(parentQueryPart));
+            Query resultQuery = buildSingleQuery(PaymentsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart));
             validator.validateQuery(resultQuery);
             return resultQuery;
         }
@@ -149,7 +180,11 @@ public class PaymentsFunction extends PagedBaseFunction implements CompositeQuer
                     new GetDataFunction(queryPart.getDescriptor() + ":"+GetDataFunction.FUNC_NAME, queryPart.getParameters()),
                     new GetCountFunction(queryPart.getDescriptor() + ":" +GetCountFunction.FUNC_NAME, queryPart.getParameters())
             );
-            CompositeQuery compositeQuery = createCompositeQuery(queryPart.getDescriptor(), getParameters(queryPart.getParent()), queries, false);
+            CompositeQuery<QueryResult, List<QueryResult>>  compositeQuery = createCompositeQuery(
+                    queryPart.getDescriptor(),
+                    getParameters(queryPart.getParent()),
+                    queries
+                    );
             return createPaymentsFunction(queryPart.getDescriptor(), queryPart.getParameters(), compositeQuery);
         }
 
@@ -157,28 +192,73 @@ public class PaymentsFunction extends PagedBaseFunction implements CompositeQuer
         public boolean apply(List<QueryPart> queryParts, QueryPart parent) {
             return getMatchedPartsStream(PaymentsParser.getMainDescriptor(), queryParts).findFirst().isPresent();
         }
-
     }
 
-    private static PaymentsFunction createPaymentsFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery subquery) {
+    private static PaymentsFunction createPaymentsFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery<QueryResult, List<QueryResult>>  subquery) {
         PaymentsFunction paymentsFunction = new PaymentsFunction(descriptor, queryParameters, subquery);
         subquery.setParentQuery(paymentsFunction);
         return paymentsFunction;
     }
 
-    private static class GetDataFunction extends PagedBaseFunction {
+    private static class GetDataFunction extends PagedBaseFunction<Payment, Collection<Payment>> {
         private static final String FUNC_NAME = PaymentsFunction.FUNC_NAME + "_data";
 
         public GetDataFunction(Object descriptor, QueryParameters params) {
             super(descriptor, params, FUNC_NAME);
         }
+
+        @Override
+        public QueryResult<Payment, Collection<Payment>> execute(QueryContext context) throws QueryExecutionException {
+            FunctionQueryContext functionContext = getContext(context);
+            PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
+            try {
+                Pair<Integer, Collection<Payment>> result = functionContext.getDao().getPayments(
+                        parameters.getMerchantId(),
+                        parameters.getShopId(),
+                        Optional.ofNullable(parameters.getInvoiceId()),
+                        Optional.ofNullable(parameters.getPaymentId()),
+                        Optional.ofNullable(parameters.getPaymentStatus()),
+                        Optional.ofNullable(parameters.getPanMask()),
+                        Optional.ofNullable(Instant.from(parameters.getFromTime())),
+                        Optional.ofNullable(Instant.from(parameters.getToTime())),
+                        Optional.ofNullable(parameters.getSize()),
+                        Optional.ofNullable(parameters.getFrom())
+                );
+                return new BaseQueryResult<>(() -> result.getValue().stream(), () -> result.getValue());
+            } catch (DaoException e) {
+                throw new QueryExecutionException(e);
+            }
+        }
     }
 
-    private static class GetCountFunction extends ScopedBaseFunction {
+    private static class GetCountFunction extends ScopedBaseFunction<Integer, Integer> {
         private static final String FUNC_NAME = PaymentsFunction.FUNC_NAME + "_count";
 
         public GetCountFunction(Object descriptor, QueryParameters params) {
             super(descriptor, params, FUNC_NAME);
+        }
+
+        @Override
+        public QueryResult<Integer, Integer> execute(QueryContext context) throws QueryExecutionException {
+            FunctionQueryContext functionContext = getContext(context);
+            PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
+            try {
+                Pair<Integer, Collection<Payment>> result = functionContext.getDao().getPayments(
+                        parameters.getMerchantId(),
+                        parameters.getShopId(),
+                        Optional.ofNullable(parameters.getInvoiceId()),
+                        Optional.ofNullable(parameters.getPaymentId()),
+                        Optional.ofNullable(parameters.getPaymentStatus()),
+                        Optional.ofNullable(parameters.getPanMask()),
+                        Optional.ofNullable(Instant.from(parameters.getFromTime())),
+                        Optional.ofNullable(Instant.from(parameters.getToTime())),
+                        Optional.ofNullable(parameters.getSize()),
+                        Optional.ofNullable(parameters.getFrom())
+                );
+                return new BaseQueryResult<>(() -> Stream.of(result.getKey()), () -> result.getKey());
+            } catch (DaoException e) {
+                throw new QueryExecutionException(e);
+            }
         }
     }
 }

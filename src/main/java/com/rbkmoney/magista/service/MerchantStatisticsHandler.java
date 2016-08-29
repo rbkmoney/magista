@@ -5,18 +5,12 @@ import com.rbkmoney.damsel.merch_stat.DatasetTooBig;
 import com.rbkmoney.damsel.merch_stat.MerchantStatisticsSrv.Iface;
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.damsel.merch_stat.StatResponseData;
-import com.rbkmoney.magista.query.Query;
-import com.rbkmoney.magista.query.QueryContext;
-import com.rbkmoney.magista.query.QueryParser;
-import com.rbkmoney.magista.query.QueryResult;
-import com.rbkmoney.magista.query.impl.QueryContextBuilder;
+import com.rbkmoney.magista.query2.QueryProcessor;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.stream.Collector;
 
 /**
  * Created by vpankrashkin on 09.08.16.
@@ -24,12 +18,10 @@ import java.util.stream.Collector;
 public class MerchantStatisticsHandler implements Iface {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private QueryParser queryParser;
-    private QueryContextBuilder contextBuilder;
+    private QueryProcessor<String, StatResponse> queryProcessor;
 
-    public MerchantStatisticsHandler(QueryParser queryParser, QueryContextBuilder contextBuilder) {
-        this.queryParser = queryParser;
-        this.contextBuilder = contextBuilder;
+    public MerchantStatisticsHandler(QueryProcessor<String, StatResponse> queryProcessor) {
+        this.queryProcessor = queryProcessor;
     }
 
     @Override
@@ -55,10 +47,8 @@ public class MerchantStatisticsHandler implements Iface {
     private StatResponse getStatResponse(StatRequest statRequest) throws InvalidRequest {
         log.info("New stat request: {}" ,statRequest);
         try {
-            Query query = queryParser.parse(statRequest.getDsl());
-            QueryContext context = contextBuilder.getQueryContext(query);
-            QueryResult<?, StatResponse> qResult = query.execute(context);
-            StatResponse statResponse = qResult.getCollectedStream();
+
+            StatResponse statResponse = queryProcessor.processQuery(statRequest.getDsl());
             log.debug("Stat response: {}", statRequest);
             return statResponse;
         } catch (Exception e) {

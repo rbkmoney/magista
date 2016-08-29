@@ -1,8 +1,8 @@
 package com.rbkmoney.magista.query2.impl;
 
 
-import com.rbkmoney.magista.query2.Query;
-import com.rbkmoney.magista.query2.QueryParameters;
+import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.magista.query2.*;
 import com.rbkmoney.magista.query2.builder.QueryBuilder;
 import com.rbkmoney.magista.query2.builder.QueryBuilderException;
 import com.rbkmoney.magista.query2.impl.builder.AbstractQueryBuilder;
@@ -13,6 +13,7 @@ import com.rbkmoney.magista.query2.parser.QueryPart;
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,7 +22,7 @@ import static com.rbkmoney.magista.query2.impl.Parameters.*;
 /**
  * Created by vpankrashkin on 08.08.16.
  */
-public abstract class StatBaseFunction extends ScopedBaseFunction {
+public abstract class StatBaseFunction extends ScopedBaseFunction<Map<String, String>, StatResponse> {
 
     public StatBaseFunction(Object descriptor, QueryParameters params, String name) {
         super(descriptor, params, name);
@@ -114,7 +115,7 @@ public abstract class StatBaseFunction extends ScopedBaseFunction {
 
         @Override
         public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildAndWrapQueries(getDescriptor(queryParts), queryParts, queryPart -> createQuery(queryPart), getParameters(parentQueryPart));
+            Query resultQuery = buildSingleQuery(getDescriptor(queryParts), queryParts, queryPart -> createQuery(queryPart));
             validator.validateQuery(resultQuery);
             return resultQuery;
         }

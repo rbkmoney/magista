@@ -37,9 +37,7 @@ public abstract class BaseQueryBuilder implements QueryBuilder {
                     )
                     .collect(Collectors.toList());
             if (queries.size() > 1) {
-                CompositeQuery compositeQuery = new BaseCompositeQuery(new Object(), new QueryParameters(Collections.emptyMap(), null));
-                compositeQuery.setChildQueries(queries, false);
-                return compositeQuery;
+                throw new QueryBuilderException("Build result has more than one query");
             } else if (queries.size() == 1) {
                 return queries.get(0);
             } else {

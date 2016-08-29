@@ -10,7 +10,7 @@ import static com.rbkmoney.magista.query2.impl.Parameters.SIZE_PARAMETER;
 /**
  * Created by vpankrashkin on 23.08.16.
  */
-public abstract class PagedBaseFunction extends ScopedBaseFunction {
+public abstract class PagedBaseFunction<T ,CT> extends ScopedBaseFunction<T, CT> {
 
     public PagedBaseFunction(Object descriptor, QueryParameters params, String name) {
         super(descriptor, params, name);
