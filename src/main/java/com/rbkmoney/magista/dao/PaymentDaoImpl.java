@@ -14,19 +14,17 @@ import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by tolkonepiu on 23.08.16.
@@ -45,20 +43,21 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                 "amount, currency_code, payment_system, city_name, ip, created_at, model " +
                 "from mst.payment where id = :id";
 
-        Payment invoice;
+        Payment payment;
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("id", id);
-            log.trace("SQL: {}, Params: {}", sql, params);
-            invoice = getNamedParameterJdbcTemplate().queryForObject(
+            MapSqlParameterSource source = new MapSqlParameterSource("id", id);
+            log.trace("SQL: {}, Params: {}", sql, source.getValues());
+            payment = getNamedParameterJdbcTemplate().queryForObject(
                     sql,
-                    params,
+                    source,
                     getRowMapper()
             );
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
         } catch (NestedRuntimeException ex) {
             throw new DaoException(ex);
         }
-        return invoice;
+        return payment;
     }
 
     @Override
@@ -78,9 +77,9 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
         execute(updateSql, createSqlParameterSource(payment));
     }
 
-    public void execute(String updateSql, SqlParameterSource source) throws DaoException {
+    public void execute(String updateSql, MapSqlParameterSource source) throws DaoException {
         try {
-            log.trace("SQL: {}, Params: {}", updateSql, source);
+            log.trace("SQL: {}, Params: {}", updateSql, source.getValues());
             int rowsAffected = getNamedParameterJdbcTemplate().update(updateSql, source);
 
             if (rowsAffected != 1) {
@@ -91,7 +90,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
         }
     }
 
-    private SqlParameterSource createSqlParameterSource(Payment payment) {
+    private MapSqlParameterSource createSqlParameterSource(Payment payment) {
         try {
             MapSqlParameterSource source = new MapSqlParameterSource()
                     .addValue("id", payment.getId())
@@ -108,16 +107,11 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                     .addValue("city_name", payment.getCityName())
                     .addValue("ip", payment.getIp())
                     .addValue("created_at", Timestamp.from(payment.getCreatedAt()))
+                    .addValue("changed_at", Timestamp.from(payment.getChangedAt()))
                     .addValue("model", new TSerializer(new TJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()));
 
-            if (payment.getChangedAt() != null) {
-                source.addValue("changed_at", Timestamp.from(payment.getCreatedAt()));
-            } else {
-                source.addValue("changed_at", null, Types.TIMESTAMP);
-            }
-
             PGobject data = new PGobject();
-            data.setType("json");
+            data.setType("jsonb");
             data.setValue(new TSerializer(new TSimpleJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()));
             source.addValue("data", data, Types.OTHER);
 
@@ -146,9 +140,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                 payment.setCityName(rs.getString("city_name"));
                 payment.setIp(rs.getString("ip"));
                 payment.setCreatedAt(rs.getTimestamp("created_at").toInstant());
-                if (rs.getTimestamp("changed_at") != null) {
-                    payment.setCreatedAt(rs.getTimestamp("changed_at").toInstant());
-                }
+                payment.setChangedAt(rs.getTimestamp("changed_at").toInstant());
                 InvoicePayment model = new InvoicePayment();
                 new TDeserializer(new TJSONProtocol.Factory()).deserialize(model, rs.getBytes("model"));
 

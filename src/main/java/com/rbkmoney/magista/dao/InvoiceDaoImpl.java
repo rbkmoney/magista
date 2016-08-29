@@ -17,15 +17,12 @@ import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by tolkonepiu on 23.08.16.
@@ -45,13 +42,12 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
 
         Invoice invoice;
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("id", id);
+        MapSqlParameterSource source = new MapSqlParameterSource("id", id);
         try {
-            log.trace("SQL: {}, Params: {}", sql, params);
+            log.trace("SQL: {}, Params: {}", sql, source.getValues());
             invoice = getNamedParameterJdbcTemplate().queryForObject(
                     sql,
-                    params,
+                    source,
                     getRowMapper()
             );
         } catch (EmptyResultDataAccessException ex) {
@@ -81,9 +77,9 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
         execute(updateSql, createSqlParameterSource(invoice));
     }
 
-    public void execute(String updateSql, SqlParameterSource source) throws DaoException {
+    public void execute(String updateSql, MapSqlParameterSource source) throws DaoException {
         try {
-            log.trace("SQL: {}, Params: {}", updateSql, source);
+            log.trace("SQL: {}, Params: {}", updateSql, source.getValues());
             int rowsAffected = getNamedParameterJdbcTemplate().update(updateSql, source);
 
             if (rowsAffected != 1) {
@@ -94,7 +90,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
         }
     }
 
-    private SqlParameterSource createSqlParameterSource(Invoice invoice) {
+    private MapSqlParameterSource createSqlParameterSource(Invoice invoice) {
         try {
             MapSqlParameterSource source = new MapSqlParameterSource()
                     .addValue("id", invoice.getId())
@@ -105,13 +101,8 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
                     .addValue("amount", invoice.getAmount())
                     .addValue("currency_code", invoice.getCurrencyCode())
                     .addValue("created_at", Timestamp.from(invoice.getCreatedAt()))
+                    .addValue("changed_at", Timestamp.from(invoice.getChangedAt()))
                     .addValue("model", new TSerializer(new TJSONProtocol.Factory()).toString(invoice.getModel(), StandardCharsets.UTF_8.name()));
-
-            if (invoice.getChangedAt() != null) {
-                source.addValue("changed_at", Timestamp.from(invoice.getCreatedAt()));
-            } else {
-                source.addValue("changed_at", null, Types.TIMESTAMP);
-            }
 
             PGobject data = new PGobject();
             data.setType("json");
@@ -137,9 +128,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
                 invoice.setAmount(rs.getLong("amount"));
                 invoice.setCurrencyCode(rs.getString("currency_code"));
                 invoice.setCreatedAt(rs.getTimestamp("created_at").toInstant());
-                if (rs.getTimestamp("changed_at") != null) {
-                    invoice.setCreatedAt(rs.getTimestamp("changed_at").toInstant());
-                }
+                invoice.setChangedAt(rs.getTimestamp("changed_at").toInstant());
                 com.rbkmoney.damsel.domain.Invoice model = new com.rbkmoney.damsel.domain.Invoice();
                 new TDeserializer(new TJSONProtocol.Factory()).deserialize(model, rs.getBytes("model"));
                 invoice.setModel(model);
