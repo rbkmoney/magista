@@ -105,7 +105,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
                     .addValue("model", new TSerializer(new TJSONProtocol.Factory()).toString(invoice.getModel(), StandardCharsets.UTF_8.name()));
 
             PGobject data = new PGobject();
-            data.setType("json");
+            data.setType("jsonb");
             data.setValue(new TSerializer(new TSimpleJSONProtocol.Factory()).toString(invoice.getModel(), StandardCharsets.UTF_8.name()));
             source.addValue("data", data, Types.OTHER);
 
