@@ -37,7 +37,6 @@ public class PaymentService {
     @Autowired
     CustomerDao customerDao;
 
-    @Transactional
     public void changePaymentStatus(String paymentId, String invoiceId, long eventId, InvoicePaymentStatus status, Instant changedAt) throws NotFoundException, DataAccessException {
         log.trace("Change payment status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'", paymentId, invoiceId, eventId, status.getSetField().getFieldName());
 
@@ -60,7 +59,6 @@ public class PaymentService {
         }
     }
 
-    @Transactional
     public void savePayment(String invoiceId, long eventId, InvoicePayment invoicePayment) throws NotFoundException, StorageException {
         log.trace("Save payment, paymentId='{}', invoiceId='{}', eventId='{}'", invoicePayment.getId(), invoiceId, eventId);
 
