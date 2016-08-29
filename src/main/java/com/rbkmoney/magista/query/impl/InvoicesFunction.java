@@ -8,7 +8,7 @@ import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.query.Pair;
 import com.rbkmoney.magista.query.QueryExecutionException;
 import com.rbkmoney.magista.query.QueryResult;
-import com.rbkmoney.magista.repository.DaoException;
+import com.rbkmoney.magista.exception.StorageException;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -61,7 +61,7 @@ public class InvoicesFunction extends CursorScopedBaseFunction {
                     Optional.ofNullable(getFrom() == null ? null : getFrom())
             );
             return new BaseQueryResult<>(result.getKey(), () -> result.getValue().stream(), dataCollectorFunction);
-        } catch (DaoException e) {
+        } catch (StorageException e) {
             throw new QueryExecutionException(e);
         }
     }

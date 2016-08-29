@@ -6,7 +6,7 @@ import com.rbkmoney.eventstock.client.poll.PollingEventPublisherBuilder;
 import com.rbkmoney.magista.handler.Handler;
 import com.rbkmoney.magista.handler.poller.EventStockErrorHandler;
 import com.rbkmoney.magista.handler.poller.EventStockHandler;
-import com.rbkmoney.magista.repository.EventRepository;
+import com.rbkmoney.magista.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -32,10 +32,10 @@ public class EventStockPollerConfig {
     int maxPoolSize;
 
     @Autowired
-    EventRepository eventRepository;
+    List<Handler> handlers;
 
     @Autowired
-    List<Handler> handlers;
+    EventService eventService;
 
     @Bean
     public EventPublisher eventPublisher() throws IOException {
@@ -55,7 +55,7 @@ public class EventStockPollerConfig {
 
     public EventFilter eventFilter() {
         EventConstraint.EventIDRange eventIDRange = new EventConstraint.EventIDRange();
-        Long lastEventId = eventRepository.getLastEventId();
+        Long lastEventId = eventService.getLastEventId();
         if (lastEventId != null) {
             eventIDRange.setFromExclusive(lastEventId);
         }
