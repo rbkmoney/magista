@@ -4,7 +4,6 @@ import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
-import com.rbkmoney.magista.query.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
