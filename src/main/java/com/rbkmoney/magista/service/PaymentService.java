@@ -45,7 +45,7 @@ public class PaymentService {
         log.trace("Change payment status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'", paymentId, invoiceId, eventId, status.getSetField().getFieldName());
 
         try {
-            Payment payment = paymentDao.findById(invoiceId);
+            Payment payment = paymentDao.findById(paymentId);
             if (payment == null) {
                 throw new NotFoundException(String.format("Payment not found, paymentId='%s', invoiceId='%s', eventId='%d'", paymentId, invoiceId, eventId));
             }
