@@ -3,13 +3,16 @@ package com.rbkmoney.magista.query;
 /**
  * Created by vpankrashkin on 03.08.16.
  */
-public interface Query {
+public interface Query<T, CT> {
+    Object getDescriptor();
 
     Query getParentQuery();
 
-    Object getParameter(String key);
+    void setParentQuery(Query query);
 
-    Object getNestedParameter(String key);
+    QueryParameters getQueryParameters();
 
-    QueryResult execute(QueryContext context) throws QueryExecutionException;
+    QueryResult<T, CT> execute(QueryContext context) throws QueryExecutionException;
+
+
 }

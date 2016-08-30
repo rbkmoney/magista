@@ -3,7 +3,7 @@ package com.rbkmoney.magista.query;
 /**
  * Created by vpankrashkin on 09.08.16.
  */
-public class QueryExecutionException extends RuntimeException {
+public class QueryExecutionException extends QueryProcessingException {
     public QueryExecutionException() {
     }
 

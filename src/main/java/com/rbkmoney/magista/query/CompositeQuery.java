@@ -3,11 +3,17 @@ package com.rbkmoney.magista.query;
 import java.util.List;
 
 /**
- * Created by vpankrashkin on 03.08.16.
+ * Created by vpankrashkin on 28.08.16.
  */
-public interface CompositeQuery extends Query {
+public interface CompositeQuery<T, CT> extends Query<T, CT> {
+    List<Query> getChildQueries();
 
-    List<Query> getQueries();
+    default boolean isParallel() {
+        return false;
+    }
 
-    boolean isParallel();
+    default QueryResult<T, CT> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
+        throw new UnsupportedOperationException("Explicit implementation required");
+    }
+
 }

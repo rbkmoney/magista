@@ -1,85 +1,72 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.magista.query.*;
 import org.springframework.util.StringUtils;
 
-import java.time.temporal.TemporalAccessor;
 import java.util.Map;
+
+import static com.rbkmoney.magista.query.impl.Parameters.MERCHANT_ID_PARAM;
+import static com.rbkmoney.magista.query.impl.Parameters.SHOP_ID_PARAM;
 
 /**
  * Created by vpankrashkin on 08.08.16.
  */
-public abstract class ScopedBaseFunction extends BaseFunction {
-    public static final String MERCHANT_ID_PARAM = "merchant_id";
-    public static final String SHOP_ID_PARAM = "shop_id";
-    public static final String FROM_TIME_PARAM = "from_time";
-    public static final String TO_TIME_PARAM = "to_time";
+public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT>{
 
-    public ScopedBaseFunction(Map<String, Object> params, Class resultElementType, String name) {
-        super(params, resultElementType, name);
-    }
+    public ScopedBaseFunction(Object descriptor, QueryParameters params, String name) {
+        super(descriptor, params, name);
 
-    public TemporalAccessor getFromTime() {
-        return getTimeParameter(FROM_TIME_PARAM, false);
-    }
-
-    public TemporalAccessor getToTime() {
-        return getTimeParameter(TO_TIME_PARAM, false);
-    }
-
-    public String getMerchantId() {
-        return getStringParameter(MERCHANT_ID_PARAM, false);
-    }
-
-    public String getShopId() {
-        return getStringParameter(SHOP_ID_PARAM, false);
     }
 
     @Override
-    protected boolean checkParams(Map<String, Object> params, boolean throwOnError) {
-        return super.checkParams(params, throwOnError) && checkMerchantId(throwOnError) && checkShopId(throwOnError) && checkTimeParameters(throwOnError);
+    public ScopedBaseParameters getQueryParameters() {
+        return (ScopedBaseParameters) super.getQueryParameters();
     }
 
-    protected boolean checkTimeParameters(boolean throwOnError) {
-        return checkFromTime(throwOnError) && checkToTime(throwOnError);
+    @Override
+    protected QueryParameters createQueryParameters(QueryParameters parameters, QueryParameters derivedParameters) {
+        return new ScopedBaseParameters(parameters, derivedParameters);
     }
 
-    private boolean checkMerchantId(boolean throwOnError) {
-        if (!StringUtils.hasLength(getStringParameter(MERCHANT_ID_PARAM, false))) {
-            return checkParamsResult(throwOnError, true, MERCHANT_ID_PARAM + " not found");
+    protected FunctionQueryContext getContext(QueryContext context) {
+        return this.getContext(context, FunctionQueryContext.class);
+    }
+
+    public static class ScopedBaseParameters extends QueryParameters {
+
+        public ScopedBaseParameters(Map<String, Object> parameters, QueryParameters derivedParameters) {
+            super(parameters, derivedParameters);
         }
-        return true;
-    }
 
-    private boolean checkShopId(boolean throwOnError) {
-        if (!StringUtils.hasLength(getStringParameter(SHOP_ID_PARAM, false))) {
-            return checkParamsResult(throwOnError, true, SHOP_ID_PARAM + " not found");
+        public ScopedBaseParameters(QueryParameters parameters, QueryParameters derivedParameters) {
+            super(parameters, derivedParameters);
         }
-        return true;
-    }
 
-    private boolean checkFromTime(boolean throwOnError) {
-        return checkTime(FROM_TIME_PARAM, isTimeRequired(), throwOnError);
-    }
-
-    private boolean checkToTime(boolean throwOnError) {
-        return checkTime(TO_TIME_PARAM, isTimeRequired(), throwOnError);
-    }
-
-    protected boolean isTimeRequired() {
-        return true;
-    }
-
-    protected boolean checkTime(String key, boolean required, boolean throwOnError) {
-        TemporalAccessor val;
-        try {
-            val = getTimeParameter(key, false);
-        } catch (Exception e) {
-            return checkParamsResult(throwOnError, true, key + ": " + e.getMessage());
+        public String getMerchantId() {
+            return getStringParameter(MERCHANT_ID_PARAM, false);
         }
-        if (val == null && required) {
-            return checkParamsResult(throwOnError, true, key + " not found");
+
+        public String getShopId() {
+            return getStringParameter(SHOP_ID_PARAM, false);
         }
-        return true;
+
+    }
+
+    public static class ScopedBaseValidator extends BaseQueryValidator {
+        @Override
+        public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
+            super.validateParameters(parameters);
+            ScopedBaseParameters scopedParameters = super.checkParamsType(parameters, ScopedBaseParameters.class);
+
+            if (!StringUtils.hasLength(scopedParameters.getMerchantId())) {
+                checkParamsResult(true, MERCHANT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            }
+
+            if (!StringUtils.hasLength(scopedParameters.getShopId())) {
+                checkParamsResult(true, SHOP_ID_PARAM,  RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            }
+
+        }
 
     }
 
