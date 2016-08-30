@@ -32,6 +32,10 @@ public class GeoProviderIpml implements GeoProvider {
     @Override
     public String getCityName(String ip) throws ProviderException {
         try {
+            if (!StringUtils.hasText(ip)) {
+                return "UNKNOWN";
+            }
+
             String uri = GEO_API_URL + ip;
             FreeGeoIpResponse resp = restTemplate.getForObject(uri, FreeGeoIpResponse.class);
 

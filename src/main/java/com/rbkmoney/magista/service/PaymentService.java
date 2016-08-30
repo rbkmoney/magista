@@ -10,13 +10,14 @@ import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.model.Customer;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
+import com.rbkmoney.magista.provider.GeoProvider;
+import com.rbkmoney.magista.provider.ProviderException;
 import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -36,6 +37,9 @@ public class PaymentService {
 
     @Autowired
     CustomerDao customerDao;
+
+    @Autowired
+    GeoProvider geoProvider;
 
     public void changePaymentStatus(String paymentId, String invoiceId, long eventId, InvoicePaymentStatus status, Instant changedAt) throws NotFoundException, DataAccessException {
         log.trace("Change payment status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'", paymentId, invoiceId, eventId, status.getSetField().getFieldName());
@@ -81,6 +85,13 @@ public class PaymentService {
             ClientInfo clientInfo = payer.getClientInfo();
             payment.setCustomerId(clientInfo.getFingerprint());
             payment.setIp(clientInfo.getIpAddress());
+
+            try {
+                payment.setCityName(geoProvider.getCityName(payment.getIp()));
+            } catch (ProviderException ex) {
+                log.warn("Failed to find city name by ip", ex);
+                payment.setCityName("UNKNOWN");
+            }
 
             PaymentTool paymentTool = payer.getPaymentTool();
             payment.setMaskedPan(paymentTool.getBankCard().getMaskedPan());
