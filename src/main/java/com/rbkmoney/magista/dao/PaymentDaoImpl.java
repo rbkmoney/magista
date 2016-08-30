@@ -40,7 +40,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
     @Override
     public Payment findById(String id) throws DaoException {
         String sql = "SELECT id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, " +
-                "amount, currency_code, payment_system, city_name, ip, created_at, model " +
+                "amount, currency_code, payment_system, city_name, ip, created_at, changed_at, model " +
                 "from mst.payment where id = :id";
 
         Payment payment;
