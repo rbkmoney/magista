@@ -199,10 +199,9 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getPaymentsTurnoverStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        StringBuilder sb = new StringBuilder("select currency_code as currency_symbolic_code, SUM(amount) as amount_with_fee, SUM(amount) as amount_without_fee, ");
-        addTail(sb, "mst.payment", "sp_val", splitInterval, Arrays.asList("currency_code"), Arrays.asList("currency_code"), () -> " and status = '"+InvoicePaymentStatus._Fields.SUCCEEDED.getFieldName()+"'");
-        String sql = sb.toString();
-        MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime);
+        String sql = "SELECT currency_code AS currency_symbolic_code, SUM(amount) AS amount_with_fee, SUM(amount) AS amount_without_fee, trunc(EXTRACT(EPOCH FROM (created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment WHERE shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time AND status = :succeeded_status GROUP BY sp_val, currency_code ORDER BY sp_val";
+        MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
+        params.addValue("succeeded_status", InvoicePaymentStatus._Fields.SUCCEEDED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
         try {
             return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
@@ -220,10 +219,9 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getPaymentsGeoStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        StringBuilder sb = new StringBuilder("select city_name, currency_code as currency_symbolic_code, SUM(amount) as amount_with_fee, SUM(amount) as amount_without_fee, ");
-        addTail(sb, "mst.payment", "sp_val", splitInterval, Arrays.asList("city_name", "currency_code"), Arrays.asList("city_name", "currency_code"), () -> " and status = '"+InvoicePaymentStatus._Fields.SUCCEEDED.getFieldName()+"'");
-        String sql = sb.toString();
-        MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime);
+        String sql = "SELECT city_name, currency_code as currency_symbolic_code, SUM(amount) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time  group by sp_val, city_name, currency_code order by sp_val";
+        MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
+        params.addValue("succeeded_status", InvoicePaymentStatus._Fields.SUCCEEDED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
         try {
             return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
@@ -242,11 +240,10 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getPaymentsConversionStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        StringBuilder sb = new StringBuilder("select t.*, t.successful_count::float / t.total_count as conversion from (SELECT SUM(case WHEN (status = '"+InvoicePaymentStatus._Fields.SUCCEEDED.getFieldName()+"' or status = '"+InvoicePaymentStatus._Fields.FAILED.getFieldName()+"') then 1 else 0 end) as total_count, SUM(CASE WHEN status = '"+ InvoicePaymentStatus._Fields.SUCCEEDED.getFieldName()+"' THEN 1 ELSE 0 END) as successful_count, ");
-        addTail(sb, "mst.payment", "sp_val", splitInterval, Collections.EMPTY_LIST, Collections.EMPTY_LIST, () -> "");
-        sb.append(") as t");
-        String sql = sb.toString();
-        MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime);
+        String sql = "select t.*, t.successful_count::float / t.total_count as conversion from (SELECT SUM(case WHEN (status = :succeeded_status or status = :failed_status) then 1 else 0 end) as total_count, SUM(CASE WHEN status = :succeeded_status THEN 1 ELSE 0 END) as successful_count, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time GROUP BY sp_val order by sp_val) as t";
+        MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
+        params.addValue("succeeded_status", InvoicePaymentStatus._Fields.SUCCEEDED.getFieldName());
+        params.addValue("failed_status", InvoicePaymentStatus._Fields.FAILED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
         try {
             return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
@@ -264,10 +261,8 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getCustomersRateStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        StringBuilder sb = new StringBuilder("SELECT count(id) as unic_count, ");
-        addTail(sb, "mst.customer", "sp_val", splitInterval, Collections.EMPTY_LIST, Collections.EMPTY_LIST, () -> "");
-        String sql = sb.toString();
-        MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime);
+        String sql = "SELECT count(id) as unic_count, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+" sec')) AS sp_val from mst.customer WHERE shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time GROUP BY sp_val ORDER BY sp_val";
+        MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         log.trace("SQL: {}, Params: {}", sql, params);
         try {
             return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
@@ -281,42 +276,19 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         }
     }
 
-    private MapSqlParameterSource createParamsMap(String merchantId, String shopId, Instant fromTime, Instant toTime) {
+    private MapSqlParameterSource createParamsMap(String merchantId, String shopId, Instant fromTime, Instant toTime, Integer splitInterval) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("merchant_id", merchantId);
         params.addValue("shop_id", shopId);
         params.addValue("from_time", Timestamp.from(fromTime));
         params.addValue("to_time", Timestamp.from(toTime));
+        params.addValue("split_interval", splitInterval);
         return params;
-    }
-
-    private StringBuilder addTail(StringBuilder sb, String tableName, String chunkFieldName, int splitInterval, Collection<String> extraGroupingFields, Collection<String> extraOrderingFields, Supplier<String> extraWhereSupplier) {
-        String splitField = chunkFieldName;
-        addChunckField(sb, "from_time", splitField, splitInterval);
-        sb.append(" from ").append(tableName);
-        sb.append(" where shop_id=:shop_id and merchant_id=:merchant_id and created_at >= :from_time and created_at < :to_time ");
-        sb.append(extraWhereSupplier.get());
-        sb.append(" group by ").append(splitField);
-        for (String field: extraGroupingFields) {
-            sb.append(',').append(field);
-        }
-
-        sb.append(" order by ").append(splitField);
-        for (String field: extraOrderingFields) {
-            sb.append(',').append(field);
-        }
-        return sb;
-    }
-
-    private StringBuilder addChunckField(StringBuilder sb, String fromTimeNameTemplate, String chunkFieldName, int splitInterval) {
-        sb.append(" trunc(EXTRACT(epoch FROM (created_at - ").append(':').append(fromTimeNameTemplate).append(")) / EXTRACT(epoch FROM INTERVAL '").append(splitInterval).append(" sec')) AS ").append(chunkFieldName).append(' ');
-        return sb;
     }
 
     private StringBuilder addCondition(StringBuilder sb, String fieldName, boolean apply) {
         return addCondition(sb, fieldName, fieldName, "and", "=", apply);
     }
-
 
     private StringBuilder addCondition(StringBuilder sb, String fieldName, String templateField, String op, String eq, boolean apply) {
         return apply ? sb.append(' ').append(op).append(' '). append(fieldName).append(eq).append(':').append(templateField) : sb;
