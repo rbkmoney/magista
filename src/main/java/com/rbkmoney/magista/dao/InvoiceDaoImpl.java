@@ -50,8 +50,10 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
                     source,
                     getRowMapper()
             );
+          log.trace("Invoice found by id: {}", id);
         } catch (EmptyResultDataAccessException ex) {
-            return null;
+            invoice =  null;
+            log.trace("Invoice not found by id: {}", id);
         } catch (NestedRuntimeException ex) {
             throw new DaoException(ex);
         }

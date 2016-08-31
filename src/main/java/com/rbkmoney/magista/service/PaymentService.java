@@ -87,10 +87,13 @@ public class PaymentService {
             payment.setIp(clientInfo.getIpAddress());
 
             try {
+                log.info("Start enrichment");
                 payment.setCityName(geoProvider.getCityName(payment.getIp()));
             } catch (ProviderException ex) {
                 log.warn("Failed to find city name by ip", ex);
                 payment.setCityName("UNKNOWN");
+            } finally {
+                log.info("Finish enrichment");
             }
 
             PaymentTool paymentTool = payer.getPaymentTool();
