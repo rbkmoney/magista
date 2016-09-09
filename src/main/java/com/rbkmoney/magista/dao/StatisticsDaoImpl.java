@@ -276,6 +276,27 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         }
     }
 
+    @Override
+    public Collection<Map<String, String>> getPaymentsCardTypesStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
+        String sql = "SELECT count(payment_system) as total_count, payment_system as payment_system, SUM(amount) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time GROUP BY sp_val, payment_system order by sp_val";
+        MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
+        params.addValue("succeeded_status", InvoicePaymentStatus._Fields.SUCCEEDED.getFieldName());
+        log.trace("SQL: {}, Params: {}", sql, params);
+        try {
+            return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
+                Map<String, String> map = new HashMap<>();
+                map.put("offset", (rs.getLong("sp_val")*splitInterval)+"" );
+                map.put("total_count", rs.getString("total_count"));
+                map.put("payment_system", rs.getString("payment_system"));
+                map.put("amount_with_fee", rs.getString("amount_with_fee"));
+                map.put("amount_without_fee", rs.getString("amount_without_fee"));
+                return map;
+            });
+        } catch (NestedRuntimeException e) {
+            throw new DaoException(e);
+        }
+    }
+
     private MapSqlParameterSource createParamsMap(String merchantId, String shopId, Instant fromTime, Instant toTime, Integer splitInterval) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("merchant_id", merchantId);

@@ -61,6 +61,15 @@ public class QueryProcessorImplTest {
     }
 
     @Test
+    public void testPaymentsCardTypesStat() {
+        String json = "{'query': {'payments_pmt_cards_stat': {'merchant_id': '42','shop_id': '45','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T16:12:00Z', 'split_interval':'60'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(1, statResponse.getData().getRecords().size());
+        assertEquals(0, statResponse.getTotalCount());
+        assertEquals(PaymentsCardTypesStatFunction.FUNC_NAME, statResponse.getData().getRecords().get(0).get(StatisticsDaoTest.KEY));
+    }
+
+    @Test
     public void testPaymentsConversionStat() {
         String json = "{'query': {'payments_conversion_stat': {'merchant_id': '42','shop_id': '45','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T16:12:00Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
@@ -109,6 +118,11 @@ public class QueryProcessorImplTest {
         @Override
         public Collection<Map<String, String>> getPaymentsGeoStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
              return getMaps(merchantId, shopId, fromTime, toTime, splitInterval, PaymentsGeoStatFunction.FUNC_NAME);
+        }
+
+        @Override
+        public Collection<Map<String, String>> getPaymentsCardTypesStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
+            return getMaps(merchantId, shopId, fromTime, toTime, splitInterval, PaymentsCardTypesStatFunction.FUNC_NAME);
         }
 
         @Override

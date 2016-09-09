@@ -91,4 +91,12 @@ public interface StatisticsDao {
             int splitInterval
     ) throws DaoException;
 
+    Collection<Map<String, String>> getPaymentsCardTypesStat(
+            String merchantId,
+            String shopId,
+            Instant fromTime,
+            Instant toTime,
+            int splitInterval
+    ) throws DaoException;
+
 }
