@@ -10,7 +10,6 @@ import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.model.Customer;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
-import com.rbkmoney.magista.provider.GeoProvider;
 import com.rbkmoney.magista.provider.ProviderException;
 import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.slf4j.Logger;
@@ -38,8 +37,6 @@ public class PaymentService {
     @Autowired
     CustomerDao customerDao;
 
-    @Autowired
-    GeoProvider geoProvider;
 
     public void changePaymentStatus(String paymentId, String invoiceId, long eventId, InvoicePaymentStatus status, Instant changedAt) throws NotFoundException, DataAccessException {
         log.trace("Change payment status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'", paymentId, invoiceId, eventId, status.getSetField().getFieldName());
@@ -88,7 +85,8 @@ public class PaymentService {
 
             try {
                 log.info("Start enrichment");
-                payment.setCityName(geoProvider.getCityName(payment.getIp()));
+                //todo: fix
+                payment.setCityName("test");
             } catch (ProviderException ex) {
                 log.warn("Failed to find city name by ip", ex);
                 payment.setCityName("UNKNOWN");
