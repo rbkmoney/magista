@@ -23,6 +23,7 @@ public class QueryParserImpl extends BaseQueryParser {
                         new CustomersRateStatFunction.CustomersRateStatParser(),
                         new PaymentsConversionStatFunction.PaymentsConversionStatParser(),
                         new PaymentsGeoStatFunction.PaymentsGeoStatParser(),
+                        new PaymentsCardTypesStatFunction.PaymentsCardTypesStatParser(),
                         new PaymentsTurnoverStatFunction.PaymentsTurnoverStatParser()
                 )
         );
