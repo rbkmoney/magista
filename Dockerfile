@@ -2,7 +2,7 @@
 
 # base java service image
 FROM dr.rbkmoney.com/rbkmoney/service-java:@dockerfile.base.service.tag@
-MAINTAINER Vladimir Pankrashkin <v.pankrashikn@rbkmoney.com>, Pavel Popov <p.popov@rbkmoney.com>
+MAINTAINER Vladimir Pankrashkin <v.pankrashkin@rbkmoney.com>, Pavel Popov <p.popov@rbkmoney.com>
 
 COPY @artifactId@-@version@.jar /opt/@artifactId@/@artifactId@-@version@.jar
 CMD ["java", "-Xmx512m", "-jar","/opt/@artifactId@/@artifactId@-@version@.jar"]
