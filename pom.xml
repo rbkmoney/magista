@@ -162,6 +162,11 @@
             <version>fb43ca0</version>
         </dependency>
         <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>rotatable-appender</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>javafx</groupId>
             <artifactId>jfxrt</artifactId>
             <version>2.0</version>
