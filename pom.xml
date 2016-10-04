@@ -162,8 +162,8 @@
             <version>fb43ca0</version>
         </dependency>
         <dependency>
-            <groupId>com.rbkmoney</groupId>
-            <artifactId>rotatable-appender</artifactId>
+            <groupId>com.rbkmoney.logback</groupId>
+            <artifactId>nop-rolling</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>
