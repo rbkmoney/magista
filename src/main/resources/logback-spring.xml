@@ -44,10 +44,7 @@
         <appender-ref ref="FILE"/>
     </root>
 
-    <logger name="com.rbkmoney" level="ALL">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
-    </logger>
-
+    <logger name="com.rbkmoney" level="ALL"/>
+    
     <jmxConfigurator/>
 </configuration>
