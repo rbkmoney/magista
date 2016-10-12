@@ -16,6 +16,7 @@
     <version>1.0.3</version>
 
     <properties>
+        <server.port>8022</server.port>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -190,6 +191,7 @@
                 <targetPath>${project.build.directory}</targetPath>
                 <includes>
                     <include>Dockerfile</include>
+                    <include>containerpilot.json</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>
