@@ -102,7 +102,7 @@ public class PaymentService {
 
             payment.setStatus(invoicePayment.getStatus().getSetField());
 
-            Funds cost = invoicePayment.getCost();
+            Cash cost = invoicePayment.getCost();
             payment.setAmount(cost.getAmount());
             payment.setCurrencyCode(cost.getCurrency().getSymbolicCode());
 
