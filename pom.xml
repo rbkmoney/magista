@@ -160,7 +160,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
-            <version>1.91-25a49e4</version>
+            <version>1.96-29d6caf</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.logback</groupId>

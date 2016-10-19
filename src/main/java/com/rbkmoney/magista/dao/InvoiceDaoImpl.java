@@ -8,7 +8,6 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -22,7 +21,6 @@ import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.sql.Types;
 
 /**
  * Created by tolkonepiu on 23.08.16.
@@ -50,9 +48,9 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
                     source,
                     getRowMapper()
             );
-          log.trace("Invoice found by id: {}", id);
+            log.trace("Invoice found by id: {}", id);
         } catch (EmptyResultDataAccessException ex) {
-            invoice =  null;
+            invoice = null;
             log.trace("Invoice not found by id: {}", id);
         } catch (NestedRuntimeException ex) {
             throw new DaoException(ex);
@@ -94,7 +92,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
 
     private MapSqlParameterSource createSqlParameterSource(Invoice invoice) {
         try {
-            MapSqlParameterSource source = new MapSqlParameterSource()
+            return new MapSqlParameterSource()
                     .addValue("id", invoice.getId())
                     .addValue("event_id", invoice.getEventId())
                     .addValue("merchant_id", invoice.getMerchantId())
@@ -104,16 +102,9 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
                     .addValue("currency_code", invoice.getCurrencyCode())
                     .addValue("created_at", Timestamp.from(invoice.getCreatedAt()))
                     .addValue("changed_at", Timestamp.from(invoice.getChangedAt()))
-                    .addValue("model", new TSerializer(new TJSONProtocol.Factory()).toString(invoice.getModel(), StandardCharsets.UTF_8.name()));
-
-            PGobject data = new PGobject();
-            data.setType("jsonb");
-            data.setValue(new TSerializer(new TSimpleJSONProtocol.Factory()).toString(invoice.getModel(), StandardCharsets.UTF_8.name()));
-            source.addValue("data", data, Types.OTHER);
-
-            return source;
-
-        } catch (SQLException | TException ex) {
+                    .addValue("model", new TSerializer(new TJSONProtocol.Factory()).toString(invoice.getModel(), StandardCharsets.UTF_8.name()))
+                    .addValue("data", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(invoice.getModel(), StandardCharsets.UTF_8.name()));
+        } catch (TException ex) {
             throw new DaoException("Failed to serialize invoice model", ex);
         }
     }
