@@ -10,7 +10,6 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -24,7 +23,6 @@ import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.sql.Types;
 
 /**
  * Created by tolkonepiu on 23.08.16.
@@ -92,7 +90,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
 
     private MapSqlParameterSource createSqlParameterSource(Payment payment) {
         try {
-            MapSqlParameterSource source = new MapSqlParameterSource()
+            return new MapSqlParameterSource()
                     .addValue("id", payment.getId())
                     .addValue("event_id", payment.getEventId())
                     .addValue("invoice_id", payment.getInvoiceId())
@@ -108,16 +106,10 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                     .addValue("ip", payment.getIp())
                     .addValue("created_at", Timestamp.from(payment.getCreatedAt()))
                     .addValue("changed_at", Timestamp.from(payment.getChangedAt()))
-                    .addValue("model", new TSerializer(new TJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()));
+                    .addValue("model", new TSerializer(new TJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()))
+                    .addValue("data", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()));
 
-            PGobject data = new PGobject();
-            data.setType("jsonb");
-            data.setValue(new TSerializer(new TSimpleJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()));
-            source.addValue("data", data, Types.OTHER);
-
-            return source;
-
-        } catch (SQLException | TException ex) {
+        } catch (TException ex) {
             throw new DaoException("Failed to serialize payment model", ex);
         }
     }

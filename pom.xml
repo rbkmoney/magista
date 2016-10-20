@@ -13,7 +13,7 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
 
     <properties>
         <server.port>8022</server.port>
@@ -129,6 +129,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>4.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>3.8.4</version>
+        </dependency>
+        <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
         </dependency>
@@ -148,9 +158,9 @@
 
         <!--RBK libs-->
         <dependency>
-            <groupId>com.rbkmoney.dbinit</groupId>
+            <groupId>com.rbkmoney</groupId>
             <artifactId>dbinit</artifactId>
-            <version>0.1.0</version>
+            <version>1.0.5</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -160,7 +170,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
-            <version>1.91-25a49e4</version>
+            <version>1.96-29d6caf</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.logback</groupId>
@@ -221,9 +231,5 @@
                 </executions>
             </plugin>
         </plugins>
-
-
     </build>
-
-
 </project>
