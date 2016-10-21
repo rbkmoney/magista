@@ -1,7 +1,10 @@
 package com.rbkmoney.magista.listener;
 
+import com.rbkmoney.eventstock.client.DefaultSubscriberConfig;
+import com.rbkmoney.eventstock.client.EventConstraint;
 import com.rbkmoney.eventstock.client.EventPublisher;
-import com.rbkmoney.eventstock.client.SubscriberConfig;
+import com.rbkmoney.eventstock.client.poll.EventFlowFilter;
+import com.rbkmoney.magista.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -17,11 +20,18 @@ public class OnStart implements ApplicationListener<ApplicationReadyEvent> {
     EventPublisher eventPublisher;
 
     @Autowired
-    SubscriberConfig subscriberConfig;
+    EventService eventService;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        eventPublisher.subscribe(subscriberConfig);
+        EventConstraint.EventIDRange eventIDRange = new EventConstraint.EventIDRange();
+        Long lastEventId = eventService.getLastEventId();
+        if (lastEventId != null) {
+            eventIDRange.setFromExclusive(lastEventId);
+        }
+        EventFlowFilter eventFlowFilter = new EventFlowFilter(new EventConstraint(eventIDRange));
+
+        eventPublisher.subscribe(new DefaultSubscriberConfig(eventFlowFilter));
     }
 
 }

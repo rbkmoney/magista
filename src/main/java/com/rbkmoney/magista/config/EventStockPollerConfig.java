@@ -34,9 +34,6 @@ public class EventStockPollerConfig {
     @Autowired
     List<Handler> handlers;
 
-    @Autowired
-    EventService eventService;
-
     @Bean
     public EventPublisher eventPublisher() throws IOException {
         return new PollingEventPublisherBuilder()
@@ -46,20 +43,6 @@ public class EventStockPollerConfig {
                 .withMaxPoolSize(maxPoolSize)
                 .withPollDelay(pollDelay)
                 .build();
-    }
-
-    @Bean
-    public SubscriberConfig subscriberConfig() {
-        return new DefaultSubscriberConfig(eventFilter());
-    }
-
-    public EventFilter eventFilter() {
-        EventConstraint.EventIDRange eventIDRange = new EventConstraint.EventIDRange();
-        Long lastEventId = eventService.getLastEventId();
-        if (lastEventId != null) {
-            eventIDRange.setFromExclusive(lastEventId);
-        }
-        return new EventFlowFilter(new EventConstraint(eventIDRange));
     }
 
 }

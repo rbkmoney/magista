@@ -33,6 +33,6 @@ public class EventStockHandler implements EventHandler<StockEvent> {
 
     @Override
     public void handleNoMoreElements(String subsKey) {
-
+        log.warn("No more elements in BM, Subs key '{}'", subsKey);
     }
 }
