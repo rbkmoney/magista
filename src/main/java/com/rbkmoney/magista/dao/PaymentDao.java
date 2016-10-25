@@ -8,7 +8,7 @@ import com.rbkmoney.magista.model.Payment;
  */
 public interface PaymentDao {
 
-    Payment findById(String id) throws DaoException;
+    Payment findById(String paymentId, String invoiceId) throws DaoException;
 
     void insert(Payment payment) throws DaoException;
 

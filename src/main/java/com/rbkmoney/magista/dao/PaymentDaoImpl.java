@@ -36,14 +36,16 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
     }
 
     @Override
-    public Payment findById(String id) throws DaoException {
+    public Payment findById(String paymentId, String invoiceId) throws DaoException {
         String sql = "SELECT id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, " +
                 "amount, currency_code, payment_system, city_name, ip, created_at, changed_at, model " +
-                "from mst.payment where id = :id";
+                "from mst.payment where id = :id and invoice_id = :invoice_id";
 
         Payment payment;
         try {
-            MapSqlParameterSource source = new MapSqlParameterSource("id", id);
+            MapSqlParameterSource source = new MapSqlParameterSource()
+                    .addValue("id", paymentId)
+                    .addValue("invoice_id", invoiceId);
             log.trace("SQL: {}, Params: {}", sql, source.getValues());
             payment = getNamedParameterJdbcTemplate().queryForObject(
                     sql,
