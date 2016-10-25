@@ -73,7 +73,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                 "id = :id, event_id = :event_id, invoice_id = :invoice_id, merchant_id = :merchant_id, " +
                 "shop_id = :shop_id, customer_id = :customer_id, masked_pan = :masked_pan, status = :status, " +
                 "amount = :amount, currency_code = :currency_code, payment_system = :payment_system, " +
-                "city_name = :city_name, ip = :ip, created_at = :created_at, changed_at=:changed_at, model = :model, data = :data where id = :id";
+                "city_name = :city_name, ip = :ip, created_at = :created_at, changed_at=:changed_at, model = :model, data = :data where id = :id and invoice_id = :invoice_id";
         execute(updateSql, createSqlParameterSource(payment));
     }
 
