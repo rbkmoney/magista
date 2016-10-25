@@ -26,6 +26,10 @@ public class InvoiceService {
     @Autowired
     InvoiceDao invoiceDao;
 
+    public Invoice getInvoiceById(String invoiceId) throws StorageException {
+        return invoiceDao.findById(invoiceId);
+    }
+
     public void changeInvoiceStatus(String invoiceId, long eventId, InvoiceStatus status, Instant changedAt) throws NotFoundException, StorageException {
         log.trace("Change invoice status, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceId, eventId, status.getSetField().getFieldName());
 

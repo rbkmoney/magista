@@ -41,11 +41,15 @@ public class PaymentService {
     @Autowired
     GeoProvider geoProvider;
 
+    public Payment getPaymentByIds(String paymentId, String invoiceId) throws DataAccessException {
+        return paymentDao.findById(paymentId, invoiceId);
+    }
+
     public void changePaymentStatus(String paymentId, String invoiceId, long eventId, InvoicePaymentStatus status, Instant changedAt) throws NotFoundException, DataAccessException {
         log.trace("Change payment status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'", paymentId, invoiceId, eventId, status.getSetField().getFieldName());
 
         try {
-            Payment payment = paymentDao.findById(paymentId);
+            Payment payment = paymentDao.findById(paymentId, invoiceId);
             if (payment == null) {
                 throw new NotFoundException(String.format("Payment not found, paymentId='%s', invoiceId='%s', eventId='%d'", paymentId, invoiceId, eventId));
             }

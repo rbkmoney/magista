@@ -33,7 +33,7 @@ create table mst.payment (
   changed_at timestamp without time zone not null,
   model character varying not null,
   data character varying not null,
-  constraint payment_pkey primary key (id)
+  constraint payment_pkey primary key (invoice_id, id)
 );
 
 create table mst.customer (
