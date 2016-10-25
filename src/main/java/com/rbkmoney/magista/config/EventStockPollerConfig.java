@@ -1,9 +1,7 @@
 package com.rbkmoney.magista.config;
 
-import com.rbkmoney.eventstock.client.*;
-import com.rbkmoney.eventstock.client.poll.EventFlowFilter;
+import com.rbkmoney.eventstock.client.EventPublisher;
 import com.rbkmoney.eventstock.client.poll.PollingEventPublisherBuilder;
-import com.rbkmoney.magista.handler.Handler;
 import com.rbkmoney.magista.handler.poller.EventStockErrorHandler;
 import com.rbkmoney.magista.handler.poller.EventStockHandler;
 import com.rbkmoney.magista.service.EventService;
@@ -14,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by tolkonepiu on 03.08.16.
@@ -32,13 +29,13 @@ public class EventStockPollerConfig {
     int maxPoolSize;
 
     @Autowired
-    List<Handler> handlers;
+    EventService eventService;
 
     @Bean
     public EventPublisher eventPublisher() throws IOException {
         return new PollingEventPublisherBuilder()
                 .withURI(bmUri.getURI())
-                .withEventHandler(new EventStockHandler(handlers))
+                .withEventHandler(new EventStockHandler(eventService))
                 .withErrorHandler(new EventStockErrorHandler())
                 .withMaxPoolSize(maxPoolSize)
                 .withPollDelay(pollDelay)
