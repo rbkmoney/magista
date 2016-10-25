@@ -111,7 +111,7 @@ public class InvoiceAndPaymentServiceTest {
         assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", payment.getMerchantId());
         assertEquals("1", payment.getShopId());
         assertEquals("90b3bd52129ff2a40277445e02b85df3", payment.getCustomerId());
-        assertEquals(InvoicePaymentStatus._Fields.CANCELLED, payment.getStatus());
+        assertEquals(InvoicePaymentStatus._Fields.FAILED, payment.getStatus());
 
         paymentService.changePaymentStatus("1", invoiceId, 44, InvoicePaymentStatus.captured(new InvoicePaymentCaptured()), instant);
         payment = paymentService.getPaymentByIds("1", invoiceId);
