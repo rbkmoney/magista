@@ -13,7 +13,7 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
 
     <properties>
         <server.port>8022</server.port>
@@ -170,7 +170,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
-            <version>1.96-29d6caf</version>
+            <version>1.99-557f549</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.logback</groupId>

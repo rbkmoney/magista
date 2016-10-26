@@ -240,7 +240,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getPaymentsConversionStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "select t.*, t.successful_count::float / t.total_count as conversion from (SELECT SUM(case WHEN (status = :succeeded_status or status = :failed_status) then 1 else 0 end) as total_count, SUM(CASE WHEN status = :succeeded_status THEN 1 ELSE 0 END) as successful_count, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time GROUP BY sp_val order by sp_val) as t";
+        String sql = "select t.*, t.successful_count::float / greatest(t.total_count, 1) as conversion from (SELECT SUM(case WHEN (status = :succeeded_status or status = :failed_status) then 1 else 0 end) as total_count, SUM(CASE WHEN status = :succeeded_status THEN 1 ELSE 0 END) as successful_count, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time GROUP BY sp_val order by sp_val) as t";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         params.addValue("failed_status", InvoicePaymentStatus._Fields.FAILED.getFieldName());
