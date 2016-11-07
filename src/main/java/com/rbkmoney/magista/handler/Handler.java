@@ -5,13 +5,13 @@ import com.rbkmoney.thrift.filter.Filter;
 /**
  * Created by tolkonepiu on 03.08.16.
  */
-public interface Handler<T> {
+public interface Handler<T, P> {
 
     default boolean accept(T value) {
         return getFilter().match(value);
     }
 
-    void handle(T value);
+    P handle(T value);
 
     Filter getFilter();
 

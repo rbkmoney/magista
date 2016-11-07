@@ -21,8 +21,7 @@ public class EventStockHandler implements EventHandler<StockEvent> {
 
     @Override
     public void handleEvent(StockEvent stockEvent, String subsKey) {
-        log.trace("Handle event, id '{}', subs key '{}'", stockEvent.getSourceEvent().getProcessingEvent().getId(), subsKey);
-        eventService.proccessEvent(stockEvent);
+        eventService.processEvent(stockEvent);
     }
 
     @Override

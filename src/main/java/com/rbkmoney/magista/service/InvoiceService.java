@@ -1,19 +1,15 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.damsel.domain.InvoiceStatus;
-import com.rbkmoney.damsel.payment_processing.InvoiceCreated;
 import com.rbkmoney.magista.dao.InvoiceDao;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.model.Invoice;
-import com.rbkmoney.thrift.filter.converter.TemporalConverter;
+import com.rbkmoney.magista.model.InvoiceStatusChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
 
 /**
  * Created by tolkonepiu on 22.08.16.
@@ -30,52 +26,36 @@ public class InvoiceService {
         return invoiceDao.findById(invoiceId);
     }
 
-    public void changeInvoiceStatus(String invoiceId, long eventId, InvoiceStatus status, Instant changedAt) throws NotFoundException, StorageException {
-        log.trace("Change invoice status, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceId, eventId, status.getSetField().getFieldName());
+    public void changeInvoiceStatus(InvoiceStatusChange invoiceStatusChange) throws NotFoundException, StorageException {
+        log.trace("Change invoice status, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
 
         try {
-            Invoice invoice = invoiceDao.findById(invoiceId);
+            Invoice invoice = invoiceDao.findById(invoiceStatusChange.getInvoiceId());
             if (invoice == null) {
-                throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'", invoiceId, eventId));
+                throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId()));
             }
 
-            invoice.setStatus(status.getSetField());
-            invoice.setChangedAt(changedAt);
-            invoice.getModel().setStatus(status);
+            invoice.setStatus(invoiceStatusChange.getStatus().getSetField());
+            invoice.setChangedAt(invoiceStatusChange.getChangedAt());
+            invoice.getModel().setStatus(invoiceStatusChange.getStatus());
 
             invoiceDao.update(invoice);
-            log.info("Invoice status have been changed, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceId, eventId, status.getSetField().getFieldName());
+            log.info("Invoice status have been changed, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
 
         } catch (DaoException ex) {
-            String message = String.format("Failed to change invoice status, invoiceId='%s', eventId='%d', invoiceStatus='%s'", invoiceId, eventId, status.getSetField().getFieldName());
+            String message = String.format("Failed to change invoice status, invoiceId='%s', eventId='%d', invoiceStatus='%s'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
             throw new StorageException(message, ex);
         }
     }
 
-    public void saveInvoice(long eventId, InvoiceCreated invoiceCreated) throws StorageException {
-        log.trace("Save invoice, invoiceId='{}', eventId='{}'", invoiceCreated.getInvoice().getId(), eventId);
-
+    public void saveInvoice(Invoice invoice) throws StorageException {
+        log.trace("Save invoice, invoiceId='{}', eventId='{}'", invoice.getId(), invoice.getEventId());
         try {
-            Invoice invoice = new Invoice();
-            invoice.setId(invoiceCreated.getInvoice().getId());
-            invoice.setEventId(eventId);
-            invoice.setShopId(invoiceCreated.getInvoice().getShopId());
-            invoice.setMerchantId(invoiceCreated.getInvoice().getOwner().getId());
-            invoice.setStatus(invoiceCreated.getInvoice().getStatus().getSetField());
-
-            Instant createdAt = Instant.from(TemporalConverter.stringToTemporal(invoiceCreated.getInvoice().getCreatedAt()));
-            invoice.setCreatedAt(createdAt);
-            invoice.setChangedAt(createdAt);
-
-            invoice.setAmount(invoiceCreated.getInvoice().getCost().getAmount());
-            invoice.setCurrencyCode(invoiceCreated.getInvoice().getCost().getCurrency().getSymbolicCode());
-            invoice.setModel(invoiceCreated.getInvoice());
-
             invoiceDao.insert(invoice);
-            log.info("Invoice have been saved, invoiceId='{}', eventId='{}'", invoiceCreated.getInvoice().getId(), eventId);
+            log.info("Invoice have been saved, invoiceId='{}', eventId='{}'", invoice.getId(), invoice.getEventId());
 
         } catch (DaoException ex) {
-            String message = String.format("Failed to save invoice, id='%s', eventId='%d'", invoiceCreated.getInvoice().getId(), eventId);
+            String message = String.format("Failed to save invoice, id='%s', eventId='%d'", invoice.getId(), invoice.getEventId());
             throw new StorageException(message, ex);
         }
     }

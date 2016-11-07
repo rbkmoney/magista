@@ -32,6 +32,8 @@ public class OnStart implements ApplicationListener<ApplicationReadyEvent> {
         EventFlowFilter eventFlowFilter = new EventFlowFilter(new EventConstraint(eventIDRange));
 
         eventPublisher.subscribe(new DefaultSubscriberConfig(eventFlowFilter));
+
+        eventService.start();
     }
 
 }
