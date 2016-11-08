@@ -15,8 +15,8 @@ public class HandleTask implements Callable<Pair> {
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
-    StockEvent stockEvent;
-    List<Handler> handlers;
+    private StockEvent stockEvent;
+    private List<Handler> handlers;
 
     public HandleTask(StockEvent stockEvent, List<Handler> handlers) {
         this.stockEvent = stockEvent;

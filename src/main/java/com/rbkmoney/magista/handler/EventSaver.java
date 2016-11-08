@@ -16,10 +16,10 @@ import java.util.concurrent.Future;
  */
 public class EventSaver implements Runnable {
 
-    BlockingQueue<Future<Pair>> queue;
+    private BlockingQueue<Future<Pair>> queue;
 
-    PaymentService paymentService;
-    InvoiceService invoiceService;
+    private PaymentService paymentService;
+    private InvoiceService invoiceService;
 
     public EventSaver(BlockingQueue<Future<Pair>> queue, PaymentService paymentService, InvoiceService invoiceService) {
         this.queue = queue;

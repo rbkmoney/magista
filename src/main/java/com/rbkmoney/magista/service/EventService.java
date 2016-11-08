@@ -27,21 +27,21 @@ public class EventService {
     Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    EventDao eventDao;
+    private EventDao eventDao;
 
     @Autowired
-    List<Handler> handlers;
+    private List<Handler> handlers;
 
     @Autowired
-    InvoiceService invoiceService;
+    private InvoiceService invoiceService;
 
     @Autowired
-    PaymentService paymentService;
+    private PaymentService paymentService;
 
-    BlockingQueue<Future<Pair>> queue;
+    private BlockingQueue<Future<Pair>> queue;
 
     @Value("${bm.queue.limit:100}")
-    int queueLimit;
+    private int queueLimit;
 
     EventSaver eventSaver;
 
@@ -78,7 +78,7 @@ public class EventService {
     }
 
     public void start() {
-        queue = new LinkedBlockingQueue(100);
+        queue = new LinkedBlockingQueue(queueLimit);
         eventSaver = new EventSaver(queue, paymentService, invoiceService);
         Thread newThread = new Thread(eventSaver, "EventSaver");
         newThread.start();
