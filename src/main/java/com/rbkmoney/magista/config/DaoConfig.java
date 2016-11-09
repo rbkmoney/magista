@@ -1,6 +1,8 @@
 package com.rbkmoney.magista.config;
 
 import com.rbkmoney.magista.dao.*;
+import org.jooq.Schema;
+import org.jooq.impl.SchemaImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -42,4 +44,10 @@ public class DaoConfig {
     public EventDao eventDao(DataSource ds) {
         return new EventDaoImpl(ds);
     }
+
+    @Bean
+    public Schema dbSchema() {
+        return new SchemaImpl("mst");
+    }
+
 }
