@@ -32,7 +32,7 @@ public class GeoProviderIpml implements GeoProvider {
     @Override
     public String getCityName(String ip) throws ProviderException {
         try {
-            if (!StringUtils.hasText(ip)) {
+            if (!StringUtils.isEmpty(ip)) {
                 return "UNKNOWN";
             }
 

@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.handler.poller;
+package com.rbkmoney.magista.event.impl.poller;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.eventstock.client.EventHandler;

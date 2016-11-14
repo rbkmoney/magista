@@ -1,38 +1,25 @@
-package com.rbkmoney.magista.handler;
+package com.rbkmoney.magista.event.impl.mapper;
 
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payment_processing.Event;
+import com.rbkmoney.magista.event.Mapper;
+import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.model.Payment;
-import com.rbkmoney.thrift.filter.Filter;
-import com.rbkmoney.thrift.filter.PathConditionFilter;
 import com.rbkmoney.thrift.filter.converter.TemporalConverter;
-import com.rbkmoney.thrift.filter.rule.PathConditionRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
 /**
- * Created by tolkonepiu on 04.08.16.
+ * Created by tolkonepiu on 10/11/2016.
  */
-@Component
-public class PaymentStartedHandler implements Handler<StockEvent, Payment> {
-
-    Logger log = LoggerFactory.getLogger(this.getClass());
-
-    private Filter filter;
-
-    private String path = "source_event.processing_event.payload.invoice_event.invoice_payment_event.invoice_payment_started.payment";
-
-    public PaymentStartedHandler() {
-        filter = new PathConditionFilter(new PathConditionRule(path));
-    }
-
+public class PaymentMapper implements Mapper<InvoiceEventContext> {
     @Override
-    public Payment handle(StockEvent value) {
-        Event event = value.getSourceEvent().getProcessingEvent();
+    public InvoiceEventContext fill(InvoiceEventContext value) {
+
+        StockEvent stockEvent = value.getSource();
+
+        Event event = stockEvent.getSourceEvent().getProcessingEvent();
         long eventId = event.getId();
         String invoiceId = event.getSource().getInvoice();
         InvoicePayment invoicePayment = event.getPayload().getInvoiceEvent().getInvoicePaymentEvent().getInvoicePaymentStarted().getPayment();
@@ -47,16 +34,6 @@ public class PaymentStartedHandler implements Handler<StockEvent, Payment> {
         ClientInfo clientInfo = payer.getClientInfo();
         payment.setCustomerId(clientInfo.getFingerprint());
         payment.setIp(clientInfo.getIpAddress());
-
-//        try {
-//            log.info("Start enrichment");
-//            payment.setCityName(geoProvider.getCityName(payment.getIp()));
-//        } catch (ProviderException ex) {
-//            log.warn("Failed to find city name by ip", ex);
-//            payment.setCityName("UNKNOWN");
-//        } finally {
-//            log.info("Finish enrichment");
-//        }
 
         PaymentTool paymentTool = payer.getPaymentTool();
         payment.setMaskedPan(paymentTool.getBankCard().getMaskedPan());
@@ -74,11 +51,8 @@ public class PaymentStartedHandler implements Handler<StockEvent, Payment> {
 
         payment.setModel(invoicePayment);
 
-        return payment;
-    }
+        value.setPayment(payment);
 
-    @Override
-    public Filter getFilter() {
-        return filter;
+        return value;
     }
 }

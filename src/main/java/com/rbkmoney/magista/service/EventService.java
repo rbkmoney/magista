@@ -1,13 +1,13 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.eventstock.client.poll.Pair;
 import com.rbkmoney.magista.dao.EventDao;
+import com.rbkmoney.magista.event.EventContext;
+import com.rbkmoney.magista.event.EventSaver;
+import com.rbkmoney.magista.event.HandleTask;
+import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.StorageException;
-import com.rbkmoney.magista.handler.EventSaver;
-import com.rbkmoney.magista.handler.HandleTask;
-import com.rbkmoney.magista.handler.Handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class EventService {
     @Autowired
     private PaymentService paymentService;
 
-    private BlockingQueue<Future<Pair>> queue;
+    private BlockingQueue<Future<EventContext>> queue;
 
     @Value("${bm.queue.limit:100}")
     private int queueLimit;
@@ -69,12 +69,25 @@ public class EventService {
     }
 
     public void processEvent(StockEvent stockEvent) {
-        Future<Pair> future = executorService.submit(new HandleTask(stockEvent, handlers));
+        Handler handler = getHandler(stockEvent);
+        HandleTask handleTask = new HandleTask(stockEvent, handler);
+
+        Future<EventContext> eventContextFuture = executorService.submit(handleTask);
+
         try {
-            queue.put(future);
-        } catch (InterruptedException e) {
-            //ALARM! if you see it, don't approve this pull request
+            queue.put(eventContextFuture);
+        } catch (InterruptedException ex) {
+            //ALARM! DON'T APPROVE!
         }
+    }
+
+    private Handler getHandler(StockEvent stockEvent) {
+        for (Handler handler : handlers) {
+            if (handler.accept(stockEvent)) {
+                return handler;
+            }
+        }
+        return null;
     }
 
     public void start() {
