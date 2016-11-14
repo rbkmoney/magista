@@ -36,7 +36,11 @@ public class PaymentGeoMapper implements Mapper<InvoiceEventContext> {
         } catch (ProviderException ex) {
             log.warn("Failed to find city name by ip", ex);
             payment.setCityName("UNKNOWN");
+        } finally {
+            log.debug("End geo enrichment, paymentId='{}', invoiceId='{}', eventId='{}'",
+                    payment.getId(), payment.getInvoiceId(), payment.getEventId());
         }
+
         value.setPayment(payment);
 
         return value;

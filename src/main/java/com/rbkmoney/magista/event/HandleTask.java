@@ -23,6 +23,9 @@ public class HandleTask implements Callable<EventContext> {
 
     @Override
     public EventContext call() throws Exception {
+        log.info("Start event handling, id='{}', type='{}'",
+                stockEvent.getSourceEvent().getProcessingEvent().getId(), handler.getEventType());
+
         return handler.handle(stockEvent);
     }
 }

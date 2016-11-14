@@ -3,14 +3,11 @@ package com.rbkmoney.magista.event.impl.handler;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.magista.event.EventContext;
 import com.rbkmoney.magista.event.EventType;
-import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.event.impl.mapper.PaymentGeoMapper;
 import com.rbkmoney.magista.event.impl.mapper.PaymentMapper;
 import com.rbkmoney.magista.provider.GeoProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,9 +19,7 @@ import java.util.List;
  * Created by tolkonepiu on 04.08.16.
  */
 @Component
-public class PaymentStartedHandler implements Handler<StockEvent> {
-
-    final private Logger log = LoggerFactory.getLogger(this.getClass());
+public class PaymentStartedHandler extends AbstractInvoiceEventHandler {
 
     @Autowired
     GeoProvider geoProvider;
@@ -51,5 +46,10 @@ public class PaymentStartedHandler implements Handler<StockEvent> {
     @Override
     public EventType getEventType() {
         return EventType.INVOICE_PAYMENT_STARTED;
+    }
+
+    @Override
+    List<Mapper> getMappers() {
+        return mappers;
     }
 }
