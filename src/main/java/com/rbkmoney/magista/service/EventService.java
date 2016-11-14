@@ -70,14 +70,16 @@ public class EventService {
 
     public void processEvent(StockEvent stockEvent) {
         Handler handler = getHandler(stockEvent);
-        HandleTask handleTask = new HandleTask(stockEvent, handler);
+        if (handler != null) {
+            HandleTask handleTask = new HandleTask(stockEvent, handler);
 
-        Future<EventContext> eventContextFuture = executorService.submit(handleTask);
+            Future<EventContext> eventContextFuture = executorService.submit(handleTask);
 
-        try {
-            queue.put(eventContextFuture);
-        } catch (InterruptedException ex) {
-            //ALARM! DON'T APPROVE!
+            try {
+                queue.put(eventContextFuture);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
