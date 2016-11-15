@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
  */
 public class HandleTask implements Callable<EventContext> {
 
-    Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private StockEvent stockEvent;
     private Handler handler;

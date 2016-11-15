@@ -16,9 +16,9 @@ import java.util.List;
 @Component
 public class InvoiceCreatedHandler extends AbstractInvoiceEventHandler {
 
-    List<Mapper> mappers = Arrays.asList(new Mapper[]{
+    List<Mapper> mappers = Arrays.asList(
             new InvoiceMapper()
-    });
+    );
 
     @Override
     public EventType getEventType() {

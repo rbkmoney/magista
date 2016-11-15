@@ -14,9 +14,9 @@ import java.util.List;
 @Component
 public class PaymentStatusChangedHandler extends AbstractInvoiceEventHandler {
 
-    private List<Mapper> mappers = Arrays.asList(new Mapper[]{
+    private List<Mapper> mappers = Arrays.asList(
             new PaymentStatusMapper()
-    });
+    );
 
     @Override
     public EventType getEventType() {

@@ -22,10 +22,10 @@ public class EventStockPollerConfig {
     @Value("${bm.pooling.url}")
     Resource bmUri;
 
-    @Value("${bm.pooling.delay:5000}")
+    @Value("${bm.pooling.delay}")
     int pollDelay;
 
-    @Value("${bm.pooling.maxPoolSize:1}")
+    @Value("${bm.pooling.maxPoolSize}")
     int maxPoolSize;
 
     @Autowired

@@ -28,10 +28,10 @@ public class PaymentStartedHandler extends AbstractInvoiceEventHandler {
 
     @PostConstruct
     public void init() {
-        mappers = Arrays.asList(new Mapper[]{
+        mappers = Arrays.asList(
                 new PaymentMapper(),
                 new PaymentGeoMapper(geoProvider)
-        });
+        );
     }
 
     @Override
