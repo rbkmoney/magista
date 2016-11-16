@@ -40,7 +40,7 @@ public class EventService {
 
     private BlockingQueue<Future<EventContext>> queue;
 
-    @Value("${bm.queue.limit:100}")
+    @Value("${bm.pooling.queue.limit}")
     private int queueLimit;
 
     EventSaver eventSaver;
