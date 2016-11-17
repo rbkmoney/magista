@@ -2,10 +2,7 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.magista.dao.EventDao;
-import com.rbkmoney.magista.event.EventContext;
-import com.rbkmoney.magista.event.EventSaver;
-import com.rbkmoney.magista.event.HandleTask;
-import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.event.*;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.StorageException;
 import org.slf4j.Logger;
@@ -32,13 +29,7 @@ public class EventService {
     @Autowired
     private List<Handler> handlers;
 
-    @Autowired
-    private InvoiceService invoiceService;
-
-    @Autowired
-    private PaymentService paymentService;
-
-    private BlockingQueue<Future<EventContext>> queue;
+    private BlockingQueue<Future<Processor>> queue;
 
     @Value("${bm.pooling.queue.limit}")
     private int queueLimit;
@@ -73,7 +64,7 @@ public class EventService {
         if (handler != null) {
             HandleTask handleTask = new HandleTask(stockEvent, handler);
 
-            Future<EventContext> eventContextFuture = executorService.submit(handleTask);
+            Future<Processor> eventContextFuture = executorService.submit(handleTask);
 
             try {
                 queue.put(eventContextFuture);
@@ -94,7 +85,7 @@ public class EventService {
 
     public void start() {
         queue = new LinkedBlockingQueue(queueLimit);
-        eventSaver = new EventSaver(queue, paymentService, invoiceService);
+        eventSaver = new EventSaver(queue);
         Thread newThread = new Thread(eventSaver, "EventSaver");
         newThread.start();
     }

@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
 /**
  * Created by tolkonepiu on 31/10/2016.
  */
-public class HandleTask implements Callable<EventContext> {
+public class HandleTask implements Callable<Processor> {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -22,7 +22,7 @@ public class HandleTask implements Callable<EventContext> {
     }
 
     @Override
-    public EventContext call() throws Exception {
+    public Processor call() throws Exception {
         log.info("Start event handling, id='{}', type='{}'",
                 stockEvent.getSourceEvent().getProcessingEvent().getId(), handler.getEventType());
 

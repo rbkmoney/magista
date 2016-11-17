@@ -1,10 +1,7 @@
 package com.rbkmoney.magista.event;
 
-import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
-import com.rbkmoney.magista.service.InvoiceService;
-import com.rbkmoney.magista.service.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,42 +16,21 @@ public class EventSaver implements Runnable {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private BlockingQueue<Future<EventContext>> queue;
+    private BlockingQueue<Future<Processor>> queue;
 
-    private PaymentService paymentService;
-    private InvoiceService invoiceService;
-
-    public EventSaver(BlockingQueue<Future<EventContext>> queue, PaymentService paymentService, InvoiceService invoiceService) {
+    public EventSaver(BlockingQueue<Future<Processor>> queue) {
         this.queue = queue;
-        this.paymentService = paymentService;
-        this.invoiceService = invoiceService;
     }
 
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                Future<EventContext> future = queue.take();
-                EventContext eventContext = future.get();
+                Future<Processor> future = queue.take();
+                Processor processor = future.get();
 
-                if (eventContext != null && eventContext instanceof InvoiceEventContext) {
-                    InvoiceEventContext invoiceEventContext = (InvoiceEventContext) eventContext;
-                    if (invoiceEventContext.getInvoice() != null) {
-                        invoiceService.saveInvoice(invoiceEventContext.getInvoice());
-                    }
+                processor.execute();
 
-                    if (invoiceEventContext.getInvoiceStatusChange() != null) {
-                        invoiceService.changeInvoiceStatus(invoiceEventContext.getInvoiceStatusChange());
-                    }
-
-                    if (invoiceEventContext.getPayment() != null) {
-                        paymentService.savePayment(invoiceEventContext.getPayment());
-                    }
-
-                    if (invoiceEventContext.getPaymentStatusChange() != null) {
-                        paymentService.changePaymentStatus(invoiceEventContext.getPaymentStatusChange());
-                    }
-                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException ex) {

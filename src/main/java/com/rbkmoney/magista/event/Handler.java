@@ -9,7 +9,7 @@ public interface Handler<T> {
         return getEventType().getFilter().match(event);
     }
 
-    EventContext handle(T event);
+    Processor handle(T event);
 
     EventType getEventType();
 
