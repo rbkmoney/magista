@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class InvoiceService {
 
-    Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     InvoiceDao invoiceDao;

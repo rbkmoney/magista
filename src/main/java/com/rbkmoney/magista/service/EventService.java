@@ -2,7 +2,10 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.magista.dao.EventDao;
-import com.rbkmoney.magista.event.*;
+import com.rbkmoney.magista.event.EventSaver;
+import com.rbkmoney.magista.event.HandleTask;
+import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.StorageException;
 import org.slf4j.Logger;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,22 +35,36 @@ public class EventService {
 
     private BlockingQueue<Future<Processor>> queue;
 
-    @Value("${bm.pooling.queue.limit}")
+    @Value("${bm.pooling.handler.maxPoolSize}")
+    private int pollSize;
+
+    @Value("${bm.pooling.handler.queue.limit}")
     private int queueLimit;
+
+    @Value("${bm.pooling.handler.timeout}")
+    private long timeout;
 
     EventSaver eventSaver;
 
-    ExecutorService executorService = Executors.newFixedThreadPool(5, new ThreadFactory() {
-        AtomicInteger counter = new AtomicInteger();
-        ThreadGroup group = new ThreadGroup("HandleGroup");
+    ExecutorService executorService;
 
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread thread = new Thread(group, r, "Handler-" + counter.incrementAndGet());
-            thread.setDaemon(true);
-            return thread;
-        }
-    });
+    @PostConstruct
+    public void init() {
+        executorService = Executors.newFixedThreadPool(pollSize, new ThreadFactory() {
+            AtomicInteger counter = new AtomicInteger();
+            ThreadGroup group = new ThreadGroup("HandleGroup");
+
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread thread = new Thread(group, r, "EventHandler-" + counter.incrementAndGet());
+                thread.setDaemon(true);
+                return thread;
+            }
+        });
+
+        queue = new LinkedBlockingQueue(queueLimit);
+        eventSaver = new EventSaver(queue, timeout);
+    }
 
     public Long getLastEventId() {
         Long lastEventId;
@@ -64,14 +82,17 @@ public class EventService {
         if (handler != null) {
             HandleTask handleTask = new HandleTask(stockEvent, handler);
 
-            Future<Processor> eventContextFuture = executorService.submit(handleTask);
-
+            Future<Processor> processorFuture = executorService.submit(handleTask);
             try {
-                queue.put(eventContextFuture);
+                queue.put(processorFuture);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    public boolean isEventQueueEmpty() {
+        return queue.isEmpty();
     }
 
     private Handler getHandler(StockEvent stockEvent) {
@@ -84,8 +105,6 @@ public class EventService {
     }
 
     public void start() {
-        queue = new LinkedBlockingQueue(queueLimit);
-        eventSaver = new EventSaver(queue);
         Thread newThread = new Thread(eventSaver, "EventSaver");
         newThread.start();
     }

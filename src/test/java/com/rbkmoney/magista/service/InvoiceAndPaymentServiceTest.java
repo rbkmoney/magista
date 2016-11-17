@@ -44,7 +44,6 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 //ALARM! Don't approve pull request, if you see @Ignore annotation
-@Ignore
 public class InvoiceAndPaymentServiceTest {
 
     @Autowired
@@ -87,6 +86,9 @@ public class InvoiceAndPaymentServiceTest {
         for (StockEvent stockEvent : stockEvents) {
             eventService.processEvent(stockEvent);
         }
+
+        while(!eventService.isEventQueueEmpty());
+
         assertEquals(JdbcTestUtils.countRowsInTable(jdbcTemplate, "mst.invoice"), 8);
         assertEquals(JdbcTestUtils.countRowsInTable(jdbcTemplate, "mst.payment"), 7);
         assertEquals(JdbcTestUtils.countRowsInTable(jdbcTemplate, "mst.customer"), 3);
