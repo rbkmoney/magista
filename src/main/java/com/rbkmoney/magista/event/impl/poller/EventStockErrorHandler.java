@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.handler.poller;
+package com.rbkmoney.magista.event.impl.poller;
 
 import com.rbkmoney.eventstock.client.ErrorActionType;
 import com.rbkmoney.eventstock.client.ErrorHandler;
