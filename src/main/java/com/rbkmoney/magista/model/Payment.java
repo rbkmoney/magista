@@ -33,7 +33,9 @@ public class Payment {
 
     private BankCardPaymentSystem paymentSystem;
 
-    private String cityName;
+    private int cityId;
+
+    private int  countryId;
 
     private String ip;
 
@@ -131,12 +133,20 @@ public class Payment {
         this.paymentSystem = paymentSystem;
     }
 
-    public String getCityName() {
-        return cityName;
+    public int getCityId() {
+        return cityId;
     }
 
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+
+    public int getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(int countryId) {
+        this.countryId = countryId;
     }
 
     public String getIp() {
@@ -185,7 +195,8 @@ public class Payment {
                 ", amount=" + amount +
                 ", currencyCode='" + currencyCode + '\'' +
                 ", paymentSystem=" + paymentSystem +
-                ", cityName='" + cityName + '\'' +
+                ", cityId='" + cityId + '\'' +
+                ", countryId='" + countryId + '\'' +
                 ", ip='" + ip + '\'' +
                 ", createdAt=" + createdAt +
                 ", changedAt=" + changedAt +

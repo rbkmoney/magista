@@ -15,7 +15,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Created by vpankrashkin on 10.08.16.
@@ -219,7 +218,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getPaymentsGeoStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT city_name, currency_code as currency_symbolic_code, SUM(amount) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time  group by sp_val, city_name, currency_code order by sp_val";
+        String sql = "SELECT city_id, country_id, currency_code as currency_symbolic_code, SUM(amount) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time  group by sp_val, city_id, currency_code order by sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
@@ -227,7 +226,8 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
                 Map<String, String> map = new HashMap<>();
                 map.put("offset", (rs.getLong("sp_val")*splitInterval)+"" );
-                map.put("city_name", rs.getString("city_name"));
+                map.put("city_id", rs.getString("city_id"));
+                map.put("country_id", rs.getString("country_id"));
                 map.put("currency_symbolic_code", rs.getString("currency_symbolic_code"));
                 map.put("amount_with_fee", rs.getString("amount_with_fee"));
                 map.put("amount_without_fee", rs.getString("amount_without_fee"));

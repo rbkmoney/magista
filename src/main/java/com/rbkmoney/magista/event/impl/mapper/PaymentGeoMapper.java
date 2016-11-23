@@ -1,5 +1,7 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
+import com.rbkmoney.damsel.geo_ip.LocationInfo;
+import com.rbkmoney.damsel.geo_ip.geo_ipConstants;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.model.Payment;
@@ -31,11 +33,13 @@ public class PaymentGeoMapper implements Mapper<InvoiceEventContext> {
                 payment.getId(), payment.getInvoiceId(), payment.getEventId());
 
         try {
-            String cityName = geoProvider.getCityName(payment.getIp());
-            payment.setCityName(cityName);
+            LocationInfo locationInfo = geoProvider.getLocationInfo(payment.getIp());
+            payment.setCityId(locationInfo.getCityGeoId());
+            payment.setCountryId(locationInfo.getCountryGeoId());
         } catch (ProviderException ex) {
             log.warn("Failed to find city name by ip", ex);
-            payment.setCityName("UNKNOWN");
+            payment.setCityId(geo_ipConstants.GEO_ID_UNKNOWN);
+            payment.setCountryId(geo_ipConstants.GEO_ID_UNKNOWN);
         } finally {
             log.debug("End geo enrichment, paymentId='{}', invoiceId='{}', eventId='{}'",
                     payment.getId(), payment.getInvoiceId(), payment.getEventId());
