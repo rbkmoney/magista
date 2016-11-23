@@ -218,7 +218,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getPaymentsGeoStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT city_id, country_id, currency_code as currency_symbolic_code, SUM(amount) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time  group by sp_val, city_id, currency_code order by sp_val";
+        String sql = "SELECT city_id, country_id, currency_code as currency_symbolic_code, SUM(amount) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time  group by sp_val, city_id, country_id, currency_code order by sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
