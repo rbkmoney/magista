@@ -13,7 +13,7 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.0.7</version>
+    <version>1.1.0</version>
 
     <properties>
         <server.port>8022</server.port>
