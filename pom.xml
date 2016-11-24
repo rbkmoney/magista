@@ -170,7 +170,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
-            <version>1.99-557f549</version>
+            <version>1.108-35f8043</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>

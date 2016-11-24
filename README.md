@@ -63,7 +63,8 @@
 ##### `payments_geo_stat`
 Возвращает статистику по географии платежей (агрегация сумм успешных платежей по городам) в виде набора, сгруппированного по представленным в выборке городам и валютам:
 
-- `city_name` - город, который определился для данной совокупности платежей(ключ)
+- `city_id` - ID города, который определился для данной совокупности платежей(ключ)
+- `country_id` - ID страны, которая определилась для данной совокупности платежей(ключ)
 - `currency_symbolic_code` - символьный код валюты(ключ)
 - `amount_with_fee` - сумма с вычетом комиссий
 - `amount_without_fee` - сумма без вычета комиссий
@@ -111,28 +112,32 @@
 [
 	{
 		"offset": "0",
-		"city_name": "Москва",
+		"city_id": "111111",
+		"country_id": "222222",
 		"currency_symbolic_code": "RUB",
 		"amount_with_fee": "9000",
 		"amount_without_fee": "10000"
 	},
 	{
 		"offset": "0",
-		"city_name": "Ярославль",
+		"city_id": "111111",
+		"country_id": "222222",
 		"currency_symbolic_code": "RUB",
 		"amount_with_fee": "900",
 		"amount_without_fee": "1000"
 	},
 	{
 		"offset": "300",
-		"city_name": "Москва",
+		"city_id": "111111",
+		"country_id": "222222",
 		"currency_symbolic_code": "RUB",
 		"amount_with_fee": "18000",
 		"amount_without_fee": "19000"
 	},
 	{
 		"offset": "300",
-		"city_name": "Ярославль",
+		"city_id": "111111",
+		"country_id": "222222",
 		"currency_symbolic_code": "RUB",
 		"amount_with_fee": "5000",
 		"amount_without_fee": "5100"

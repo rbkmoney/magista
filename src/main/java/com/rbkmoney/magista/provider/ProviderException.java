@@ -9,6 +9,10 @@ public class ProviderException extends RuntimeException {
         super();
     }
 
+    public ProviderException(Throwable cause) {
+        super(cause);
+    }
+
     public ProviderException(String message) {
         super(message);
     }

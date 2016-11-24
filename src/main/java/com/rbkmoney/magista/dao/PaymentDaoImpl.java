@@ -38,7 +38,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
     @Override
     public Payment findById(String paymentId, String invoiceId) throws DaoException {
         String sql = "SELECT id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, " +
-                "amount, currency_code, payment_system, city_name, ip, created_at, changed_at, model " +
+                "amount, currency_code, payment_system, city_id, country_id, ip, created_at, changed_at, model " +
                 "from mst.payment where id = :id and invoice_id = :invoice_id";
 
         Payment payment;
@@ -62,8 +62,8 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
 
     @Override
     public void insert(Payment payment) throws DaoException {
-        String updateSql = "insert into mst.payment (id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, currency_code, payment_system, city_name, ip, created_at, changed_at, model, data) " +
-                "values (:id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :currency_code, :payment_system, :city_name, :ip, :created_at, :changed_at, :model, :data)";
+        String updateSql = "insert into mst.payment (id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, currency_code, payment_system, city_id, country_id, ip, created_at, changed_at, model, data) " +
+                "values (:id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :currency_code, :payment_system, :city_id, :country_id, :ip, :created_at, :changed_at, :model, :data)";
         execute(updateSql, createSqlParameterSource(payment));
     }
 
@@ -73,7 +73,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                 "id = :id, event_id = :event_id, invoice_id = :invoice_id, merchant_id = :merchant_id, " +
                 "shop_id = :shop_id, customer_id = :customer_id, masked_pan = :masked_pan, status = :status, " +
                 "amount = :amount, currency_code = :currency_code, payment_system = :payment_system, " +
-                "city_name = :city_name, ip = :ip, created_at = :created_at, changed_at=:changed_at, model = :model, data = :data where id = :id and invoice_id = :invoice_id";
+                "city_id = :city_id, country_id = :country_id, ip = :ip, created_at = :created_at, changed_at=:changed_at, model = :model, data = :data where id = :id and invoice_id = :invoice_id";
         execute(updateSql, createSqlParameterSource(payment));
     }
 
@@ -104,7 +104,8 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                     .addValue("amount", payment.getAmount())
                     .addValue("currency_code", payment.getCurrencyCode())
                     .addValue("payment_system", payment.getPaymentSystem().name())
-                    .addValue("city_name", payment.getCityName())
+                    .addValue("city_id", payment.getCityId())
+                    .addValue("country_id", payment.getCountryId())
                     .addValue("ip", payment.getIp())
                     .addValue("created_at", Timestamp.from(payment.getCreatedAt()))
                     .addValue("changed_at", Timestamp.from(payment.getChangedAt()))
@@ -131,7 +132,8 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                 payment.setAmount(rs.getLong("amount"));
                 payment.setCurrencyCode(rs.getString("currency_code"));
                 payment.setPaymentSystem(BankCardPaymentSystem.valueOf(rs.getString("payment_system")));
-                payment.setCityName(rs.getString("city_name"));
+                payment.setCityId(rs.getInt("city_id"));
+                payment.setCountryId(rs.getInt("country_id"));
                 payment.setIp(rs.getString("ip"));
                 payment.setCreatedAt(rs.getTimestamp("created_at").toInstant());
                 payment.setChangedAt(rs.getTimestamp("changed_at").toInstant());
