@@ -170,8 +170,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
-            <!--TODO update after https://github.com/rbkmoney/damsel/pull/89-->
-            <version>1.101-a8be468</version>
+            <version>1.108-35f8043</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>

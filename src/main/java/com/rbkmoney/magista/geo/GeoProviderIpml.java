@@ -19,7 +19,6 @@ public class GeoProviderIpml implements GeoProvider {
 
     @Override
     public LocationInfo getLocationInfo(String ip) throws ProviderException {
-
         try {
             return columbusClient.getLocation(ip);
         } catch (TException e) {

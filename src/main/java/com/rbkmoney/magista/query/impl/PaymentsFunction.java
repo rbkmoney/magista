@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
@@ -56,9 +57,8 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
                 () -> {
                     StatResponseData statResponseData = StatResponseData.payments(paymentsResult.getDataStream().map(payment -> {
                         StatPayment statPayment = new StatPayment(payment.getInvoiceId(), payment.getModel());
-                        //TODO uncomment after https://github.com/rbkmoney/damsel/pull/89 will be merged
-//                        LocationInfo locationInfo = new LocationInfo(payment.getCityId(), payment.getCountryId());
-//                        statPayment.setLocationInfo(locationInfo);
+                        LocationInfo locationInfo = new LocationInfo(payment.getCityId(), payment.getCountryId());
+                        statPayment.setLocationInfo(locationInfo);
                         return statPayment;
                     }).collect(Collectors.toList()));
                     StatResponse statResponse = new StatResponse(statResponseData);
