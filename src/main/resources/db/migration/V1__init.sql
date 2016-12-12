@@ -25,6 +25,7 @@ create table mst.payment (
   masked_pan character varying not null,
   status character varying not null,
   amount bigint not null,
+  fee bigint not null,
   currency_code character varying not null,
   payment_system character varying not null,
   country_id int not null,

@@ -29,6 +29,8 @@ public class Payment {
 
     private long amount;
 
+    private long fee;
+
     private String currencyCode;
 
     private BankCardPaymentSystem paymentSystem;
@@ -117,6 +119,14 @@ public class Payment {
         this.amount = amount;
     }
 
+    public long getFee() {
+        return fee;
+    }
+
+    public void setFee(long fee) {
+        this.fee = fee;
+    }
+
     public String getCurrencyCode() {
         return currencyCode;
     }
@@ -193,6 +203,7 @@ public class Payment {
                 ", maskedPan='" + maskedPan + '\'' +
                 ", status=" + status +
                 ", amount=" + amount +
+                ", fee=" + fee +
                 ", currencyCode='" + currencyCode + '\'' +
                 ", paymentSystem=" + paymentSystem +
                 ", cityId='" + cityId + '\'' +

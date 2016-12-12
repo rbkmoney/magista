@@ -7,6 +7,7 @@ import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.damsel.event_stock.SourceEvent;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payment_processing.Event;
+import com.rbkmoney.magista.event.EventType;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.InvoiceStatusChange;
 import com.rbkmoney.magista.model.Payment;
