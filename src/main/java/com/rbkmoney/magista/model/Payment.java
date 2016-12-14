@@ -19,7 +19,7 @@ public class Payment {
 
     private String merchantId;
 
-    private String shopId;
+    private int shopId;
 
     private String customerId;
 
@@ -79,11 +79,11 @@ public class Payment {
         this.merchantId = merchantId;
     }
 
-    public String getShopId() {
+    public int getShopId() {
         return shopId;
     }
 
-    public void setShopId(String shopId) {
+    public void setShopId(int shopId) {
         this.shopId = shopId;
     }
 
@@ -198,7 +198,7 @@ public class Payment {
                 ", eventId=" + eventId +
                 ", invoiceId='" + invoiceId + '\'' +
                 ", merchantId='" + merchantId + '\'' +
-                ", shopId='" + shopId + '\'' +
+                ", shopId=" + shopId +
                 ", customerId='" + customerId + '\'' +
                 ", maskedPan='" + maskedPan + '\'' +
                 ", status=" + status +

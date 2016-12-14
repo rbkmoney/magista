@@ -116,7 +116,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
                 invoice.setId(rs.getString("id"));
                 invoice.setEventId(rs.getLong("event_id"));
                 invoice.setMerchantId(rs.getString("merchant_id"));
-                invoice.setShopId(rs.getString("shop_id"));
+                invoice.setShopId(rs.getInt("shop_id"));
                 invoice.setStatus(InvoiceStatus._Fields.findByName(rs.getString("status")));
                 invoice.setAmount(rs.getLong("amount"));
                 invoice.setCurrencyCode(rs.getString("currency_code"));

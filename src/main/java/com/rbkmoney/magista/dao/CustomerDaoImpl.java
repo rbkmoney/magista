@@ -26,7 +26,7 @@ public class CustomerDaoImpl extends NamedParameterJdbcDaoSupport implements Cus
     }
 
     @Override
-    public Customer findByIds(String customerId, String shopId, String merchantId) throws DaoException {
+    public Customer findByIds(String customerId, int shopId, String merchantId) throws DaoException {
         Customer customer;
         MapSqlParameterSource source = new MapSqlParameterSource()
                 .addValue("id", customerId)

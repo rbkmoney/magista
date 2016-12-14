@@ -9,7 +9,7 @@ public class Customer {
 
     private String id;
 
-    private String shopId;
+    private int shopId;
 
     private String merchantId;
 
@@ -23,11 +23,11 @@ public class Customer {
         this.id = id;
     }
 
-    public String getShopId() {
+    public int getShopId() {
         return shopId;
     }
 
-    public void setShopId(String shopId) {
+    public void setShopId(int shopId) {
         this.shopId = shopId;
     }
 

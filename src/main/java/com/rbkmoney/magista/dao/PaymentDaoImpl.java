@@ -126,7 +126,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                 payment.setEventId(rs.getLong("event_id"));
                 payment.setInvoiceId(rs.getString("invoice_id"));
                 payment.setMerchantId(rs.getString("merchant_id"));
-                payment.setShopId(rs.getString("shop_id"));
+                payment.setShopId(rs.getInt("shop_id"));
                 payment.setCustomerId(rs.getString("customer_id"));
                 payment.setMaskedPan(rs.getString("masked_pan"));
                 payment.setStatus(InvoicePaymentStatus._Fields.findByName(rs.getString("status")));
