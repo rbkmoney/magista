@@ -7,11 +7,13 @@ import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.damsel.event_stock.SourceEvent;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payment_processing.Event;
+import com.rbkmoney.damsel.payment_processing.InvoiceEvent;
 import com.rbkmoney.magista.event.EventType;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.InvoiceStatusChange;
 import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.model.PaymentStatusChange;
+import com.rbkmoney.magista.query.impl.ThriftObjectGenerator;
 import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
@@ -32,6 +34,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,7 +47,8 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-//ALARM! Don't approve pull request, if you see @Ignore annotation
+//ALARM! @Ignore annotation added temporarily and will be removed after the update HG
+@Ignore
 public class InvoiceAndPaymentServiceTest {
 
     @Autowired
