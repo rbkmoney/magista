@@ -15,7 +15,7 @@ public class Invoice {
 
     private String merchantId;
 
-    private String shopId;
+    private int shopId;
 
     private InvoiceStatus._Fields status;
 
@@ -53,11 +53,11 @@ public class Invoice {
         this.merchantId = merchantId;
     }
 
-    public String getShopId() {
+    public int getShopId() {
         return shopId;
     }
 
-    public void setShopId(String shopId) {
+    public void setShopId(int shopId) {
         this.shopId = shopId;
     }
 
@@ -115,7 +115,7 @@ public class Invoice {
                 "id='" + id + '\'' +
                 ", eventId=" + eventId +
                 ", merchantId='" + merchantId + '\'' +
-                ", shopId='" + shopId + '\'' +
+                ", shopId=" + shopId +
                 ", status=" + status +
                 ", amount=" + amount +
                 ", currencyCode='" + currencyCode + '\'' +

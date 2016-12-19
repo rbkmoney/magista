@@ -19,7 +19,7 @@ public class Payment {
 
     private String merchantId;
 
-    private String shopId;
+    private int shopId;
 
     private String customerId;
 
@@ -28,6 +28,8 @@ public class Payment {
     private InvoicePaymentStatus._Fields status;
 
     private long amount;
+
+    private long fee;
 
     private String currencyCode;
 
@@ -77,11 +79,11 @@ public class Payment {
         this.merchantId = merchantId;
     }
 
-    public String getShopId() {
+    public int getShopId() {
         return shopId;
     }
 
-    public void setShopId(String shopId) {
+    public void setShopId(int shopId) {
         this.shopId = shopId;
     }
 
@@ -115,6 +117,14 @@ public class Payment {
 
     public void setAmount(long amount) {
         this.amount = amount;
+    }
+
+    public long getFee() {
+        return fee;
+    }
+
+    public void setFee(long fee) {
+        this.fee = fee;
     }
 
     public String getCurrencyCode() {
@@ -188,11 +198,12 @@ public class Payment {
                 ", eventId=" + eventId +
                 ", invoiceId='" + invoiceId + '\'' +
                 ", merchantId='" + merchantId + '\'' +
-                ", shopId='" + shopId + '\'' +
+                ", shopId=" + shopId +
                 ", customerId='" + customerId + '\'' +
                 ", maskedPan='" + maskedPan + '\'' +
                 ", status=" + status +
                 ", amount=" + amount +
+                ", fee=" + fee +
                 ", currencyCode='" + currencyCode + '\'' +
                 ", paymentSystem=" + paymentSystem +
                 ", cityId='" + cityId + '\'' +

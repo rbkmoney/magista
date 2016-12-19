@@ -26,7 +26,7 @@ public class InvoiceMapper implements Mapper<InvoiceEventContext> {
         invoice.setId(invoiceCreated.getInvoice().getId());
         invoice.setEventId(eventId);
         invoice.setShopId(invoiceCreated.getInvoice().getShopId());
-        invoice.setMerchantId(invoiceCreated.getInvoice().getOwner().getId());
+        invoice.setMerchantId(invoiceCreated.getInvoice().getOwnerId());
         invoice.setStatus(invoiceCreated.getInvoice().getStatus().getSetField());
 
         Instant createdAt = Instant.from(TemporalConverter.stringToTemporal(invoiceCreated.getInvoice().getCreatedAt()));

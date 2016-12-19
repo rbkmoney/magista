@@ -8,7 +8,7 @@ import com.rbkmoney.magista.model.Customer;
  */
 public interface CustomerDao {
 
-    Customer findByIds(String customerId, String shopId, String merchantId) throws DaoException;
+    Customer findByIds(String customerId, int shopId, String merchantId) throws DaoException;
 
     void insert(Customer customer) throws DaoException;
 

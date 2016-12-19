@@ -31,31 +31,35 @@ public class InvoiceEventContext implements EventContext<StockEvent> {
         return invoice;
     }
 
-    public void setInvoice(Invoice invoice) {
+    public InvoiceEventContext setInvoice(Invoice invoice) {
         this.invoice = invoice;
+        return this;
     }
 
     public InvoiceStatusChange getInvoiceStatusChange() {
         return invoiceStatusChange;
     }
 
-    public void setInvoiceStatusChange(InvoiceStatusChange invoiceStatusChange) {
+    public InvoiceEventContext setInvoiceStatusChange(InvoiceStatusChange invoiceStatusChange) {
         this.invoiceStatusChange = invoiceStatusChange;
+        return this;
     }
 
     public Payment getPayment() {
         return payment;
     }
 
-    public void setPayment(Payment payment) {
+    public InvoiceEventContext setPayment(Payment payment) {
         this.payment = payment;
+        return this;
     }
 
     public PaymentStatusChange getPaymentStatusChange() {
         return paymentStatusChange;
     }
 
-    public void setPaymentStatusChange(PaymentStatusChange paymentStatusChange) {
+    public InvoiceEventContext setPaymentStatusChange(PaymentStatusChange paymentStatusChange) {
         this.paymentStatusChange = paymentStatusChange;
+        return this;
     }
 }
