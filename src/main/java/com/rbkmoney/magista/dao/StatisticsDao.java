@@ -99,4 +99,9 @@ public interface StatisticsDao {
             int splitInterval
     ) throws DaoException;
 
+    Collection<Map<String, String>> getAccountingDataByPeriod(
+            Instant fromTime,
+            Instant toTime
+    ) throws DaoException;
+
 }

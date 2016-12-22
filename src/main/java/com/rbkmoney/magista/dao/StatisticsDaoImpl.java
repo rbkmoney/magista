@@ -297,6 +297,30 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         }
     }
 
+    @Override
+    public Collection<Map<String, String>> getAccountingDataByPeriod(Instant fromTime, Instant toTime) throws DaoException {
+        String sql = "SELECT merchant_id, shop_id, currency_code, sum(amount) as funds_acquired, sum(fee) as fee_charged FROM mst.payment where status = :succeeded_status AND created_at >= :from_time AND created_at < :to_time GROUP BY shop_id, currency_code, merchant_id ORDER BY merchant_id, shop_id";
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("from_time", Timestamp.from(fromTime))
+                .addValue("to_time", Timestamp.from(toTime))
+                .addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
+        log.trace("SQL: {}, Params: {}", sql, params.getValues());
+
+        try {
+            return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
+                Map<String, String> map = new HashMap<>();
+                map.put("merchant_id", rs.getString("merchant_id"));
+                map.put("shop_id", rs.getString("shop_id"));
+                map.put("funds_acquired", rs.getString("funds_acquired"));
+                map.put("fee_charged", rs.getString("fee_charged"));
+                return map;
+            });
+        } catch (NestedRuntimeException e) {
+            throw new DaoException(e);
+        }
+    }
+
     private MapSqlParameterSource createParamsMap(String merchantId, String shopId, Instant fromTime, Instant toTime, Integer splitInterval) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("merchant_id", merchantId);

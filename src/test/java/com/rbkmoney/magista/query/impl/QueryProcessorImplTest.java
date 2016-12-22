@@ -87,6 +87,15 @@ public class QueryProcessorImplTest {
         assertEquals(CustomersRateStatFunction.FUNC_NAME, statResponse.getData().getRecords().get(0).get(StatisticsDaoTest.KEY));
     }
 
+    @Test
+    public void testAccountingReport() {
+        String json = "{'query': {'accounting_report': {'from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T17:12:00Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(1, statResponse.getData().getRecords().size());
+        assertEquals(0, statResponse.getTotalCount());
+        assertEquals(AccountingReportFunction.FUNC_NAME, statResponse.getData().getRecords().get(0).get(StatisticsDaoTest.KEY));
+    }
+
     private static class StatisticsDaoTest implements StatisticsDao {
         public static final String KEY = "KEY";
 
@@ -123,6 +132,15 @@ public class QueryProcessorImplTest {
         @Override
         public Collection<Map<String, String>> getPaymentsCardTypesStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
             return getMaps(merchantId, shopId, fromTime, toTime, splitInterval, PaymentsCardTypesStatFunction.FUNC_NAME);
+        }
+
+        @Override
+        public Collection<Map<String, String>> getAccountingDataByPeriod(Instant fromTime, Instant toTime) throws DaoException {
+            return Arrays.asList(new HashMap<String, String>(){{
+                put(fromTime+"", fromTime+"");
+                put(toTime+"", toTime+"");
+                put(KEY, AccountingReportFunction.FUNC_NAME);
+            }});
         }
 
         @Override

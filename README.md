@@ -169,3 +169,8 @@
 - `from_time`
 - `to_time`
 - `invoice_status` - статус инвойса, имена берем из thrift-интерфейса **domain.InvoiceStatus**, к примеру: `paid`
+
+### Параметры запросов отчетов
+
+1. `from_time` - начало временного интервала выборки(inclusive).
+2. `to_time` - конец временного интервала выборки(exclusive).
