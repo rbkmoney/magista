@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 public class AccountingReportFunction extends ReportBaseFunction {
 
-    public static final String FUNC_NAME = "accounting_report";
+    public static final String FUNC_NAME = "party_turnover_stat";
 
     public AccountingReportFunction(Object descriptor, QueryParameters params) {
         super(descriptor, params, FUNC_NAME);

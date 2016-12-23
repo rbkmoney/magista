@@ -5,9 +5,7 @@ import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by vpankrashkin on 10.08.16.

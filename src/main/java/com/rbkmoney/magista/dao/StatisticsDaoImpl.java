@@ -59,8 +59,8 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("shop_id", shopId);
         params.addValue("id", invoiceId.orElse(null));
         params.addValue("status", invoiceStatus.orElse(null));
-        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()): null);
-        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()): null);
+        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()) : null);
+        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()) : null);
 
         try {
             List<Invoice> invoices = getNamedParameterJdbcTemplate().query(dataSql, params, InvoiceDaoImpl.getRowMapper());
@@ -92,8 +92,8 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("shop_id", shopId);
         params.addValue("id", invoiceId.orElse(null));
         params.addValue("status", invoiceStatus.orElse(null));
-        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()): null);
-        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()): null);
+        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()) : null);
+        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()) : null);
 
         try {
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
@@ -145,8 +145,8 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
         params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
-        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()): null);
-        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()): null);
+        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()) : null);
+        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()) : null);
 
         try {
             List<Payment> payments = getNamedParameterJdbcTemplate().query(dataSql, params, PaymentDaoImpl.getRowMapper());
@@ -186,26 +186,27 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
         params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
-        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()): null);
-        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()): null);
+        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()) : null);
+        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()) : null);
 
         try {
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
             return count.intValue();
         } catch (NestedRuntimeException e) {
             throw new DaoException(e);
-        }    }
+        }
+    }
 
     @Override
     public Collection<Map<String, String>> getPaymentsTurnoverStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT currency_code AS currency_symbolic_code, SUM(amount - fee) AS amount_with_fee, SUM(amount) AS amount_without_fee, trunc(EXTRACT(EPOCH FROM (created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment WHERE shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time AND status = :succeeded_status GROUP BY sp_val, currency_code ORDER BY sp_val";
+        String sql = "SELECT currency_code AS currency_symbolic_code, SUM(amount - fee) AS amount_with_fee, SUM(amount) AS amount_without_fee, trunc(EXTRACT(EPOCH FROM (created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.payment WHERE shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time AND status = :succeeded_status GROUP BY sp_val, currency_code ORDER BY sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
         try {
             return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
                 Map<String, String> map = new HashMap<>();
-                map.put("offset", (rs.getLong("sp_val")*splitInterval)+"" );
+                map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
                 map.put("currency_symbolic_code", rs.getString("currency_symbolic_code"));
                 map.put("amount_with_fee", rs.getString("amount_with_fee"));
                 map.put("amount_without_fee", rs.getString("amount_without_fee"));
@@ -218,14 +219,14 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getPaymentsGeoStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT city_id, country_id, currency_code as currency_symbolic_code, SUM(amount - fee) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time  group by sp_val, city_id, country_id, currency_code order by sp_val";
+        String sql = "SELECT city_id, country_id, currency_code as currency_symbolic_code, SUM(amount - fee) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time  group by sp_val, city_id, country_id, currency_code order by sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
         try {
             return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
                 Map<String, String> map = new HashMap<>();
-                map.put("offset", (rs.getLong("sp_val")*splitInterval)+"" );
+                map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
                 map.put("city_id", rs.getString("city_id"));
                 map.put("country_id", rs.getString("country_id"));
                 map.put("currency_symbolic_code", rs.getString("currency_symbolic_code"));
@@ -240,7 +241,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getPaymentsConversionStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "select t.*, t.successful_count::float / greatest(t.total_count, 1) as conversion from (SELECT SUM(case WHEN (status = :succeeded_status or status = :failed_status) then 1 else 0 end) as total_count, SUM(CASE WHEN status = :succeeded_status THEN 1 ELSE 0 END) as successful_count, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time GROUP BY sp_val order by sp_val) as t";
+        String sql = "select t.*, t.successful_count::float / greatest(t.total_count, 1) as conversion from (SELECT SUM(case WHEN (status = :succeeded_status or status = :failed_status) then 1 else 0 end) as total_count, SUM(CASE WHEN status = :succeeded_status THEN 1 ELSE 0 END) as successful_count, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.payment where shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time GROUP BY sp_val order by sp_val) as t";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         params.addValue("failed_status", InvoicePaymentStatus._Fields.FAILED.getFieldName());
@@ -248,7 +249,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         try {
             return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
                 Map<String, String> map = new HashMap<>();
-                map.put("offset", (rs.getLong("sp_val")*splitInterval)+"" );
+                map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
                 map.put("conversion", rs.getString("conversion"));
                 map.put("total_count", rs.getString("total_count"));
                 map.put("successful_count", rs.getString("successful_count"));
@@ -261,13 +262,13 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getCustomersRateStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT count(id) as unic_count, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+" sec')) AS sp_val from mst.customer WHERE shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time GROUP BY sp_val ORDER BY sp_val";
+        String sql = "SELECT count(id) as unic_count, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '" + splitInterval + " sec')) AS sp_val from mst.customer WHERE shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time GROUP BY sp_val ORDER BY sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         log.trace("SQL: {}, Params: {}", sql, params);
         try {
             return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
                 Map<String, String> map = new HashMap<>();
-                map.put("offset", (rs.getLong("sp_val")*splitInterval)+"" );
+                map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
                 map.put("unic_count", rs.getString("unic_count"));
                 return map;
             });
@@ -278,14 +279,14 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getPaymentsCardTypesStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT count(payment_system) as total_count, payment_system as payment_system, SUM(amount - fee) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '"+splitInterval+"  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time GROUP BY sp_val, payment_system order by sp_val";
+        String sql = "SELECT count(payment_system) as total_count, payment_system as payment_system, SUM(amount - fee) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time GROUP BY sp_val, payment_system order by sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
         try {
             return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
                 Map<String, String> map = new HashMap<>();
-                map.put("offset", (rs.getLong("sp_val")*splitInterval)+"" );
+                map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
                 map.put("total_count", rs.getString("total_count"));
                 map.put("payment_system", rs.getString("payment_system"));
                 map.put("amount_with_fee", rs.getString("amount_with_fee"));
@@ -299,7 +300,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     @Override
     public Collection<Map<String, String>> getAccountingDataByPeriod(Instant fromTime, Instant toTime) throws DaoException {
-        String sql = "SELECT merchant_id, shop_id, currency_code, sum(amount) as funds_acquired, sum(fee) as fee_charged FROM mst.payment where status = :succeeded_status AND created_at >= :from_time AND created_at < :to_time GROUP BY shop_id, currency_code, merchant_id ORDER BY merchant_id, shop_id";
+        String sql = "SELECT part1.merchant_id, part1.shop_id, part1.currency_code, funds_acquired, fee_charged, coalesce(opening_balance, 0) AS opening_balance, (coalesce(opening_balance, 0) + funds_acquired - fee_charged) AS closing_balance FROM (SELECT merchant_id, shop_id, currency_code, sum(amount) AS funds_acquired, sum(fee) AS fee_charged FROM mst.payment WHERE status = :succeeded_status AND created_at >= :from_time AND created_at < :to_time GROUP BY shop_id, currency_code, merchant_id ORDER BY merchant_id, shop_id) part1 LEFT JOIN (SELECT merchant_id, shop_id, sum(amount - fee) AS opening_balance FROM mst.payment WHERE status = :succeeded_status AND created_at < :from_time GROUP BY shop_id, merchant_id) part2 ON part1.merchant_id = part2.merchant_id AND part1.shop_id = part2.shop_id ORDER BY merchant_id, shop_id";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("from_time", Timestamp.from(fromTime))
@@ -312,8 +313,11 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
                 Map<String, String> map = new HashMap<>();
                 map.put("merchant_id", rs.getString("merchant_id"));
                 map.put("shop_id", rs.getString("shop_id"));
+                map.put("currency_code", rs.getString("currency_code"));
+                map.put("opening_balance", rs.getString("opening_balance"));
                 map.put("funds_acquired", rs.getString("funds_acquired"));
                 map.put("fee_charged", rs.getString("fee_charged"));
+                map.put("closing_balance", rs.getString("closing_balance"));
                 return map;
             });
         } catch (NestedRuntimeException e) {
@@ -336,7 +340,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
     }
 
     private StringBuilder addCondition(StringBuilder sb, String fieldName, String templateField, String op, String eq, boolean apply) {
-        return apply ? sb.append(' ').append(op).append(' '). append(fieldName).append(eq).append(':').append(templateField) : sb;
+        return apply ? sb.append(' ').append(op).append(' ').append(fieldName).append(eq).append(':').append(templateField) : sb;
     }
 
     private StringBuilder addPagination(StringBuilder sb, String orderField, Optional<Integer> limit, Optional<Integer> offset) {
