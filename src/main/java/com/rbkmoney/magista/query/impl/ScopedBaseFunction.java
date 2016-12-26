@@ -1,6 +1,9 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.magista.query.*;
+import com.rbkmoney.magista.query.BaseFunction;
+import com.rbkmoney.magista.query.BaseQueryValidator;
+import com.rbkmoney.magista.query.QueryContext;
+import com.rbkmoney.magista.query.QueryParameters;
 import org.springframework.util.StringUtils;
 
 import java.util.Map;
@@ -11,7 +14,7 @@ import static com.rbkmoney.magista.query.impl.Parameters.SHOP_ID_PARAM;
 /**
  * Created by vpankrashkin on 08.08.16.
  */
-public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT>{
+public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
 
     public ScopedBaseFunction(Object descriptor, QueryParameters params, String name) {
         super(descriptor, params, name);
@@ -46,8 +49,8 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT>{
             return getStringParameter(MERCHANT_ID_PARAM, false);
         }
 
-        public String getShopId() {
-            return getStringParameter(SHOP_ID_PARAM, false);
+        public Integer getShopId() {
+            return getIntParameter(SHOP_ID_PARAM, false);
         }
 
     }
@@ -62,8 +65,8 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT>{
                 checkParamsResult(true, MERCHANT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
-            if (!StringUtils.hasLength(scopedParameters.getShopId())) {
-                checkParamsResult(true, SHOP_ID_PARAM,  RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            if (scopedParameters.getShopId() == null) {
+                checkParamsResult(true, SHOP_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
         }
