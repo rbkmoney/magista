@@ -2,9 +2,6 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.magista.dao.StatisticsDao;
-import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.model.Invoice;
-import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
 import org.junit.After;
@@ -18,8 +15,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -105,10 +101,31 @@ public class QueryProcessorImplTest {
         String json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(3, statResponse.getData().getRecords().size());
-        assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", statResponse.getData().getRecords().get(0).get("merchant_id"));
-        assertEquals("19980", statResponse.getData().getRecords().get(0).get("fee_charged"));
-        assertEquals("2259530", statResponse.getData().getRecords().get(0).get("opening_balance"));
-        assertEquals("2683550", statResponse.getData().getRecords().get(0).get("closing_balance"));
+
+        Map<String, String> result1 = statResponse.getData().getRecords().get(0);
+        assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result1.get("merchant_id"));
+        assertEquals("1", result1.get("shop_id"));
+        assertEquals("444000", result1.get("funds_acquired"));
+        assertEquals("19980", result1.get("fee_charged"));
+        assertEquals("2259530", result1.get("opening_balance"));
+        assertEquals("2683550", result1.get("closing_balance"));
+
+        Map<String, String> result2 = statResponse.getData().getRecords().get(1);
+        assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result2.get("merchant_id"));
+        assertEquals("2", result2.get("shop_id"));
+        assertEquals("3631200", result2.get("funds_acquired"));
+        assertEquals("163403", result2.get("fee_charged"));
+        assertEquals("0", result2.get("opening_balance"));
+        assertEquals("3467797", result2.get("closing_balance"));
+
+        Map<String, String> result3 = statResponse.getData().getRecords().get(2);
+        assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result3.get("merchant_id"));
+        assertEquals("3", result3.get("shop_id"));
+        assertEquals("450000", result3.get("funds_acquired"));
+        assertEquals("20250", result3.get("fee_charged"));
+        assertEquals("0", result3.get("opening_balance"));
+        assertEquals("429750", result3.get("closing_balance"));
+
         assertEquals(0, statResponse.getTotalCount());
     }
 

@@ -4,7 +4,6 @@ import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
-import org.jooq.util.hsqldb.HSQLDBDataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -12,7 +11,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 import javax.sql.DataSource;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
