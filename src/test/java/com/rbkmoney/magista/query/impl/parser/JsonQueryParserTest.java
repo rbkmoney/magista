@@ -194,7 +194,7 @@ public class JsonQueryParserTest {
 
         assertEquals(RootQuery.RootParser.getMainDescriptor(), queryParts.get(0).getDescriptor());
         assertEquals(queryParts.get(0).getChildren().get(0).getDescriptor(), CustomersRateStatFunction.CustomersRateStatParser.getMainDescriptor());
-s
+
         StatBaseFunction.StatBaseParameters parameters = (StatBaseFunction.StatBaseParameters) queryParts.get(0).getChildren().get(0).getParameters();
         assertEquals("1", parameters.getMerchantId());
         assertEquals(Integer.valueOf(2), parameters.getShopId());
