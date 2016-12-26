@@ -89,7 +89,7 @@ public class QueryProcessorImplTest {
 
     @Test
     public void testAccountingReport() {
-        String json = "{'query': {'accounting_report': {'from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T17:12:00Z'}}}";
+        String json = "{'query': {'shop_accounting_report': {'from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T17:12:00Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
