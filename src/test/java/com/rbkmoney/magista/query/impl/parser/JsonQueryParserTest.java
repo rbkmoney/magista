@@ -1,7 +1,5 @@
 package com.rbkmoney.magista.query.impl.parser;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.magista.query.impl.*;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
@@ -22,21 +20,21 @@ public class JsonQueryParserTest {
     @Test
     public void testNoFunctionParse() throws Exception {
         String json = "{'query': {'payments_geo_stat1': {}}}";
-            List<QueryPart> queryParts = parser.parseQuery(json);
+        List<QueryPart> queryParts = parser.parseQuery(json);
         assertEquals("root query", 1, queryParts.size());
         assertEquals("root query has 0 parameter - no recognized function names", 0, queryParts.get(0).getChildren().size());
 
     }
 
     @Test(expected = QueryParserException.class)
-    public void testNoQueryParse () {
+    public void testNoQueryParse() {
         String json = "{'query1': {'invoices': {}}}";
-        List<QueryPart>  queryParts = parser.parseQuery(json);
+        List<QueryPart> queryParts = parser.parseQuery(json);
         fail("no root query, should not reach this point");
     }
 
     @Test
-    public  void  testPaymentsParse() throws Exception {
+    public void testPaymentsParse() throws Exception {
         String json = "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
         List<QueryPart> queryParts = parser.parseQuery(json);
         assertEquals("root query", 1, queryParts.size());
@@ -50,7 +48,7 @@ public class JsonQueryParserTest {
 
         PaymentsFunction.PaymentsParameters parameters = (PaymentsFunction.PaymentsParameters) queryParts.get(0).getChildren().get(0).getParameters();
         assertEquals("1", parameters.getMerchantId());
-        assertEquals("2", parameters.getShopId());
+        assertEquals(Integer.valueOf(2), parameters.getShopId());
         assertEquals("A", parameters.getInvoiceId());
         assertEquals("B", parameters.getPaymentId());
         assertEquals("12**12", parameters.getPanMask());
@@ -62,7 +60,7 @@ public class JsonQueryParserTest {
     }
 
     @Test
-    public  void  testPaymentsParseWithPagination() throws Exception {
+    public void testPaymentsParseWithPagination() throws Exception {
         String json = "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}, 'size':'2', 'from':'1'}}";
         List<QueryPart> queryParts = parser.parseQuery(json);
         assertEquals("root query", 1, queryParts.size());
@@ -76,7 +74,7 @@ public class JsonQueryParserTest {
 
         PaymentsFunction.PaymentsParameters parameters = (PaymentsFunction.PaymentsParameters) queryParts.get(0).getChildren().get(0).getParameters();
         assertEquals("1", parameters.getMerchantId());
-        assertEquals("2", parameters.getShopId());
+        assertEquals(Integer.valueOf(2), parameters.getShopId());
         assertEquals("A", parameters.getInvoiceId());
         assertEquals("B", parameters.getPaymentId());
         assertEquals("12**12", parameters.getPanMask());
@@ -88,7 +86,7 @@ public class JsonQueryParserTest {
     }
 
     @Test(expected = QueryParserException.class)
-    public  void  testPaymentsPanParseError() throws Exception {
+    public void testPaymentsPanParseError() throws Exception {
         String json = "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'pan_mask':'12**12!','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
@@ -100,7 +98,7 @@ public class JsonQueryParserTest {
     }
 
     @Test(expected = QueryParserException.class)
-    public  void  testPaymentsShopParseError() throws Exception {
+    public void testPaymentsShopParseError() throws Exception {
         String json = "{'query': {'payments': {'merchant_id': '1','invoice_id':'A','payment_id':'B', 'pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
@@ -111,7 +109,7 @@ public class JsonQueryParserTest {
     }
 
     @Test
-    public  void  testInvoicesParse() throws Exception {
+    public void testInvoicesParse() throws Exception {
         String json = "{'query': {'invoices': {'merchant_id': '1','shop_id': '2','invoice_id':'A','invoice_status':'paid','from_time': '2016-03-22T00:12:00Z'}}}";
         List<QueryPart> queryParts = parser.parseQuery(json);
         assertEquals("root query", 1, queryParts.size());
@@ -125,7 +123,7 @@ public class JsonQueryParserTest {
 
         InvoicesFunction.InvoicesParameters parameters = (InvoicesFunction.InvoicesParameters) queryParts.get(0).getChildren().get(0).getParameters();
         assertEquals("1", parameters.getMerchantId());
-        assertEquals("2", parameters.getShopId());
+        assertEquals(Integer.valueOf(2), parameters.getShopId());
         assertEquals("A", parameters.getInvoiceId());
         assertEquals("paid", parameters.getInvoiceStatus());
         assertEquals("2016-03-22T00:12:00Z", TemporalConverter.temporalToString(parameters.getFromTime()));
@@ -135,7 +133,7 @@ public class JsonQueryParserTest {
     }
 
     @Test
-    public  void  testInvoicesParseWithPagination() throws Exception {
+    public void testInvoicesParseWithPagination() throws Exception {
         String json = "{'query': {'invoices': {'merchant_id': '1','shop_id': '2','invoice_id':'A','invoice_status':'paid','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z', 'from':'1', 'size':'2'}}}";
         List<QueryPart> queryParts = parser.parseQuery(json);
         assertEquals("root query", 1, queryParts.size());
@@ -149,7 +147,7 @@ public class JsonQueryParserTest {
 
         InvoicesFunction.InvoicesParameters parameters = (InvoicesFunction.InvoicesParameters) queryParts.get(0).getChildren().get(0).getParameters();
         assertEquals("1", parameters.getMerchantId());
-        assertEquals("2", parameters.getShopId());
+        assertEquals(Integer.valueOf(2), parameters.getShopId());
         assertEquals("A", parameters.getInvoiceId());
         assertEquals("paid", parameters.getInvoiceStatus());
         assertEquals(1, parameters.getFrom().intValue());
@@ -162,7 +160,7 @@ public class JsonQueryParserTest {
     }
 
     @Test(expected = QueryParserException.class)
-    public  void  testInvoicesTimeParseError() throws Exception {
+    public void testInvoicesTimeParseError() throws Exception {
         String json = "{'query': {'invoices': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T00:00:00Z'}}}";
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
@@ -174,7 +172,7 @@ public class JsonQueryParserTest {
     }
 
     @Test(expected = QueryParserException.class)
-    public  void  testInvoicesMerchantParseError() throws Exception {
+    public void testInvoicesMerchantParseError() throws Exception {
         String json = "{'query': {'invoices': {'shop_id': '1','invoice_id':'A','payment_id':'B', 'pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
@@ -185,7 +183,7 @@ public class JsonQueryParserTest {
     }
 
     @Test
-    public  void  testCustomersRateStatParse() throws Exception {
+    public void testCustomersRateStatParse() throws Exception {
         String json = "{'query': {'customers_rate_stat': {'merchant_id': '1','shop_id': '2', 'split_interval':'1','from_time': '2016-03-22T00:12:00Z', 'to_time': '2016-03-22T01:00:00Z'}}}";
         List<QueryPart> queryParts = parser.parseQuery(json);
         assertEquals("root query", 1, queryParts.size());
@@ -196,17 +194,17 @@ public class JsonQueryParserTest {
 
         assertEquals(RootQuery.RootParser.getMainDescriptor(), queryParts.get(0).getDescriptor());
         assertEquals(queryParts.get(0).getChildren().get(0).getDescriptor(), CustomersRateStatFunction.CustomersRateStatParser.getMainDescriptor());
-
+s
         StatBaseFunction.StatBaseParameters parameters = (StatBaseFunction.StatBaseParameters) queryParts.get(0).getChildren().get(0).getParameters();
         assertEquals("1", parameters.getMerchantId());
-        assertEquals("2", parameters.getShopId());
-        assertEquals((Integer)1, parameters.getSplitInterval());
+        assertEquals(Integer.valueOf(2), parameters.getShopId());
+        assertEquals((Integer) 1, parameters.getSplitInterval());
         assertEquals("2016-03-22T00:12:00Z", TemporalConverter.temporalToString(parameters.getFromTime()));
         assertEquals("2016-03-22T01:00:00Z", TemporalConverter.temporalToString(parameters.getToTime()));
     }
 
     @Test
-    public  void  testStatFunctionsMatch() throws Exception {
+    public void testStatFunctionsMatch() throws Exception {
         String functionNames[] = {
                 CustomersRateStatFunction.CustomersRateStatParser.getMainDescriptor(),
                 PaymentsConversionStatFunction.PaymentsConversionStatParser.getMainDescriptor(),
@@ -214,9 +212,9 @@ public class JsonQueryParserTest {
                 PaymentsTurnoverStatFunction.PaymentsTurnoverStatParser.getMainDescriptor()
 
         };
-        String json =  "{'query': {'%fname%': {'merchant_id': '1','shop_id': '2', 'split_interval':'1','from_time': '2016-03-22T00:12:00Z', 'to_time': '2016-03-22T01:00:00Z'}}}";
+        String json = "{'query': {'%fname%': {'merchant_id': '1','shop_id': '2', 'split_interval':'1','from_time': '2016-03-22T00:12:00Z', 'to_time': '2016-03-22T01:00:00Z'}}}";
 
-        for (String name: functionNames) {
+        for (String name : functionNames) {
             List<QueryPart> queryParts = parser.parseQuery(json.replaceAll("%fname%", name));
             assertEquals(RootQuery.RootParser.getMainDescriptor(), queryParts.get(0).getDescriptor());
             assertEquals(queryParts.get(0).getChildren().get(0).getDescriptor(), name);
