@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Sql("classpath:data/sql/invoices_and_payments_test_data.sql")
+@Transactional
 public class QueryProcessorImplTest {
     private QueryProcessorImpl queryProcessor;
 
