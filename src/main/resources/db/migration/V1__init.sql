@@ -20,7 +20,7 @@ create table mst.payment (
   event_id bigint not null,
   invoice_id character varying not null,
   merchant_id character varying not null,
-  shop_id bigint not null,
+  shop_id int not null,
   customer_id character varying,
   masked_pan character varying not null,
   status character varying not null,

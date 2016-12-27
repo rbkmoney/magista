@@ -169,3 +169,58 @@
 - `from_time`
 - `to_time`
 - `invoice_status` - статус инвойса, имена берем из thrift-интерфейса **domain.InvoiceStatus**, к примеру: `paid`
+
+### Параметры запросов отчетов
+
+Отчет по магазинам. Представляет из себя данные по магазинам мерчантов в разрезе за определенный период. Более подробная информация есть [здесь](https://github.com/rbkmoney/reporter/blob/master/docs/accounting_report.md).  
+Параметры:
+- `from_time` - начало временного интервала выборки(inclusive).
+- `to_time` - конец временного интервала выборки(exclusive).
+
+####Пример:
+
+Запросим данный отчет за период:
+
+```json
+{
+   "query":{
+      "shop_accounting_report":{
+         "from_time":"2016-08-11T00:12:00Z",
+         "to_time":"2016-08-11T17:12:00Z"
+      }
+   }
+}
+```
+В ответ получим структуру:
+
+```json
+[
+  {
+    "merchant_id": "74480e4f-1a36-4edd-8175-7a9e984313b0",
+    "shop_id": "1",
+    "currency_code": "RUB",
+    "funds_acquired": "444000",
+    "fee_charged": "19980",
+    "opening_balance": "2259530",
+    "closing_balance": "2683550"
+  },
+  {
+    "merchant_id": "74480e4f-1a36-4edd-8175-7a9e984313b0",
+    "shop_id": "2",
+    "currency_code": "RUB",
+    "funds_acquired": "3631200",
+    "fee_charged": "163403",
+    "opening_balance": "0",
+    "closing_balance": "3467797"
+  },
+  {
+    "merchant_id": "74480e4f-1a36-4edd-8175-7a9e984313b0",
+    "shop_id": "3",
+    "currency_code": "RUB",
+    "funds_acquired": "450000",
+    "fee_charged": "20250",
+    "opening_balance": "0",
+    "closing_balance": "429750"
+  }
+]
+```

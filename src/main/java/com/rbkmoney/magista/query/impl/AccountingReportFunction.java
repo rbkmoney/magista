@@ -13,35 +13,33 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Created by vpankrashkin on 09.08.16.
+ * Created by tolkonepiu on 21/12/2016.
  */
-public class PaymentsCardTypesStatFunction extends StatBaseFunction {
+public class AccountingReportFunction extends ReportBaseFunction {
 
-    public static final String FUNC_NAME = "payments_pmt_cards_stat";
+    public static final String FUNC_NAME = "shop_accounting_report";
 
-    private PaymentsCardTypesStatFunction(Object descriptor, QueryParameters params) {
+    public AccountingReportFunction(Object descriptor, QueryParameters params) {
         super(descriptor, params, FUNC_NAME);
     }
 
     @Override
     public QueryResult<Map<String, String>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
         try {
-            Collection<Map<String, String>> result = getContext(context).getDao().getPaymentsCardTypesStat(
-                    getQueryParameters().getMerchantId(),
-                    getQueryParameters().getShopId(),
+            Collection<Map<String, String>> result = getContext(context).getDao().getAccountingDataByPeriod(
                     Instant.from(getQueryParameters().getFromTime()),
-                    Instant.from(getQueryParameters().getToTime()),
-                    getQueryParameters().getSplitInterval()
+                    Instant.from(getQueryParameters().getToTime())
             );
+
             return new BaseQueryResult<>(() -> result.stream(), () -> new StatResponse(StatResponseData.records(result.stream().collect(Collectors.toList()))));
         } catch (DaoException e) {
             throw new QueryExecutionException(e);
         }
     }
 
-    public static class PaymentsCardTypesStatParser extends StatBaseParser {
+    public static class AccountingReportParser extends ReportBaseFunction.ReportBaseParser {
 
-        public PaymentsCardTypesStatParser() {
+        public AccountingReportParser() {
             super(FUNC_NAME);
         }
 
@@ -50,16 +48,16 @@ public class PaymentsCardTypesStatFunction extends StatBaseFunction {
         }
     }
 
-    public static class PaymentsCardTypesStatBuilder extends StatBaseBuilder {
+    public static class AccountingReportBuilder extends AccountingReportFunction.ReportBaseBuilder {
 
         @Override
         protected Query createQuery(QueryPart queryPart) {
-            return new PaymentsCardTypesStatFunction(queryPart.getDescriptor(), queryPart.getParameters());
+            return new AccountingReportFunction(queryPart.getDescriptor(), queryPart.getParameters());
         }
 
         @Override
         protected Object getDescriptor(List<QueryPart> queryParts) {
-            return PaymentsCardTypesStatParser.getMainDescriptor();
+            return AccountingReportFunction.AccountingReportParser.getMainDescriptor();
         }
     }
 

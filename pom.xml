@@ -13,7 +13,7 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.1.0</version>
+    <version>1.5.0</version>
 
     <properties>
         <server.port>8022</server.port>
@@ -149,6 +149,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>9.4-1206-jdbc42</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

@@ -2,149 +2,138 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.magista.dao.StatisticsDao;
-import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.model.Invoice;
-import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by vpankrashkin on 29.08.16.
  */
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@Sql("classpath:data/sql/invoices_and_payments_test_data.sql")
+@Transactional
 public class QueryProcessorImplTest {
     private QueryProcessorImpl queryProcessor;
 
+    @Autowired
+    StatisticsDao statisticsDao;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+
     @Before
     public void before() {
-        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(new StatisticsDaoTest());
-        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(),contextFactory);
+        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao);
+        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
     }
 
     @Test
     public void testInvoices() {
-        String json = "{'query': {'invoices': {'merchant_id': '1','shop_id': '1','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T12:12:00Z', 'from':'1', 'size':'2'}}}";
+        String json = "{'query': {'invoices': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T12:12:00Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(1, statResponse.getData().getInvoices().size());
-        assertEquals(2, statResponse.getTotalCount());
+        assertEquals(0, statResponse.getData().getInvoices().size());
+        assertEquals(0, statResponse.getTotalCount());
     }
 
     @Test
     public void testPayments() {
-        String json = "{'query': {'payments': {'merchant_id': '42','shop_id': '45','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T12:12:00Z', 'from':'1', 'size':'2'}}}";
+        String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T12:12:00Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(1, statResponse.getData().getPayments().size());
-        assertEquals(2, statResponse.getTotalCount());
+        assertEquals(0, statResponse.getData().getPayments().size());
+        assertEquals(0, statResponse.getTotalCount());
     }
 
     @Test
     public void testPaymentsTurnover() {
-        String json = "{'query': {'payments_turnover': {'merchant_id': '42','shop_id': '45','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T16:12:00Z', 'split_interval':'60', 'from':'1', 'size':'2'}}}";
+        String json = "{'query': {'payments_turnover': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
-        assertEquals(PaymentsTurnoverStatFunction.FUNC_NAME, statResponse.getData().getRecords().get(0).get(StatisticsDaoTest.KEY));
     }
 
     @Test
     public void testPaymentsGeoStat() {
-        String json = "{'query': {'payments_geo_stat': {'merchant_id': '42','shop_id': '45','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T16:12:00Z', 'split_interval':'60'}}}";
+        String json = "{'query': {'payments_geo_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
-        assertEquals(PaymentsGeoStatFunction.FUNC_NAME, statResponse.getData().getRecords().get(0).get(StatisticsDaoTest.KEY));
     }
 
     @Test
     public void testPaymentsCardTypesStat() {
-        String json = "{'query': {'payments_pmt_cards_stat': {'merchant_id': '42','shop_id': '45','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T16:12:00Z', 'split_interval':'60'}}}";
+        String json = "{'query': {'payments_pmt_cards_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
-        assertEquals(PaymentsCardTypesStatFunction.FUNC_NAME, statResponse.getData().getRecords().get(0).get(StatisticsDaoTest.KEY));
     }
 
     @Test
     public void testPaymentsConversionStat() {
-        String json = "{'query': {'payments_conversion_stat': {'merchant_id': '42','shop_id': '45','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T16:12:00Z', 'split_interval':'60'}}}";
+        String json = "{'query': {'payments_conversion_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(1, statResponse.getData().getRecords().size());
+        assertEquals(2, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
-        assertEquals(PaymentsConversionStatFunction.FUNC_NAME, statResponse.getData().getRecords().get(0).get(StatisticsDaoTest.KEY));
     }
 
     @Test
     public void testCustomersRateStat() {
-        String json = "{'query': {'customers_rate_stat': {'merchant_id': '42','shop_id': '45','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T17:12:00Z', 'split_interval':'60'}}}";
+        String json = "{'query': {'customers_rate_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(1, statResponse.getData().getRecords().size());
+        assertEquals(2, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
-        assertEquals(CustomersRateStatFunction.FUNC_NAME, statResponse.getData().getRecords().get(0).get(StatisticsDaoTest.KEY));
     }
 
-    private static class StatisticsDaoTest implements StatisticsDao {
-        public static final String KEY = "KEY";
+    @Test
+    public void testAccountingReport() {
+        String json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(3, statResponse.getData().getRecords().size());
 
-        @Override
-        public Collection<Invoice> getInvoices(String merchantId, String shopId, Optional<String> invoiceId, Optional<String> invoiceStatus, Optional<Instant> fromTime, Optional<Instant> toTime, Optional<Integer> limit, Optional<Integer> offset) throws DaoException {
-            return Arrays.asList(new Invoice());
-        }
+        Map<String, String> result1 = statResponse.getData().getRecords().get(0);
+        assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result1.get("merchant_id"));
+        assertEquals("1", result1.get("shop_id"));
+        assertEquals("444000", result1.get("funds_acquired"));
+        assertEquals("19980", result1.get("fee_charged"));
+        assertEquals("2259530", result1.get("opening_balance"));
+        assertEquals("2683550", result1.get("closing_balance"));
 
-        @Override
-        public int getInvoicesCount(String merchantId, String shopId, Optional<String> invoiceId, Optional<String> invoiceStatus, Optional<Instant> fromTime, Optional<Instant> toTime, Optional<Integer> limit, Optional<Integer> offset) throws DaoException {
-            return 2;
-        }
+        Map<String, String> result2 = statResponse.getData().getRecords().get(1);
+        assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result2.get("merchant_id"));
+        assertEquals("2", result2.get("shop_id"));
+        assertEquals("3631200", result2.get("funds_acquired"));
+        assertEquals("163403", result2.get("fee_charged"));
+        assertEquals("0", result2.get("opening_balance"));
+        assertEquals("3467797", result2.get("closing_balance"));
 
-        @Override
-        public Collection<Payment> getPayments(String merchantId, String shopId, Optional<String> invoiceId, Optional<String> paymentId, Optional<String> paymentStatus, Optional<String> panMask, Optional<Instant> fromTime, Optional<Instant> toTime, Optional<Integer> limit, Optional<Integer> offset) throws DaoException {
-            return Arrays.asList(new Payment());
-        }
+        Map<String, String> result3 = statResponse.getData().getRecords().get(2);
+        assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result3.get("merchant_id"));
+        assertEquals("3", result3.get("shop_id"));
+        assertEquals("450000", result3.get("funds_acquired"));
+        assertEquals("20250", result3.get("fee_charged"));
+        assertEquals("0", result3.get("opening_balance"));
+        assertEquals("429750", result3.get("closing_balance"));
 
-        @Override
-        public Integer getPaymentsCount(String merchantId, String shopId, Optional<String> invoiceId, Optional<String> paymentId, Optional<String> paymentStatus, Optional<String> panMask, Optional<Instant> fromTime, Optional<Instant> toTime, Optional<Integer> limit, Optional<Integer> offset) throws DaoException {
-            return 2;
-        }
+        assertEquals(0, statResponse.getTotalCount());
+    }
 
-        @Override
-        public Collection<Map<String, String>> getPaymentsTurnoverStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-            return getMaps(merchantId, shopId, fromTime, toTime, splitInterval, PaymentsTurnoverStatFunction.FUNC_NAME);
-        }
-
-        @Override
-        public Collection<Map<String, String>> getPaymentsGeoStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-             return getMaps(merchantId, shopId, fromTime, toTime, splitInterval, PaymentsGeoStatFunction.FUNC_NAME);
-        }
-
-        @Override
-        public Collection<Map<String, String>> getPaymentsCardTypesStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-            return getMaps(merchantId, shopId, fromTime, toTime, splitInterval, PaymentsCardTypesStatFunction.FUNC_NAME);
-        }
-
-        @Override
-        public Collection<Map<String, String>> getPaymentsConversionStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-            return getMaps(merchantId, shopId, fromTime, toTime, splitInterval, PaymentsConversionStatFunction.FUNC_NAME);
-        }
-
-        @Override
-        public Collection<Map<String, String>> getCustomersRateStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-            return getMaps(merchantId, shopId, fromTime, toTime, splitInterval, CustomersRateStatFunction.FUNC_NAME);
-        }
-
-        protected Collection<Map<String, String>> getMaps(final String merchantId, final String shopId, final Instant fromTime, final Instant toTime, final int splitInterval, String key) {
-            return Arrays.asList(new HashMap<String, String>(){{
-                put(merchantId, merchantId);
-                put(shopId, shopId);
-                put(fromTime+"", fromTime+"");
-                put(toTime+"", toTime+"");
-                put(splitInterval+"", splitInterval+"");
-                put(KEY, key);
-            }});
-        }
+    @After
+    public void after() {
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "mst.invoice", "mst.payment", "mst.customer");
     }
 }
 

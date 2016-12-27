@@ -5,9 +5,7 @@ import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by vpankrashkin on 10.08.16.
@@ -15,7 +13,7 @@ import java.util.Optional;
 public interface StatisticsDao {
     Collection<Invoice> getInvoices(
             String merchantId,
-            String shopId,
+            int shopId,
             Optional<String> invoiceId,
             Optional<String> invoiceStatus,
             Optional<Instant> fromTime,
@@ -25,7 +23,7 @@ public interface StatisticsDao {
     ) throws DaoException;
 
     int getInvoicesCount(String merchantId,
-                         String shopId,
+                         int shopId,
                          Optional<String> invoiceId,
                          Optional<String> invoiceStatus,
                          Optional<Instant> fromTime,
@@ -35,7 +33,7 @@ public interface StatisticsDao {
 
     Collection<Payment> getPayments(
             String merchantId,
-            String shopId,
+            int shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
@@ -48,7 +46,7 @@ public interface StatisticsDao {
 
     Integer getPaymentsCount(
             String merchantId,
-            String shopId,
+            int shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
@@ -61,7 +59,7 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getPaymentsTurnoverStat(
             String merchantId,
-            String shopId,
+            int shopId,
             Instant fromTime,
             Instant toTime,
             int splitInterval
@@ -69,7 +67,7 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getPaymentsGeoStat(
             String merchantId,
-            String shopId,
+            int shopId,
             Instant fromTime,
             Instant toTime,
             int splitInterval
@@ -77,7 +75,7 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getPaymentsConversionStat(
             String merchantId,
-            String shopId,
+            int shopId,
             Instant fromTime,
             Instant toTime,
             int splitInterval
@@ -85,7 +83,7 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getCustomersRateStat(
             String merchantId,
-            String shopId,
+            int shopId,
             Instant fromTime,
             Instant toTime,
             int splitInterval
@@ -93,10 +91,15 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getPaymentsCardTypesStat(
             String merchantId,
-            String shopId,
+            int shopId,
             Instant fromTime,
             Instant toTime,
             int splitInterval
+    ) throws DaoException;
+
+    Collection<Map<String, String>> getAccountingDataByPeriod(
+            Instant fromTime,
+            Instant toTime
     ) throws DaoException;
 
 }
