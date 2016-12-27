@@ -6,6 +6,7 @@ import com.rbkmoney.magista.query.parser.QueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**

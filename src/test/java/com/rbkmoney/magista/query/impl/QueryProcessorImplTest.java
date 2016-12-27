@@ -58,41 +58,41 @@ public class QueryProcessorImplTest {
 
     @Test
     public void testPaymentsTurnover() {
-        String json = "{'query': {'payments_turnover': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T16:12:00Z', 'split_interval':'60', 'from':'1', 'size':'2'}}}";
+        String json = "{'query': {'payments_turnover': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(0, statResponse.getData().getRecords().size());
+        assertEquals(1, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
     }
 
     @Test
     public void testPaymentsGeoStat() {
-        String json = "{'query': {'payments_geo_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T16:12:00Z', 'split_interval':'60'}}}";
+        String json = "{'query': {'payments_geo_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(0, statResponse.getData().getRecords().size());
+        assertEquals(1, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
     }
 
     @Test
     public void testPaymentsCardTypesStat() {
-        String json = "{'query': {'payments_pmt_cards_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T16:12:00Z', 'split_interval':'60'}}}";
+        String json = "{'query': {'payments_pmt_cards_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(0, statResponse.getData().getRecords().size());
+        assertEquals(1, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
     }
 
     @Test
     public void testPaymentsConversionStat() {
-        String json = "{'query': {'payments_conversion_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-08-11T00:12:00Z','to_time': '2016-08-11T16:12:00Z', 'split_interval':'60'}}}";
+        String json = "{'query': {'payments_conversion_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(0, statResponse.getData().getRecords().size());
+        assertEquals(2, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
     }
 
     @Test
     public void testCustomersRateStat() {
-        String json = "{'query': {'customers_rate_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '2','from_time': '2016-10-25T15:41:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
+        String json = "{'query': {'customers_rate_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(0, statResponse.getData().getRecords().size());
+        assertEquals(2, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
     }
 

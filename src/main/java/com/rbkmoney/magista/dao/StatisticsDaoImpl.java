@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 import javax.sql.DataSource;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -62,8 +61,17 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("shop_id", shopId);
         params.addValue("id", invoiceId.orElse(null));
         params.addValue("status", invoiceStatus.orElse(null));
-        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()) : null);
-        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()) : null);
+
+        if (fromTime.isPresent()) {
+            params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
+        } else {
+            params.addValue("from_time", null, Types.NULL);
+        }
+        if (toTime.isPresent()) {
+            params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
+        } else {
+            params.addValue("to_time", null, Types.NULL);
+        }
 
         try {
             List<Invoice> invoices = getNamedParameterJdbcTemplate().query(dataSql, params, InvoiceDaoImpl.getRowMapper());
@@ -95,9 +103,17 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("shop_id", shopId);
         params.addValue("id", invoiceId.orElse(null));
         params.addValue("status", invoiceStatus.orElse(null));
-        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()) : null);
-        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()) : null);
 
+        if (fromTime.isPresent()) {
+            params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
+        } else {
+            params.addValue("from_time", null, Types.NULL);
+        }
+        if (toTime.isPresent()) {
+            params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
+        } else {
+            params.addValue("to_time", null, Types.NULL);
+        }
         try {
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
             return count.intValue();
@@ -148,8 +164,17 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
         params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
-        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()) : null);
-        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()) : null);
+
+        if (fromTime.isPresent()) {
+            params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
+        } else {
+            params.addValue("from_time", null, Types.NULL);
+        }
+        if (toTime.isPresent()) {
+            params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
+        } else {
+            params.addValue("to_time", null, Types.NULL);
+        }
 
         try {
             List<Payment> payments = getNamedParameterJdbcTemplate().query(dataSql, params, PaymentDaoImpl.getRowMapper());
@@ -189,8 +214,17 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
         params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
-        params.addValue("from_time", fromTime.isPresent() ? Timestamp.from(fromTime.get()) : null);
-        params.addValue("to_time", toTime.isPresent() ? Timestamp.from(toTime.get()) : null);
+
+        if (fromTime.isPresent()) {
+            params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
+        } else {
+            params.addValue("from_time", null, Types.NULL);
+        }
+        if (toTime.isPresent()) {
+            params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
+        } else {
+            params.addValue("to_time", null, Types.NULL);
+        }
 
         try {
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
@@ -331,8 +365,8 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("merchant_id", merchantId);
         params.addValue("shop_id", shopId);
-        params.addValue("from_time", Timestamp.from(fromTime));
-        params.addValue("to_time", Timestamp.from(toTime));
+        params.addValue("from_time", LocalDateTime.ofInstant(fromTime, ZoneId.of("UTC")), Types.OTHER);
+        params.addValue("to_time", LocalDateTime.ofInstant(toTime, ZoneId.of("UTC")), Types.OTHER);
         params.addValue("split_interval", splitInterval);
         return params;
     }
