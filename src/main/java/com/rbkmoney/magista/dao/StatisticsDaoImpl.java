@@ -161,7 +161,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("merchant_id", merchantId);
         params.addValue("shop_id", shopId);
         params.addValue("invoice_id", invoiceId.orElse(null));
-        params.addValue("id", paymentId.orElse(null));
+        params.addValue("payment_id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
         params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
 
@@ -211,7 +211,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("merchant_id", merchantId);
         params.addValue("shop_id", shopId);
         params.addValue("invoice_id", invoiceId.orElse(null));
-        params.addValue("id", paymentId.orElse(null));
+        params.addValue("payment_id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
         params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
 
