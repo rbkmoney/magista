@@ -140,7 +140,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
             addCondition(head, "invoice_id", invoiceId.isPresent());
-            addCondition(head, "id", paymentId.isPresent());
+            addCondition(head, "payment_id", paymentId.isPresent());
             addCondition(head, "status", paymentStatus.isPresent());
             if (panMask.isPresent()) {
                 head.append(" masked_pan like :masked_pan ");
@@ -191,7 +191,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
             addCondition(head, "invoice_id", invoiceId.isPresent());
-            addCondition(head, "id", paymentId.isPresent());
+            addCondition(head, "payment_id", paymentId.isPresent());
             addCondition(head, "status", paymentStatus.isPresent());
             if (panMask.isPresent()) {
                 head.append(" masked_pan like :masked_pan ");
