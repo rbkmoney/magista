@@ -122,7 +122,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
         return (rs, i) -> {
             try {
                 Payment payment = new Payment();
-                payment.setId(rs.getString("id"));
+                payment.setId(rs.getString("payment_id"));
                 payment.setEventId(rs.getLong("event_id"));
                 payment.setInvoiceId(rs.getString("invoice_id"));
                 payment.setMerchantId(rs.getString("merchant_id"));
