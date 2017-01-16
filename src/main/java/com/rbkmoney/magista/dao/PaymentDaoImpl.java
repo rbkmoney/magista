@@ -37,9 +37,9 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
 
     @Override
     public Payment findById(String paymentId, String invoiceId) throws DaoException {
-        String sql = "SELECT id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, " +
+        String sql = "SELECT payment_id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, " +
                 "amount, fee, currency_code, payment_system, city_id, country_id, ip, created_at, changed_at, model " +
-                "from mst.payment where id = :id and invoice_id = :invoice_id";
+                "from mst.payment where payment_id = :id and invoice_id = :invoice_id";
 
         Payment payment;
         try {
@@ -62,7 +62,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
 
     @Override
     public void insert(Payment payment) throws DaoException {
-        String updateSql = "insert into mst.payment (id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, fee, currency_code, payment_system, city_id, country_id, ip, created_at, changed_at, model, data) " +
+        String updateSql = "insert into mst.payment (payment_id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, fee, currency_code, payment_system, city_id, country_id, ip, created_at, changed_at, model, data) " +
                 "values (:id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :fee, :currency_code, :payment_system, :city_id, :country_id, :ip, :created_at, :changed_at, :model, :data)";
         execute(updateSql, createSqlParameterSource(payment));
     }
@@ -70,7 +70,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
     @Override
     public void update(Payment payment) throws DaoException {
         String updateSql = "update mst.payment set " +
-                "id = :id, event_id = :event_id, invoice_id = :invoice_id, merchant_id = :merchant_id, " +
+                "payment_id = :id, event_id = :event_id, invoice_id = :invoice_id, merchant_id = :merchant_id, " +
                 "shop_id = :shop_id, customer_id = :customer_id, masked_pan = :masked_pan, status = :status, " +
                 "amount = :amount, fee = :fee, currency_code = :currency_code, payment_system = :payment_system, " +
                 "city_id = :city_id, country_id = :country_id, ip = :ip, created_at = :created_at, changed_at=:changed_at, model = :model, data = :data where id = :id and invoice_id = :invoice_id";
@@ -122,7 +122,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
         return (rs, i) -> {
             try {
                 Payment payment = new Payment();
-                payment.setId(rs.getString("id"));
+                payment.setId(rs.getString("payment_id"));
                 payment.setEventId(rs.getLong("event_id"));
                 payment.setInvoiceId(rs.getString("invoice_id"));
                 payment.setMerchantId(rs.getString("merchant_id"));

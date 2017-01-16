@@ -15,8 +15,10 @@ create table mst.invoice (
   constraint invoice_pkey primary key (id)
 );
 
+create index invoice_cms_key on mst.invoice (created_at, merchant_id, shop_id);
+
 create table mst.payment (
-  id character varying not null,
+  payment_id character varying not null,
   event_id bigint not null,
   invoice_id character varying not null,
   merchant_id character varying not null,
@@ -35,14 +37,19 @@ create table mst.payment (
   changed_at timestamp without time zone not null,
   model character varying not null,
   data character varying not null,
-  constraint payment_pkey primary key (invoice_id, id)
+  constraint payment_pkey primary key (invoice_id, payment_id)
 );
+
+create index payment_cms_key on mst.payment (created_at, merchant_id, shop_id);
+create index payment_ms_key on mst.payment (merchant_id, shop_id);
 
 create table mst.customer (
   id character varying not null,
   shop_id bigint not null,
   merchant_id character varying not null,
   created_at timestamp without time zone not null,
-  constraint customer_pkey primary key (id, shop_id, merchant_id)
+  constraint customer_pkey primary key (id, merchant_id, shop_id)
 );
+
+create index customer_cms_key on mst.customer (created_at, merchant_id, shop_id);
 

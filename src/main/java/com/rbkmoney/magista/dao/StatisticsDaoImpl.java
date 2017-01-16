@@ -140,7 +140,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
             addCondition(head, "invoice_id", invoiceId.isPresent());
-            addCondition(head, "id", paymentId.isPresent());
+            addCondition(head, "payment_id", paymentId.isPresent());
             addCondition(head, "status", paymentStatus.isPresent());
             if (panMask.isPresent()) {
                 head.append(" masked_pan like :masked_pan ");
@@ -161,7 +161,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("merchant_id", merchantId);
         params.addValue("shop_id", shopId);
         params.addValue("invoice_id", invoiceId.orElse(null));
-        params.addValue("id", paymentId.orElse(null));
+        params.addValue("payment_id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
         params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
 
@@ -191,7 +191,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
             addCondition(head, "invoice_id", invoiceId.isPresent());
-            addCondition(head, "id", paymentId.isPresent());
+            addCondition(head, "payment_id", paymentId.isPresent());
             addCondition(head, "status", paymentStatus.isPresent());
             if (panMask.isPresent()) {
                 head.append(" masked_pan like :masked_pan ");
@@ -211,7 +211,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("merchant_id", merchantId);
         params.addValue("shop_id", shopId);
         params.addValue("invoice_id", invoiceId.orElse(null));
-        params.addValue("id", paymentId.orElse(null));
+        params.addValue("payment_id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
         params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
 
