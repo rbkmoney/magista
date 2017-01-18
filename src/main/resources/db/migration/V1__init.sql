@@ -40,7 +40,6 @@ create table mst.payment (
   constraint payment_pkey primary key (invoice_id, payment_id)
 );
 
-create index payment_cms_key on mst.payment (created_at, merchant_id, shop_id);
 create index payment_ms_key on mst.payment (merchant_id, shop_id);
 
 create table mst.customer (
