@@ -112,32 +112,32 @@
 [
 	{
 		"offset": "0",
-		"city_id": "111111",
-		"country_id": "222222",
+		"city_id": "524901",
+		"country_id": "2017370",
 		"currency_symbolic_code": "RUB",
 		"amount_with_fee": "9000",
 		"amount_without_fee": "10000"
 	},
 	{
 		"offset": "0",
-		"city_id": "111111",
-		"country_id": "222222",
+		"city_id": "7536080",
+		"country_id": "2017370",
 		"currency_symbolic_code": "RUB",
 		"amount_with_fee": "900",
 		"amount_without_fee": "1000"
 	},
 	{
 		"offset": "300",
-		"city_id": "111111",
-		"country_id": "222222",
+		"city_id": "524901",
+		"country_id": "2017370",
 		"currency_symbolic_code": "RUB",
 		"amount_with_fee": "18000",
 		"amount_without_fee": "19000"
 	},
 	{
 		"offset": "300",
-		"city_id": "111111",
-		"country_id": "222222",
+		"city_id": "7536080",
+		"country_id": "2017370",
 		"currency_symbolic_code": "RUB",
 		"amount_with_fee": "5000",
 		"amount_without_fee": "5100"
@@ -171,6 +171,8 @@
 - `invoice_status` - статус инвойса, имена берем из thrift-интерфейса **domain.InvoiceStatus**, к примеру: `paid`
 
 ### Параметры запросов отчетов
+
+##### `shop_accounting_report`
 
 Отчет по магазинам. Представляет из себя данные по магазинам мерчантов в разрезе за определенный период. Более подробная информация есть [здесь](https://github.com/rbkmoney/reporter/blob/master/docs/accounting_report.md).  
 Параметры:
