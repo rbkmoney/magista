@@ -15,7 +15,7 @@ postgres:
     - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
 
 bustermaze:
-  image: dr.rbkmoney.com/rbkmoney/bustermaze:96d1fb602a286a7de6f2fe2ffa0238116106472a
+  image: dr.rbkmoney.com/rbkmoney/bustermaze:d4f3a74350c3fb5919036036917707cecb2bcfb0
   ports:
    - '18022:8022'
   links:
@@ -59,12 +59,12 @@ columbus-postgres:
 
 
 hgmock:
-  image: dr.rbkmoney.com/rbkmoney/hgmock:738d55df6b4a74a6abc3c2404a18efc9cf0f9c62
+  image: dr.rbkmoney.com/rbkmoney/hgmock:e0ac94e756523a1e6af14bf4b492261fd48acaac
   entrypoint:
    - java
    - -jar
    - /opt/hg-mock/hg-mock.jar
-   - --hg.event.total.amount=1000
+   - --hg.event.total.amount=0
    - --hg.event.include.notsent=true
    - --logging.level.ROOT=warn
    - --logging.level.com.rbkmoney=warn

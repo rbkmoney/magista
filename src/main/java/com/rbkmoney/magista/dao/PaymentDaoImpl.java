@@ -39,12 +39,12 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
     public Payment findById(String paymentId, String invoiceId) throws DaoException {
         String sql = "SELECT payment_id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, " +
                 "amount, fee, currency_code, payment_system, city_id, country_id, ip, created_at, changed_at, model " +
-                "from mst.payment where payment_id = :id and invoice_id = :invoice_id";
+                "from mst.payment where payment_id = :payment_id and invoice_id = :invoice_id";
 
         Payment payment;
         try {
             MapSqlParameterSource source = new MapSqlParameterSource()
-                    .addValue("id", paymentId)
+                    .addValue("payment_id", paymentId)
                     .addValue("invoice_id", invoiceId);
             log.trace("SQL: {}, Params: {}", sql, source.getValues());
             payment = getNamedParameterJdbcTemplate().queryForObject(
@@ -63,17 +63,17 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
     @Override
     public void insert(Payment payment) throws DaoException {
         String updateSql = "insert into mst.payment (payment_id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, fee, currency_code, payment_system, city_id, country_id, ip, created_at, changed_at, model, data) " +
-                "values (:id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :fee, :currency_code, :payment_system, :city_id, :country_id, :ip, :created_at, :changed_at, :model, :data)";
+                "values (:payment_id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :fee, :currency_code, :payment_system, :city_id, :country_id, :ip, :created_at, :changed_at, :model, :data)";
         execute(updateSql, createSqlParameterSource(payment));
     }
 
     @Override
     public void update(Payment payment) throws DaoException {
         String updateSql = "update mst.payment set " +
-                "payment_id = :id, event_id = :event_id, invoice_id = :invoice_id, merchant_id = :merchant_id, " +
+                "payment_id = :payment_id, event_id = :event_id, invoice_id = :invoice_id, merchant_id = :merchant_id, " +
                 "shop_id = :shop_id, customer_id = :customer_id, masked_pan = :masked_pan, status = :status, " +
                 "amount = :amount, fee = :fee, currency_code = :currency_code, payment_system = :payment_system, " +
-                "city_id = :city_id, country_id = :country_id, ip = :ip, created_at = :created_at, changed_at=:changed_at, model = :model, data = :data where id = :id and invoice_id = :invoice_id";
+                "city_id = :city_id, country_id = :country_id, ip = :ip, created_at = :created_at, changed_at=:changed_at, model = :model, data = :data where payment_id = :payment_id and invoice_id = :invoice_id";
         execute(updateSql, createSqlParameterSource(payment));
     }
 
@@ -93,7 +93,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
     private MapSqlParameterSource createSqlParameterSource(Payment payment) {
         try {
             return new MapSqlParameterSource()
-                    .addValue("id", payment.getId())
+                    .addValue("payment_id", payment.getId())
                     .addValue("event_id", payment.getEventId())
                     .addValue("invoice_id", payment.getInvoiceId())
                     .addValue("merchant_id", payment.getMerchantId())
