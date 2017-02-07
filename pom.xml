@@ -13,7 +13,7 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.5.3-SNAPSHOT</version>
+    <version>1.5.4-SNAPSHOT</version>
 
     <properties>
         <server.port>8022</server.port>
@@ -27,14 +27,14 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <mst.db.url>jdbc:postgresql://localhost:5432/magista</mst.db.url>
+                <mst.db.url>jdbc:postgresql://localhost:35432/magista</mst.db.url>
                 <mst.db.user>postgres</mst.db.user>
                 <mst.db.password>postgres</mst.db.password>
                 <mst.db.schema>mst</mst.db.schema>
                 <flyway.db.url>${mst.db.url}</flyway.db.url>
                 <flyway.user>${mst.db.user}</flyway.user>
                 <flyway.password>${mst.db.password}</flyway.password>
-                <bm.pooling.url>http://localhost:8081/repo</bm.pooling.url>
+                <bm.pooling.url>http://localhost:18022/repo</bm.pooling.url>
                 <bm.pooling.limit>10</bm.pooling.limit>
             </properties>
         </profile>

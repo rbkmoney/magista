@@ -29,21 +29,26 @@ public class EventSaver implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                Future<Processor> future = queue.peek();
-                if (future != null) {
-                    Processor processor = future.get();
-                    processor.execute();
+                try {
+                    Future<Processor> future = queue.peek();
+                    if (future != null) {
+                        Processor processor = future.get();
+                        processor.execute();
+                        queue.take();
+                        //TODO one bad event can stop the whole processing flow, need to do smth with it...
+                    } else {
+                        //log.trace("EventSaver sleep for {} milliseconds", timeout);
+                        TimeUnit.MILLISECONDS.sleep(timeout);
+                    }
+                } catch (ExecutionException | NotFoundException ex) {
                     queue.take();
-                } else {
-                    log.trace("EventSaver sleep for {} milliseconds", timeout);
+                    log.error("Failed to handle event, skipped", ex);
+                } catch (StorageException ex) {
+                    log.error("Failed to save event after handling", ex);
                     TimeUnit.MILLISECONDS.sleep(timeout);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-            } catch (ExecutionException ex) {
-                log.error("Failed to handle event", ex);
-            } catch (NotFoundException | StorageException ex) {
-                log.error("Failed to save event after handling", ex);
             }
         }
     }

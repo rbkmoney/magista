@@ -45,6 +45,7 @@
     </root>
 
     <logger name="com.rbkmoney" level="ALL"/>
+    <logger name="com.rbkmoney.woody" level="INFO"/>
     
     <jmxConfigurator/>
 </configuration>
