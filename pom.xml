@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.rbkmoney</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.1.RELEASE</version>
+        <version>1.5.1.RELEASE</version>
     </parent>
 
     <groupId>com.rbkmoney.magista</groupId>
@@ -27,7 +27,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <mst.db.url>jdbc:postgresql://localhost:35432/magista</mst.db.url>
+                <mst.db.url>jdbc:postgresql://localhost:5432/magista</mst.db.url>
                 <mst.db.user>postgres</mst.db.user>
                 <mst.db.password>postgres</mst.db.password>
                 <mst.db.schema>mst</mst.db.schema>
@@ -118,14 +118,21 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+            <version>1.4.2</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -145,6 +152,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
+            <version>2.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -185,14 +193,8 @@
         <dependency>
             <groupId>com.rbkmoney.logback</groupId>
             <artifactId>nop-rolling</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
-        <dependency>
-            <groupId>javafx</groupId>
-            <artifactId>jfxrt</artifactId>
-            <version>2.0</version>
-        </dependency>
-
         <!--Test libs-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -208,7 +210,6 @@
                 <targetPath>${project.build.directory}</targetPath>
                 <includes>
                     <include>Dockerfile</include>
-                    <include>containerpilot.json</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>
