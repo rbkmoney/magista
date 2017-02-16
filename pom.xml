@@ -17,113 +17,19 @@
 
     <properties>
         <server.port>8022</server.port>
+        <dockerfile.base.service.tag>f26fcc19d1941ab74f1c72dd8a408be17a769333</dockerfile.base.service.tag>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <db.url>jdbc:postgresql://localhost:35432/magista</db.url>
+        <db.user>postgres</db.user>
+        <db.password>postgres</db.password>
+        <db.schema>mst</db.schema>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <mst.db.url>jdbc:postgresql://localhost:5432/magista</mst.db.url>
-                <mst.db.user>postgres</mst.db.user>
-                <mst.db.password>postgres</mst.db.password>
-                <mst.db.schema>mst</mst.db.schema>
-                <flyway.db.url>${mst.db.url}</flyway.db.url>
-                <flyway.user>${mst.db.user}</flyway.user>
-                <flyway.password>${mst.db.password}</flyway.password>
-                <bm.pooling.url>http://localhost:18022/repo</bm.pooling.url>
-                <bm.pooling.limit>10</bm.pooling.limit>
-            </properties>
-        </profile>
-        <profile>
-            <id>ci</id>
-            <properties>
-                <mst.db.url>jdbc:postgresql://${db.url.host.name}:5432/magista</mst.db.url>
-                <mst.db.user>postgres</mst.db.user>
-                <mst.db.password>postgres</mst.db.password>
-                <mst.db.schema>mst</mst.db.schema>
-                <db.url.host.name>mst_db</db.url.host.name>
-                <flyway.db.url>${mst.db.url}</flyway.db.url>
-                <flyway.user>${mst.db.user}</flyway.user>
-                <flyway.password>${mst.db.password}</flyway.password>
-                <bm.pooling.url>http://locahost:8080</bm.pooling.url>
-                <bm.pooling.limit>10</bm.pooling.limit>
-            </properties>
-        </profile>
-        <profile>
-            <!--If want to run docker container with PostgresDB on test phase-->
-            <id>with_db</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>io.fabric8</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.15.16</version>
-                        <configuration>
-                            <images>
-                                <image>
-                                    <alias>database</alias>
-                                    <name>postgres:9.6</name>
-                                    <run>
-                                        <env>
-                                            <POSTGRES_PASSWORD>postgres</POSTGRES_PASSWORD>
-                                            <POSTGRES_USER>postgres</POSTGRES_USER>
-                                            <POSTGRES_DB>mst</POSTGRES_DB>
-                                        </env>
-                                        <ports>
-                                            <port>5432:5432</port>
-                                        </ports>
-                                        <wait>
-                                            <log>ready for start up</log>
-                                            <time>20000</time>
-                                        </wait>
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>stop containers before build</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>stop</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>start containers</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>start</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>stop containers</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>stop</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-    </profiles>
     <dependencies>
         <!--Thrirdparty libs-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-validator</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -173,7 +79,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>dbinit</artifactId>
-            <version>1.0.5</version>
+            <version>1.0.7</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -201,6 +107,18 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>1.1.8</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>1.1.8</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -223,20 +141,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>ru.concerteza.buildnumber</groupId>
-                <artifactId>maven-jgit-buildnumber-plugin</artifactId>
-                <version>1.2.9</version>
-                <executions>
-                    <execution>
-                        <id>git-buildnumber</id>
-                        <goals>
-                            <goal>extract-buildnumber</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
