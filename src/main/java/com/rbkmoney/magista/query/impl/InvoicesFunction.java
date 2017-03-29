@@ -82,7 +82,7 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
         return subquery.isParallel();
     }
 
-    public static class InvoicesParameters extends PagedBaseParameters {
+    public static class InvoicesParameters extends PaymentsFunction.PaymentsParameters {
 
         public InvoicesParameters(Map<String, Object> parameters, QueryParameters derivedParameters) {
             super(parameters, derivedParameters);
@@ -100,12 +100,8 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
             return getStringParameter(INVOICE_STATUS_PARAM, false);
         }
 
-        public TemporalAccessor getFromTime() {
-            return getTimeParameter(FROM_TIME_PARAM, false);
-        }
-
-        public TemporalAccessor getToTime() {
-            return getTimeParameter(TO_TIME_PARAM, false);
+        public Long getInvoiceAmount() {
+            return getLongParameter(INVOICE_AMOUNT_PARAM, false);
         }
 
     }

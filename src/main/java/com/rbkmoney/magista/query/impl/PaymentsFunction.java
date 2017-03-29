@@ -118,8 +118,24 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
             return getTimeParameter(TO_TIME_PARAM, false);
         }
 
+        public String getPaymentEmail() {
+            return getStringParameter(PAYMENT_EMAIL_PARAM, false);
+        }
+
+        public String getPaymentIp() {
+            return getStringParameter(PAYMENT_IP_PARAM, false);
+        }
+
+        public String getPaymentFingerprint() {
+            return getStringParameter(PAYMENT_FINGERPRINT_PARAM, false);
+        }
+
+        public Long getPaymentAmount() {
+            return getLongParameter(PAYMENT_AMOUNT_PARAM, false);
+        }
+
         public String getPanMask() {
-            return getStringParameter(PAN_MASK_PARAM, false);
+            return getStringParameter(PAYMENT_PAN_MASK_PARAM, false);
         }
     }
 
@@ -132,7 +148,7 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
 
             String val = paymentsParameters.getPanMask();
             if (val != null && !val.matches("[\\d*]+")) {
-                checkParamsResult(true, PAN_MASK_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+                checkParamsResult(true, PAYMENT_PAN_MASK_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
             validateTimePeriod(paymentsParameters.getFromTime(), paymentsParameters.getToTime());
         }
