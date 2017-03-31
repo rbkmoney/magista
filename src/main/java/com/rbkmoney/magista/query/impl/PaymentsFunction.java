@@ -31,7 +31,7 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
 
     private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
-    private PaymentsFunction(Object descriptor, QueryParameters params, CompositeQuery<QueryResult, List<QueryResult>>  subquery) {
+    private PaymentsFunction(Object descriptor, QueryParameters params, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
         super(descriptor, params, FUNC_NAME);
         this.subquery = subquery;
     }
@@ -46,14 +46,14 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
     @Override
     public QueryResult<Payment, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
         if (collectedResults.size() != 2) {
-            throw new QueryExecutionException("Wrong query results count:"+collectedResults.size());
+            throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
         }
 
         QueryResult<Payment, List<Payment>> paymentsResult = (QueryResult<Payment, List<Payment>>) collectedResults.get(0);
         QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
-                () ->paymentsResult.getDataStream(),
+                () -> paymentsResult.getDataStream(),
                 () -> {
                     StatResponseData statResponseData = StatResponseData.payments(paymentsResult.getDataStream().map(payment -> {
                         StatPayment statPayment = new StatPayment(payment.getInvoiceId(), payment.getModel());
@@ -192,14 +192,14 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
 
         private CompositeQuery createQuery(QueryPart queryPart) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":"+GetDataFunction.FUNC_NAME, queryPart.getParameters()),
-                    new GetCountFunction(queryPart.getDescriptor() + ":" +GetCountFunction.FUNC_NAME, queryPart.getParameters())
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters()),
+                    new GetCountFunction(queryPart.getDescriptor() + ":" + GetCountFunction.FUNC_NAME, queryPart.getParameters())
             );
-            CompositeQuery<QueryResult, List<QueryResult>>  compositeQuery = createCompositeQuery(
+            CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
                     queryPart.getDescriptor(),
                     getParameters(queryPart.getParent()),
                     queries
-                    );
+            );
             return createPaymentsFunction(queryPart.getDescriptor(), queryPart.getParameters(), compositeQuery);
         }
 
@@ -209,7 +209,7 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
         }
     }
 
-    private static PaymentsFunction createPaymentsFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery<QueryResult, List<QueryResult>>  subquery) {
+    private static PaymentsFunction createPaymentsFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
         PaymentsFunction paymentsFunction = new PaymentsFunction(descriptor, queryParameters, subquery);
         subquery.setParentQuery(paymentsFunction);
         return paymentsFunction;
@@ -233,7 +233,11 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getPaymentStatus()),
+                        Optional.ofNullable(parameters.getPaymentEmail()),
+                        Optional.ofNullable(parameters.getPaymentIp()),
+                        Optional.ofNullable(parameters.getPaymentFingerprint()),
                         Optional.ofNullable(parameters.getPanMask()),
+                        Optional.ofNullable(parameters.getPaymentAmount()),
                         Optional.ofNullable(Instant.from(parameters.getFromTime())),
                         Optional.ofNullable(Instant.from(parameters.getToTime())),
                         Optional.ofNullable(parameters.getSize()),
@@ -264,7 +268,11 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getPaymentStatus()),
+                        Optional.ofNullable(parameters.getPaymentEmail()),
+                        Optional.ofNullable(parameters.getPaymentIp()),
+                        Optional.ofNullable(parameters.getPaymentFingerprint()),
                         Optional.ofNullable(parameters.getPanMask()),
+                        Optional.ofNullable(parameters.getPaymentAmount()),
                         Optional.ofNullable(Instant.from(parameters.getFromTime())),
                         Optional.ofNullable(Instant.from(parameters.getToTime())),
                         Optional.ofNullable(parameters.getSize()),

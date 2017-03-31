@@ -14,7 +14,6 @@ import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 
 import java.time.Instant;
-import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,14 +44,14 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
     @Override
     public QueryResult<Invoice, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
         if (collectedResults.size() != 2) {
-            throw new QueryExecutionException("Wrong query results count:"+collectedResults.size());
+            throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
         }
 
         QueryResult<Invoice, List<Invoice>> invoicesResult = (QueryResult<Invoice, List<Invoice>>) collectedResults.get(0);
         QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
-                () ->invoicesResult.getDataStream(),
+                () -> invoicesResult.getDataStream(),
                 () -> {
                     StatResponseData statResponseData = StatResponseData.invoices(invoicesResult.getDataStream().map(invoice -> new StatInvoice(invoice.getModel())).collect(Collectors.toList()));
                     StatResponse statResponse = new StatResponse(statResponseData);
@@ -62,7 +61,7 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
     }
 
 
-        @Override
+    @Override
     public InvoicesParameters getQueryParameters() {
         return (InvoicesParameters) super.getQueryParameters();
     }
@@ -156,14 +155,14 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
 
         private CompositeQuery createQuery(QueryPart queryPart) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":"+GetDataFunction.FUNC_NAME, queryPart.getParameters()),
-                    new GetCountFunction(queryPart.getDescriptor() + ":" +GetCountFunction.FUNC_NAME, queryPart.getParameters())
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters()),
+                    new GetCountFunction(queryPart.getDescriptor() + ":" + GetCountFunction.FUNC_NAME, queryPart.getParameters())
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
                     queryPart.getDescriptor(),
                     getParameters(queryPart.getParent()),
                     queries
-                    );
+            );
             return createInvoicesFunction(queryPart.getDescriptor(), queryPart.getParameters(), compositeQuery);
         }
 
@@ -196,7 +195,15 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
                         parameters.getMerchantId(),
                         parameters.getShopId(),
                         Optional.ofNullable(parameters.getInvoiceId()),
+                        Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getInvoiceStatus()),
+                        Optional.ofNullable(parameters.getPaymentStatus()),
+                        Optional.ofNullable(parameters.getInvoiceAmount()),
+                        Optional.ofNullable(parameters.getPaymentAmount()),
+                        Optional.ofNullable(parameters.getPaymentEmail()),
+                        Optional.ofNullable(parameters.getPaymentIp()),
+                        Optional.ofNullable(parameters.getPaymentFingerprint()),
+                        Optional.ofNullable(parameters.getPanMask()),
                         Optional.ofNullable(Instant.from(parameters.getFromTime())),
                         Optional.ofNullable(Instant.from(parameters.getToTime())),
                         Optional.ofNullable(parameters.getSize()),
@@ -225,7 +232,15 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
                         parameters.getMerchantId(),
                         parameters.getShopId(),
                         Optional.ofNullable(parameters.getInvoiceId()),
+                        Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getInvoiceStatus()),
+                        Optional.ofNullable(parameters.getPaymentStatus()),
+                        Optional.ofNullable(parameters.getInvoiceAmount()),
+                        Optional.ofNullable(parameters.getPaymentAmount()),
+                        Optional.ofNullable(parameters.getPaymentEmail()),
+                        Optional.ofNullable(parameters.getPaymentIp()),
+                        Optional.ofNullable(parameters.getPaymentFingerprint()),
+                        Optional.ofNullable(parameters.getPanMask()),
                         Optional.ofNullable(Instant.from(parameters.getFromTime())),
                         Optional.ofNullable(Instant.from(parameters.getToTime())),
                         Optional.ofNullable(parameters.getSize()),

@@ -10,6 +10,7 @@ import org.junit.Ignore;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.AbstractMap;
 import java.util.List;
 
 /**
