@@ -222,7 +222,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             addCondition(head, "masked_pan", "like", paymentPanMask.isPresent());
             addCondition(head, "ip", "like", paymentIp.isPresent());
             addCondition(head, "customer_id", "like", paymentFingerprint.isPresent());
-            //TODO email
+            addCondition(head, "email", "like", paymentEmail.isPresent());
 
             addCondition(head, "created_at", "from_time", "and", ">=", fromTime.isPresent());
             addCondition(head, "created_at", "to_time", "and", "<", toTime.isPresent());
@@ -242,9 +242,10 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("invoice_id", invoiceId.orElse(null));
         params.addValue("payment_id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
-        params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
-        params.addValue("ip", paymentStatus.orElse("").replaceAll("\\*", "_"));
-        params.addValue("customer_id", paymentStatus.orElse("").replaceAll("\\*", "_"));
+        params.addValue("masked_pan", paymentPanMask.orElse("").replaceAll("\\*", "_"));
+        params.addValue("ip", paymentIp.orElse("").replaceAll("\\*", "_"));
+        params.addValue("customer_id", paymentFingerprint.orElse("").replaceAll("\\*", "_"));
+        params.addValue("email", paymentEmail.orElse("").replaceAll("\\*", "_"));
 
         if (fromTime.isPresent()) {
             params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
@@ -291,7 +292,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             addCondition(head, "masked_pan", "like", paymentPanMask.isPresent());
             addCondition(head, "ip", "like", paymentIp.isPresent());
             addCondition(head, "customer_id", "like", paymentFingerprint.isPresent());
-            //TODO email
+            addCondition(head, "email", "like", paymentEmail.isPresent());
 
             addCondition(head, "created_at", "from_time", "and", ">=", fromTime.isPresent());
             addCondition(head, "created_at", "to_time", "and", "<", toTime.isPresent());
@@ -309,7 +310,10 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("invoice_id", invoiceId.orElse(null));
         params.addValue("payment_id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
-        params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
+        params.addValue("masked_pan", paymentPanMask.orElse("").replaceAll("\\*", "_"));
+        params.addValue("ip", paymentIp.orElse("").replaceAll("\\*", "_"));
+        params.addValue("customer_id", paymentFingerprint.orElse("").replaceAll("\\*", "_"));
+        params.addValue("email", paymentEmail.orElse("").replaceAll("\\*", "_"));
 
         if (fromTime.isPresent()) {
             params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);

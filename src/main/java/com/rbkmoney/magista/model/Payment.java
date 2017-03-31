@@ -39,6 +39,10 @@ public class Payment {
 
     private int  countryId;
 
+    private String email;
+
+    private String phoneNumber;
+
     private String ip;
 
     private Instant createdAt;
@@ -159,6 +163,22 @@ public class Payment {
         this.countryId = countryId;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public String getIp() {
         return ip;
     }
@@ -206,8 +226,10 @@ public class Payment {
                 ", fee=" + fee +
                 ", currencyCode='" + currencyCode + '\'' +
                 ", paymentSystem=" + paymentSystem +
-                ", cityId='" + cityId + '\'' +
-                ", countryId='" + countryId + '\'' +
+                ", cityId=" + cityId +
+                ", countryId=" + countryId +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
                 ", ip='" + ip + '\'' +
                 ", createdAt=" + createdAt +
                 ", changedAt=" + changedAt +
