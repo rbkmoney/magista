@@ -91,7 +91,6 @@ public class JsonQueryParserTest {
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
         } catch (QueryParserException e) {
-            e.printStackTrace();
             throw e;
         }
 
@@ -103,7 +102,6 @@ public class JsonQueryParserTest {
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
         } catch (QueryParserException e) {
-            e.printStackTrace();
             throw e;
         }
     }
@@ -165,7 +163,6 @@ public class JsonQueryParserTest {
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
         } catch (QueryParserException e) {
-            e.printStackTrace();
             throw e;
         }
 
@@ -177,7 +174,6 @@ public class JsonQueryParserTest {
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
         } catch (QueryParserException e) {
-            e.printStackTrace();
             throw e;
         }
     }

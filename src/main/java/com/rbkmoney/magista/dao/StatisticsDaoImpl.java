@@ -51,7 +51,12 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             head.append(" where (TRUE) ");
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
-            addInCondition(head, "id", "invoice_ids", "and", true);
+            addInCondition(head, "id", "invoice_ids", "and",
+                    invoiceId.isPresent()
+                            || (paymentAmount.isPresent() || paymentEmail.isPresent()
+                            || paymentFingerprint.isPresent() || paymentId.isPresent()
+                            || paymentIp.isPresent() || paymentPanMask.isPresent()
+                            || paymentStatus.isPresent()));
             addCondition(head, "status", invoiceStatus.isPresent());
             addCondition(head, "amount", invoiceAmount.isPresent());
             addCondition(head, "created_at", "from_time", "and", ">=", fromTime.isPresent());
@@ -90,7 +95,11 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         if (invoiceId.isPresent()) {
             invoiceIds.add(invoiceId.get());
         }
-        params.addValue("invoice_ids", invoiceIds);
+        if (!invoiceIds.isEmpty()) {
+            params.addValue("invoice_ids", invoiceIds);
+        } else {
+            params.addValue("invoice_ids", null);
+        }
 
         params.addValue("status", invoiceStatus.orElse(null));
         params.addValue("amount", invoiceAmount.orElse(null));
@@ -98,12 +107,12 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         if (fromTime.isPresent()) {
             params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("from_time", null, Types.NULL);
+            params.addValue("from_time", null);
         }
         if (toTime.isPresent()) {
             params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("to_time", null, Types.NULL);
+            params.addValue("to_time", null);
         }
 
         try {
@@ -136,7 +145,12 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             head.append(" where (TRUE) ");
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
-            addInCondition(head, "id", "invoice_ids", "and", true);
+            addInCondition(head, "id", "invoice_ids", "and",
+                    invoiceId.isPresent()
+                            || (paymentAmount.isPresent() || paymentEmail.isPresent()
+                            || paymentFingerprint.isPresent() || paymentId.isPresent()
+                            || paymentIp.isPresent() || paymentPanMask.isPresent()
+                            || paymentStatus.isPresent()));
             addCondition(head, "status", invoiceStatus.isPresent());
             addCondition(head, "amount", invoiceAmount.isPresent());
             addCondition(head, "created_at", "from_time", "and", ">=", fromTime.isPresent());
@@ -173,7 +187,11 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         if (invoiceId.isPresent()) {
             invoiceIds.add(invoiceId.get());
         }
-        params.addValue("invoice_ids", invoiceIds);
+        if (!invoiceIds.isEmpty()) {
+            params.addValue("invoice_ids", invoiceIds);
+        } else {
+            params.addValue("invoice_ids", null);
+        }
 
         params.addValue("status", invoiceStatus.orElse(null));
         params.addValue("amount", invoiceAmount.orElse(null));
@@ -181,12 +199,12 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         if (fromTime.isPresent()) {
             params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("from_time", null, Types.NULL);
+            params.addValue("from_time", null);
         }
         if (toTime.isPresent()) {
             params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("to_time", null, Types.NULL);
+            params.addValue("to_time", null);
         }
         try {
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
@@ -250,12 +268,12 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         if (fromTime.isPresent()) {
             params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("from_time", null, Types.NULL);
+            params.addValue("from_time", null);
         }
         if (toTime.isPresent()) {
             params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("to_time", null, Types.NULL);
+            params.addValue("to_time", null);
         }
 
         try {
@@ -318,12 +336,12 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         if (fromTime.isPresent()) {
             params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("from_time", null, Types.NULL);
+            params.addValue("from_time", null);
         }
         if (toTime.isPresent()) {
             params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("to_time", null, Types.NULL);
+            params.addValue("to_time", null);
         }
 
         try {
