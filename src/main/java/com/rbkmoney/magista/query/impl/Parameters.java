@@ -17,10 +17,15 @@ public class Parameters {
 
     public static final String INVOICE_ID_PARAM = "invoice_id";
     public static final String INVOICE_STATUS_PARAM = "invoice_status";
+    public static final String INVOICE_AMOUNT_PARAM = "invoice_amount";
 
     public static final String PAYMENT_ID_PARAM = "payment_id";
     public static final String PAYMENT_STATUS_PARAM = "payment_status";
-    public static final String PAN_MASK_PARAM = "pan_mask";
+    public static final String PAYMENT_EMAIL_PARAM = "payment_email";
+    public static final String PAYMENT_IP_PARAM = "payment_ip";
+    public static final String PAYMENT_FINGERPRINT_PARAM = "payment_fingerprint";
+    public static final String PAYMENT_PAN_MASK_PARAM = "payment_pan_mask";
+    public static final String PAYMENT_AMOUNT_PARAM = "payment_amount";
 
     public static final String SPLIT_INTERVAL_PARAM = "split_interval";
 

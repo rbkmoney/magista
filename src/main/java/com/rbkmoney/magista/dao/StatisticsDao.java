@@ -5,7 +5,9 @@ import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by vpankrashkin on 10.08.16.
@@ -15,7 +17,15 @@ public interface StatisticsDao {
             String merchantId,
             int shopId,
             Optional<String> invoiceId,
+            Optional<String> paymentId,
             Optional<String> invoiceStatus,
+            Optional<String> paymentStatus,
+            Optional<Long> invoiceAmount,
+            Optional<Long> paymentAmount,
+            Optional<String> paymentEmail,
+            Optional<String> paymentIp,
+            Optional<String> paymentFingerprint,
+            Optional<String> paymentPanMask,
             Optional<Instant> fromTime,
             Optional<Instant> toTime,
             Optional<Integer> limit,
@@ -25,7 +35,15 @@ public interface StatisticsDao {
     int getInvoicesCount(String merchantId,
                          int shopId,
                          Optional<String> invoiceId,
+                         Optional<String> paymentId,
                          Optional<String> invoiceStatus,
+                         Optional<String> paymentStatus,
+                         Optional<Long> invoiceAmount,
+                         Optional<Long> paymentAmount,
+                         Optional<String> paymentEmail,
+                         Optional<String> paymentIp,
+                         Optional<String> paymentFingerprint,
+                         Optional<String> paymentPanMask,
                          Optional<Instant> fromTime,
                          Optional<Instant> toTime,
                          Optional<Integer> limit,
@@ -37,7 +55,11 @@ public interface StatisticsDao {
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
-            Optional<String> panMask,
+            Optional<String> paymentEmail,
+            Optional<String> paymentIp,
+            Optional<String> paymentFingerprint,
+            Optional<String> paymentPanMask,
+            Optional<Long> paymentAmount,
             Optional<Instant> fromTime,
             Optional<Instant> toTime,
             Optional<Integer> limit,
@@ -50,7 +72,11 @@ public interface StatisticsDao {
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
-            Optional<String> panMask,
+            Optional<String> paymentEmail,
+            Optional<String> paymentIp,
+            Optional<String> paymentFingerprint,
+            Optional<String> paymentPanMask,
+            Optional<Long> paymentAmount,
             Optional<Instant> fromTime,
             Optional<Instant> toTime,
             Optional<Integer> limit,

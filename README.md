@@ -157,17 +157,29 @@
 - `invoice_id`
 - `from_time`
 - `to_time`
+- `payment_email` - почта, полностью или частично 
+- `payment_ip` - ip адрес в виде строки
+- `payment_fingerprint` - отпечаток браузера в виде строки
+- `payment_pan_mask` - маска в формате [\d\*]+ где все символы * трактуются как любой символ
+- `payment_amount` - сумма без комисси в минорных единицах 
 - `payment_status` - статус платежа, имена берем из thrift-интерфейса **domain.InvoicePaymentStatus**, к примеру: `succeeded`
-- `pan_mask` - маска в формате [\d\*]+ где все символы * трактуются как любой символ
 
 ##### `invoices` 
 Выборка по инвойсам. Параметры:
 
 - `merchant_id`
 - `shop_id`
+- `payment_id`
 - `invoice_id`
 - `from_time`
 - `to_time`
+- `payment_email` - почта, полностью или частично 
+- `payment_ip` - ip адрес в виде строки
+- `payment_fingerprint` - отпечаток браузера в виде строки
+- `payment_pan_mask` - маска в формате [\d\*]+ где все символы * трактуются как любой символ
+- `payment_amount` - сумма платежа без комисси в минорных единицах 
+- `invoice_amount` - сумма инвойса без комисси в минорных единицах 
+- `payment_status` - статус платежа, имена берем из thrift-интерфейса **domain.InvoicePaymentStatus**, к примеру: `succeeded`
 - `invoice_status` - статус инвойса, имена берем из thrift-интерфейса **domain.InvoiceStatus**, к примеру: `paid`
 
 ### Параметры запросов отчетов

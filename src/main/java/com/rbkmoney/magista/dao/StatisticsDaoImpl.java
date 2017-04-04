@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by vpankrashkin on 10.08.16.
@@ -33,18 +34,31 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             String merchantId,
             int shopId,
             Optional<String> invoiceId,
+            Optional<String> paymentId,
             Optional<String> invoiceStatus,
+            Optional<String> paymentStatus,
+            Optional<Long> invoiceAmount,
+            Optional<Long> paymentAmount,
+            Optional<String> paymentEmail,
+            Optional<String> paymentIp,
+            Optional<String> paymentFingerprint,
+            Optional<String> paymentPanMask,
             Optional<Instant> fromTime,
             Optional<Instant> toTime,
             Optional<Integer> limit,
-            Optional<Integer> offset
-    ) throws DaoException {
+            Optional<Integer> offset) throws DaoException {
         Function<StringBuilder, StringBuilder> func = head -> {
             head.append(" where (TRUE) ");
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
-            addCondition(head, "id", invoiceId.isPresent());
+            addInCondition(head, "id", "invoice_ids", "and",
+                    invoiceId.isPresent()
+                            || (paymentAmount.isPresent() || paymentEmail.isPresent()
+                            || paymentFingerprint.isPresent() || paymentId.isPresent()
+                            || paymentIp.isPresent() || paymentPanMask.isPresent()
+                            || paymentStatus.isPresent()));
             addCondition(head, "status", invoiceStatus.isPresent());
+            addCondition(head, "amount", invoiceAmount.isPresent());
             addCondition(head, "created_at", "from_time", "and", ">=", fromTime.isPresent());
             addCondition(head, "created_at", "to_time", "and", "<", toTime.isPresent());
             return head;
@@ -59,18 +73,46 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("merchant_id", merchantId);
         params.addValue("shop_id", shopId);
-        params.addValue("id", invoiceId.orElse(null));
+
+        Collection<Payment> payments = getPayments(
+                merchantId,
+                shopId,
+                invoiceId,
+                paymentId,
+                paymentStatus,
+                paymentEmail,
+                paymentIp,
+                paymentFingerprint,
+                paymentPanMask,
+                paymentAmount,
+                fromTime,
+                toTime,
+                limit,
+                offset
+        );
+
+        Set<String> invoiceIds = payments.stream().map(t -> t.getInvoiceId()).collect(Collectors.toSet());
+        if (invoiceId.isPresent()) {
+            invoiceIds.add(invoiceId.get());
+        }
+        if (!invoiceIds.isEmpty()) {
+            params.addValue("invoice_ids", invoiceIds);
+        } else {
+            params.addValue("invoice_ids", null);
+        }
+
         params.addValue("status", invoiceStatus.orElse(null));
+        params.addValue("amount", invoiceAmount.orElse(null));
 
         if (fromTime.isPresent()) {
             params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("from_time", null, Types.NULL);
+            params.addValue("from_time", null);
         }
         if (toTime.isPresent()) {
             params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("to_time", null, Types.NULL);
+            params.addValue("to_time", null);
         }
 
         try {
@@ -82,13 +124,35 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
     }
 
     @Override
-    public int getInvoicesCount(String merchantId, int shopId, Optional<String> invoiceId, Optional<String> invoiceStatus, Optional<Instant> fromTime, Optional<Instant> toTime, Optional<Integer> limit, Optional<Integer> offset) throws DaoException {
+    public int getInvoicesCount(
+            String merchantId,
+            int shopId,
+            Optional<String> invoiceId,
+            Optional<String> paymentId,
+            Optional<String> invoiceStatus,
+            Optional<String> paymentStatus,
+            Optional<Long> invoiceAmount,
+            Optional<Long> paymentAmount,
+            Optional<String> paymentEmail,
+            Optional<String> paymentIp,
+            Optional<String> paymentFingerprint,
+            Optional<String> paymentPanMask,
+            Optional<Instant> fromTime,
+            Optional<Instant> toTime,
+            Optional<Integer> limit,
+            Optional<Integer> offset) throws DaoException {
         Function<StringBuilder, StringBuilder> func = head -> {
             head.append(" where (TRUE) ");
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
-            addCondition(head, "id", invoiceId.isPresent());
+            addInCondition(head, "id", "invoice_ids", "and",
+                    invoiceId.isPresent()
+                            || (paymentAmount.isPresent() || paymentEmail.isPresent()
+                            || paymentFingerprint.isPresent() || paymentId.isPresent()
+                            || paymentIp.isPresent() || paymentPanMask.isPresent()
+                            || paymentStatus.isPresent()));
             addCondition(head, "status", invoiceStatus.isPresent());
+            addCondition(head, "amount", invoiceAmount.isPresent());
             addCondition(head, "created_at", "from_time", "and", ">=", fromTime.isPresent());
             addCondition(head, "created_at", "to_time", "and", "<", toTime.isPresent());
             return head;
@@ -101,18 +165,46 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("merchant_id", merchantId);
         params.addValue("shop_id", shopId);
-        params.addValue("id", invoiceId.orElse(null));
+
+        Collection<Payment> payments = getPayments(
+                merchantId,
+                shopId,
+                invoiceId,
+                paymentId,
+                paymentStatus,
+                paymentEmail,
+                paymentIp,
+                paymentFingerprint,
+                paymentPanMask,
+                paymentAmount,
+                fromTime,
+                toTime,
+                limit,
+                offset
+        );
+
+        Set<String> invoiceIds = payments.stream().map(t -> t.getInvoiceId()).collect(Collectors.toSet());
+        if (invoiceId.isPresent()) {
+            invoiceIds.add(invoiceId.get());
+        }
+        if (!invoiceIds.isEmpty()) {
+            params.addValue("invoice_ids", invoiceIds);
+        } else {
+            params.addValue("invoice_ids", null);
+        }
+
         params.addValue("status", invoiceStatus.orElse(null));
+        params.addValue("amount", invoiceAmount.orElse(null));
 
         if (fromTime.isPresent()) {
             params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("from_time", null, Types.NULL);
+            params.addValue("from_time", null);
         }
         if (toTime.isPresent()) {
             params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("to_time", null, Types.NULL);
+            params.addValue("to_time", null);
         }
         try {
             Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
@@ -129,12 +221,15 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
-            Optional<String> panMask,
+            Optional<String> paymentEmail,
+            Optional<String> paymentIp,
+            Optional<String> paymentFingerprint,
+            Optional<String> paymentPanMask,
+            Optional<Long> paymentAmount,
             Optional<Instant> fromTime,
             Optional<Instant> toTime,
             Optional<Integer> limit,
-            Optional<Integer> offset
-    ) throws DaoException {
+            Optional<Integer> offset) throws DaoException {
         Function<StringBuilder, StringBuilder> func = head -> {
             head.append(" where (TRUE) ");
             addCondition(head, "merchant_id", true);
@@ -142,9 +237,11 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             addCondition(head, "invoice_id", invoiceId.isPresent());
             addCondition(head, "payment_id", paymentId.isPresent());
             addCondition(head, "status", paymentStatus.isPresent());
-            if (panMask.isPresent()) {
-                head.append(" masked_pan like :masked_pan ");
-            }
+            addCondition(head, "masked_pan", "like", paymentPanMask.isPresent());
+            addCondition(head, "ip", "like", paymentIp.isPresent());
+            addCondition(head, "customer_id", "like", paymentFingerprint.isPresent());
+            addCondition(head, "email", "like", paymentEmail.isPresent());
+
             addCondition(head, "created_at", "from_time", "and", ">=", fromTime.isPresent());
             addCondition(head, "created_at", "to_time", "and", "<", toTime.isPresent());
             return head;
@@ -163,17 +260,20 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("invoice_id", invoiceId.orElse(null));
         params.addValue("payment_id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
-        params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
+        params.addValue("masked_pan", paymentPanMask.orElse("").replaceAll("\\*", "_"));
+        params.addValue("ip", paymentIp.orElse("").replaceAll("\\*", "_"));
+        params.addValue("customer_id", paymentFingerprint.orElse("").replaceAll("\\*", "_"));
+        params.addValue("email", paymentEmail.orElse("").replaceAll("\\*", "_"));
 
         if (fromTime.isPresent()) {
             params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("from_time", null, Types.NULL);
+            params.addValue("from_time", null);
         }
         if (toTime.isPresent()) {
             params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("to_time", null, Types.NULL);
+            params.addValue("to_time", null);
         }
 
         try {
@@ -185,7 +285,21 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
     }
 
     @Override
-    public Integer getPaymentsCount(String merchantId, int shopId, Optional<String> invoiceId, Optional<String> paymentId, Optional<String> paymentStatus, Optional<String> panMask, Optional<Instant> fromTime, Optional<Instant> toTime, Optional<Integer> limit, Optional<Integer> offset) throws DaoException {
+    public Integer getPaymentsCount(
+            String merchantId,
+            int shopId,
+            Optional<String> invoiceId,
+            Optional<String> paymentId,
+            Optional<String> paymentStatus,
+            Optional<String> paymentEmail,
+            Optional<String> paymentIp,
+            Optional<String> paymentFingerprint,
+            Optional<String> paymentPanMask,
+            Optional<Long> paymentAmount,
+            Optional<Instant> fromTime,
+            Optional<Instant> toTime,
+            Optional<Integer> limit,
+            Optional<Integer> offset) throws DaoException {
         Function<StringBuilder, StringBuilder> func = head -> {
             head.append(" where (TRUE) ");
             addCondition(head, "merchant_id", true);
@@ -193,16 +307,17 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             addCondition(head, "invoice_id", invoiceId.isPresent());
             addCondition(head, "payment_id", paymentId.isPresent());
             addCondition(head, "status", paymentStatus.isPresent());
-            if (panMask.isPresent()) {
-                head.append(" masked_pan like :masked_pan ");
-            }
+            addCondition(head, "masked_pan", "like", paymentPanMask.isPresent());
+            addCondition(head, "ip", "like", paymentIp.isPresent());
+            addCondition(head, "customer_id", "like", paymentFingerprint.isPresent());
+            addCondition(head, "email", "like", paymentEmail.isPresent());
+
             addCondition(head, "created_at", "from_time", "and", ">=", fromTime.isPresent());
             addCondition(head, "created_at", "to_time", "and", "<", toTime.isPresent());
             return head;
         };
 
         StringBuilder countSb = new StringBuilder("select count(*) from mst.payment");
-
 
         countSb = func.apply(countSb);
 
@@ -213,17 +328,20 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
         params.addValue("invoice_id", invoiceId.orElse(null));
         params.addValue("payment_id", paymentId.orElse(null));
         params.addValue("status", paymentStatus.orElse(null));
-        params.addValue("masked_pan", paymentStatus.orElse("").replaceAll("\\*", "_"));
+        params.addValue("masked_pan", paymentPanMask.orElse("").replaceAll("\\*", "_"));
+        params.addValue("ip", paymentIp.orElse("").replaceAll("\\*", "_"));
+        params.addValue("customer_id", paymentFingerprint.orElse("").replaceAll("\\*", "_"));
+        params.addValue("email", paymentEmail.orElse("").replaceAll("\\*", "_"));
 
         if (fromTime.isPresent()) {
             params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("from_time", null, Types.NULL);
+            params.addValue("from_time", null);
         }
         if (toTime.isPresent()) {
             params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
         } else {
-            params.addValue("to_time", null, Types.NULL);
+            params.addValue("to_time", null);
         }
 
         try {
@@ -373,6 +491,14 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
 
     private StringBuilder addCondition(StringBuilder sb, String fieldName, boolean apply) {
         return addCondition(sb, fieldName, fieldName, "and", "=", apply);
+    }
+
+    private StringBuilder addInCondition(StringBuilder sb, String fieldName, String templateField, String op, boolean apply) {
+        return apply ? sb.append(' ').append(op).append(' ').append(fieldName).append(" ").append("in").append(" ").append("(").append(':').append(templateField).append(")") : sb;
+    }
+
+    private StringBuilder addCondition(StringBuilder sb, String fieldName, String eq, boolean apply) {
+        return addCondition(sb, fieldName, fieldName, "and", eq, apply);
     }
 
     private StringBuilder addCondition(StringBuilder sb, String fieldName, String templateField, String op, String eq, boolean apply) {

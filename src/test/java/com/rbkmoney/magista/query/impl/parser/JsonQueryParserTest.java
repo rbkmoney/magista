@@ -35,7 +35,7 @@ public class JsonQueryParserTest {
 
     @Test
     public void testPaymentsParse() throws Exception {
-        String json = "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
+        String json = "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'payment_pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
         List<QueryPart> queryParts = parser.parseQuery(json);
         assertEquals("root query", 1, queryParts.size());
         assertEquals("root query has 1 parameter - function name", 1, queryParts.get(0).getParameters().getParametersMap().size());
@@ -61,7 +61,7 @@ public class JsonQueryParserTest {
 
     @Test
     public void testPaymentsParseWithPagination() throws Exception {
-        String json = "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}, 'size':'2', 'from':'1'}}";
+        String json = "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'payment_pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}, 'size':'2', 'from':'1'}}";
         List<QueryPart> queryParts = parser.parseQuery(json);
         assertEquals("root query", 1, queryParts.size());
         assertEquals("root query has 3 parameters - function name, pagination", 3, queryParts.get(0).getParameters().getParametersMap().size());
@@ -87,11 +87,10 @@ public class JsonQueryParserTest {
 
     @Test(expected = QueryParserException.class)
     public void testPaymentsPanParseError() throws Exception {
-        String json = "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'pan_mask':'12**12!','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
+        String json = "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'payment_pan_mask':'12**12!','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
         } catch (QueryParserException e) {
-            e.printStackTrace();
             throw e;
         }
 
@@ -99,11 +98,10 @@ public class JsonQueryParserTest {
 
     @Test(expected = QueryParserException.class)
     public void testPaymentsShopParseError() throws Exception {
-        String json = "{'query': {'payments': {'merchant_id': '1','invoice_id':'A','payment_id':'B', 'pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
+        String json = "{'query': {'payments': {'merchant_id': '1','invoice_id':'A','payment_id':'B', 'payment_pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
         } catch (QueryParserException e) {
-            e.printStackTrace();
             throw e;
         }
     }
@@ -165,7 +163,6 @@ public class JsonQueryParserTest {
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
         } catch (QueryParserException e) {
-            e.printStackTrace();
             throw e;
         }
 
@@ -173,11 +170,10 @@ public class JsonQueryParserTest {
 
     @Test(expected = QueryParserException.class)
     public void testInvoicesMerchantParseError() throws Exception {
-        String json = "{'query': {'invoices': {'shop_id': '1','invoice_id':'A','payment_id':'B', 'pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
+        String json = "{'query': {'invoices': {'shop_id': '1','invoice_id':'A','payment_id':'B', 'payment_pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
         try {
             List<QueryPart> queryParts = parser.parseQuery(json);
         } catch (QueryParserException e) {
-            e.printStackTrace();
             throw e;
         }
     }
