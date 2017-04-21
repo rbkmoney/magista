@@ -47,7 +47,7 @@ public class QueryParameters {
             try {
                 return Long.parseLong(val.toString());
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Field:"+key +" has incorrect value", e);
+                throw new IllegalArgumentException("Order:"+key +" has incorrect value", e);
             }
         } else {
             return null;
@@ -62,7 +62,7 @@ public class QueryParameters {
             try {
                 return Integer.parseInt(val.toString());
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Field:"+key +" has incorrect value", e);
+                throw new IllegalArgumentException("Order:"+key +" has incorrect value", e);
             }
         } else {
             return null;

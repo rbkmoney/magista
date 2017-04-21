@@ -19,7 +19,7 @@ public class Test {
     public void test() throws URISyntaxException, TException {
         THSpawnClientBuilder clientBuilder = (THSpawnClientBuilder) new THSpawnClientBuilder().withAddress(new URI("http://localhost:8082/stat"));
         MerchantStatisticsSrv.Iface client = clientBuilder.build(MerchantStatisticsSrv.Iface.class);
-        // List<com.rbkmoney.damsel.domain.Invoice>
+        // Ordering<com.rbkmoney.damsel.domain.Invoice>
         String json = "{'query': {'invoices': {'merchant_id': 'hg_tests_SUITE','shop_id': 'THRIFT-SHOP','from_time': '2016-08-11T00:12:00Z','to_time': '2016-09-11T12:12:00Z', 'from':'1', 'size':'2'}}}";
         //String json = "{'query': {'payments': {'merchant_id': 'hg_tests_SUITE','shop_id': 'THRIFT-SHOP','from_time': '2016-08-11T00:12:00Z','to_time': '2016-09-11T12:12:00Z', 'from':'1', 'size':'2'}}}";
         //String json = "{'query': {'payments_turnover': {'merchant_id': 'hg_tests_SUITE','shop_id': 'THRIFT-SHOP','from_time': '2016-08-11T00:12:00Z','to_time': '2016-09-11T16:12:00Z', 'split_interval':'60', 'from':'1', 'size':'2'}}}";
