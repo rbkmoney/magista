@@ -19,13 +19,4 @@ public abstract class UnkeyedInstance<T extends DSLDef, V extends DSLInstance> e
         return children;
     }
 
-    public void setChildren(Collection<? extends V> children) {
-        this.children.clear();
-        this.children.addAll(children);
-    }
-
-    public void addChild(V value) {
-        children.add(value);
-    }
-
 }

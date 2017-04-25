@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.dsl.instance;
 
+import com.rbkmoney.magista.dsl.def.DSLDef;
 import com.rbkmoney.magista.dsl.def.ValueDef;
 
 /**
@@ -16,6 +17,10 @@ public class ValueInstance<T extends ValueDef, V> extends UnkeyedInstance<T, DSL
         this.value = value;
     }
 
+    @Override
+    public void setChild(DSLDef def, DSLInstance instance) {
+        throw new IllegalStateException("Value cannot have children");
+    }
 
     public V getValue() {
         return value;

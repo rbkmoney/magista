@@ -39,4 +39,10 @@ public abstract class Def implements DSLDef {
         return childDefList;
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{" +
+                "childDefList=" + childDefList +
+                '}';
+    }
 }

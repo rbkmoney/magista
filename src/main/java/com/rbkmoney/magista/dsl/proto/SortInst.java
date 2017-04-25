@@ -12,12 +12,12 @@ public class SortInst extends KeyedInstance {
         super(LimitDef.INSTANCE);
     }
 
-    public Ordering getSize() {
-        return (Ordering) getChild(ORDERING_NAME);
+    public Ordering getOrdering() {
+        return (Ordering) getChild(SortDef.Ordering.INSTANCE);
     }
 
-    public void setSize(Ordering ordering) {
-        putChild(ORDERING_NAME, ordering);
+    public void setOrdering(Ordering ordering) {
+        setChild(SortDef.Ordering.INSTANCE, ordering);
     }
 
     public static class Ordering extends ArrayInstance<Ordering.Order> {

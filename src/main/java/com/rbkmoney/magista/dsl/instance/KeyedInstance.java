@@ -2,6 +2,7 @@ package com.rbkmoney.magista.dsl.instance;
 
 import com.rbkmoney.magista.dsl.def.DSLDef;
 import com.rbkmoney.magista.dsl.def.ParameterDSLDef;
+import com.rbkmoney.magista.dsl.def.ParameterDef;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,6 +19,12 @@ public abstract class KeyedInstance<T extends DSLDef> extends Instance<T> {
     }
 
     @Override
+    public void setChild(DSLDef def, DSLInstance instance) {
+        checkChildDef(def);
+        children.put(def, instance);
+    }
+
+    @Override
     public Collection<DSLInstance> getChildren() {
         return children.values();
     }
@@ -26,33 +33,21 @@ public abstract class KeyedInstance<T extends DSLDef> extends Instance<T> {
         return children;
     }
 
-    public DSLInstance getChild(Object key) {
-        return children.get(key);
-    }
-
-    public void putChild(Object key, DSLInstance value) {
-        children.put(key, value);
+    public DSLInstance getChild(DSLDef def) {
+        return children.get(def);
     }
 
     public ParameterInstance getOrCreateParameter(ParameterDSLDef def) {
-        return getOrCreateParameter(def.getName(), def);
-    }
-
-    public ParameterInstance getOrCreateParameter(Object key, ParameterDSLDef def) {
-        ParameterInstance param = getParameter(key);
+        ParameterInstance param = getParameter(def);
         if (param == null) {
             param = new ParameterInstance(def);
-            setParameter(key, param);
+            setParameter(def, param);
         }
         return param;
     }
 
     public ParameterInstance getParameter(ParameterDSLDef def) {
-        return getParameter(def.getName());
-    }
-
-    public ParameterInstance getParameter(Object key) {
-        Object value = getChild(key);
+        Object value = getChild(def);
         if (value instanceof ParameterInstance) {
             return (ParameterInstance) value;
         } else {
@@ -60,12 +55,8 @@ public abstract class KeyedInstance<T extends DSLDef> extends Instance<T> {
         }
     }
 
-    public <V1> V1 getParameterValue(ParameterDSLDef def, Class<V1> expectedType) {
-        return getParameterValue(def.getName(), expectedType);
-    }
-
-    public <V> V getParameterValue(Object key, Class<V> expectedType) {
-        ParameterInstance param = getParameter(key);
+    public <V> V getParameterValue(ParameterDSLDef def, Class<V> expectedType) {
+        ParameterInstance param = getParameter(def);
         if (param != null && param.getValue() instanceof ValueInstance) {
             Object value =  ((ValueInstance) param.getValue()).getValue();
             if (value == null || expectedType.isAssignableFrom(value.getClass())) {
@@ -75,11 +66,7 @@ public abstract class KeyedInstance<T extends DSLDef> extends Instance<T> {
         return null;
     }
 
-    public void setParameter(ParameterInstance value) {
-        setParameter(value.getName(), value);
-    }
-
-    public void setParameter(Object key, ParameterInstance value) {
-        putChild(key, value);
+    public void setParameter(ParameterDSLDef def, ParameterInstance value) {
+        setChild(def, value);
     }
 }

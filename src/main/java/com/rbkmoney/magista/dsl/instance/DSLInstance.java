@@ -12,5 +12,6 @@ import java.util.Map;
 public interface DSLInstance<T extends DSLDef> {
     T getDef();
     DSLInstance getParent();
+    void setChild(DSLDef def, DSLInstance instance);
     Collection<? extends DSLInstance> getChildren();
 }

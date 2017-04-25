@@ -22,14 +22,14 @@ public abstract class EnumInstance<T extends EnumDef> extends Instance<T> {
         return value.isEmpty() ? null : value.get(0);
     }
 
-    public void setEnumValue(DSLInstance value) {
-        for (DSLDef def: getDef().getChildDefs()) {
-            if (def.isAssignable(value)) {
-                this.value.set(0, value);
-                return;
-            }
-        }
-        throw new IllegalStateException("No matching def found for instance value");
+    public void setEnumValue(DSLDef def, DSLInstance value) {
+        setChild(def, value);
+    }
+
+    @Override
+    public void setChild(DSLDef def, DSLInstance value) {
+        checkChildDef(def);
+        this.value.set(0, value);
     }
 
     @Override

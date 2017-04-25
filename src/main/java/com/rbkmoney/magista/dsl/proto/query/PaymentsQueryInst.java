@@ -15,11 +15,11 @@ public class PaymentsQueryInst extends FunctionInstance {
     }
 
     public LimitInst getLimit() {
-        return (LimitInst) getChild(LimitDef.NAME);
+        return (LimitInst) getChild(LimitDef.INSTANCE);
     }
 
     public void setLimit(LimitInst limit) {
-        putChild(LimitDef.NAME, limit);
+        setChild(LimitDef.INSTANCE, limit);
     }
 
     public Long getPaymentIdParameter() {

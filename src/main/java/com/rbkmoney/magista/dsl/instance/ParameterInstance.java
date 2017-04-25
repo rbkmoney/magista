@@ -17,10 +17,10 @@ public class ParameterInstance<T extends ParameterDSLDef, V extends DSLInstance>
     }
 
     public V getValue() {
-        return (V) getChild(ParameterDef.VALUE_KEY);
+        return (V) getChild(getDef());
     }
 
     public void setValue(V value) {
-        putChild(ParameterDef.VALUE_KEY, value);
+        setChild(getDef(), value);
     }
 }

@@ -29,4 +29,14 @@ public abstract class Instance<T extends DSLDef> implements DSLInstance<T> {
         this.parent = parent;
     }
 
+    protected boolean isChildDef(DSLDef def) {
+        return getDef().getChildDefs().contains(def);
+    }
+
+    protected void checkChildDef(DSLDef def) {
+        if (!isChildDef(def)) {
+            throw new IllegalArgumentException("Expected def in: "+ getDef().getChildDefs() + " but referred: " + def);
+        }
+    }
+
 }

@@ -15,19 +15,19 @@ public class LimitInst extends KeyedInstance {
     }
 
     public Size getSize() {
-        return (Size) getChild(LimitDef.SizeDef.NAME);
+        return (Size) getChild(LimitDef.SizeDef.INSTANCE);
     }
 
     public void setSize(Size size) {
-        putChild(LimitDef.SizeDef.NAME, size);
+        setChild(LimitDef.SizeDef.INSTANCE, size);
     }
 
     public From getFrom() {
-        return (From) getChild(LimitDef.FromDef.NAME);
+        return (From) getChild(LimitDef.FromDef.INSTANCE);
     }
 
     public void setFrom(From from) {
-        putChild(LimitDef.FromDef.NAME, from);
+        setChild(LimitDef.FromDef.INSTANCE, from);
     }
 
     public static class Size extends ParameterInstance<LimitDef.SizeDef, LongValueInstance> {
