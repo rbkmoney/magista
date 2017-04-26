@@ -2,6 +2,7 @@ package com.rbkmoney.magista.dsl.proto;
 
 import com.rbkmoney.magista.dsl.DSLInvalidException;
 import com.rbkmoney.magista.dsl.def.*;
+import com.rbkmoney.magista.dsl.instance.DSLInstance;
 import com.rbkmoney.magista.dsl.instance.DSLInstanceValidator;
 
 import java.util.Arrays;
@@ -13,7 +14,7 @@ public class SortDef extends NamedDef implements DSLInstanceValidator<LimitInst>
     public static final SortDef INSTANCE = new SortDef();
 
     public SortDef() {
-        super(Arrays.asList(Ordering.INSTANCE ), "sort");
+        super(Arrays.asList(OrderingDef.INSTANCE ), "sort");
     }
 
     @Override
@@ -21,30 +22,55 @@ public class SortDef extends NamedDef implements DSLInstanceValidator<LimitInst>
 
     }
 
-    public static class Ordering extends ArrayDef {
-        public static final Ordering INSTANCE = new Ordering();
+    @Override
+    public DSLInstance createInstance() {
+        return new SortInst();
+    }
 
-        public Ordering() {
-            super(new VarParameterDef(Order.INSTANCE, ""));
+    public static class OrderingDef extends ArrayDef {
+        public static final OrderingDef INSTANCE = new OrderingDef();
+
+        public OrderingDef() {
+            super(new VarParameterDef(OrderDef.INSTANCE, ""));
         }
 
-        public static class Order extends EnumDef {
-            public static Order INSTANCE = new Order();
+        @Override
+        public DSLInstance createInstance() {
+            return new SortInst.Ordering();
+        }
 
-            public Order() {
-                super(Arrays.asList(Asc.INSTANCE, Desc.INSTANCE));
+        public static class OrderDef extends EnumDef {
+            public static OrderDef INSTANCE = new OrderDef();
+
+            public OrderDef() {
+                super(Arrays.asList(AscDef.INSTANCE, DescDef.INSTANCE));
             }
 
-            public static class Asc extends ParameterDef {
-                public static final Asc INSTANCE = new Asc();
-                public Asc() {
+            @Override
+            public DSLInstance createInstance() {
+                return new SortInst.Ordering.Order();
+            }
+
+            public static class AscDef extends ParameterDef {
+                public static final AscDef INSTANCE = new AscDef();
+                public AscDef() {
                     super(null, "asc");
                 }
+
+                @Override
+                public DSLInstance createInstance() {
+                    return new SortInst.Ordering.Order.Asc();
+                }
             }
-            public static class Desc extends ParameterDef {
-                public static final Desc INSTANCE = new Desc();
-                public Desc() {
+            public static class DescDef extends ParameterDef {
+                public static final DescDef INSTANCE = new DescDef();
+                public DescDef() {
                     super(null, "desc");
+                }
+
+                @Override
+                public DSLInstance createInstance() {
+                    return new SortInst.Ordering.Order.Desc();
                 }
 
             }

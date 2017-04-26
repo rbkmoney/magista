@@ -17,11 +17,11 @@ public abstract class Def implements DSLDef {
     }
 
 
-/*    public T build(Object scr, DSLInstance parentInstance) throws DSLBuildException {
+/*    public T buildBase(Object scr, DSLInstance parentInstance) throws DSLBuildException {
         if (builder == null) {
-            throw new DSLBuildException("Not configured to build instance");
+            throw new DSLBuildException("Not configured to buildBase instance");
         }
-        return builder.build(scr, this, parentInstance);
+        return builder.buildBase(scr, this, parentInstance);
     }
 
 

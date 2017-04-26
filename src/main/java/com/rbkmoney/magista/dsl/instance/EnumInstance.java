@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by vpankrashkin on 07.04.17.
  */
-public abstract class EnumInstance<T extends EnumDef> extends Instance<T> {
+public class EnumInstance<T extends EnumDef> extends Instance<T> {
     private List<DSLInstance> value = new ArrayList<>();
 
     public EnumInstance(T def) {

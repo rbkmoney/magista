@@ -13,32 +13,32 @@ public class SortInst extends KeyedInstance {
     }
 
     public Ordering getOrdering() {
-        return (Ordering) getChild(SortDef.Ordering.INSTANCE);
+        return (Ordering) getChild(SortDef.OrderingDef.INSTANCE);
     }
 
     public void setOrdering(Ordering ordering) {
-        setChild(SortDef.Ordering.INSTANCE, ordering);
+        setChild(SortDef.OrderingDef.INSTANCE, ordering);
     }
 
     public static class Ordering extends ArrayInstance<Ordering.Order> {
         public Ordering() {
-            super(SortDef.Ordering.INSTANCE);
+            super(SortDef.OrderingDef.INSTANCE);
         }
 
-        public static class Order extends EnumInstance<SortDef.Ordering.Order> {
+        public static class Order extends EnumInstance<SortDef.OrderingDef.OrderDef> {
             public Order() {
-                super(SortDef.Ordering.Order.INSTANCE);
+                super(SortDef.OrderingDef.OrderDef.INSTANCE);
             }
 
-            public static class Asc extends ParameterInstance<SortDef.Ordering.Order.Asc, DSLInstance> {
+            public static class Asc extends ParameterInstance<SortDef.OrderingDef.OrderDef.AscDef, DSLInstance> {
                 public Asc() {
-                    super(SortDef.Ordering.Order.Asc.INSTANCE);
+                    super(SortDef.OrderingDef.OrderDef.AscDef.INSTANCE);
                 }
             }
 
-            public static class Desc extends ParameterInstance<SortDef.Ordering.Order.Desc, DSLInstance> {
+            public static class Desc extends ParameterInstance<SortDef.OrderingDef.OrderDef.DescDef, DSLInstance> {
                 public Desc() {
-                    super(SortDef.Ordering.Order.Desc.INSTANCE);
+                    super(SortDef.OrderingDef.OrderDef.DescDef.INSTANCE);
                 }
             }
         }

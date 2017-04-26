@@ -1,5 +1,8 @@
 package com.rbkmoney.magista.dsl.def;
 
+import com.rbkmoney.magista.dsl.instance.DSLInstance;
+import com.rbkmoney.magista.dsl.instance.ParameterInstance;
+
 import java.util.Arrays;
 
 /**
@@ -14,5 +17,10 @@ public class ParameterDef extends NamedDef implements ParameterDSLDef {
 
     public DSLDef getValueDef() {
         return getChildDefs().get(0);
+    }
+
+    @Override
+    public DSLInstance createInstance() {
+        return new ParameterInstance(this);
     }
 }

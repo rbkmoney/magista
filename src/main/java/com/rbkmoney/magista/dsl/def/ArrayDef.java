@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * Created by vpankrashkin on 11.04.17.
  */
-public class ArrayDef extends Def {
+public abstract class ArrayDef extends Def {
 
     public ArrayDef(DSLDef itemsDef) {
         super(Arrays.asList(itemsDef));

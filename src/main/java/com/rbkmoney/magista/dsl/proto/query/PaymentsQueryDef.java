@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.dsl.proto.query;
 
 import com.rbkmoney.magista.dsl.def.*;
+import com.rbkmoney.magista.dsl.instance.DSLInstance;
 import com.rbkmoney.magista.dsl.proto.LimitDef;
 import com.rbkmoney.magista.dsl.proto.SortDef;
 
@@ -27,5 +28,10 @@ public class PaymentsQueryDef extends FunctionDef {
     protected static List<ParameterDSLDef> genInputParameterDefs() {
         return Arrays.asList(PAYMENT_ID_DEF
         );
+    }
+
+    @Override
+    public DSLInstance createInstance() {
+        return new PaymentsQueryInst();
     }
 }

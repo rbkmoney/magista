@@ -39,7 +39,7 @@ public abstract class BaseQueryBuilder implements QueryBuilder {
                 return queries.get(0);
             } else {
                 log.warn("No builders matched following query parts: {}", queryParts);
-                throw new QueryBuilderException("Can't build query, no match to process");
+                throw new QueryBuilderException("Can't buildBase query, no match to process");
             }
         } catch (QueryBuilderException e) {
             throw e;

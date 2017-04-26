@@ -10,12 +10,8 @@ import java.util.Objects;
  */
 public interface DSLDef {
     List<DSLDef> getChildDefs();
-    default boolean isAssignable(DSLInstance instance) {
-        if (instance != null) {
-            return  Objects.equals(instance.getDef(), this);
-        }
-        return true;
-    }
+
+    DSLInstance createInstance();//TODO fix type casting
 
 
 }

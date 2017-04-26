@@ -4,6 +4,7 @@ import com.rbkmoney.magista.dsl.DSLInvalidException;
 import com.rbkmoney.magista.dsl.def.NamedDef;
 import com.rbkmoney.magista.dsl.def.LongValueDef;
 import com.rbkmoney.magista.dsl.def.ParameterDef;
+import com.rbkmoney.magista.dsl.instance.DSLInstance;
 import com.rbkmoney.magista.dsl.instance.DSLInstanceValidator;
 
 import java.util.Arrays;
@@ -28,6 +29,11 @@ public class LimitDef extends NamedDef implements DSLInstanceValidator<LimitInst
         }
     }
 
+    @Override
+    public DSLInstance createInstance() {
+        return new LimitInst();
+    }
+
     public static class SizeDef extends ParameterDef implements DSLInstanceValidator<LimitInst.Size> {
         public static final String NAME = "size";
         public static final SizeDef INSTANCE = new SizeDef();
@@ -40,6 +46,11 @@ public class LimitDef extends NamedDef implements DSLInstanceValidator<LimitInst
         public void validate(LimitInst.Size instance) throws DSLInvalidException {
             validateParamValueNotNull(this, instance);
             checkTrue(instance.getValue().getValue() > 0, this, "Only positive value allowed here");
+        }
+
+        @Override
+        public DSLInstance createInstance() {
+            return new LimitInst.Size();
         }
     }
 
@@ -55,6 +66,11 @@ public class LimitDef extends NamedDef implements DSLInstanceValidator<LimitInst
         public void validate(LimitInst.From instance) throws DSLInvalidException {
             validateParamValueNotNull(this, instance);
             checkTrue(instance.getValue().getValue() >= 0, this, "Only positive or zero value allowed here");
+        }
+
+        @Override
+        public DSLInstance createInstance() {
+            return new LimitInst.From();
         }
     }
 }

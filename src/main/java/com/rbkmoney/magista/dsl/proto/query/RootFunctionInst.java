@@ -9,8 +9,8 @@ import com.rbkmoney.magista.dsl.proto.LimitInst;
 /**
  * Created by vpankrashkin on 13.04.17.
  */
-public class RootQueryInst extends KeyedInstance {
-    public RootQueryInst(RootFunctionDef def) {
+public class RootFunctionInst extends KeyedInstance {
+    public RootFunctionInst(RootFunctionDef def) {
         super(def);
     }
 
