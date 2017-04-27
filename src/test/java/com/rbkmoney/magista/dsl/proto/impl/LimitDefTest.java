@@ -16,7 +16,7 @@ import java.util.function.Function;
  * Created by vpankrashkin on 13.04.17.
  */
 public class LimitDefTest {
-    @Test(expected = DSLInvalidException.class)
+  /*  @Test(expected = DSLInvalidException.class)
     public void testValidateNoParams() {
         LimitDef def = new LimitDef(genBuilder(Function.identity()));
         buildAndValidate(def);
@@ -75,5 +75,5 @@ public class LimitDefTest {
             return null;
         };
     }
-
+*/
 }
