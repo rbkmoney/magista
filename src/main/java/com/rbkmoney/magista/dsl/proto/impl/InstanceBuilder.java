@@ -27,45 +27,77 @@ public abstract class InstanceBuilder<T extends DSLInstance> implements DSLInsta
         if (builder != null) {
             return (T) builder.build(src, defTree, parentInstance);
         } else {
-            return  (T) fillInstance(src, defTree, buildBase(src, defTree, parentInstance));
+            return (T) fillInstance(src, defTree, buildBase(src, defTree, parentInstance));
         }
     }
 
-    protected DSLInstance fillInstance(Object src, DefTree defTree, DSLInstance instance) {
-        List<DSLDef> childDefs = defTree.getNode().getChildDefs();
-        for (int i = 0; i < childDefs.size(); ++i) {
-            DSLDef childDef = childDefs.get(i);
-            //build list
-            DSLInstance value = build(walkTree(src, defTree), , instance);
-            instance.setChild(childDef, value);
+    private DSLInstance fillInstance(Object src, DefTree defTree, DSLInstance instance) {
+        if (defTree.getNode() != instance.getDef()) {//if tree contains child defs, consider they're already processed
+            while (defTree.getNode() != null && defTree.getNode() != instance.getDef()) {
+                defTree.remNode();
+            }
+            return instance;
+        }
+
+        if (defTree.getNode() instanceof ArrayDef){
+            return fillArrayInstance(src, defTree, (ArrayInstance) instance);
+        } else {
+            List<DSLDef> childDefs = defTree.getNode().getChildDefs();
+            for (int i = 0; i < childDefs.size(); ++i) {
+                DSLDef childDef = childDefs.get(i);
+                DSLInstance value = build(walkTree(src, defTree.addNode(childDef)), defTree, instance);
+                instance.setChild(childDef, value);
+                defTree.remNode();
+            }
+            return instance;
+        }
+    }
+
+
+    private ArrayInstance fillArrayInstance(Object src, DefTree defTree, ArrayInstance instance) {
+        ArrayDef def = (ArrayDef) defTree.getNode();
+        DSLDef itemsDef = ((ArrayDef)defTree.getNode()).getItemsDef();
+        int i;
+        for (i = 0; hasMoreElements(src, def, defTree, i); ++i) {
+            DSLInstance value = build(walkTree(src, defTree.addNode(itemsDef)), defTree, instance);
+            instance.setChild(itemsDef, value);
+        }
+        while (i-- > 0) {
             defTree.remNode();
         }
         return instance;
     }
 
+    abstract protected boolean hasMoreElements(Object src, ArrayDef def, DefTree defTree, int processedCount);
+
     /**
-     * @param  src parent, root or any other object, depends on implementation
+     * @param src parent, root or any other object, depends on implementation. By default def tree navigation is relied on builder implementation.
+     *            For navigating in array, all sequentially read defs're added as tree nodes, so same defs count to nearest array def up in tree is number or reading element (1 based)
      * @return src object representation of last defTree node or any other object, allowing to get this value
-     * */
+     */
     protected Object walkTree(Object src, DefTree defTree) {
         return src;
     }
 
-    private DSLInstance buildBase(Object parentSrc, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
+    private DSLInstance buildBase(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
+        if (src == null) {
+            return null;
+        }
+
         DSLDef def = defTree.getNode();
 
         if (def instanceof FunctionDef) {
-            return buildBaseFunc(parentSrc, defTree, parentInstance);
+            return buildBaseFunc(src, defTree, parentInstance);
         } else if (def instanceof ArrayDef) {
-            return buildBaseArray(parentSrc, defTree, parentInstance);
+            return buildBaseArray(src, defTree, parentInstance);
         } else if (def instanceof EnumDef) {
-            return buildBaseEnum(parentSrc, defTree, parentInstance);
+            return buildBaseEnum(src, defTree, parentInstance);
         } else if (def instanceof ParameterDef) {
-            return buildBaseParam(parentSrc, defTree, parentInstance);
+            return buildBaseParam(src, defTree, parentInstance);
         } else if (def instanceof ValueDef) {
-            return buildBaseVal(parentSrc, defTree, parentInstance);
+            return buildBaseVal(src, defTree, parentInstance);
         } else {
-            return buildUndefined(parentSrc, defTree, parentInstance);
+            return buildUndefined(src, defTree, parentInstance);
         }
     }
 
@@ -73,14 +105,11 @@ public abstract class InstanceBuilder<T extends DSLInstance> implements DSLInsta
         return (FunctionInstance) defTree.getNode().createInstance();
     }
 
-    //add smth to tell that instance is already filled
-    protected ArrayInstance buildBaseArray(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-
-    }
-
     protected EnumInstance buildBaseEnum(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-
+        return (EnumInstance) defTree.getNode().createInstance();
     }
+
+    protected abstract ArrayInstance buildBaseArray(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
 
     protected ValueInstance buildBaseVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
         DSLDef def = defTree.getNode();
@@ -94,7 +123,6 @@ public abstract class InstanceBuilder<T extends DSLInstance> implements DSLInsta
             return buildUndefinedVal(src, defTree, parentInstance);
         }
     }
-
     protected NumberValueInstance buildBaseNumVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
         DSLDef def = defTree.getNode();
         if (def instanceof LongValueDef) {
@@ -106,20 +134,25 @@ public abstract class InstanceBuilder<T extends DSLInstance> implements DSLInsta
         }
     }
 
+
+    abstract protected VarParameterInstance buildBaseVarParam(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
+
     abstract protected LongValueInstance buildBaseLongVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
+
     abstract protected LongValueInstance buildBaseDoubleVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
+
     abstract protected BooleanValueInstance buildBaseBoolVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
-
-    protected NumberValueInstance buildUndefinedNumVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-        throw new DSLBuildException("Unknown number def: "+ defTree.getNode());
-    }
-
-    protected ValueInstance buildUndefinedVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-        throw new DSLBuildException("Unknown value def: "+ defTree.getNode());
-    }
 
     abstract protected StringValueInstance buildBaseStrVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
 
+    protected NumberValueInstance buildUndefinedNumVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
+        throw new DSLBuildException("Unknown number def: " + defTree.getNode());
+    }
+
+
+    protected ValueInstance buildUndefinedVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
+        throw new DSLBuildException("Unknown value def: " + defTree.getNode());
+    }
 
     protected ParameterInstance buildBaseParam(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
         DSLDef def = defTree.getNode();
@@ -130,9 +163,12 @@ public abstract class InstanceBuilder<T extends DSLInstance> implements DSLInsta
         }
     }
 
-    abstract protected VarParameterInstance buildBaseVarParam(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
+    protected ParameterInstance buildUndefinedParam(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
+        throw new DSLBuildException("Unknown param def: " + defTree.getNode());
+    }
 
-    abstract protected ParameterInstance buildUndefinedParam(Object src, DefTree def, DSLInstance parentInstance) throws DSLBuildException;
-    abstract protected ParameterInstance buildUndefined(Object src, DefTree def, DSLInstance parentInstance) throws DSLBuildException;
+    protected ParameterInstance buildUndefined(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
+        throw new DSLBuildException("Unknown def: " + defTree.getNode());
+    }
 
 }
