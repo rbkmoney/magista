@@ -47,7 +47,7 @@ CREATE TABLE mst.payment (
   event_id       BIGINT                      NOT NULL,
   merchant_id    CHARACTER VARYING           NOT NULL,
   shop_id        INT                         NOT NULL,
-  customer_id    CHARACTER VARYING,
+  fingerprint    CHARACTER VARYING,
   masked_pan     CHARACTER VARYING           NOT NULL,
   status         CHARACTER VARYING           NOT NULL,
   amount         BIGINT                      NOT NULL,
