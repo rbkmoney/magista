@@ -21,11 +21,12 @@ CREATE TABLE mst.invoice_event (
   payment_phone_number  CHARACTER VARYING,
   payment_email         CHARACTER VARYING,
   payment_fingerprint   CHARACTER VARYING,
-  payment_created_at    TIMESTAMP WITHOUT TIME ZONE
+  payment_created_at    TIMESTAMP WITHOUT TIME ZONE,
+  CONSTRAINT invoice_event_pkey PRIMARY KEY (event_id)
 );
 
 CREATE TABLE mst.invoice (
-  id            CHARACTER VARYING           NOT NULL,
+  invoice_id    CHARACTER VARYING           NOT NULL,
   event_id      BIGINT                      NOT NULL,
   merchant_id   CHARACTER VARYING           NOT NULL,
   shop_id       BIGINT                      NOT NULL,
@@ -33,10 +34,8 @@ CREATE TABLE mst.invoice (
   amount        BIGINT                      NOT NULL,
   currency_code CHARACTER VARYING           NOT NULL,
   created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  changed_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  model         CHARACTER VARYING           NOT NULL,
-  data          CHARACTER VARYING           NOT NULL,
-  CONSTRAINT invoice_pkey PRIMARY KEY (id)
+  model         BYTEA                       NOT NULL,
+  CONSTRAINT invoice_pkey PRIMARY KEY (invoice_id)
 );
 
 CREATE INDEX invoice_cms_key
@@ -44,8 +43,8 @@ CREATE INDEX invoice_cms_key
 
 CREATE TABLE mst.payment (
   payment_id     CHARACTER VARYING           NOT NULL,
-  event_id       BIGINT                      NOT NULL,
   invoice_id     CHARACTER VARYING           NOT NULL,
+  event_id       BIGINT                      NOT NULL,
   merchant_id    CHARACTER VARYING           NOT NULL,
   shop_id        INT                         NOT NULL,
   customer_id    CHARACTER VARYING,
@@ -61,9 +60,7 @@ CREATE TABLE mst.payment (
   phone_number   CHARACTER VARYING,
   email          CHARACTER VARYING,
   created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  changed_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  model          CHARACTER VARYING           NOT NULL,
-  data           CHARACTER VARYING           NOT NULL,
+  model          BYTEA                       NOT NULL,
   CONSTRAINT payment_pkey PRIMARY KEY (invoice_id, payment_id)
 );
 
