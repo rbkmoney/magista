@@ -31,7 +31,6 @@ public class InvoiceMapper implements Mapper<InvoiceEventContext> {
 
         Instant createdAt = Instant.from(TemporalConverter.stringToTemporal(invoiceCreated.getInvoice().getCreatedAt()));
         invoice.setCreatedAt(createdAt);
-        invoice.setChangedAt(createdAt);
 
         invoice.setAmount(invoiceCreated.getInvoice().getCost().getAmount());
         invoice.setCurrencyCode(invoiceCreated.getInvoice().getCost().getCurrency().getSymbolicCode());

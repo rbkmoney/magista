@@ -12,6 +12,4 @@ public interface InvoiceDao {
 
     void insert(Invoice invoice) throws DaoException;
 
-    void update(Invoice invoice) throws DaoException;
-
 }

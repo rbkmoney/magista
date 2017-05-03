@@ -36,10 +36,10 @@ public class InvoiceService {
             }
 
             invoice.setStatus(invoiceStatusChange.getStatus().getSetField());
-            invoice.setChangedAt(invoiceStatusChange.getChangedAt());
+//            invoice.setChangedAt(invoiceStatusChange.getChangedAt());
             invoice.getModel().setStatus(invoiceStatusChange.getStatus());
 
-            invoiceDao.update(invoice);
+//            invoiceDao.update(invoice);
             log.info("Invoice status have been changed, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
 
         } catch (DaoException ex) {

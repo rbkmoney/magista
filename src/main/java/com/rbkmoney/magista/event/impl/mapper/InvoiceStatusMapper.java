@@ -18,13 +18,13 @@ public class InvoiceStatusMapper implements Mapper<InvoiceEventContext> {
         Event event = value.getSource().getSourceEvent().getProcessingEvent();
         long eventId = event.getId();
         String invoiceId = event.getSource().getInvoice();
-        Instant changedAt = Instant.from(TemporalConverter.stringToTemporal(event.getCreatedAt()));
+//        Instant changedAt = Instant.from(TemporalConverter.stringToTemporal(event.getCreatedAt()));
         InvoiceStatus status = event.getPayload().getInvoiceEvent().getInvoiceStatusChanged().getStatus();
 
         InvoiceStatusChange invoiceStatusChange = new InvoiceStatusChange();
         invoiceStatusChange.setEventId(eventId);
         invoiceStatusChange.setInvoiceId(invoiceId);
-        invoiceStatusChange.setChangedAt(changedAt);
+//        invoiceStatusChange.setChangedAt(changedAt);
         invoiceStatusChange.setStatus(status);
 
         value.setInvoiceStatusChange(invoiceStatusChange);

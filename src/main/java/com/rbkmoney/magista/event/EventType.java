@@ -1,10 +1,10 @@
 package com.rbkmoney.magista.event;
 
-import com.rbkmoney.thrift.filter.Filter;
-import com.rbkmoney.thrift.filter.PathConditionFilter;
-import com.rbkmoney.thrift.filter.condition.Condition;
-import com.rbkmoney.thrift.filter.condition.IsNullCondition;
-import com.rbkmoney.thrift.filter.rule.PathConditionRule;
+import com.rbkmoney.geck.filter.Condition;
+import com.rbkmoney.geck.filter.Filter;
+import com.rbkmoney.geck.filter.PathConditionFilter;
+import com.rbkmoney.geck.filter.condition.IsNullCondition;
+import com.rbkmoney.geck.filter.rule.PathConditionRule;
 
 /**
  * Created by tolkonepiu on 10/11/2016.

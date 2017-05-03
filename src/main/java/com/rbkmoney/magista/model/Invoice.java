@@ -25,8 +25,6 @@ public class Invoice {
 
     private Instant createdAt;
 
-    private Instant changedAt;
-
     private com.rbkmoney.damsel.domain.Invoice model;
 
     public String getId() {
@@ -93,14 +91,6 @@ public class Invoice {
         this.createdAt = createdAt;
     }
 
-    public Instant getChangedAt() {
-        return changedAt;
-    }
-
-    public void setChangedAt(Instant changedAt) {
-        this.changedAt = changedAt;
-    }
-
     public com.rbkmoney.damsel.domain.Invoice getModel() {
         return model;
     }
@@ -120,7 +110,6 @@ public class Invoice {
                 ", amount=" + amount +
                 ", currencyCode='" + currencyCode + '\'' +
                 ", createdAt=" + createdAt +
-                ", changedAt=" + changedAt +
                 '}';
     }
 }
