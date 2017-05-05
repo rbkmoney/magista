@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Created by tolkonepiu on 03/05/2017.
  */
@@ -30,11 +32,40 @@ public class InvoiceDaoTest extends AbstractIntegrationTest {
         invoice.setAmount(100);
         invoice.setCurrencyCode("RUB");
         invoice.setStatus(InvoiceStatus._Fields.UNPAID);
-        invoice.setCreatedAt(Instant.now());
+        Instant now = Instant.now();
+        invoice.setCreatedAt(now);
+        invoice.setChangedAt(now);
         invoice.setModel(new MockTBaseProcessor().process(new com.rbkmoney.damsel.domain.Invoice(),
                 new TBaseHandler<>(com.rbkmoney.damsel.domain.Invoice.class)));
 
         invoiceDao.insert(invoice);
+
+        assertEquals(invoice, invoiceDao.findById(invoice.getId()));
+    }
+
+    @Test
+    public void insertTwoInvoicesWithEqualsInvoiceIdTest() throws IOException {
+        Invoice invoice = new Invoice();
+        invoice.setId("; drop mst.invoice; --");
+        invoice.setMerchantId(UUID.randomUUID().toString());
+        invoice.setEventId(1L);
+        invoice.setShopId(123);
+        invoice.setAmount(100);
+        invoice.setCurrencyCode("RUB");
+        invoice.setStatus(InvoiceStatus._Fields.UNPAID);
+        Instant now = Instant.now();
+        invoice.setCreatedAt(now);
+        invoice.setChangedAt(now);
+        invoice.setModel(new MockTBaseProcessor().process(new com.rbkmoney.damsel.domain.Invoice(),
+                new TBaseHandler<>(com.rbkmoney.damsel.domain.Invoice.class)));
+
+        invoiceDao.insert(invoice);
+
+        invoice.setEventId(2L);
+        invoice.setStatus(InvoiceStatus._Fields.PAID);
+        invoice.setChangedAt(Instant.now());
+        invoiceDao.insert(invoice);
+        invoiceDao.findById(invoice.getId());
     }
 
 }

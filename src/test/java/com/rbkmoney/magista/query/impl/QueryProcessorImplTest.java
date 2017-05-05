@@ -7,6 +7,7 @@ import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,6 +24,7 @@ import static org.junit.Assert.assertEquals;
  */
 
 @Sql("classpath:data/sql/invoices_and_payments_test_data.sql")
+@Ignore
 @Transactional
 public class QueryProcessorImplTest extends AbstractIntegrationTest {
     private QueryProcessorImpl queryProcessor;

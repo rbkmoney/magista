@@ -26,25 +26,26 @@ CREATE TABLE mst.invoice_event (
 );
 
 CREATE TABLE mst.invoice (
-  invoice_id    CHARACTER VARYING           NOT NULL,
   event_id      BIGINT                      NOT NULL,
+  invoice_id    CHARACTER VARYING           NOT NULL,
   merchant_id   CHARACTER VARYING           NOT NULL,
   shop_id       BIGINT                      NOT NULL,
   status        CHARACTER VARYING           NOT NULL,
   amount        BIGINT                      NOT NULL,
   currency_code CHARACTER VARYING           NOT NULL,
   created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  changed_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   model         BYTEA                       NOT NULL,
-  CONSTRAINT invoice_pkey PRIMARY KEY (invoice_id)
+  CONSTRAINT invoice_pkey PRIMARY KEY (event_id)
 );
 
 CREATE INDEX invoice_cms_key
   ON mst.invoice (created_at, merchant_id, shop_id);
 
 CREATE TABLE mst.payment (
+  event_id       BIGINT                      NOT NULL,
   payment_id     CHARACTER VARYING           NOT NULL,
   invoice_id     CHARACTER VARYING           NOT NULL,
-  event_id       BIGINT                      NOT NULL,
   merchant_id    CHARACTER VARYING           NOT NULL,
   shop_id        INT                         NOT NULL,
   fingerprint    CHARACTER VARYING,
@@ -60,8 +61,9 @@ CREATE TABLE mst.payment (
   phone_number   CHARACTER VARYING,
   email          CHARACTER VARYING,
   created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  changed_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   model          BYTEA                       NOT NULL,
-  CONSTRAINT payment_pkey PRIMARY KEY (invoice_id, payment_id)
+  CONSTRAINT payment_pkey PRIMARY KEY (event_id)
 );
 
 CREATE INDEX payment_ms_key

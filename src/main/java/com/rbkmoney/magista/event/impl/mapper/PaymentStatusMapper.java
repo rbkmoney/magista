@@ -17,14 +17,14 @@ public class PaymentStatusMapper implements Mapper<InvoiceEventContext> {
     public InvoiceEventContext fill(InvoiceEventContext value) {
         Event event = value.getSource().getSourceEvent().getProcessingEvent();
         String invoiceId = event.getSource().getInvoice();
-        Instant changedAt = Instant.from(TemporalConverter.stringToTemporal(event.getCreatedAt()));
+        Instant createdAt = Instant.from(TemporalConverter.stringToTemporal(event.getCreatedAt()));
         InvoicePaymentStatusChanged invoicePaymentStatusChanged = event.getPayload().getInvoiceEvent().getInvoicePaymentEvent().getInvoicePaymentStatusChanged();
 
         PaymentStatusChange paymentStatusChange = new PaymentStatusChange();
         paymentStatusChange.setEventId(event.getId());
         paymentStatusChange.setInvoiceId(invoiceId);
         paymentStatusChange.setPaymentId(invoicePaymentStatusChanged.getPaymentId());
-        paymentStatusChange.setChangedAt(changedAt);
+        paymentStatusChange.setCreatedAt(createdAt);
         paymentStatusChange.setStatus(invoicePaymentStatusChanged.getStatus());
 
         value.setPaymentStatusChange(paymentStatusChange);

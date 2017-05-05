@@ -27,20 +27,24 @@ public class InvoiceService {
     }
 
     public void changeInvoiceStatus(InvoiceStatusChange invoiceStatusChange) throws NotFoundException, StorageException {
-        log.trace("Change invoice status, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
+        log.debug("Change invoice status, invoiceId='{}', eventId='{}', invoiceStatus='{}'",
+                invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
 
         try {
             Invoice invoice = invoiceDao.findById(invoiceStatusChange.getInvoiceId());
             if (invoice == null) {
-                throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId()));
+                throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'",
+                        invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId()));
             }
 
+            invoice.setEventId(invoiceStatusChange.getEventId());
             invoice.setStatus(invoiceStatusChange.getStatus().getSetField());
-//            invoice.setChangedAt(invoiceStatusChange.getChangedAt());
+            invoice.setChangedAt(invoiceStatusChange.getCreatedAt());
             invoice.getModel().setStatus(invoiceStatusChange.getStatus());
 
-//            invoiceDao.update(invoice);
-            log.info("Invoice status have been changed, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
+            invoiceDao.insert(invoice);
+            log.info("Invoice status have been changed, invoiceId='{}', eventId='{}', invoiceStatus='{}'",
+                    invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
 
         } catch (DaoException ex) {
             String message = String.format("Failed to change invoice status, invoiceId='%s', eventId='%d', invoiceStatus='%s'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
@@ -49,13 +53,16 @@ public class InvoiceService {
     }
 
     public void saveInvoice(Invoice invoice) throws StorageException {
-        log.trace("Save invoice, invoiceId='{}', eventId='{}'", invoice.getId(), invoice.getEventId());
+        log.debug("Save invoice, invoiceId='{}', eventId='{}'", invoice.getId(), invoice.getEventId());
         try {
             invoiceDao.insert(invoice);
-            log.info("Invoice have been saved, invoiceId='{}', eventId='{}'", invoice.getId(), invoice.getEventId());
+            log.info("Invoice have been saved, invoiceId='{}', eventId='{}'",
+                    invoice.getId(), invoice.getEventId());
 
         } catch (DaoException ex) {
-            String message = String.format("Failed to save invoice, id='%s', eventId='%d'", invoice.getId(), invoice.getEventId());
+            String message = String.format("Failed to save invoice, id='%s', eventId='%d'",
+                    invoice.getId(), invoice.getEventId());
+
             throw new StorageException(message, ex);
         }
     }
