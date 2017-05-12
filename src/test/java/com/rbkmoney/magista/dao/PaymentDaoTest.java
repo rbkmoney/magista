@@ -79,7 +79,7 @@ public class PaymentDaoTest extends AbstractIntegrationTest {
         payment.setChangedAt(Instant.now());
         paymentDao.insert(payment);
 
-        paymentDao.findById(payment.getId(), payment.getInvoiceId());
+        assertEquals(payment, paymentDao.findById(payment.getId(), payment.getInvoiceId()));
     }
 
 }

@@ -1,10 +1,13 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
+import com.rbkmoney.damsel.event_stock.SourceEvent;
 import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceCreated;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.model.Invoice;
+import com.rbkmoney.magista.model.InvoiceEvent;
 import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 
 import java.time.Instant;
@@ -22,6 +25,12 @@ public class InvoiceMapper implements Mapper<InvoiceEventContext> {
         long eventId = stockEvent.getSourceEvent().getProcessingEvent().getId();
         InvoiceCreated invoiceCreated = stockEvent.getSourceEvent().getProcessingEvent().getPayload().getInvoiceEvent().getInvoiceCreated();
 
+        value.setInvoice(fillInvoice(eventId, invoiceCreated));
+
+        return value;
+    }
+
+    private Invoice fillInvoice(long eventId, InvoiceCreated invoiceCreated) {
         Invoice invoice = new Invoice();
         invoice.setId(invoiceCreated.getInvoice().getId());
         invoice.setEventId(eventId);
@@ -35,10 +44,7 @@ public class InvoiceMapper implements Mapper<InvoiceEventContext> {
         invoice.setAmount(invoiceCreated.getInvoice().getCost().getAmount());
         invoice.setCurrencyCode(invoiceCreated.getInvoice().getCost().getCurrency().getSymbolicCode());
         invoice.setModel(invoiceCreated.getInvoice());
-
-        value.setInvoice(invoice);
-
-        return value;
+        return invoice;
     }
 
 }

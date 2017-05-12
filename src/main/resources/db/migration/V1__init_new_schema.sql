@@ -11,6 +11,7 @@ CREATE TABLE mst.invoice_event (
   invoice_amount        BIGINT,
   invoice_currency_code CHARACTER VARYING,
   invoice_created_at    TIMESTAMP WITHOUT TIME ZONE,
+  payment_id            CHARACTER VARYING,
   payment_status        CHARACTER VARYING,
   payment_amount        BIGINT,
   payment_fee           BIGINT,

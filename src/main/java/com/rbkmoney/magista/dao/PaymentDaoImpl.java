@@ -87,7 +87,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                     .addValue("amount", payment.getAmount())
                     .addValue("fee", payment.getFee())
                     .addValue("currency_code", payment.getCurrencyCode())
-                    .addValue("payment_system", payment.getPaymentSystem().name())
+                    .addValue("payment_system", payment.getPaymentSystem(), Types.VARCHAR)
                     .addValue("city_id", payment.getCityId())
                     .addValue("country_id", payment.getCountryId())
                     .addValue("phone_number", payment.getPhoneNumber())

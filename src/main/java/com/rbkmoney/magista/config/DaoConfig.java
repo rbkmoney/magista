@@ -35,8 +35,8 @@ public class DaoConfig {
 
     @Bean
     @DependsOn("dbInitializer")
-    public CustomerDao customerDao(DataSource ds) {
-        return new CustomerDaoImpl(ds);
+    public InvoiceEventDao invoiceEventDao(DataSource ds) {
+        return new InvoiceEventDaoImpl(ds);
     }
 
     @Bean

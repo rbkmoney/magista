@@ -2,10 +2,7 @@ package com.rbkmoney.magista.event.impl.context;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.magista.event.EventContext;
-import com.rbkmoney.magista.model.Invoice;
-import com.rbkmoney.magista.model.InvoiceStatusChange;
-import com.rbkmoney.magista.model.Payment;
-import com.rbkmoney.magista.model.PaymentStatusChange;
+import com.rbkmoney.magista.model.*;
 
 /**
  * Created by tolkonepiu on 10/11/2016.
@@ -17,6 +14,7 @@ public class InvoiceEventContext implements EventContext<StockEvent> {
     private InvoiceStatusChange invoiceStatusChange;
     private Payment payment;
     private PaymentStatusChange paymentStatusChange;
+    private InvoiceEvent invoiceEvent;
 
     public InvoiceEventContext(StockEvent stockEvent) {
         this.stockEvent = stockEvent;
@@ -61,5 +59,13 @@ public class InvoiceEventContext implements EventContext<StockEvent> {
     public InvoiceEventContext setPaymentStatusChange(PaymentStatusChange paymentStatusChange) {
         this.paymentStatusChange = paymentStatusChange;
         return this;
+    }
+
+    public InvoiceEvent getInvoiceEvent() {
+        return invoiceEvent;
+    }
+
+    public void setInvoiceEvent(InvoiceEvent invoiceEvent) {
+        this.invoiceEvent = invoiceEvent;
     }
 }

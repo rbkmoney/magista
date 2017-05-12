@@ -37,7 +37,6 @@ public class EventSaver implements Runnable {
                         queue.take();
                         //TODO one bad event can stop the whole processing flow, need to do smth with it...
                     } else {
-                        //log.trace("EventSaver sleep for {} milliseconds", timeout);
                         TimeUnit.MILLISECONDS.sleep(timeout);
                     }
                 } catch (ExecutionException | NotFoundException ex) {
