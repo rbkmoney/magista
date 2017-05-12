@@ -8,6 +8,8 @@ import com.rbkmoney.magista.model.InvoiceEvent;
  */
 public interface InvoiceEventDao {
 
+    Long getLastEventId() throws DaoException;
+
     InvoiceEvent findPaymentByInvoiceAndPaymentId(String invoiceId, String paymentId) throws DaoException;
 
     InvoiceEvent findInvoiceById(String invoiceId) throws DaoException;

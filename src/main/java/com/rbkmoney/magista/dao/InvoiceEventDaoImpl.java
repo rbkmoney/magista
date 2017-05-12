@@ -29,6 +29,17 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
     }
 
     @Override
+    public Long getLastEventId() throws DaoException {
+        try {
+            return getJdbcTemplate().queryForObject("select max(event_id) from mst.invoice_event", Long.class);
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        } catch (NestedRuntimeException ex) {
+            throw new DaoException(ex);
+        }
+    }
+
+    @Override
     public InvoiceEvent findPaymentByInvoiceAndPaymentId(String invoiceId, String paymentId) throws DaoException {
         String request = "select * from mst.invoice_event where invoice_id = :invoice_id and payment_id = :payment_id " +
                 "order by event_id desc limit 1";

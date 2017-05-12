@@ -40,12 +40,6 @@ public class DaoConfig {
     }
 
     @Bean
-    @DependsOn("dbInitializer")
-    public EventDao eventDao(DataSource ds) {
-        return new EventDaoImpl(ds);
-    }
-
-    @Bean
     public Schema dbSchema() {
         return new SchemaImpl("mst");
     }
