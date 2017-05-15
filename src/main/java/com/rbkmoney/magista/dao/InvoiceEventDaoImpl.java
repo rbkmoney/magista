@@ -63,7 +63,7 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
 
     @Override
     public InvoiceEvent findInvoiceById(String invoiceId) throws DaoException {
-        String request = "select * from mst.invoice_event where invoice_id = :invoice_id " +
+        String request = "select * from mst.invoice_event where invoice_id = :invoice_id and payment_id is null " +
                 "order by event_id desc limit 1";
         InvoiceEvent invoiceEvent;
         try {
