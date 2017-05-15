@@ -157,6 +157,8 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
                 .addValue("payment_phone_number", invoiceEvent.getPaymentPhoneNumber())
                 .addValue("payment_email", invoiceEvent.getPaymentEmail())
                 .addValue("payment_fingerprint", invoiceEvent.getPaymentFingerprint())
-                .addValue("payment_created_at", LocalDateTime.ofInstant(invoiceEvent.getPaymentCreatedAt(), ZoneOffset.UTC), Types.OTHER);
+                .addValue("payment_created_at", invoiceEvent.getPaymentCreatedAt() != null ?
+                                LocalDateTime.ofInstant(invoiceEvent.getPaymentCreatedAt(), ZoneOffset.UTC) : null,
+                        Types.OTHER);
     }
 }
