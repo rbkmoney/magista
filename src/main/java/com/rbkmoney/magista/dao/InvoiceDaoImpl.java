@@ -78,8 +78,10 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
                     .addValue("status", invoice.getStatus().getFieldName())
                     .addValue("amount", invoice.getAmount())
                     .addValue("currency_code", invoice.getCurrencyCode())
-                    .addValue("created_at", invoice.getCreatedAt(), Types.OTHER)
-                    .addValue("changed_at", invoice.getChangedAt(), Types.OTHER)
+                    .addValue("created_at", LocalDateTime.ofInstant(invoice.getCreatedAt(), ZoneOffset.UTC),
+                            Types.OTHER)
+                    .addValue("changed_at", LocalDateTime.ofInstant(invoice.getChangedAt(), ZoneOffset.UTC),
+                            Types.OTHER)
                     .addValue("model", new TBaseProcessor().process(invoice.getModel(),
                             MsgPackHandler.newBufferedInstance(true)));
         } catch (IOException ex) {

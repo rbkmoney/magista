@@ -93,8 +93,10 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                     .addValue("phone_number", payment.getPhoneNumber())
                     .addValue("email", payment.getEmail())
                     .addValue("ip", payment.getIp())
-                    .addValue("created_at", payment.getCreatedAt(), Types.OTHER)
-                    .addValue("changed_at", payment.getChangedAt(), Types.OTHER)
+                    .addValue("created_at", LocalDateTime.ofInstant(payment.getCreatedAt(),
+                            ZoneOffset.UTC), Types.OTHER)
+                    .addValue("changed_at", LocalDateTime.ofInstant(payment.getChangedAt(),
+                            ZoneOffset.UTC), Types.OTHER)
                     .addValue("model", new TBaseProcessor().process(payment.getModel(),
                             MsgPackHandler.newBufferedInstance(true)));
 

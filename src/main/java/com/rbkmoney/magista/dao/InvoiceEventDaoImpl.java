@@ -138,13 +138,13 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
                 .addValue("merchant_id", invoiceEvent.getMerchantId())
                 .addValue("shop_id", invoiceEvent.getShopId())
                 .addValue("event_type", invoiceEvent.getEventType(), Types.VARCHAR)
-                .addValue("event_created_at", invoiceEvent.getEventCreatedAt(), Types.OTHER)
+                .addValue("event_created_at", LocalDateTime.ofInstant(invoiceEvent.getEventCreatedAt(), ZoneOffset.UTC), Types.OTHER)
                 .addValue("invoice_id", invoiceEvent.getInvoiceId())
                 .addValue("invoice_status",
                         invoiceEvent.getInvoiceStatus() != null ? invoiceEvent.getInvoiceStatus().getFieldName() : null)
                 .addValue("invoice_amount", invoiceEvent.getInvoiceAmount())
                 .addValue("invoice_currency_code", invoiceEvent.getInvoiceCurrencyCode())
-                .addValue("invoice_created_at", invoiceEvent.getInvoiceCreatedAt(), Types.OTHER)
+                .addValue("invoice_created_at", LocalDateTime.ofInstant(invoiceEvent.getInvoiceCreatedAt(), ZoneOffset.UTC), Types.OTHER)
                 .addValue("payment_id", invoiceEvent.getPaymentId())
                 .addValue("payment_status",
                         invoiceEvent.getPaymentStatus() != null ? invoiceEvent.getPaymentStatus().getFieldName() : null)
@@ -157,6 +157,6 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
                 .addValue("payment_phone_number", invoiceEvent.getPaymentPhoneNumber())
                 .addValue("payment_email", invoiceEvent.getPaymentEmail())
                 .addValue("payment_fingerprint", invoiceEvent.getPaymentFingerprint())
-                .addValue("payment_created_at", invoiceEvent.getPaymentCreatedAt(), Types.OTHER);
+                .addValue("payment_created_at", LocalDateTime.ofInstant(invoiceEvent.getPaymentCreatedAt(), ZoneOffset.UTC), Types.OTHER);
     }
 }
