@@ -94,7 +94,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>eventstock-client</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.7</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.rbkmoney.thrift</groupId>
