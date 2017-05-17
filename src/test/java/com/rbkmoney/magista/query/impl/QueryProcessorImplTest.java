@@ -29,9 +29,6 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     @Autowired
     StatisticsDao statisticsDao;
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
     @Before
     public void before() {
         QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao);
@@ -95,7 +92,6 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void testAccountingReport() {
         String json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
