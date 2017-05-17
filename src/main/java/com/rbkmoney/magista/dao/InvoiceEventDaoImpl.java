@@ -107,6 +107,7 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
             invoiceEvent.setPaymentCityId(rs.getInt("payment_city_id"));
             invoiceEvent.setPaymentIp(rs.getString("payment_ip"));
             invoiceEvent.setPaymentPhoneNumber(rs.getString("payment_phone_number"));
+            invoiceEvent.setPaymentMaskedPan(rs.getString("payment_masked_pan"));
             invoiceEvent.setPaymentEmail(rs.getString("payment_email"));
             invoiceEvent.setPaymentFingerprint(rs.getString("payment_fingerprint"));
             LocalDateTime paymentCreatedAt = rs.getObject("payment_created_at", LocalDateTime.class);
@@ -119,8 +120,8 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
 
     @Override
     public void insert(InvoiceEvent invoiceEvent) throws DaoException {
-        String request = "insert into mst.invoice_event (event_id, merchant_id, shop_id, event_type, event_created_at, invoice_id, invoice_status, invoice_amount, invoice_currency_code, invoice_created_at, payment_id, payment_status, payment_amount, payment_fee, payment_system, payment_country_id, payment_city_id, payment_ip, payment_phone_number, payment_email, payment_fingerprint, payment_created_at)" +
-                "values(:event_id, :merchant_id, :shop_id, :event_type, :event_created_at, :invoice_id, :invoice_status, :invoice_amount, :invoice_currency_code, :invoice_created_at, :payment_id, :payment_status, :payment_amount, :payment_fee, :payment_system, :payment_country_id, :payment_city_id, :payment_ip, :payment_phone_number, :payment_email, :payment_fingerprint, :payment_created_at)";
+        String request = "insert into mst.invoice_event (event_id, merchant_id, shop_id, event_type, event_created_at, invoice_id, invoice_status, invoice_amount, invoice_currency_code, invoice_created_at, payment_id, payment_status, payment_amount, payment_fee, payment_system, payment_country_id, payment_city_id, payment_ip, payment_phone_number, payment_masked_pan, payment_email, payment_fingerprint, payment_created_at)" +
+                "values(:event_id, :merchant_id, :shop_id, :event_type, :event_created_at, :invoice_id, :invoice_status, :invoice_amount, :invoice_currency_code, :invoice_created_at, :payment_id, :payment_status, :payment_amount, :payment_fee, :payment_system, :payment_country_id, :payment_city_id, :payment_ip, :payment_phone_number, :payment_masked_pan, :payment_email, :payment_fingerprint, :payment_created_at)";
         try {
             int rowsAffected = getNamedParameterJdbcTemplate().update(request, createSqlParameterSource(invoiceEvent));
 
@@ -155,6 +156,7 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
                 .addValue("payment_city_id", invoiceEvent.getPaymentCityId())
                 .addValue("payment_ip", invoiceEvent.getPaymentIp())
                 .addValue("payment_phone_number", invoiceEvent.getPaymentPhoneNumber())
+                .addValue("payment_masked_pan", invoiceEvent.getPaymentMaskedPan())
                 .addValue("payment_email", invoiceEvent.getPaymentEmail())
                 .addValue("payment_fingerprint", invoiceEvent.getPaymentFingerprint())
                 .addValue("payment_created_at", invoiceEvent.getPaymentCreatedAt() != null ?

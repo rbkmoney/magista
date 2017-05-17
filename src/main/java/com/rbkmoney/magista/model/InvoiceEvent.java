@@ -50,6 +50,8 @@ public class InvoiceEvent {
 
     private String paymentPhoneNumber;
 
+    private String paymentMaskedPan;
+
     private String paymentEmail;
 
     private String paymentFingerprint;
@@ -208,6 +210,14 @@ public class InvoiceEvent {
         this.paymentPhoneNumber = paymentPhoneNumber;
     }
 
+    public String getPaymentMaskedPan() {
+        return paymentMaskedPan;
+    }
+
+    public void setPaymentMaskedPan(String paymentMaskedPan) {
+        this.paymentMaskedPan = paymentMaskedPan;
+    }
+
     public String getPaymentEmail() {
         return paymentEmail;
     }
@@ -262,6 +272,8 @@ public class InvoiceEvent {
         if (paymentIp != null ? !paymentIp.equals(that.paymentIp) : that.paymentIp != null) return false;
         if (paymentPhoneNumber != null ? !paymentPhoneNumber.equals(that.paymentPhoneNumber) : that.paymentPhoneNumber != null)
             return false;
+        if (paymentMaskedPan != null ? !paymentMaskedPan.equals(that.paymentMaskedPan) : that.paymentMaskedPan != null)
+            return false;
         if (paymentEmail != null ? !paymentEmail.equals(that.paymentEmail) : that.paymentEmail != null) return false;
         if (paymentFingerprint != null ? !paymentFingerprint.equals(that.paymentFingerprint) : that.paymentFingerprint != null)
             return false;
@@ -289,6 +301,7 @@ public class InvoiceEvent {
         result = 31 * result + paymentCityId;
         result = 31 * result + (paymentIp != null ? paymentIp.hashCode() : 0);
         result = 31 * result + (paymentPhoneNumber != null ? paymentPhoneNumber.hashCode() : 0);
+        result = 31 * result + (paymentMaskedPan != null ? paymentMaskedPan.hashCode() : 0);
         result = 31 * result + (paymentEmail != null ? paymentEmail.hashCode() : 0);
         result = 31 * result + (paymentFingerprint != null ? paymentFingerprint.hashCode() : 0);
         result = 31 * result + (paymentCreatedAt != null ? paymentCreatedAt.hashCode() : 0);
@@ -317,6 +330,7 @@ public class InvoiceEvent {
                 ", paymentCityId=" + paymentCityId +
                 ", paymentIp='" + paymentIp + '\'' +
                 ", paymentPhoneNumber='" + paymentPhoneNumber + '\'' +
+                ", paymentMaskedPan='" + paymentMaskedPan + '\'' +
                 ", paymentEmail='" + paymentEmail + '\'' +
                 ", paymentFingerprint='" + paymentFingerprint + '\'' +
                 ", paymentCreatedAt=" + paymentCreatedAt +

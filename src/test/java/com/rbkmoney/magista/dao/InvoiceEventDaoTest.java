@@ -46,6 +46,7 @@ public class InvoiceEventDaoTest extends AbstractIntegrationTest {
         invoiceEvent.setPaymentIp("localhost");
         invoiceEvent.setPaymentFingerprint("ewjrpo23j34gj34gj34g");
         invoiceEvent.setPaymentPhoneNumber("89999999999");
+        invoiceEvent.setPaymentMaskedPan("9999");
         invoiceEvent.setPaymentCreatedAt(Instant.now());
 
         invoiceEventDao.insert(invoiceEvent);
