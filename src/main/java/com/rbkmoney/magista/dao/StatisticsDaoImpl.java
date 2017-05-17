@@ -504,7 +504,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
     }
 
     private StringBuilder addCondition(StringBuilder sb, String fieldName, String templateField, String op, String eq, boolean apply) {
-        return apply ? sb.append(' ').append(op).append(' ').append(fieldName).append(eq).append(':').append(templateField) : sb;
+        return apply ? sb.append(' ').append(op).append(' ').append(fieldName).append(' ').append(eq).append(' ').append(':').append(templateField) : sb;
     }
 
     private StringBuilder addPagination(StringBuilder sb, String orderField, Optional<Integer> limit, Optional<Integer> offset) {
