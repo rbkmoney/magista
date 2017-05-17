@@ -48,7 +48,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             Optional<Integer> limit,
             Optional<Integer> offset) throws DaoException {
         Function<StringBuilder, StringBuilder> func = head -> {
-            head.append(" where (TRUE) ");
+            head.append(" where event_id = (select max(event_id) from mst.invoice t2 where t2.invoice_id = t1.invoice_id) ");
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
             addInCondition(head, "id", "invoice_ids", "and",
@@ -64,7 +64,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             return head;
         };
 
-        StringBuilder dataSb = new StringBuilder("select * from mst.invoice");
+        StringBuilder dataSb = new StringBuilder("select * from mst.invoice t1");
 
         dataSb = func.apply(dataSb);
         addPagination(dataSb, "event_id desc", limit, offset);
@@ -142,7 +142,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             Optional<Integer> limit,
             Optional<Integer> offset) throws DaoException {
         Function<StringBuilder, StringBuilder> func = head -> {
-            head.append(" where (TRUE) ");
+            head.append(" where event_id = (select max(event_id) from mst.invoice t2 where t2.invoice_id = t1.invoice_id) ");
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
             addInCondition(head, "id", "invoice_ids", "and",
@@ -158,7 +158,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             return head;
         };
 
-        StringBuilder countSb = new StringBuilder("select count(*) from mst.invoice");
+        StringBuilder countSb = new StringBuilder("select count(*) from mst.invoice t1");
         countSb = func.apply(countSb);
 
         String countSql = countSb.toString();
@@ -231,7 +231,8 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             Optional<Integer> limit,
             Optional<Integer> offset) throws DaoException {
         Function<StringBuilder, StringBuilder> func = head -> {
-            head.append(" where (TRUE) ");
+            head.append(" where event_id = (select max(event_id) from mst.payment t2 " +
+                    "where t2.invoice_id = t1.invoice_id and t2.payment_id = t1.payment_id) ");
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
             addCondition(head, "invoice_id", invoiceId.isPresent());
@@ -247,7 +248,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             return head;
         };
 
-        StringBuilder dataSb = new StringBuilder("select * from mst.payment");
+        StringBuilder dataSb = new StringBuilder("select * from mst.payment t1");
 
         dataSb = func.apply(dataSb);
         addPagination(dataSb, "event_id desc", limit, offset);
@@ -301,7 +302,8 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             Optional<Integer> limit,
             Optional<Integer> offset) throws DaoException {
         Function<StringBuilder, StringBuilder> func = head -> {
-            head.append(" where (TRUE) ");
+            head.append(" where event_id = (select max(event_id) from mst.payment t2 " +
+                    "where t2.invoice_id = t1.invoice_id and t2.payment_id = t1.payment_id) ");
             addCondition(head, "merchant_id", true);
             addCondition(head, "shop_id", true);
             addCondition(head, "invoice_id", invoiceId.isPresent());
@@ -317,7 +319,7 @@ public class StatisticsDaoImpl extends NamedParameterJdbcDaoSupport implements S
             return head;
         };
 
-        StringBuilder countSb = new StringBuilder("select count(*) from mst.payment");
+        StringBuilder countSb = new StringBuilder("select count(*) from mst.payment t1");
 
         countSb = func.apply(countSb);
 
