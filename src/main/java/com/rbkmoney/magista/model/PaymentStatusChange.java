@@ -12,17 +12,17 @@ public class PaymentStatusChange {
     long eventId;
     String invoiceId;
     String paymentId;
-    Instant changedAt;
+    Instant createdAt;
     InvoicePaymentStatus status;
 
     public PaymentStatusChange() {
     }
 
-    public PaymentStatusChange(long eventId, String invoiceId, String paymentId, Instant changedAt, InvoicePaymentStatus status) {
+    public PaymentStatusChange(long eventId, String invoiceId, String paymentId, Instant createdAt, InvoicePaymentStatus status) {
         this.eventId = eventId;
         this.invoiceId = invoiceId;
         this.paymentId = paymentId;
-        this.changedAt = changedAt;
+        this.createdAt = createdAt;
         this.status = status;
     }
 
@@ -50,12 +50,12 @@ public class PaymentStatusChange {
         this.paymentId = paymentId;
     }
 
-    public Instant getChangedAt() {
-        return changedAt;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setChangedAt(Instant changedAt) {
-        this.changedAt = changedAt;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
     public InvoicePaymentStatus getStatus() {
@@ -72,7 +72,7 @@ public class PaymentStatusChange {
                 "eventId=" + eventId +
                 ", invoiceId='" + invoiceId + '\'' +
                 ", paymentId='" + paymentId + '\'' +
-                ", changedAt=" + changedAt +
+                ", createdAt=" + createdAt +
                 ", status=" + status +
                 '}';
     }

@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.magista.dao.EventDao;
+import com.rbkmoney.magista.dao.InvoiceEventDao;
 import com.rbkmoney.magista.event.EventSaver;
 import com.rbkmoney.magista.event.HandleTask;
 import com.rbkmoney.magista.event.Handler;
@@ -28,7 +28,7 @@ public class EventService {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private EventDao eventDao;
+    private InvoiceEventDao invoiceEventDao;
 
     @Autowired
     private List<Handler> handlers;
@@ -69,8 +69,8 @@ public class EventService {
     public Long getLastEventId() {
         Long lastEventId;
         try {
-            log.trace("Get last event id");
-            lastEventId = eventDao.getLastEventId();
+            log.debug("Get last event id");
+            lastEventId = invoiceEventDao.getLastEventId();
         } catch (DaoException ex) {
             throw new StorageException("Failed to get last event id", ex);
         }

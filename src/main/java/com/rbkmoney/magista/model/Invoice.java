@@ -110,6 +110,39 @@ public class Invoice {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Invoice invoice = (Invoice) o;
+
+        if (eventId != invoice.eventId) return false;
+        if (shopId != invoice.shopId) return false;
+        if (amount != invoice.amount) return false;
+        if (id != null ? !id.equals(invoice.id) : invoice.id != null) return false;
+        if (merchantId != null ? !merchantId.equals(invoice.merchantId) : invoice.merchantId != null) return false;
+        if (status != invoice.status) return false;
+        if (currencyCode != null ? !currencyCode.equals(invoice.currencyCode) : invoice.currencyCode != null)
+            return false;
+        if (createdAt != null ? !createdAt.equals(invoice.createdAt) : invoice.createdAt != null) return false;
+        return model != null ? model.equals(invoice.model) : invoice.model == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (int) (eventId ^ (eventId >>> 32));
+        result = 31 * result + (merchantId != null ? merchantId.hashCode() : 0);
+        result = 31 * result + shopId;
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (int) (amount ^ (amount >>> 32));
+        result = 31 * result + (currencyCode != null ? currencyCode.hashCode() : 0);
+        result = 31 * result + (createdAt != null ? createdAt.hashCode() : 0);
+        result = 31 * result + (model != null ? model.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "Invoice{" +
                 "id='" + id + '\'' +
@@ -120,7 +153,7 @@ public class Invoice {
                 ", amount=" + amount +
                 ", currencyCode='" + currencyCode + '\'' +
                 ", createdAt=" + createdAt +
-                ", changedAt=" + changedAt +
+                ", model=" + model +
                 '}';
     }
 }

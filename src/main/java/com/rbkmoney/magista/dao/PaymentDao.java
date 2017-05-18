@@ -12,6 +12,4 @@ public interface PaymentDao {
 
     void insert(Payment payment) throws DaoException;
 
-    void update(Payment payment) throws DaoException;
-
 }

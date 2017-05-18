@@ -1,0 +1,14 @@
+{
+  "query": {
+    "payments": {
+      "sort": [
+        {
+          "id": "asc"
+        }
+      ],
+      "limit": {
+        "offset": 0
+      }
+    }
+  }
+}
