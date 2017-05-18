@@ -9,8 +9,6 @@ import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseProcessor;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Payment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
@@ -60,7 +58,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
     @Override
     public void insert(Payment payment) throws DaoException {
         String updateSql = "insert into mst.payment (payment_id, event_id, invoice_id, merchant_id, shop_id, fingerprint, masked_pan, status, amount, fee, currency_code, payment_system, city_id, country_id, phone_number, email, ip, created_at, changed_at, model) " +
-                "values (:payment_id, :event_id, :invoice_id, :merchant_id, :shop_id, :fingerprint, :masked_pan, :status, :amount, :fee, :currency_code, :payment_system, :city_id, :country_id, :phone_number, :email, :ip, :created_at, :changed_at, :model)";
+                "values (:payment_id, :event_id, :invoice_id, :merchant_id, :shop_id, :fingerprint, :masked_pan, :status::invoice_payment_status, :amount, :fee, :currency_code, :payment_system, :city_id, :country_id, :phone_number, :email, :ip, :created_at, :changed_at, :model)";
 
         try {
             int rowsAffected = getNamedParameterJdbcTemplate().update(updateSql, createSqlParameterSource(payment));

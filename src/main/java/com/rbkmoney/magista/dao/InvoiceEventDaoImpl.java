@@ -5,6 +5,7 @@ import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.magista.event.EventType;
 import com.rbkmoney.magista.exception.DaoException;
+import com.rbkmoney.magista.model.EventCategory;
 import com.rbkmoney.magista.model.InvoiceEvent;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -86,6 +87,7 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
         return (rs, i) -> {
             InvoiceEvent invoiceEvent = new InvoiceEvent();
             invoiceEvent.setEventId(rs.getLong("event_id"));
+            invoiceEvent.setEventCategory(EventCategory.valueOf(rs.getString("event_category")));
             invoiceEvent.setMerchantId(rs.getString("merchant_id"));
             invoiceEvent.setShopId(rs.getInt("shop_id"));
             invoiceEvent.setEventType(EventType.valueOf(rs.getString("event_type")));
@@ -120,8 +122,8 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
 
     @Override
     public void insert(InvoiceEvent invoiceEvent) throws DaoException {
-        String request = "insert into mst.invoice_event (event_id, merchant_id, shop_id, event_type, event_created_at, invoice_id, invoice_status, invoice_amount, invoice_currency_code, invoice_created_at, payment_id, payment_status, payment_amount, payment_fee, payment_system, payment_country_id, payment_city_id, payment_ip, payment_phone_number, payment_masked_pan, payment_email, payment_fingerprint, payment_created_at)" +
-                "values(:event_id, :merchant_id, :shop_id, :event_type, :event_created_at, :invoice_id, :invoice_status, :invoice_amount, :invoice_currency_code, :invoice_created_at, :payment_id, :payment_status, :payment_amount, :payment_fee, :payment_system, :payment_country_id, :payment_city_id, :payment_ip, :payment_phone_number, :payment_masked_pan, :payment_email, :payment_fingerprint, :payment_created_at)";
+        String request = "insert into mst.invoice_event (event_id, event_category, merchant_id, shop_id, event_type, event_created_at, invoice_id, invoice_status, invoice_amount, invoice_currency_code, invoice_created_at, payment_id, payment_status, payment_amount, payment_fee, payment_system, payment_country_id, payment_city_id, payment_ip, payment_phone_number, payment_masked_pan, payment_email, payment_fingerprint, payment_created_at)" +
+                "values(:event_id, :event_category::INVOICE_EVENT_CATEGORY, :merchant_id, :shop_id, :event_type::INVOICE_EVENT_TYPE, :event_created_at, :invoice_id, :invoice_status::INVOICE_STATUS, :invoice_amount, :invoice_currency_code, :invoice_created_at, :payment_id, :payment_status::INVOICE_PAYMENT_STATUS, :payment_amount, :payment_fee, :payment_system, :payment_country_id, :payment_city_id, :payment_ip, :payment_phone_number, :payment_masked_pan, :payment_email, :payment_fingerprint, :payment_created_at)";
         try {
             int rowsAffected = getNamedParameterJdbcTemplate().update(request, createSqlParameterSource(invoiceEvent));
 
@@ -136,6 +138,7 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
     private SqlParameterSource createSqlParameterSource(InvoiceEvent invoiceEvent) {
         return new MapSqlParameterSource()
                 .addValue("event_id", invoiceEvent.getEventId())
+                .addValue("event_category", invoiceEvent.getEventCategory(), Types.VARCHAR)
                 .addValue("merchant_id", invoiceEvent.getMerchantId())
                 .addValue("shop_id", invoiceEvent.getShopId())
                 .addValue("event_type", invoiceEvent.getEventType(), Types.VARCHAR)

@@ -1,18 +1,31 @@
 CREATE SCHEMA IF NOT EXISTS mst;
 
+CREATE TYPE INVOICE_EVENT_CATEGORY AS ENUM ('INVOICE', 'PAYMENT');
+
+CREATE TYPE INVOICE_EVENT_TYPE AS ENUM ('INVOICE_CREATED', 'INVOICE_STATUS_CHANGED',
+  'INVOICE_PAYMENT_STARTED', 'INVOICE_PAYMENT_STATUS_CHANGED');
+
+CREATE TYPE INVOICE_PAYMENT_STATUS AS ENUM ('pending', 'processed',
+  'captured', 'cancelled', 'failed');
+
+CREATE TYPE INVOICE_STATUS AS ENUM ('unpaid', 'paid',
+  'cancelled', 'fulfilled');
+
+
 CREATE TABLE mst.invoice_event (
-  event_id              BIGINT            NOT NULL,
-  merchant_id           CHARACTER VARYING NOT NULL,
-  shop_id               INT               NOT NULL,
-  invoice_id            CHARACTER VARYING NOT NULL,
-  event_type            CHARACTER VARYING NOT NULL,
+  event_id              BIGINT                      NOT NULL,
+  event_category        INVOICE_EVENT_CATEGORY      NOT NULL,
+  event_type            INVOICE_EVENT_TYPE          NOT NULL,
   event_created_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  invoice_status        CHARACTER VARYING NOT NULL,
+  merchant_id           CHARACTER VARYING           NOT NULL,
+  shop_id               INT                         NOT NULL,
+  invoice_id            CHARACTER VARYING           NOT NULL,
+  invoice_status        INVOICE_STATUS              NOT NULL,
   invoice_amount        BIGINT,
   invoice_currency_code CHARACTER VARYING,
   invoice_created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   payment_id            CHARACTER VARYING,
-  payment_status        CHARACTER VARYING,
+  payment_status        INVOICE_PAYMENT_STATUS,
   payment_amount        BIGINT,
   payment_fee           BIGINT,
   payment_system        CHARACTER VARYING,
@@ -32,7 +45,7 @@ CREATE TABLE mst.invoice (
   invoice_id    CHARACTER VARYING           NOT NULL,
   merchant_id   CHARACTER VARYING           NOT NULL,
   shop_id       BIGINT                      NOT NULL,
-  status        CHARACTER VARYING           NOT NULL,
+  status        INVOICE_STATUS              NOT NULL,
   amount        BIGINT                      NOT NULL,
   currency_code CHARACTER VARYING           NOT NULL,
   created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
@@ -52,7 +65,7 @@ CREATE TABLE mst.payment (
   shop_id        INT                         NOT NULL,
   fingerprint    CHARACTER VARYING,
   masked_pan     CHARACTER VARYING           NOT NULL,
-  status         CHARACTER VARYING           NOT NULL,
+  status         INVOICE_PAYMENT_STATUS      NOT NULL,
   amount         BIGINT                      NOT NULL,
   fee            BIGINT                      NOT NULL,
   currency_code  CHARACTER VARYING           NOT NULL,

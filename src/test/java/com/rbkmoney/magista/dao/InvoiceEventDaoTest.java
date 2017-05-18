@@ -4,7 +4,9 @@ import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.event.EventType;
+import com.rbkmoney.magista.model.EventCategory;
 import com.rbkmoney.magista.model.InvoiceEvent;
+import com.rbkmoney.magista.model.Payment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.UUID;
 
+import static com.rbkmoney.magista.model.EventCategory.PAYMENT;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -29,6 +32,7 @@ public class InvoiceEventDaoTest extends AbstractIntegrationTest {
         invoiceEvent.setMerchantId(UUID.randomUUID().toString());
         invoiceEvent.setShopId(424242);
         invoiceEvent.setEventId(Long.MAX_VALUE);
+        invoiceEvent.setEventCategory(EventCategory.PAYMENT);
         invoiceEvent.setEventType(EventType.INVOICE_CREATED);
         invoiceEvent.setEventCreatedAt(Instant.now());
         invoiceEvent.setInvoiceId("; --");
@@ -60,6 +64,7 @@ public class InvoiceEventDaoTest extends AbstractIntegrationTest {
         invoiceEvent.setMerchantId(UUID.randomUUID().toString());
         invoiceEvent.setShopId(424242);
         invoiceEvent.setEventId(1);
+        invoiceEvent.setEventCategory(EventCategory.INVOICE);
         invoiceEvent.setEventType(EventType.INVOICE_CREATED);
         invoiceEvent.setEventCreatedAt(Instant.now());
         invoiceEvent.setInvoiceId("; --");

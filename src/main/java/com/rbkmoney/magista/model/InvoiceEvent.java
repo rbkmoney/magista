@@ -14,6 +14,8 @@ public class InvoiceEvent {
 
     private long eventId;
 
+    private EventCategory eventCategory;
+
     private String merchantId;
 
     private int shopId;
@@ -64,6 +66,14 @@ public class InvoiceEvent {
 
     public void setEventId(long eventId) {
         this.eventId = eventId;
+    }
+
+    public EventCategory getEventCategory() {
+        return eventCategory;
+    }
+
+    public void setEventCategory(EventCategory eventCategory) {
+        this.eventCategory = eventCategory;
     }
 
     public String getMerchantId() {
@@ -256,6 +266,7 @@ public class InvoiceEvent {
         if (paymentFee != that.paymentFee) return false;
         if (paymentCountryId != that.paymentCountryId) return false;
         if (paymentCityId != that.paymentCityId) return false;
+        if (eventCategory != that.eventCategory) return false;
         if (merchantId != null ? !merchantId.equals(that.merchantId) : that.merchantId != null) return false;
         if (invoiceId != null ? !invoiceId.equals(that.invoiceId) : that.invoiceId != null) return false;
         if (eventType != that.eventType) return false;
@@ -283,6 +294,7 @@ public class InvoiceEvent {
     @Override
     public int hashCode() {
         int result = (int) (eventId ^ (eventId >>> 32));
+        result = 31 * result + (eventCategory != null ? eventCategory.hashCode() : 0);
         result = 31 * result + (merchantId != null ? merchantId.hashCode() : 0);
         result = 31 * result + shopId;
         result = 31 * result + (invoiceId != null ? invoiceId.hashCode() : 0);
@@ -312,6 +324,7 @@ public class InvoiceEvent {
     public String toString() {
         return "InvoiceEvent{" +
                 "eventId=" + eventId +
+                ", eventCategory=" + eventCategory +
                 ", merchantId='" + merchantId + '\'' +
                 ", shopId=" + shopId +
                 ", invoiceId='" + invoiceId + '\'' +

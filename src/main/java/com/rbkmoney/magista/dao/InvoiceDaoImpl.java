@@ -54,7 +54,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
     @Override
     public void insert(Invoice invoice) throws DaoException {
         String updateSql = "insert into mst.invoice (invoice_id, event_id, merchant_id, shop_id, status, amount, currency_code, created_at, changed_at, model) " +
-                "values (:invoice_id, :event_id, :merchant_id, :shop_id, :status, :amount, :currency_code, :created_at, :changed_at, :model)";
+                "values (:invoice_id, :event_id, :merchant_id, :shop_id, :status::invoice_status, :amount, :currency_code, :created_at, :changed_at, :model)";
 
         try {
             int rowsAffected = getNamedParameterJdbcTemplate()
