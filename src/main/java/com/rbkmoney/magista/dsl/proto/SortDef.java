@@ -51,10 +51,10 @@ public class SortDef extends NamedDef implements DSLInstanceValidator<LimitInst>
                 return new SortInst.Ordering.Order();
             }
 
-            public static class AscDef extends ParameterDef {
+            public static class AscDef extends ConstStringValueDef {
                 public static final AscDef INSTANCE = new AscDef();
                 public AscDef() {
-                    super(null, "asc");
+                    super("asc");
                 }
 
                 @Override
@@ -62,17 +62,16 @@ public class SortDef extends NamedDef implements DSLInstanceValidator<LimitInst>
                     return new SortInst.Ordering.Order.Asc();
                 }
             }
-            public static class DescDef extends ParameterDef {
+            public static class DescDef extends ConstStringValueDef {
                 public static final DescDef INSTANCE = new DescDef();
                 public DescDef() {
-                    super(null, "desc");
+                    super("desc");
                 }
 
                 @Override
                 public DSLInstance createInstance() {
                     return new SortInst.Ordering.Order.Desc();
                 }
-
             }
         }
     }

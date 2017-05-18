@@ -1,6 +1,9 @@
 package com.rbkmoney.magista.dsl.proto;
 
-import com.rbkmoney.magista.dsl.instance.*;
+import com.rbkmoney.magista.dsl.instance.ArrayInstance;
+import com.rbkmoney.magista.dsl.instance.ConstStringValueInstance;
+import com.rbkmoney.magista.dsl.instance.EnumInstance;
+import com.rbkmoney.magista.dsl.instance.KeyedInstance;
 
 /**
  * Created by vpankrashkin on 13.04.17.
@@ -9,7 +12,7 @@ public class SortInst extends KeyedInstance {
     private static final String ORDERING_NAME = "ordering";
 
     public SortInst() {
-        super(LimitDef.INSTANCE);
+        super(SortDef.INSTANCE);
     }
 
     public Ordering getOrdering() {
@@ -30,15 +33,15 @@ public class SortInst extends KeyedInstance {
                 super(SortDef.OrderingDef.OrderDef.INSTANCE);
             }
 
-            public static class Asc extends ParameterInstance<SortDef.OrderingDef.OrderDef.AscDef, DSLInstance> {
+            public static class Asc extends ConstStringValueInstance {
                 public Asc() {
-                    super(SortDef.OrderingDef.OrderDef.AscDef.INSTANCE);
+                    super(SortDef.OrderingDef.OrderDef.AscDef.INSTANCE.getValue());
                 }
             }
 
-            public static class Desc extends ParameterInstance<SortDef.OrderingDef.OrderDef.DescDef, DSLInstance> {
+            public static class Desc extends ConstStringValueInstance {
                 public Desc() {
-                    super(SortDef.OrderingDef.OrderDef.DescDef.INSTANCE);
+                    super(SortDef.OrderingDef.OrderDef.AscDef.INSTANCE.getValue());
                 }
             }
         }

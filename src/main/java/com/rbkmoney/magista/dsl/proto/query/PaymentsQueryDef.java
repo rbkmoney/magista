@@ -14,8 +14,8 @@ import java.util.List;
  */
 public class PaymentsQueryDef extends FunctionDef {
     public static final String NAME = "payments";
-    public static final PaymentsQueryDef INSTANCE = new PaymentsQueryDef();
     public static final ParameterDSLDef PAYMENT_ID_DEF =  new ParameterDef(LongValueDef.INSTANCE, "payment_id");
+    public static final PaymentsQueryDef INSTANCE = new PaymentsQueryDef();
 
     public PaymentsQueryDef() {
         super(genNestedDefs(), genInputParameterDefs(), Collections.EMPTY_LIST,  NAME);

@@ -7,11 +7,13 @@ import com.rbkmoney.magista.dsl.instance.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by vpankrashkin on 21.04.17.
  */
-public abstract class InstanceBuilder<T extends DSLInstance> implements DSLInstanceBuilder<T> {
+public abstract class InstanceBuilder<T extends DSLInstance, S, SS> implements DSLInstanceBuilder<T, S, SS> {
     private Map<DSLDef, DSLInstanceBuilder> builders = new HashMap<>();
 
     public InstanceBuilder(Map<DSLDef, DSLInstanceBuilder> builders) {
@@ -19,156 +21,256 @@ public abstract class InstanceBuilder<T extends DSLInstance> implements DSLInsta
     }
 
     @Override
-    public T build(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
+    public T build(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
         if (src == null) {
             return null;
         }
-        DSLInstanceBuilder builder = builders.get(defTree.getNode());
+        DSLInstanceBuilder builder = builders.get(peekPoint(path));
         if (builder != null) {
-            return (T) builder.build(src, defTree, parentInstance);
+            return (T) builder.build(src, path, parentInstance);
         } else {
-            return (T) fillInstance(src, defTree, buildBase(src, defTree, parentInstance));
+            return (T) fillInstance(src, path, buildBase(src, path, parentInstance));
         }
     }
 
-    private DSLInstance fillInstance(Object src, DefTree defTree, DSLInstance instance) {
-        if (defTree.getNode() != instance.getDef()) {//if tree contains child defs, consider they're already processed
-            while (defTree.getNode() != null && defTree.getNode() != instance.getDef()) {
-                defTree.remNode();
-            }
+    private DSLInstance fillInstance(S src, List<PathPoint<SS>> path, DSLInstance instance) {
+        DSLDef def = instance.getDef();
+        PathPoint point = peekPoint(path);
+        if (point.getDef() != def) {//if tree contains child defs, consider they're already processed
+            do {
+                pollPoint(path).getDef();
+                point = peekPoint(path);
+            } while (point != null && point.getDef() != def);
             return instance;
         }
 
-        if (defTree.getNode() instanceof ArrayDef){
-            return fillArrayInstance(src, defTree, (ArrayInstance) instance);
-        } else {
-            List<DSLDef> childDefs = defTree.getNode().getChildDefs();
-            for (int i = 0; i < childDefs.size(); ++i) {
-                DSLDef childDef = childDefs.get(i);
-                DSLInstance value = build(walkTree(src, defTree.addNode(childDef)), defTree, instance);
-                instance.setChild(childDef, value);
-                defTree.remNode();
-            }
-            return instance;
-        }
-    }
-
-
-    private ArrayInstance fillArrayInstance(Object src, DefTree defTree, ArrayInstance instance) {
-        ArrayDef def = (ArrayDef) defTree.getNode();
-        DSLDef itemsDef = ((ArrayDef)defTree.getNode()).getItemsDef();
-        int i;
-        for (i = 0; hasMoreElements(src, def, defTree, i); ++i) {
-            DSLInstance value = build(walkTree(src, defTree.addNode(itemsDef)), defTree, instance);
-            instance.setChild(itemsDef, value);
-        }
-        while (i-- > 0) {
-            defTree.remNode();
+        PathPoint<SS> childPoint;
+        while ((childPoint = getNexChildPoint(src, path)) != null) {
+            DSLInstance value = build(src, putPoint(path, childPoint), instance);
+            instance.setChild(childPoint.getDef(), value);
+            point.addMatchedPoint(childPoint);
+            pollPoint(path);
         }
         return instance;
+
     }
 
-    abstract protected boolean hasMoreElements(Object src, ArrayDef def, DefTree defTree, int processedCount);
+
+    protected PathPoint<SS> getNexChildPoint(S src, List<PathPoint<SS>> path) throws DSLBuildException {
+        PathPoint<SS> point = peekPoint(path);
+        DSLDef def = point.getDef();
+        PathPoint<SS> childPoint = null;
+        if (def instanceof ArrayDef) {
+            int nextIdx = point.getMatchedPoints().size();
+            childPoint = new PathPoint<>(((ArrayDef) point.getDef()).getItemsDef(), null, new IndexSelection(nextIdx));
+
+        } else if (def instanceof EnumDef) {
+            if (point.getMatchedPoints().size() > 0) {
+                return null;
+            } else {
+                int processedDefs = point.getVisitedDefs().size();
+                if (def.getChildDefs().size() <= processedDefs) {
+                    return null;
+                }
+                DSLDef childDef;
+                for (int i = processedDefs; i < def.getChildDefs().size(); ++i) {
+                    childDef = def.getChildDefs().get(i);
+                    if (childDef instanceof NamedDSLDef)//value enums can be accepted
+                }
+                childPoint = new PathPoint<>(def.getChildDefs().get(processedDefs), point.getData(), );
+            }
+        } else if (def.getChildDefs().size() == 1 && !(def.getChildDefs().get(0) instanceof NamedDSLDef)) {
+            childPoint = new PathPoint<>(def.getChildDefs().get(0), point.getData(), new LinkSelection(point));
+        } else {
+            DSLDef parentDef = point.getDef();
+            Set<DSLDef> processedDefs = point.getMatchedPoints().stream().map(p -> p.getDef()).collect(Collectors.toSet());
+            for (DSLDef childDef : parentDef.getChildDefs()) {
+                if (childDef instanceof NamedDSLDef && !processedDefs.contains(childDef)) {
+                    childPoint = new PathPoint<>(childDef, null, new NameSelection(((NamedDSLDef) childDef).getName()));
+                    break;
+                }
+            }
+        }
+
+        if (childPoint == null) {
+            return null;
+        }
+        SS elemSrc = walkPath(src, path, childPoint);
+        point.addVisitedDef(childPoint.getDef());
+        if (elemSrc == null) {
+            return null;
+        } else {
+            childPoint.setData(elemSrc);
+            return childPoint;
+        }
+    }
 
     /**
      * @param src parent, root or any other object, depends on implementation. By default def tree navigation is relied on builder implementation.
      *            For navigating in array, all sequentially read defs're added as tree nodes, so same defs count to nearest array def up in tree is number or reading element (1 based)
-     * @return src object representation of last defTree node or any other object, allowing to get this value
+     * @return src object representation of last defPath node or any other object, allowing to get this value
      */
-    protected Object walkTree(Object src, DefTree defTree) {
-        return src;
-    }
+    abstract protected SS walkPath(S src, List<PathPoint<SS>> parentPath, PathPoint<SS> child) throws DSLBuildException;
 
-    private DSLInstance buildBase(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
+    private DSLInstance buildBase(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
         if (src == null) {
             return null;
         }
 
-        DSLDef def = defTree.getNode();
+        DSLDef def = peekPoint(path).getDef();
 
         if (def instanceof FunctionDef) {
-            return buildBaseFunc(src, defTree, parentInstance);
+            return buildBaseFunc(src, path, parentInstance);
         } else if (def instanceof ArrayDef) {
-            return buildBaseArray(src, defTree, parentInstance);
+            return buildBaseArray(src, path, parentInstance);
         } else if (def instanceof EnumDef) {
-            return buildBaseEnum(src, defTree, parentInstance);
+            return buildBaseEnum(src, path, parentInstance);
         } else if (def instanceof ParameterDef) {
-            return buildBaseParam(src, defTree, parentInstance);
+            return buildBaseParam(src, path, parentInstance);
         } else if (def instanceof ValueDef) {
-            return buildBaseVal(src, defTree, parentInstance);
+            return buildBaseVal(src, path, parentInstance);
         } else {
-            return buildUndefined(src, defTree, parentInstance);
+            return buildDefault(src, path, parentInstance);
         }
     }
 
-    protected FunctionInstance buildBaseFunc(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-        return (FunctionInstance) defTree.getNode().createInstance();
+    protected FunctionInstance buildBaseFunc(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
+        return (FunctionInstance) peekPoint(path).getDef().createInstance();
     }
 
-    protected EnumInstance buildBaseEnum(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-        return (EnumInstance) defTree.getNode().createInstance();
+    protected EnumInstance buildBaseEnum(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
+        return (EnumInstance) peekPoint(path).getDef().createInstance();
     }
 
-    protected abstract ArrayInstance buildBaseArray(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
+    protected ArrayInstance buildBaseArray(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
+        return ((ArrayInstance) peekPoint(path).getDef().createInstance());
+    }
 
-    protected ValueInstance buildBaseVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-        DSLDef def = defTree.getNode();
+    protected ValueInstance buildBaseVal(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
+        DSLDef def = peekPoint(path).getDef();
         if (def instanceof NumberValueDef) {
-            return buildBaseNumVal(src, defTree, parentInstance);
+            return buildBaseNumVal(src, path, parentInstance);
         } else if (def instanceof StringValueDef) {
-            return buildBaseStrVal(src, defTree, parentInstance);
+            return buildBaseStrVal(src, path, parentInstance);
         } else if (def instanceof BooleanValueDef) {
-            return buildBaseBoolVal(src, defTree, parentInstance);
+            return buildBaseBoolVal(src, path, parentInstance);
         } else {
-            return buildUndefinedVal(src, defTree, parentInstance);
+            return buildDefaultVal(src, path, parentInstance);
         }
     }
-    protected NumberValueInstance buildBaseNumVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-        DSLDef def = defTree.getNode();
+
+    protected NumberValueInstance buildBaseNumVal(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
+        DSLDef def = peekPoint(path).getDef();
         if (def instanceof LongValueDef) {
-            return buildBaseLongVal(src, defTree, parentInstance);
+            return buildBaseLongVal(src, path, parentInstance);
         } else if (def instanceof DoubleValueDef) {
-            return buildBaseDoubleVal(src, defTree, parentInstance);
+            return buildBaseDoubleVal(src, path, parentInstance);
         } else {
-            return buildUndefinedNumVal(src, defTree, parentInstance);
+            return buildDefaultNumVal(src, path, parentInstance);
         }
     }
 
 
-    abstract protected VarParameterInstance buildBaseVarParam(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
+    abstract protected LongValueInstance buildBaseLongVal(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException;
 
-    abstract protected LongValueInstance buildBaseLongVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
+    abstract protected DoubleValueInstance buildBaseDoubleVal(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException;
 
-    abstract protected LongValueInstance buildBaseDoubleVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
+    abstract protected BooleanValueInstance buildBaseBoolVal(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException;
 
-    abstract protected BooleanValueInstance buildBaseBoolVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
+    abstract protected StringValueInstance buildBaseStrVal(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException;
 
-    abstract protected StringValueInstance buildBaseStrVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException;
+    protected NumberValueInstance buildDefaultNumVal(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
+        throw new DSLBuildException("Unknown number def: " + peekPoint(path).getDef());
+    }
 
-    protected NumberValueInstance buildUndefinedNumVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-        throw new DSLBuildException("Unknown number def: " + defTree.getNode());
+    protected ValueInstance buildDefaultVal(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
+        throw new DSLBuildException("Unknown value def: " + peekPoint(path).getDef());
     }
 
 
-    protected ValueInstance buildUndefinedVal(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-        throw new DSLBuildException("Unknown value def: " + defTree.getNode());
-    }
-
-    protected ParameterInstance buildBaseParam(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-        DSLDef def = defTree.getNode();
+    protected ParameterInstance buildBaseParam(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
+        DSLDef def = peekPoint(path).getDef();
         if (def instanceof VarParameterDef) {
-            return buildBaseVarParam(src, defTree, parentInstance);
+            return buildBaseVarParam(src, path, parentInstance);
         } else {
-            return buildUndefinedParam(src, defTree, parentInstance);
+            return buildDefaultParam(src, path, parentInstance);
         }
     }
 
-    protected ParameterInstance buildUndefinedParam(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-        throw new DSLBuildException("Unknown param def: " + defTree.getNode());
+    protected VarParameterInstance buildBaseVarParam(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
+        PathPoint<SS> point = peekPoint(path);
+        VarParameterDef def = (VarParameterDef) point.getDef();
+        VarParameterInstance instance = (VarParameterInstance) def.createInstance();
+        instance.setVarName((String) point.getSelection().getKey());
+        PathPoint<SS> childPoint = new PathPoint<>(def.getValueDef(), point.getData(), new LinkSelection(point));
+        DSLInstance value = build(src, putPoint(path, childPoint), instance);
+        instance.setValue(value);
+        pollPoint(path);
+        return instance;
     }
 
-    protected ParameterInstance buildUndefined(Object src, DefTree defTree, DSLInstance parentInstance) throws DSLBuildException {
-        throw new DSLBuildException("Unknown def: " + defTree.getNode());
+    protected ParameterInstance buildDefaultParam(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
+        PathPoint<SS> point = peekPoint(path);
+        ParameterDef def = (ParameterDef) point.getDef();
+        ParameterInstance instance = (ParameterInstance) def.createInstance();
+        PathPoint<SS> childPoint = new PathPoint<>(def.getValueDef(), point.getData(), new LinkSelection(point));
+        DSLInstance value = build(src, putPoint(path, childPoint), instance);
+        instance.setValue(value);
+        pollPoint(path);
+        return instance;
+    }
+
+    protected DSLInstance buildDefault(S src, List<PathPoint<SS>> path, DSLInstance parentInstance) throws DSLBuildException {
+        return peekPoint(path).getDef().createInstance();
+    }
+
+    public static <SS> PathPoint<SS> peekPoint(List<PathPoint<SS>> path) {
+        return path.get(path.size() - 1);
+    }
+
+    public static <SS> PathPoint<SS> pollPoint(List<PathPoint<SS>> path) {
+        PathPoint<SS> point = peekPoint(path);
+        path.remove(path.size() - 1);
+        return point;
+    }
+
+    public static <SS> List<PathPoint<SS>> putPoint(List<PathPoint<SS>> path, PathPoint<SS> point) {
+        path.add(point);
+        return path;
+    }
+
+    public static class IndexSelection extends PathPoint.Selection<Integer> {
+
+        public IndexSelection(Integer key) {
+            super(key);
+        }
+    }
+
+    public static class NameSelection extends PathPoint.Selection<String> {
+
+        public NameSelection(String key) {
+            super(key);
+        }
+    }
+
+    public static class LinkSelection extends PathPoint.Selection {
+        private final PathPoint linked;
+
+        public LinkSelection(PathPoint pathPoint) {
+            super(pathPoint.getSelection().getKey());
+            this.linked = pathPoint;
+        }
+
+        public PathPoint getLinked() {
+            return linked;
+        }
+
+        @Override
+        public String toString() {
+            return "LinkSelection{" +
+                    "linked=" + linked +
+                    "} " + super.toString();
+        }
     }
 
 }

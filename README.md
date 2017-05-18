@@ -8,9 +8,9 @@
 {
   "query": { 
      "<query_type>": {
-     	"<param>": "<val>"
+     	"<param>": "<value>"
     },
-    "<query_param>":"<val>" 
+    "<query_param>":"<value>" 
 }
 ```
 

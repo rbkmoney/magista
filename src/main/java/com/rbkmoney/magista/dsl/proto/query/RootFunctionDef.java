@@ -4,6 +4,7 @@ import com.rbkmoney.magista.dsl.def.FunctionDSLDef;
 import com.rbkmoney.magista.dsl.def.FunctionDef;
 import com.rbkmoney.magista.dsl.instance.DSLInstance;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,6 +13,11 @@ import java.util.List;
  */
 public class RootFunctionDef extends FunctionDef {
     public static final String NAME = "root";
+    public static final RootFunctionDef INSTANCE = new RootFunctionDef();
+
+    public RootFunctionDef() {
+        this(Arrays.asList(QueryFunctionDef.INSTANCE));
+    }
 
     public RootFunctionDef(List<FunctionDSLDef> functionDefs) {
         super(functionDefs, Collections.EMPTY_LIST, Collections.EMPTY_LIST, NAME);

@@ -4,6 +4,7 @@ import com.rbkmoney.magista.dsl.def.FunctionDef;
 import com.rbkmoney.magista.dsl.def.FunctionDSLDef;
 import com.rbkmoney.magista.dsl.instance.DSLInstance;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,6 +13,11 @@ import java.util.List;
  */
 public class QueryFunctionDef extends FunctionDef {
     public static final String NAME = "query";
+    public static final QueryFunctionDef INSTANCE = new QueryFunctionDef();
+
+    public QueryFunctionDef() {
+        this(Arrays.asList(PaymentsQueryDef.INSTANCE));
+    }
 
     public QueryFunctionDef(List<FunctionDSLDef> functionDefs) {
         super(functionDefs, Collections.EMPTY_LIST, Collections.EMPTY_LIST, NAME);
