@@ -75,9 +75,9 @@ public abstract class InstanceBuilder<T extends DSLInstance, S, SS> implements D
                 DSLDef childDef;
                 for (int i = processedDefs; i < def.getChildDefs().size(); ++i) {
                     childDef = def.getChildDefs().get(i);
-                    if (childDef instanceof NamedDSLDef)//value enums can be accepted
+                    //if (childDef instanceof NamedDSLDef)//todo value enums can be accepted
                 }
-                childPoint = new PathPoint<>(def.getChildDefs().get(processedDefs), point.getData(), );
+                //childPoint = new PathPoint<>(def.getChildDefs().get(processedDefs), point.getData(), );
             }
         } else if (def.getChildDefs().size() == 1 && !(def.getChildDefs().get(0) instanceof NamedDSLDef)) {
             childPoint = new PathPoint<>(def.getChildDefs().get(0), point.getData(), new LinkSelection(point));
