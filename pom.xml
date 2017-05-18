@@ -17,8 +17,9 @@
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
-        <damsel.version>1.132-27bc11c</damsel.version>
+        <damsel.version>1.151-4018c41</damsel.version>
         <shared.resources.version>0.2.1</shared.resources.version>
+        <geck.version>0.1.0</geck.version>
         <server.port>8022</server.port>
         <dockerfile.base.service.tag>f26fcc19d1941ab74f1c72dd8a408be17a769333</dockerfile.base.service.tag>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -72,7 +73,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.4-1206-jdbc42</version>
+            <version>9.4.1212</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -93,7 +94,13 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>eventstock-client</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.rbkmoney.thrift</groupId>
+                    <artifactId>libthrift</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -101,14 +108,19 @@
             <version>${damsel.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.rbkmoney</groupId>
-            <artifactId>thrift-filter</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
             <groupId>com.rbkmoney.logback</groupId>
             <artifactId>nop-rolling</artifactId>
             <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney.geck</groupId>
+            <artifactId>filter</artifactId>
+            <version>${geck.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney.geck</groupId>
+            <artifactId>serializer</artifactId>
+            <version>${geck.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>

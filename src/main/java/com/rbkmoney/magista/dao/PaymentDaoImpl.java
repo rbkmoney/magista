@@ -3,15 +3,12 @@ package com.rbkmoney.magista.dao;
 import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
 import com.rbkmoney.damsel.domain.InvoicePayment;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
+import com.rbkmoney.geck.serializer.kit.msgpack.MsgPackHandler;
+import com.rbkmoney.geck.serializer.kit.msgpack.MsgPackProcessor;
+import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
+import com.rbkmoney.geck.serializer.kit.tbase.TBaseProcessor;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Payment;
-import org.apache.thrift.TDeserializer;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TJSONProtocol;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
@@ -20,16 +17,16 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 import javax.sql.DataSource;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.Types;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 /**
  * Created by tolkonepiu on 23.08.16.
  */
 public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements PaymentDao {
-
-    Logger log = LoggerFactory.getLogger(this.getClass());
 
     public PaymentDaoImpl(DataSource ds) {
         setDataSource(ds);
@@ -37,16 +34,14 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
 
     @Override
     public Payment findById(String paymentId, String invoiceId) throws DaoException {
-        String sql = "SELECT payment_id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, " +
-                "amount, fee, currency_code, payment_system, city_id, country_id, phone_number, email, ip, created_at," +
-                " changed_at, model from mst.payment where payment_id = :payment_id and invoice_id = :invoice_id";
+        String sql = "select * from mst.payment where payment_id = :payment_id and invoice_id = :invoice_id" +
+                " order by event_id desc limit 1";
 
         Payment payment;
         try {
             MapSqlParameterSource source = new MapSqlParameterSource()
                     .addValue("payment_id", paymentId)
                     .addValue("invoice_id", invoiceId);
-            log.trace("SQL: {}, Params: {}", sql, source.getValues());
             payment = getNamedParameterJdbcTemplate().queryForObject(
                     sql,
                     source,
@@ -62,25 +57,11 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
 
     @Override
     public void insert(Payment payment) throws DaoException {
-        String updateSql = "insert into mst.payment (payment_id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, fee, currency_code, payment_system, city_id, country_id, phone_number, email, ip, created_at, changed_at, model, data) " +
-                "values (:payment_id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :fee, :currency_code, :payment_system, :city_id, :country_id, :phone_number, :email, :ip, :created_at, :changed_at, :model, :data)";
-        execute(updateSql, createSqlParameterSource(payment));
-    }
+        String updateSql = "insert into mst.payment (payment_id, event_id, invoice_id, merchant_id, shop_id, fingerprint, masked_pan, status, amount, fee, currency_code, payment_system, city_id, country_id, phone_number, email, ip, created_at, changed_at, model) " +
+                "values (:payment_id, :event_id, :invoice_id, :merchant_id, :shop_id, :fingerprint, :masked_pan, :status::invoice_payment_status, :amount, :fee, :currency_code, :payment_system, :city_id, :country_id, :phone_number, :email, :ip, :created_at, :changed_at, :model)";
 
-    @Override
-    public void update(Payment payment) throws DaoException {
-        String updateSql = "update mst.payment set " +
-                "payment_id = :payment_id, event_id = :event_id, invoice_id = :invoice_id, merchant_id = :merchant_id, " +
-                "shop_id = :shop_id, customer_id = :customer_id, masked_pan = :masked_pan, status = :status, " +
-                "amount = :amount, fee = :fee, currency_code = :currency_code, payment_system = :payment_system, " +
-                "city_id = :city_id, country_id = :country_id, phone_number = :phone_number, email = :email, ip = :ip, created_at = :created_at, changed_at=:changed_at, model = :model, data = :data where payment_id = :payment_id and invoice_id = :invoice_id";
-        execute(updateSql, createSqlParameterSource(payment));
-    }
-
-    public void execute(String updateSql, MapSqlParameterSource source) throws DaoException {
         try {
-            log.trace("SQL: {}, Params: {}", updateSql, source.getValues());
-            int rowsAffected = getNamedParameterJdbcTemplate().update(updateSql, source);
+            int rowsAffected = getNamedParameterJdbcTemplate().update(updateSql, createSqlParameterSource(payment));
 
             if (rowsAffected != 1) {
                 throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(updateSql, 1, rowsAffected);
@@ -98,24 +79,26 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                     .addValue("invoice_id", payment.getInvoiceId())
                     .addValue("merchant_id", payment.getMerchantId())
                     .addValue("shop_id", payment.getShopId())
-                    .addValue("customer_id", payment.getCustomerId())
+                    .addValue("fingerprint", payment.getFingerprint())
                     .addValue("masked_pan", payment.getMaskedPan())
                     .addValue("status", payment.getStatus().getFieldName())
                     .addValue("amount", payment.getAmount())
                     .addValue("fee", payment.getFee())
                     .addValue("currency_code", payment.getCurrencyCode())
-                    .addValue("payment_system", payment.getPaymentSystem().name())
+                    .addValue("payment_system", payment.getPaymentSystem(), Types.VARCHAR)
                     .addValue("city_id", payment.getCityId())
                     .addValue("country_id", payment.getCountryId())
                     .addValue("phone_number", payment.getPhoneNumber())
                     .addValue("email", payment.getEmail())
                     .addValue("ip", payment.getIp())
-                    .addValue("created_at", Timestamp.from(payment.getCreatedAt()))
-                    .addValue("changed_at", Timestamp.from(payment.getChangedAt()))
-                    .addValue("model", new TSerializer(new TJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()))
-                    .addValue("data", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()));
+                    .addValue("created_at", LocalDateTime.ofInstant(payment.getCreatedAt(),
+                            ZoneOffset.UTC), Types.OTHER)
+                    .addValue("changed_at", LocalDateTime.ofInstant(payment.getChangedAt(),
+                            ZoneOffset.UTC), Types.OTHER)
+                    .addValue("model", new TBaseProcessor().process(payment.getModel(),
+                            MsgPackHandler.newBufferedInstance(true)));
 
-        } catch (TException ex) {
+        } catch (IOException ex) {
             throw new DaoException("Failed to serialize payment model", ex);
         }
     }
@@ -129,7 +112,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                 payment.setInvoiceId(rs.getString("invoice_id"));
                 payment.setMerchantId(rs.getString("merchant_id"));
                 payment.setShopId(rs.getInt("shop_id"));
-                payment.setCustomerId(rs.getString("customer_id"));
+                payment.setFingerprint(rs.getString("fingerprint"));
                 payment.setMaskedPan(rs.getString("masked_pan"));
                 payment.setStatus(InvoicePaymentStatus._Fields.findByName(rs.getString("status")));
                 payment.setAmount(rs.getLong("amount"));
@@ -141,15 +124,17 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                 payment.setPhoneNumber(rs.getString("phone_number"));
                 payment.setEmail(rs.getString("email"));
                 payment.setIp(rs.getString("ip"));
-                payment.setCreatedAt(rs.getTimestamp("created_at").toInstant());
-                payment.setChangedAt(rs.getTimestamp("changed_at").toInstant());
-                InvoicePayment model = new InvoicePayment();
-                new TDeserializer(new TJSONProtocol.Factory()).deserialize(model, rs.getBytes("model"));
-
+                payment.setCreatedAt(rs.getObject("created_at", LocalDateTime.class)
+                        .toInstant(ZoneOffset.UTC));
+                payment.setChangedAt(rs.getObject("changed_at", LocalDateTime.class)
+                        .toInstant(ZoneOffset.UTC));
+                InvoicePayment model =
+                        MsgPackProcessor.newBinaryInstance().process(rs.getBytes("model"),
+                                new TBaseHandler<>(InvoicePayment.class));
                 payment.setModel(model);
 
                 return payment;
-            } catch (TException ex) {
+            } catch (IOException ex) {
                 throw new SQLException("Failed to deserialize payment model", ex);
             }
         };
