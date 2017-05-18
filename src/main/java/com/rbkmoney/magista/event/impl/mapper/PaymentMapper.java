@@ -36,7 +36,7 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
         payment.setPhoneNumber(contactInfo.getPhoneNumber());
 
         ClientInfo clientInfo = payer.getClientInfo();
-        payment.setCustomerId(clientInfo.getFingerprint());
+        payment.setFingerprint(clientInfo.getFingerprint());
         payment.setIp(clientInfo.getIpAddress());
 
         PaymentTool paymentTool = payer.getPaymentTool();

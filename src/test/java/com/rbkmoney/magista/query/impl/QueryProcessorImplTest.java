@@ -5,13 +5,12 @@ import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
@@ -22,16 +21,13 @@ import static org.junit.Assert.assertEquals;
  * Created by vpankrashkin on 29.08.16.
  */
 
-@Sql("classpath:data/sql/invoices_and_payments_test_data.sql")
+@Sql("classpath:data/sql/invoice_event_stat_test_data.sql")
 @Transactional
 public class QueryProcessorImplTest extends AbstractIntegrationTest {
     private QueryProcessorImpl queryProcessor;
 
     @Autowired
     StatisticsDao statisticsDao;
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
 
     @Before
     public void before() {
@@ -128,10 +124,6 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertEquals(0, statResponse.getTotalCount());
     }
 
-    @After
-    public void after() {
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, "mst.invoice", "mst.payment", "mst.customer");
-    }
 }
 
 

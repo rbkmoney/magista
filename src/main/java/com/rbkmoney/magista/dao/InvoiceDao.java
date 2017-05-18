@@ -8,10 +8,8 @@ import com.rbkmoney.magista.model.Invoice;
  */
 public interface InvoiceDao {
 
-    Invoice findById(String id) throws DaoException;
+    Invoice findById(String invoiceId) throws DaoException;
 
     void insert(Invoice invoice) throws DaoException;
-
-    void update(Invoice invoice) throws DaoException;
 
 }

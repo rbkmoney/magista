@@ -1,16 +1,13 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.magista.dao.CustomerDao;
 import com.rbkmoney.magista.dao.InvoiceDao;
 import com.rbkmoney.magista.dao.PaymentDao;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
-import com.rbkmoney.magista.model.Customer;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.model.PaymentStatusChange;
-import com.rbkmoney.magista.provider.GeoProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,18 +28,12 @@ public class PaymentService {
     @Autowired
     PaymentDao paymentDao;
 
-    @Autowired
-    CustomerDao customerDao;
-
-    @Autowired
-    GeoProvider geoProvider;
-
     public Payment getPaymentByIds(String paymentId, String invoiceId) throws DataAccessException {
         return paymentDao.findById(paymentId, invoiceId);
     }
 
     public void changePaymentStatus(PaymentStatusChange paymentStatusChange) throws NotFoundException, DataAccessException {
-        log.trace("Change payment status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'",
+        log.debug("Change payment status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'",
                 paymentStatusChange.getPaymentId(), paymentStatusChange.getInvoiceId(), paymentStatusChange.getEventId(), paymentStatusChange.getStatus().getSetField().getFieldName());
 
         try {
@@ -52,13 +43,15 @@ public class PaymentService {
                         paymentStatusChange.getPaymentId(), paymentStatusChange.getInvoiceId(), paymentStatusChange.getEventId()));
             }
 
+            payment.setEventId(paymentStatusChange.getEventId());
             payment.setStatus(paymentStatusChange.getStatus().getSetField());
-            payment.setChangedAt(paymentStatusChange.getChangedAt());
+            payment.setChangedAt(paymentStatusChange.getCreatedAt());
             payment.getModel().setStatus(paymentStatusChange.getStatus());
 
-            paymentDao.update(payment);
+            paymentDao.insert(payment);
             log.info("Payment status have been changed, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'",
-                    paymentStatusChange.getPaymentId(), paymentStatusChange.getInvoiceId(), paymentStatusChange.getEventId(), paymentStatusChange.getStatus().getSetField().getFieldName());
+                    paymentStatusChange.getPaymentId(), paymentStatusChange.getInvoiceId(),
+                    paymentStatusChange.getEventId(), paymentStatusChange.getStatus().getSetField().getFieldName());
 
         } catch (DaoException ex) {
             String message = String.format("Failed to change payment status, paymentId='%s', invoiceId='%s', eventId='%d', invoiceStatus='%s'",
@@ -68,27 +61,18 @@ public class PaymentService {
     }
 
     public void savePayment(Payment payment) throws NotFoundException, StorageException {
-        log.trace("Save payment, paymentId='{}', invoiceId='{}', eventId='{}'", payment.getId(), payment.getInvoiceId(), payment.getEventId());
+        log.debug("Save payment, paymentId='{}', invoiceId='{}', eventId='{}'",
+                payment.getId(), payment.getInvoiceId(), payment.getEventId());
 
         try {
             Invoice invoice = invoiceDao.findById(payment.getInvoiceId());
             if (invoice == null) {
-                throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'", payment.getInvoiceId(), payment.getEventId()));
+                throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'",
+                        payment.getInvoiceId(), payment.getEventId()));
             }
 
             payment.setMerchantId(invoice.getMerchantId());
             payment.setShopId(invoice.getShopId());
-
-            if (payment.getCustomerId() != null && customerDao.findByIds(payment.getCustomerId(), payment.getShopId(), payment.getMerchantId()) == null) {
-                log.trace("Save customer, customerId='{}', paymentId='{}', invoiceId='{}', eventId='{}'", payment.getCustomerId(), payment.getId(), payment.getInvoiceId(), payment.getEventId());
-                Customer customer = new Customer();
-                customer.setId(payment.getCustomerId());
-                customer.setShopId(payment.getShopId());
-                customer.setMerchantId(payment.getMerchantId());
-                customer.setCreatedAt(payment.getCreatedAt());
-                customerDao.insert(customer);
-                log.info("New customer have been saved, customerId='{}', invoiceId='{}', eventId='{}'", payment.getId(), payment.getInvoiceId(), payment.getEventId());
-            }
 
             paymentDao.insert(payment);
             log.info("Payment have been saved, paymentId='{}', invoiceId='{}', eventId='{}'", payment.getId(), payment.getInvoiceId(), payment.getEventId());

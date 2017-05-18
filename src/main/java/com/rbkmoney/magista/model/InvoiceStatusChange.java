@@ -11,17 +11,17 @@ public class InvoiceStatusChange {
 
     long eventId;
     String invoiceId;
-    Instant changedAt;
+    Instant createdAt;
     InvoiceStatus status;
 
     public InvoiceStatusChange() {
 
     }
 
-    public InvoiceStatusChange(long eventId, String invoiceId, Instant changedAt, InvoiceStatus status) {
+    public InvoiceStatusChange(long eventId, String invoiceId, Instant createdAt, InvoiceStatus status) {
         this.eventId = eventId;
         this.invoiceId = invoiceId;
-        this.changedAt = changedAt;
+        this.createdAt = createdAt;
         this.status = status;
     }
 
@@ -41,12 +41,12 @@ public class InvoiceStatusChange {
         this.invoiceId = invoiceId;
     }
 
-    public Instant getChangedAt() {
-        return changedAt;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setChangedAt(Instant changedAt) {
-        this.changedAt = changedAt;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
     public InvoiceStatus getStatus() {
@@ -62,7 +62,7 @@ public class InvoiceStatusChange {
         return "InvoiceStatusChange{" +
                 "eventId=" + eventId +
                 ", invoiceId='" + invoiceId + '\'' +
-                ", changedAt=" + changedAt +
+                ", createdAt=" + createdAt +
                 ", status=" + status +
                 '}';
     }
