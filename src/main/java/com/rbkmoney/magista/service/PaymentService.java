@@ -1,5 +1,7 @@
 package com.rbkmoney.magista.service;
 
+import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
+import com.rbkmoney.damsel.domain.OperationFailure;
 import com.rbkmoney.magista.dao.CustomerDao;
 import com.rbkmoney.magista.dao.InvoiceDao;
 import com.rbkmoney.magista.dao.PaymentDao;
@@ -34,9 +36,6 @@ public class PaymentService {
     @Autowired
     CustomerDao customerDao;
 
-    @Autowired
-    GeoProvider geoProvider;
-
     public Payment getPaymentByIds(String paymentId, String invoiceId) throws DataAccessException {
         return paymentDao.findById(paymentId, invoiceId);
     }
@@ -52,7 +51,13 @@ public class PaymentService {
                         paymentStatusChange.getPaymentId(), paymentStatusChange.getInvoiceId(), paymentStatusChange.getEventId()));
             }
 
-            payment.setStatus(paymentStatusChange.getStatus().getSetField());
+            InvoicePaymentStatus status = paymentStatusChange.getStatus();
+            payment.setStatus(status.getSetField());
+            if (status.isSetFailed()) {
+                OperationFailure operationFailure = status.getFailed().getFailure();
+                payment.setFailureCode(operationFailure.getCode());
+                payment.setFailureDescription(operationFailure.getDescription());
+            }
             payment.setChangedAt(paymentStatusChange.getChangedAt());
 
             paymentDao.update(payment);
