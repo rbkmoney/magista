@@ -19,15 +19,23 @@ public class Invoice {
 
     private InvoiceStatus._Fields status;
 
+    private String statusDetails;
+
+    private String product;
+
+    private String description;
+
     private long amount;
 
     private String currencyCode;
 
     private Instant createdAt;
 
+    private Instant due;
+
     private Instant changedAt;
 
-    private com.rbkmoney.damsel.domain.Invoice model;
+    private byte[] context;
 
     public String getId() {
         return id;
@@ -69,6 +77,30 @@ public class Invoice {
         this.status = status;
     }
 
+    public String getStatusDetails() {
+        return statusDetails;
+    }
+
+    public void setStatusDetails(String statusDetails) {
+        this.statusDetails = statusDetails;
+    }
+
+    public String getProduct() {
+        return product;
+    }
+
+    public void setProduct(String product) {
+        this.product = product;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public long getAmount() {
         return amount;
     }
@@ -93,6 +125,14 @@ public class Invoice {
         this.createdAt = createdAt;
     }
 
+    public Instant getDue() {
+        return due;
+    }
+
+    public void setDue(Instant due) {
+        this.due = due;
+    }
+
     public Instant getChangedAt() {
         return changedAt;
     }
@@ -101,12 +141,12 @@ public class Invoice {
         this.changedAt = changedAt;
     }
 
-    public com.rbkmoney.damsel.domain.Invoice getModel() {
-        return model;
+    public byte[] getContext() {
+        return context;
     }
 
-    public void setModel(com.rbkmoney.damsel.domain.Invoice model) {
-        this.model = model;
+    public void setContext(byte[] context) {
+        this.context = context;
     }
 
     @Override
@@ -117,9 +157,13 @@ public class Invoice {
                 ", merchantId='" + merchantId + '\'' +
                 ", shopId=" + shopId +
                 ", status=" + status +
+                ", statusDetails='" + statusDetails + '\'' +
+                ", product='" + product + '\'' +
+                ", description='" + description + '\'' +
                 ", amount=" + amount +
                 ", currencyCode='" + currencyCode + '\'' +
                 ", createdAt=" + createdAt +
+                ", due=" + due +
                 ", changedAt=" + changedAt +
                 '}';
     }

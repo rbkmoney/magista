@@ -1,10 +1,11 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.damsel.base.Content;
+import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
-import com.rbkmoney.damsel.merch_stat.StatPayment;
-import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.magista.exception.DaoException;
+import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
@@ -13,6 +14,7 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
@@ -55,17 +57,92 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
         return new BaseQueryResult<>(
                 () -> paymentsResult.getDataStream(),
                 () -> {
-                    StatResponseData statResponseData = StatResponseData.payments(paymentsResult.getDataStream().map(payment -> {
-                        StatPayment statPayment = new StatPayment(payment.getInvoiceId(), payment.getModel());
-                        LocationInfo locationInfo = new LocationInfo(payment.getCityId(), payment.getCountryId());
-                        statPayment.setLocationInfo(locationInfo);
-                        return statPayment;
-                    }).collect(Collectors.toList()));
+                    StatResponseData statResponseData = StatResponseData.payments(paymentsResult.getDataStream()
+                            .map(payment -> toStatPayment(payment)).collect(Collectors.toList()));
                     StatResponse statResponse = new StatResponse(statResponseData);
                     statResponse.setTotalCount(countResult.getCollectedStream());
                     return statResponse;
                 }
         );
+    }
+
+    private StatPayment toStatPayment(Payment payment) {
+        StatPayment statPayment = new StatPayment();
+
+        statPayment.setId(payment.getId());
+        statPayment.setInvoiceId(payment.getInvoiceId());
+        statPayment.setOwnerId(payment.getMerchantId());
+        statPayment.setShopId(payment.getShopId());
+        statPayment.setCreatedAt(TemporalConverter.temporalToString(payment.getCreatedAt()));
+        statPayment.setStatus(toStatPaymentStatus(
+                payment.getStatus(),
+                payment.getFailureCode(),
+                payment.getFailureDescription()
+        ));
+
+        statPayment.setAmount(payment.getAmount());
+        statPayment.setFee(payment.getFee());
+        statPayment.setCurrencySymbolicCode(payment.getCurrencyCode());
+
+        statPayment.setPaymentTool(toStatPaymentTool(
+                payment.getPaymentTool(),
+                payment.getToken(),
+                payment.getPaymentSystem(),
+                payment.getBin(),
+                payment.getMaskedPan()
+        ));
+
+        statPayment.setIpAddress(payment.getIp());
+        statPayment.setFingerprint(payment.getCustomerId());
+        statPayment.setPhoneNumber(payment.getPhoneNumber());
+        statPayment.setEmail(payment.getEmail());
+        statPayment.setSessionId(payment.getSessionId());
+
+        Content content = new Content();
+        content.setType("application/json");
+        content.setData(payment.getContext());
+        statPayment.setContext(content);
+
+
+        LocationInfo locationInfo = new LocationInfo(payment.getCityId(), payment.getCountryId());
+        statPayment.setLocationInfo(locationInfo);
+
+        return statPayment;
+    }
+
+    private PaymentTool toStatPaymentTool(com.rbkmoney.damsel.domain.PaymentTool._Fields paymentTool, String token, BankCardPaymentSystem paymentSystem, String bin, String maskedPan) {
+        switch (paymentTool) {
+            case BANK_CARD:
+                return PaymentTool.bank_card(new BankCard(
+                        token,
+                        paymentSystem,
+                        bin,
+                        maskedPan
+                ));
+            default:
+                throw new NotFoundException(String.format("Payment tool '%s' not found", paymentTool.getFieldName()));
+        }
+    }
+
+    private InvoicePaymentStatus toStatPaymentStatus(com.rbkmoney.damsel.domain.InvoicePaymentStatus._Fields status, String failureCode, String failureDescription) {
+        switch (status) {
+            case PENDING:
+                return InvoicePaymentStatus.pending(new InvoicePaymentPending());
+            case PROCESSED:
+                return InvoicePaymentStatus.processed(new InvoicePaymentProcessed());
+            case CAPTURED:
+                return InvoicePaymentStatus.captured(new InvoicePaymentCaptured());
+            case CANCELLED:
+                return InvoicePaymentStatus.cancelled(new InvoicePaymentCancelled());
+            case FAILED:
+                OperationFailure operationFailure = new OperationFailure();
+                operationFailure.setCode(failureCode);
+                operationFailure.setDescription(failureDescription);
+
+                return InvoicePaymentStatus.failed(new InvoicePaymentFailed(operationFailure));
+            default:
+                throw new NotFoundException(String.format("Payment status '%s' not found", status.getFieldName()));
+        }
     }
 
     @Override

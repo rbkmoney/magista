@@ -1,8 +1,8 @@
 package com.rbkmoney.magista.model;
 
 import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
-import com.rbkmoney.damsel.domain.InvoicePayment;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
+import com.rbkmoney.damsel.domain.PaymentTool;
 
 import java.time.Instant;
 
@@ -27,17 +27,29 @@ public class Payment {
 
     private InvoicePaymentStatus._Fields status;
 
+    private String failureCode;
+
+    private String failureDescription;
+
     private long amount;
 
     private long fee;
 
     private String currencyCode;
 
+    private String token;
+
+    private String sessionId;
+
+    private String bin;
+
+    private PaymentTool._Fields paymentTool;
+
     private BankCardPaymentSystem paymentSystem;
 
     private int cityId;
 
-    private int  countryId;
+    private int countryId;
 
     private String email;
 
@@ -49,7 +61,7 @@ public class Payment {
 
     private Instant changedAt;
 
-    private InvoicePayment model;
+    private byte[] context;
 
     public String getId() {
         return id;
@@ -115,6 +127,22 @@ public class Payment {
         this.status = status;
     }
 
+    public String getFailureCode() {
+        return failureCode;
+    }
+
+    public void setFailureCode(String failureCode) {
+        this.failureCode = failureCode;
+    }
+
+    public String getFailureDescription() {
+        return failureDescription;
+    }
+
+    public void setFailureDescription(String failureDescription) {
+        this.failureDescription = failureDescription;
+    }
+
     public long getAmount() {
         return amount;
     }
@@ -137,6 +165,38 @@ public class Payment {
 
     public void setCurrencyCode(String currencyCode) {
         this.currencyCode = currencyCode;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getBin() {
+        return bin;
+    }
+
+    public void setBin(String bin) {
+        this.bin = bin;
+    }
+
+    public PaymentTool._Fields getPaymentTool() {
+        return paymentTool;
+    }
+
+    public void setPaymentTool(PaymentTool._Fields paymentTool) {
+        this.paymentTool = paymentTool;
     }
 
     public BankCardPaymentSystem getPaymentSystem() {
@@ -203,12 +263,12 @@ public class Payment {
         this.changedAt = changedAt;
     }
 
-    public InvoicePayment getModel() {
-        return model;
+    public byte[] getContext() {
+        return context;
     }
 
-    public void setModel(InvoicePayment model) {
-        this.model = model;
+    public void setContext(byte[] context) {
+        this.context = context;
     }
 
     @Override
@@ -225,6 +285,10 @@ public class Payment {
                 ", amount=" + amount +
                 ", fee=" + fee +
                 ", currencyCode='" + currencyCode + '\'' +
+                ", token='" + token + '\'' +
+                ", sessionId='" + sessionId + '\'' +
+                ", bin='" + bin + '\'' +
+                ", paymentTool=" + paymentTool +
                 ", paymentSystem=" + paymentSystem +
                 ", cityId=" + cityId +
                 ", countryId=" + countryId +

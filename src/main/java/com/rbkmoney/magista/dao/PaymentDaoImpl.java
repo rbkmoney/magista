@@ -1,15 +1,10 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
-import com.rbkmoney.damsel.domain.InvoicePayment;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
+import com.rbkmoney.damsel.domain.PaymentTool;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Payment;
-import org.apache.thrift.TDeserializer;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TJSONProtocol;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -20,8 +15,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 import javax.sql.DataSource;
-import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
@@ -37,9 +30,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
 
     @Override
     public Payment findById(String paymentId, String invoiceId) throws DaoException {
-        String sql = "SELECT payment_id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, " +
-                "amount, fee, currency_code, payment_system, city_id, country_id, phone_number, email, ip, created_at," +
-                " changed_at, model from mst.payment where payment_id = :payment_id and invoice_id = :invoice_id";
+        String sql = "SELECT * FROM mst.payment WHERE payment_id = :payment_id AND invoice_id = :invoice_id";
 
         Payment payment;
         try {
@@ -62,8 +53,8 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
 
     @Override
     public void insert(Payment payment) throws DaoException {
-        String updateSql = "insert into mst.payment (payment_id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, fee, currency_code, payment_system, city_id, country_id, phone_number, email, ip, created_at, changed_at, model, data) " +
-                "values (:payment_id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :fee, :currency_code, :payment_system, :city_id, :country_id, :phone_number, :email, :ip, :created_at, :changed_at, :model, :data)";
+        String updateSql = "insert into mst.payment (payment_id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, fee, token, session_id, bin, payment_tool, currency_code, payment_system, city_id, country_id, phone_number, email, ip, created_at, changed_at, context) " +
+                "values (:payment_id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :fee, :token, :session_id, :bin, :payment_tool, :currency_code, :payment_system, :city_id, :country_id, :phone_number, :email, :ip, :created_at, :changed_at, :context)";
         execute(updateSql, createSqlParameterSource(payment));
     }
 
@@ -72,8 +63,8 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
         String updateSql = "update mst.payment set " +
                 "payment_id = :payment_id, event_id = :event_id, invoice_id = :invoice_id, merchant_id = :merchant_id, " +
                 "shop_id = :shop_id, customer_id = :customer_id, masked_pan = :masked_pan, status = :status, " +
-                "amount = :amount, fee = :fee, currency_code = :currency_code, payment_system = :payment_system, " +
-                "city_id = :city_id, country_id = :country_id, phone_number = :phone_number, email = :email, ip = :ip, created_at = :created_at, changed_at=:changed_at, model = :model, data = :data where payment_id = :payment_id and invoice_id = :invoice_id";
+                "amount = :amount, fee = :fee, token = :token, session_id = :session_id, bin = :bin, payment_tool = :payment_tool, currency_code = :currency_code, payment_system = :payment_system, " +
+                "city_id = :city_id, country_id = :country_id, phone_number = :phone_number, email = :email, ip = :ip, created_at = :created_at, changed_at=:changed_at, context = :context where payment_id = :payment_id and invoice_id = :invoice_id";
         execute(updateSql, createSqlParameterSource(payment));
     }
 
@@ -91,67 +82,62 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
     }
 
     private MapSqlParameterSource createSqlParameterSource(Payment payment) {
-        try {
-            return new MapSqlParameterSource()
-                    .addValue("payment_id", payment.getId())
-                    .addValue("event_id", payment.getEventId())
-                    .addValue("invoice_id", payment.getInvoiceId())
-                    .addValue("merchant_id", payment.getMerchantId())
-                    .addValue("shop_id", payment.getShopId())
-                    .addValue("customer_id", payment.getCustomerId())
-                    .addValue("masked_pan", payment.getMaskedPan())
-                    .addValue("status", payment.getStatus().getFieldName())
-                    .addValue("amount", payment.getAmount())
-                    .addValue("fee", payment.getFee())
-                    .addValue("currency_code", payment.getCurrencyCode())
-                    .addValue("payment_system", payment.getPaymentSystem().name())
-                    .addValue("city_id", payment.getCityId())
-                    .addValue("country_id", payment.getCountryId())
-                    .addValue("phone_number", payment.getPhoneNumber())
-                    .addValue("email", payment.getEmail())
-                    .addValue("ip", payment.getIp())
-                    .addValue("created_at", Timestamp.from(payment.getCreatedAt()))
-                    .addValue("changed_at", Timestamp.from(payment.getChangedAt()))
-                    .addValue("model", new TSerializer(new TJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()))
-                    .addValue("data", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(payment.getModel(), StandardCharsets.UTF_8.name()));
-
-        } catch (TException ex) {
-            throw new DaoException("Failed to serialize payment model", ex);
-        }
+        return new MapSqlParameterSource()
+                .addValue("payment_id", payment.getId())
+                .addValue("event_id", payment.getEventId())
+                .addValue("invoice_id", payment.getInvoiceId())
+                .addValue("merchant_id", payment.getMerchantId())
+                .addValue("shop_id", payment.getShopId())
+                .addValue("customer_id", payment.getCustomerId())
+                .addValue("masked_pan", payment.getMaskedPan())
+                .addValue("status", payment.getStatus().getFieldName())
+                .addValue("amount", payment.getAmount())
+                .addValue("fee", payment.getFee())
+                .addValue("token", payment.getToken())
+                .addValue("session_id", payment.getSessionId())
+                .addValue("bin", payment.getBin())
+                .addValue("payment_tool", payment.getPaymentTool().getFieldName())
+                .addValue("currency_code", payment.getCurrencyCode())
+                .addValue("payment_system", payment.getPaymentSystem().name())
+                .addValue("city_id", payment.getCityId())
+                .addValue("country_id", payment.getCountryId())
+                .addValue("phone_number", payment.getPhoneNumber())
+                .addValue("email", payment.getEmail())
+                .addValue("ip", payment.getIp())
+                .addValue("created_at", Timestamp.from(payment.getCreatedAt()))
+                .addValue("changed_at", Timestamp.from(payment.getChangedAt()))
+                .addValue("context", payment.getContext());
     }
 
     public static RowMapper<Payment> getRowMapper() {
         return (rs, i) -> {
-            try {
-                Payment payment = new Payment();
-                payment.setId(rs.getString("payment_id"));
-                payment.setEventId(rs.getLong("event_id"));
-                payment.setInvoiceId(rs.getString("invoice_id"));
-                payment.setMerchantId(rs.getString("merchant_id"));
-                payment.setShopId(rs.getInt("shop_id"));
-                payment.setCustomerId(rs.getString("customer_id"));
-                payment.setMaskedPan(rs.getString("masked_pan"));
-                payment.setStatus(InvoicePaymentStatus._Fields.findByName(rs.getString("status")));
-                payment.setAmount(rs.getLong("amount"));
-                payment.setFee(rs.getLong("fee"));
-                payment.setCurrencyCode(rs.getString("currency_code"));
-                payment.setPaymentSystem(BankCardPaymentSystem.valueOf(rs.getString("payment_system")));
-                payment.setCityId(rs.getInt("city_id"));
-                payment.setCountryId(rs.getInt("country_id"));
-                payment.setPhoneNumber(rs.getString("phone_number"));
-                payment.setEmail(rs.getString("email"));
-                payment.setIp(rs.getString("ip"));
-                payment.setCreatedAt(rs.getTimestamp("created_at").toInstant());
-                payment.setChangedAt(rs.getTimestamp("changed_at").toInstant());
-                InvoicePayment model = new InvoicePayment();
-                new TDeserializer(new TJSONProtocol.Factory()).deserialize(model, rs.getBytes("model"));
+            Payment payment = new Payment();
+            payment.setId(rs.getString("payment_id"));
+            payment.setEventId(rs.getLong("event_id"));
+            payment.setInvoiceId(rs.getString("invoice_id"));
+            payment.setMerchantId(rs.getString("merchant_id"));
+            payment.setShopId(rs.getInt("shop_id"));
+            payment.setCustomerId(rs.getString("customer_id"));
+            payment.setMaskedPan(rs.getString("masked_pan"));
+            payment.setStatus(InvoicePaymentStatus._Fields.findByName(rs.getString("status")));
+            payment.setAmount(rs.getLong("amount"));
+            payment.setFee(rs.getLong("fee"));
+            payment.setToken(rs.getString("token"));
+            payment.setSessionId(rs.getString("session_id"));
+            payment.setBin(rs.getString("bin"));
+            payment.setPaymentTool(PaymentTool._Fields.findByName(rs.getString("payment_tool")));
+            payment.setCurrencyCode(rs.getString("currency_code"));
+            payment.setPaymentSystem(BankCardPaymentSystem.valueOf(rs.getString("payment_system")));
+            payment.setCityId(rs.getInt("city_id"));
+            payment.setCountryId(rs.getInt("country_id"));
+            payment.setPhoneNumber(rs.getString("phone_number"));
+            payment.setEmail(rs.getString("email"));
+            payment.setIp(rs.getString("ip"));
+            payment.setCreatedAt(rs.getTimestamp("created_at").toInstant());
+            payment.setChangedAt(rs.getTimestamp("changed_at").toInstant());
+            payment.setContext(rs.getBytes("context"));
 
-                payment.setModel(model);
-
-                return payment;
-            } catch (TException ex) {
-                throw new SQLException("Failed to deserialize payment model", ex);
-            }
+            return payment;
         };
     }
 }

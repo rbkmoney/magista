@@ -3,11 +3,6 @@ package com.rbkmoney.magista.dao;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Invoice;
-import org.apache.thrift.TDeserializer;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TJSONProtocol;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -18,9 +13,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 import javax.sql.DataSource;
-import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 
 /**
  * Created by tolkonepiu on 23.08.16.
@@ -35,8 +29,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
 
     @Override
     public Invoice findById(String id) throws DaoException {
-        String sql = "SELECT id, event_id, merchant_id, shop_id, status, amount, currency_code, created_at, changed_at, model " +
-                "from mst.invoice where id = :id";
+        String sql = "select * from mst.invoice where id = :id";
 
         Invoice invoice;
 
@@ -61,8 +54,8 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
     @Override
     public void insert(Invoice invoice) throws DaoException {
 
-        String updateSql = "insert into mst.invoice (id, event_id, merchant_id, shop_id, status, amount, currency_code, created_at, changed_at, model, data) " +
-                "values (:id, :event_id, :merchant_id, :shop_id, :status, :amount, :currency_code, :created_at, :changed_at, :model, :data)";
+        String updateSql = "insert into mst.invoice (id, event_id, merchant_id, shop_id, status, amount, product, description, currency_code, created_at, due, changed_at, context) " +
+                "values (:id, :event_id, :merchant_id, :shop_id, :status, :amount, :product, :description, :currency_code, :created_at, :due, :changed_at, :context)";
 
         execute(updateSql, createSqlParameterSource(invoice));
     }
@@ -71,8 +64,8 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
     public void update(Invoice invoice) throws DaoException {
         String updateSql = "update mst.invoice set " +
                 "id = :id, event_id = :event_id, merchant_id = :merchant_id, shop_id = :shop_id," +
-                " status = :status, amount = :amount, currency_code = :currency_code," +
-                " created_at = :created_at, changed_at = :changed_at, model = :model, data = :data where id = :id";
+                " status = :status, amount = :amount, product = :product, description = :description, currency_code = :currency_code," +
+                " created_at = :created_at, due = :due, changed_at = :changed_at, context = :context where id = :id";
 
         execute(updateSql, createSqlParameterSource(invoice));
     }
@@ -91,45 +84,40 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
     }
 
     private MapSqlParameterSource createSqlParameterSource(Invoice invoice) {
-        try {
-            return new MapSqlParameterSource()
-                    .addValue("id", invoice.getId())
-                    .addValue("event_id", invoice.getEventId())
-                    .addValue("merchant_id", invoice.getMerchantId())
-                    .addValue("shop_id", invoice.getShopId())
-                    .addValue("status", invoice.getStatus().getFieldName())
-                    .addValue("amount", invoice.getAmount())
-                    .addValue("currency_code", invoice.getCurrencyCode())
-                    .addValue("created_at", Timestamp.from(invoice.getCreatedAt()))
-                    .addValue("changed_at", Timestamp.from(invoice.getChangedAt()))
-                    .addValue("model", new TSerializer(new TJSONProtocol.Factory()).toString(invoice.getModel(), StandardCharsets.UTF_8.name()))
-                    .addValue("data", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(invoice.getModel(), StandardCharsets.UTF_8.name()));
-        } catch (TException ex) {
-            throw new DaoException("Failed to serialize invoice model", ex);
-        }
+        return new MapSqlParameterSource()
+                .addValue("id", invoice.getId())
+                .addValue("event_id", invoice.getEventId())
+                .addValue("merchant_id", invoice.getMerchantId())
+                .addValue("shop_id", invoice.getShopId())
+                .addValue("status", invoice.getStatus().getFieldName())
+                .addValue("amount", invoice.getAmount())
+                .addValue("product", invoice.getProduct())
+                .addValue("description", invoice.getDescription())
+                .addValue("currency_code", invoice.getCurrencyCode())
+                .addValue("created_at", Timestamp.from(invoice.getCreatedAt()))
+                .addValue("due", Timestamp.from(invoice.getDue()))
+                .addValue("changed_at", Timestamp.from(invoice.getChangedAt()))
+                .addValue("context", invoice.getContext());
     }
 
     public static RowMapper<Invoice> getRowMapper() {
         return (rs, i) -> {
-            try {
-                Invoice invoice = new Invoice();
-                invoice.setId(rs.getString("id"));
-                invoice.setEventId(rs.getLong("event_id"));
-                invoice.setMerchantId(rs.getString("merchant_id"));
-                invoice.setShopId(rs.getInt("shop_id"));
-                invoice.setStatus(InvoiceStatus._Fields.findByName(rs.getString("status")));
-                invoice.setAmount(rs.getLong("amount"));
-                invoice.setCurrencyCode(rs.getString("currency_code"));
-                invoice.setCreatedAt(rs.getTimestamp("created_at").toInstant());
-                invoice.setChangedAt(rs.getTimestamp("changed_at").toInstant());
-                com.rbkmoney.damsel.domain.Invoice model = new com.rbkmoney.damsel.domain.Invoice();
-                new TDeserializer(new TJSONProtocol.Factory()).deserialize(model, rs.getBytes("model"));
-                invoice.setModel(model);
+            Invoice invoice = new Invoice();
+            invoice.setId(rs.getString("id"));
+            invoice.setEventId(rs.getLong("event_id"));
+            invoice.setMerchantId(rs.getString("merchant_id"));
+            invoice.setShopId(rs.getInt("shop_id"));
+            invoice.setStatus(InvoiceStatus._Fields.findByName(rs.getString("status")));
+            invoice.setAmount(rs.getLong("amount"));
+            invoice.setProduct(rs.getString("product"));
+            invoice.setDescription(rs.getString("description"));
+            invoice.setCurrencyCode(rs.getString("currency_code"));
+            invoice.setCreatedAt(rs.getTimestamp("created_at").toInstant());
+            invoice.setDue(rs.getTimestamp("due").toInstant());
+            invoice.setChangedAt(rs.getTimestamp("changed_at").toInstant());
+            invoice.setContext(rs.getBytes("context"));
 
-                return invoice;
-            } catch (TException ex) {
-                throw new SQLException("Failed to deserialize invoice model", ex);
-            }
+            return invoice;
         };
     }
 }

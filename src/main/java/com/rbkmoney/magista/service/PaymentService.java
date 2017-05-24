@@ -54,7 +54,6 @@ public class PaymentService {
 
             payment.setStatus(paymentStatusChange.getStatus().getSetField());
             payment.setChangedAt(paymentStatusChange.getChangedAt());
-            payment.getModel().setStatus(paymentStatusChange.getStatus());
 
             paymentDao.update(payment);
             log.info("Payment status have been changed, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'",

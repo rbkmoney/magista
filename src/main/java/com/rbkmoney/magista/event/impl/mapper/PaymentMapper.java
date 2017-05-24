@@ -31,6 +31,8 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
 
         Payer payer = invoicePayment.getPayer();
 
+        payment.setSessionId(payer.getSessionId());
+
         ContactInfo contactInfo = payer.getContactInfo();
         payment.setEmail(contactInfo.getEmail());
         payment.setPhoneNumber(contactInfo.getPhoneNumber());
@@ -40,10 +42,22 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
         payment.setIp(clientInfo.getIpAddress());
 
         PaymentTool paymentTool = payer.getPaymentTool();
-        payment.setMaskedPan(paymentTool.getBankCard().getMaskedPan());
-        payment.setPaymentSystem(paymentTool.getBankCard().getPaymentSystem());
+        payment.setPaymentTool(paymentTool.getSetField());
+        if (paymentTool.isSetBankCard()) {
+            BankCard bankCard = paymentTool.getBankCard();
+            payment.setMaskedPan(bankCard.getMaskedPan());
+            payment.setPaymentSystem(bankCard.getPaymentSystem());
+            payment.setBin(bankCard.getBin());
+            payment.setToken(bankCard.getToken());
+        }
 
-        payment.setStatus(invoicePayment.getStatus().getSetField());
+        InvoicePaymentStatus status = invoicePayment.getStatus();
+        payment.setStatus(status.getSetField());
+        if (status.isSetFailed()) {
+            OperationFailure operationFailure = status.getFailed().getFailure();
+            payment.setFailureCode(operationFailure.getCode());
+            payment.setFailureDescription(operationFailure.getDescription());
+        }
 
         Cash cost = invoicePayment.getCost();
         payment.setAmount(cost.getAmount());
@@ -53,7 +67,9 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
         payment.setCreatedAt(createdAt);
         payment.setChangedAt(createdAt);
 
-        payment.setModel(invoicePayment);
+        if (invoicePayment.isSetContext()) {
+            payment.setContext(invoicePayment.getContext().getData());
+        }
 
         value.setPayment(payment);
 
