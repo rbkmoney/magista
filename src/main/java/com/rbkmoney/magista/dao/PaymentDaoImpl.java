@@ -53,8 +53,8 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
 
     @Override
     public void insert(Payment payment) throws DaoException {
-        String updateSql = "insert into mst.payment (payment_id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, amount, fee, token, session_id, bin, payment_tool, currency_code, payment_system, city_id, country_id, phone_number, email, ip, created_at, changed_at, context) " +
-                "values (:payment_id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :amount, :fee, :token, :session_id, :bin, :payment_tool, :currency_code, :payment_system, :city_id, :country_id, :phone_number, :email, :ip, :created_at, :changed_at, :context)";
+        String updateSql = "insert into mst.payment (payment_id, event_id, invoice_id, merchant_id, shop_id, customer_id, masked_pan, status, failure_code, failure_description, amount, fee, token, session_id, bin, payment_tool, currency_code, payment_system, city_id, country_id, phone_number, email, ip, created_at, changed_at, context) " +
+                "values (:payment_id, :event_id, :invoice_id, :merchant_id, :shop_id, :customer_id, :masked_pan, :status, :failure_code, :failure_description, :amount, :fee, :token, :session_id, :bin, :payment_tool, :currency_code, :payment_system, :city_id, :country_id, :phone_number, :email, :ip, :created_at, :changed_at, :context)";
         execute(updateSql, createSqlParameterSource(payment));
     }
 
@@ -62,7 +62,7 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
     public void update(Payment payment) throws DaoException {
         String updateSql = "update mst.payment set " +
                 "payment_id = :payment_id, event_id = :event_id, invoice_id = :invoice_id, merchant_id = :merchant_id, " +
-                "shop_id = :shop_id, customer_id = :customer_id, masked_pan = :masked_pan, status = :status, " +
+                "shop_id = :shop_id, customer_id = :customer_id, masked_pan = :masked_pan, status = :status, failure_code = :failure_code, failure_description = :failure_description, " +
                 "amount = :amount, fee = :fee, token = :token, session_id = :session_id, bin = :bin, payment_tool = :payment_tool, currency_code = :currency_code, payment_system = :payment_system, " +
                 "city_id = :city_id, country_id = :country_id, phone_number = :phone_number, email = :email, ip = :ip, created_at = :created_at, changed_at=:changed_at, context = :context where payment_id = :payment_id and invoice_id = :invoice_id";
         execute(updateSql, createSqlParameterSource(payment));
@@ -91,6 +91,8 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
                 .addValue("customer_id", payment.getCustomerId())
                 .addValue("masked_pan", payment.getMaskedPan())
                 .addValue("status", payment.getStatus().getFieldName())
+                .addValue("failure_code", payment.getFailureCode())
+                .addValue("failure_description", payment.getFailureDescription())
                 .addValue("amount", payment.getAmount())
                 .addValue("fee", payment.getFee())
                 .addValue("token", payment.getToken())
@@ -120,6 +122,8 @@ public class PaymentDaoImpl extends NamedParameterJdbcDaoSupport implements Paym
             payment.setCustomerId(rs.getString("customer_id"));
             payment.setMaskedPan(rs.getString("masked_pan"));
             payment.setStatus(InvoicePaymentStatus._Fields.findByName(rs.getString("status")));
+            payment.setFailureCode(rs.getString("failure_code"));
+            payment.setFailureDescription(rs.getString("failure_description"));
             payment.setAmount(rs.getLong("amount"));
             payment.setFee(rs.getLong("fee"));
             payment.setToken(rs.getString("token"));

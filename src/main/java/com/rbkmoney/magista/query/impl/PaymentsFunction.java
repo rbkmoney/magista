@@ -15,6 +15,7 @@ import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.thrift.filter.converter.TemporalConverter;
+import org.apache.http.entity.ContentType;
 
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
@@ -99,7 +100,7 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
         statPayment.setSessionId(payment.getSessionId());
 
         Content content = new Content();
-        content.setType("application/json");
+        content.setType(ContentType.APPLICATION_JSON.getMimeType());
         content.setData(payment.getContext());
         statPayment.setContext(content);
 

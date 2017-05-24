@@ -1,13 +1,7 @@
 package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.base.Content;
-import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.merch_stat.*;
-import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
-import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
-import com.rbkmoney.damsel.merch_stat.InvoicePaid;
-import com.rbkmoney.damsel.merch_stat.InvoiceStatus;
-import com.rbkmoney.damsel.merch_stat.InvoiceUnpaid;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.model.Invoice;
@@ -19,6 +13,7 @@ import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.thrift.filter.converter.TemporalConverter;
+import org.apache.http.entity.ContentType;
 
 import java.time.Instant;
 import java.util.*;
@@ -84,7 +79,7 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
         statInvoice.setCurrencySymbolicCode(invoice.getCurrencyCode());
 
         Content content = new Content();
-        content.setType("application/json");
+        content.setType(ContentType.APPLICATION_JSON.getMimeType());
         content.setData(invoice.getContext());
         statInvoice.setContext(content);
 

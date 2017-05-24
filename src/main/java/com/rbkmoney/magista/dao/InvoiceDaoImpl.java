@@ -14,7 +14,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 import javax.sql.DataSource;
 import java.sql.Timestamp;
-import java.sql.Types;
 
 /**
  * Created by tolkonepiu on 23.08.16.
@@ -29,7 +28,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
 
     @Override
     public Invoice findById(String id) throws DaoException {
-        String sql = "select * from mst.invoice where id = :id";
+        String sql = "SELECT * FROM mst.invoice WHERE id = :id";
 
         Invoice invoice;
 
@@ -54,8 +53,8 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
     @Override
     public void insert(Invoice invoice) throws DaoException {
 
-        String updateSql = "insert into mst.invoice (id, event_id, merchant_id, shop_id, status, amount, product, description, currency_code, created_at, due, changed_at, context) " +
-                "values (:id, :event_id, :merchant_id, :shop_id, :status, :amount, :product, :description, :currency_code, :created_at, :due, :changed_at, :context)";
+        String updateSql = "insert into mst.invoice (id, event_id, merchant_id, shop_id, status, status_details, amount, product, description, currency_code, created_at, due, changed_at, context) " +
+                "values (:id, :event_id, :merchant_id, :shop_id, :status, :status_details, :amount, :product, :description, :currency_code, :created_at, :due, :changed_at, :context)";
 
         execute(updateSql, createSqlParameterSource(invoice));
     }
@@ -64,7 +63,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
     public void update(Invoice invoice) throws DaoException {
         String updateSql = "update mst.invoice set " +
                 "id = :id, event_id = :event_id, merchant_id = :merchant_id, shop_id = :shop_id," +
-                " status = :status, amount = :amount, product = :product, description = :description, currency_code = :currency_code," +
+                " status = :status, status_details = :status_details, amount = :amount, product = :product, description = :description, currency_code = :currency_code," +
                 " created_at = :created_at, due = :due, changed_at = :changed_at, context = :context where id = :id";
 
         execute(updateSql, createSqlParameterSource(invoice));
@@ -90,6 +89,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
                 .addValue("merchant_id", invoice.getMerchantId())
                 .addValue("shop_id", invoice.getShopId())
                 .addValue("status", invoice.getStatus().getFieldName())
+                .addValue("status_details", invoice.getStatusDetails())
                 .addValue("amount", invoice.getAmount())
                 .addValue("product", invoice.getProduct())
                 .addValue("description", invoice.getDescription())
@@ -108,6 +108,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
             invoice.setMerchantId(rs.getString("merchant_id"));
             invoice.setShopId(rs.getInt("shop_id"));
             invoice.setStatus(InvoiceStatus._Fields.findByName(rs.getString("status")));
+            invoice.setStatusDetails(rs.getString("status_details"));
             invoice.setAmount(rs.getLong("amount"));
             invoice.setProduct(rs.getString("product"));
             invoice.setDescription(rs.getString("description"));
