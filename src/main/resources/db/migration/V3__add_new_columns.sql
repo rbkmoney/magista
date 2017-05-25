@@ -11,7 +11,7 @@ ALTER TABLE mst.invoice DROP COLUMN model;
 ALTER TABLE mst.payment ADD COLUMN token character varying not null;
 ALTER TABLE mst.payment ADD COLUMN session_id character varying not null;
 ALTER TABLE mst.payment ADD COLUMN bin character varying not null;
-ALTER TABLE mst.payment ADD COLUMN payment_tool character varying not null DEFAULT "bank_card";
+ALTER TABLE mst.payment ADD COLUMN payment_tool character varying not null default 'bank_card';
 ALTER TABLE mst.payment ADD COLUMN failure_code character varying;
 ALTER TABLE mst.payment ADD COLUMN failure_description character varying;
 ALTER TABLE mst.payment ADD COLUMN context BYTEA;
