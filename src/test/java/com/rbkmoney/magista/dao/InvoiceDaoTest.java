@@ -27,6 +27,8 @@ public class InvoiceDaoTest extends AbstractIntegrationTest {
 
         invoice.setStatus(InvoiceStatus._Fields.PAID);
 
+        invoiceDao.update(invoice);
+
         assertEquals(invoice, invoiceDao.findById(invoice.getId()));
     }
 }
