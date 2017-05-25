@@ -78,10 +78,13 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
         statInvoice.setAmount(invoice.getAmount());
         statInvoice.setCurrencySymbolicCode(invoice.getCurrencyCode());
 
-        Content content = new Content();
-        content.setType(ContentType.APPLICATION_JSON.getMimeType());
-        content.setData(invoice.getContext());
-        statInvoice.setContext(content);
+        if (invoice.getContext() != null) {
+            Content content = new Content();
+            //TODO we know about content type in this, its always json
+            content.setType(ContentType.APPLICATION_JSON.getMimeType());
+            content.setData(invoice.getContext());
+            statInvoice.setContext(content);
+        }
 
         return statInvoice;
     }

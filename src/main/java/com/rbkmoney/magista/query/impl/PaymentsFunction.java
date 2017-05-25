@@ -99,10 +99,13 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
         statPayment.setEmail(payment.getEmail());
         statPayment.setSessionId(payment.getSessionId());
 
-        Content content = new Content();
-        content.setType(ContentType.APPLICATION_JSON.getMimeType());
-        content.setData(payment.getContext());
-        statPayment.setContext(content);
+        if (payment.getContext() != null) {
+            Content content = new Content();
+            //TODO we know about content type in this, its always json
+            content.setType(ContentType.APPLICATION_JSON.getMimeType());
+            content.setData(payment.getContext());
+            statPayment.setContext(content);
+        }
 
 
         LocationInfo locationInfo = new LocationInfo(payment.getCityId(), payment.getCountryId());
