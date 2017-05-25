@@ -1,9 +1,9 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.damsel.merch_stat.StatInvoice;
-import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.damsel.base.Content;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.magista.exception.DaoException;
+import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
@@ -12,6 +12,8 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.thrift.filter.converter.TemporalConverter;
+import org.apache.http.entity.ContentType;
 
 import java.time.Instant;
 import java.util.*;
@@ -53,11 +55,55 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
         return new BaseQueryResult<>(
                 () -> invoicesResult.getDataStream(),
                 () -> {
-                    StatResponseData statResponseData = StatResponseData.invoices(invoicesResult.getDataStream().map(invoice -> new StatInvoice(invoice.getModel())).collect(Collectors.toList()));
+                    StatResponseData statResponseData = StatResponseData.invoices(invoicesResult.getDataStream().map(invoice -> toStatInvoice(invoice)).collect(Collectors.toList()));
                     StatResponse statResponse = new StatResponse(statResponseData);
                     statResponse.setTotalCount(countResult.getCollectedStream());
                     return statResponse;
                 });
+    }
+
+    private StatInvoice toStatInvoice(Invoice invoice) {
+        StatInvoice statInvoice = new StatInvoice();
+        statInvoice.setId(invoice.getId());
+        statInvoice.setOwnerId(invoice.getMerchantId());
+        statInvoice.setShopId(invoice.getShopId());
+        statInvoice.setCreatedAt(TemporalConverter.temporalToString(invoice.getCreatedAt()));
+
+        statInvoice.setStatus(toStatInvoiceStatus(invoice.getStatus(), invoice.getStatusDetails()));
+
+        statInvoice.setProduct(invoice.getProduct());
+        statInvoice.setDescription(invoice.getDescription());
+
+        statInvoice.setDue(TemporalConverter.temporalToString(invoice.getDue()));
+        statInvoice.setAmount(invoice.getAmount());
+        statInvoice.setCurrencySymbolicCode(invoice.getCurrencyCode());
+
+        if (invoice.getContext() != null) {
+            Content content = new Content();
+            //TODO we know about content type in this, its always json
+            content.setType(ContentType.APPLICATION_JSON.getMimeType());
+            content.setData(invoice.getContext());
+            statInvoice.setContext(content);
+        }
+
+        return statInvoice;
+    }
+
+    private InvoiceStatus toStatInvoiceStatus(com.rbkmoney.damsel.domain.InvoiceStatus._Fields status, String statusDetails) throws NotFoundException {
+        InvoiceStatus._Fields invoiceStatusField = InvoiceStatus._Fields.
+                findByName(status.getFieldName());
+        switch (invoiceStatusField) {
+            case UNPAID:
+                return InvoiceStatus.unpaid(new InvoiceUnpaid());
+            case PAID:
+                return InvoiceStatus.paid(new InvoicePaid());
+            case CANCELLED:
+                return InvoiceStatus.cancelled(new InvoiceCancelled(statusDetails));
+            case FULFILLED:
+                return InvoiceStatus.fulfilled(new InvoiceFulfilled(statusDetails));
+            default:
+                throw new NotFoundException(String.format("Status '%s' not found", status.getFieldName()));
+        }
     }
 
 

@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.service;
 
+import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.magista.dao.InvoiceDao;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
@@ -35,9 +36,15 @@ public class InvoiceService {
                 throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId()));
             }
 
+            InvoiceStatus status = invoiceStatusChange.getStatus();
             invoice.setStatus(invoiceStatusChange.getStatus().getSetField());
+            invoice.setStatus(status.getSetField());
+            if (status.isSetCancelled()) {
+                invoice.setStatusDetails(status.getCancelled().getDetails());
+            } else if (status.isSetFulfilled()) {
+                invoice.setStatusDetails(status.getFulfilled().getDetails());
+            }
             invoice.setChangedAt(invoiceStatusChange.getChangedAt());
-            invoice.getModel().setStatus(invoiceStatusChange.getStatus());
 
             invoiceDao.update(invoice);
             log.info("Invoice status have been changed, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());

@@ -88,7 +88,7 @@ public class InvoiceAndPaymentServiceTest {
             eventService.processEvent(stockEvent);
         }
 
-        while(!eventService.isEventQueueEmpty());
+        while (!eventService.isEventQueueEmpty()) ;
 
         assertEquals(JdbcTestUtils.countRowsInTable(jdbcTemplate, "mst.invoice"), 8);
         assertEquals(JdbcTestUtils.countRowsInTable(jdbcTemplate, "mst.payment"), 7);
