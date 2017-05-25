@@ -1,9 +1,7 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
-import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.magista.AbstractIntegrationTest;
-import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,8 @@ public class PaymentDaoTest extends AbstractIntegrationTest {
         paymentDao.insert(payment);
 
         payment.setStatus(InvoicePaymentStatus._Fields.CAPTURED);
+
+        paymentDao.update(payment);
 
         assertEquals(payment, paymentDao.findById(payment.getId(), payment.getInvoiceId()));
     }
