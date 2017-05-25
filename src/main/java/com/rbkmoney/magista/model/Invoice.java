@@ -3,6 +3,7 @@ package com.rbkmoney.magista.model;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
 
 import java.time.Instant;
+import java.util.Arrays;
 
 /**
  * Created by tolkonepiu on 04.08.16.
@@ -147,6 +148,50 @@ public class Invoice {
 
     public void setContext(byte[] context) {
         this.context = context;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Invoice invoice = (Invoice) o;
+
+        if (eventId != invoice.eventId) return false;
+        if (shopId != invoice.shopId) return false;
+        if (amount != invoice.amount) return false;
+        if (id != null ? !id.equals(invoice.id) : invoice.id != null) return false;
+        if (merchantId != null ? !merchantId.equals(invoice.merchantId) : invoice.merchantId != null) return false;
+        if (status != invoice.status) return false;
+        if (statusDetails != null ? !statusDetails.equals(invoice.statusDetails) : invoice.statusDetails != null)
+            return false;
+        if (product != null ? !product.equals(invoice.product) : invoice.product != null) return false;
+        if (description != null ? !description.equals(invoice.description) : invoice.description != null) return false;
+        if (currencyCode != null ? !currencyCode.equals(invoice.currencyCode) : invoice.currencyCode != null)
+            return false;
+        if (createdAt != null ? !createdAt.equals(invoice.createdAt) : invoice.createdAt != null) return false;
+        if (due != null ? !due.equals(invoice.due) : invoice.due != null) return false;
+        if (changedAt != null ? !changedAt.equals(invoice.changedAt) : invoice.changedAt != null) return false;
+        return Arrays.equals(context, invoice.context);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (int) (eventId ^ (eventId >>> 32));
+        result = 31 * result + (merchantId != null ? merchantId.hashCode() : 0);
+        result = 31 * result + shopId;
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (statusDetails != null ? statusDetails.hashCode() : 0);
+        result = 31 * result + (product != null ? product.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (int) (amount ^ (amount >>> 32));
+        result = 31 * result + (currencyCode != null ? currencyCode.hashCode() : 0);
+        result = 31 * result + (createdAt != null ? createdAt.hashCode() : 0);
+        result = 31 * result + (due != null ? due.hashCode() : 0);
+        result = 31 * result + (changedAt != null ? changedAt.hashCode() : 0);
+        result = 31 * result + Arrays.hashCode(context);
+        return result;
     }
 
     @Override
