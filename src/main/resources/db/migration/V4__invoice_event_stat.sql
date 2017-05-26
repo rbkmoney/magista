@@ -35,7 +35,7 @@ CREATE TABLE mst.invoice_event_stat (
   invoice_currency_code              CHARACTER VARYING           NOT NULL,
   invoice_due                        TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   invoice_created_at                 TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  invoice_context                    BYTEA,
+  invoice_context                    CHARACTER VARYING,
   payment_id                         CHARACTER VARYING,
   payment_status                     INVOICE_PAYMENT_STATUS,
   payment_status_failure_code        CHARACTER VARYING,
@@ -55,6 +55,6 @@ CREATE TABLE mst.invoice_event_stat (
   payment_email                      CHARACTER VARYING,
   payment_fingerprint                CHARACTER VARYING,
   payment_created_at                 TIMESTAMP WITHOUT TIME ZONE,
-  payment_context                    BYTEA,
+  payment_context                    CHARACTER VARYING,
   CONSTRAINT invoice_event_pkey PRIMARY KEY (event_id)
 );

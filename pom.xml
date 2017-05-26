@@ -22,10 +22,12 @@
         <server.port>8022</server.port>
         <dockerfile.base.service.tag>f26fcc19d1941ab74f1c72dd8a408be17a769333</dockerfile.base.service.tag>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <db.url>jdbc:postgresql://localhost:35432/magista</db.url>
+        <db.name>magista</db.name>
+        <db.url>jdbc:postgresql://localhost:5432/${db.name}</db.url>
         <db.user>postgres</db.user>
         <db.password>postgres</db.password>
         <db.schema>mst</db.schema>
+        <postgresql.jdbc.version>9.4.1212</postgresql.jdbc.version>
     </properties>
 
     <dependencies>
@@ -62,7 +64,7 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>3.8.4</version>
+            <version>${jooq.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -72,7 +74,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.4-1206-jdbc42</version>
+            <version>42.1.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -88,7 +90,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>dbinit</artifactId>
-            <version>1.0.7</version>
+            <version>1.0.9</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -194,6 +196,113 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.21.0</version>
+                <executions>
+                    <execution>
+                        <id>postgres-start</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>postgres-stop</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <images>
+                        <image>
+                            <name>postgres:latest</name>
+                            <run>
+                                <env>
+                                    <POSTGRES_DB>${db.name}</POSTGRES_DB>
+                                    <POSTGRES_USER>${db.user}</POSTGRES_USER>
+                                    <POSTGRES_PASSWORD>${db.password}</POSTGRES_PASSWORD>
+                                </env>
+                                <ports>
+                                    <port>5432:5432</port>
+                                </ports>
+                                <wait>
+                                    <log>ready for start up</log>
+                                    <time>20000</time>
+                                </wait>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>${flyway.version}</version>
+                <executions>
+                    <execution>
+                        <id>flyway-migrate</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>migrate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <url>${db.url}</url>
+                    <user>${db.user}</user>
+                    <password>${db.password}</password>
+                    <schemas>
+                        <schema>${db.schema}</schema>
+                    </schemas>
+                    <locations>
+                        <location>filesystem:${project.basedir}/src/main/resources/db/migration</location>
+                    </locations>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>${jooq.version}</version>
+                <executions>
+                    <execution>
+                        <id>jooq-generate</id>
+                        <inherited>flyway-migrate</inherited>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jdbc>
+                        <driver>org.postgresql.Driver</driver>
+                        <url>${db.url}</url>
+                        <user>${db.user}</user>
+                        <password>${db.password}</password>
+                    </jdbc>
+                    <generator>
+                        <generate>
+                            <javaTimeTypes>true</javaTimeTypes>
+                            <pojos>true</pojos>
+                            <pojosEqualsAndHashCode>true</pojosEqualsAndHashCode>
+                            <pojosToString>true</pojosToString>
+                        </generate>
+                        <database>
+                            <name>org.jooq.util.postgres.PostgresDatabase</name>
+                            <includes>.*</includes>
+                            <excludes>schema_version</excludes>
+                            <inputSchema>${db.schema}</inputSchema>
+                        </database>
+                        <target>
+                            <packageName>com.rbkmoney.magista.domain</packageName>
+                        </target>
+                    </generator>
+                </configuration>
             </plugin>
         </plugins>
     </build>

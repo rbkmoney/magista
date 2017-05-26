@@ -1,7 +1,10 @@
 package com.rbkmoney.magista.config;
 
 import com.rbkmoney.magista.dao.*;
+import com.rbkmoney.magista.domain.Mst;
+import org.jooq.DSLContext;
 import org.jooq.Schema;
+import org.jooq.impl.DefaultDSLContext;
 import org.jooq.impl.SchemaImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,8 +49,14 @@ public class DaoConfig {
     }
 
     @Bean
+    @DependsOn("dbInitializer")
+    public InvoiceEventDao invoiceEventDao(DataSource ds) {
+        return new InvoiceEventDaoImpl(ds);
+    }
+
+    @Bean
     public Schema dbSchema() {
-        return new SchemaImpl("mst");
+        return Mst.MST;
     }
 
 }
