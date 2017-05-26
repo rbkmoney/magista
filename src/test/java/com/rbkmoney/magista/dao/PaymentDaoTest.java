@@ -23,11 +23,15 @@ public class PaymentDaoTest extends AbstractIntegrationTest {
     public void insertUpdateAndFindPaymentTest() throws IOException {
         Payment payment = random(Payment.class);
 
+        payment.setEmail("\u0000\u0000\u0000");
+
         paymentDao.insert(payment);
 
         payment.setStatus(InvoicePaymentStatus._Fields.CAPTURED);
 
         paymentDao.update(payment);
+
+        payment.getEmail().replace("\u0000", "\\u0000");
 
         assertEquals(payment, paymentDao.findById(payment.getId(), payment.getInvoiceId()));
     }
