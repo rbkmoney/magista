@@ -31,7 +31,7 @@ public class InvoiceDaoTest extends AbstractIntegrationTest {
 
         invoiceDao.update(invoice);
 
-        invoice.getDescription().replace("\u0000", "\\u0000");
+        invoice.setDescription(invoice.getDescription().replace("\u0000", "\\u0000"));
 
         assertEquals(invoice, invoiceDao.findById(invoice.getId()));
     }

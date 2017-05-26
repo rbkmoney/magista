@@ -31,7 +31,7 @@ public class PaymentDaoTest extends AbstractIntegrationTest {
 
         paymentDao.update(payment);
 
-        payment.getEmail().replace("\u0000", "\\u0000");
+        payment.setEmail(payment.getEmail().replace("\u0000", "\\u0000"));
 
         assertEquals(payment, paymentDao.findById(payment.getId(), payment.getInvoiceId()));
     }
