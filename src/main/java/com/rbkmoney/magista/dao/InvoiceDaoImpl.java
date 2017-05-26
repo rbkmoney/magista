@@ -3,6 +3,7 @@ package com.rbkmoney.magista.dao;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Invoice;
+import com.rbkmoney.magista.util.StorageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -83,7 +84,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
     }
 
     private MapSqlParameterSource createSqlParameterSource(Invoice invoice) {
-        return new MapSqlParameterSource()
+        MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource()
                 .addValue("id", invoice.getId())
                 .addValue("event_id", invoice.getEventId())
                 .addValue("merchant_id", invoice.getMerchantId())
@@ -98,6 +99,7 @@ public class InvoiceDaoImpl extends NamedParameterJdbcDaoSupport implements Invo
                 .addValue("due", Timestamp.from(invoice.getDue()))
                 .addValue("changed_at", Timestamp.from(invoice.getChangedAt()))
                 .addValue("context", invoice.getContext());
+        return StorageUtil.validateParams(sqlParameterSource);
     }
 
     public static RowMapper<Invoice> getRowMapper() {

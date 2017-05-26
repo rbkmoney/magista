@@ -23,11 +23,15 @@ public class InvoiceDaoTest extends AbstractIntegrationTest {
     public void insertUpdateAndFindInvoiceTest() throws IOException {
         Invoice invoice = random(Invoice.class);
 
+        invoice.setDescription("\u0000\u0000\u0014stman description");
+
         invoiceDao.insert(invoice);
 
         invoice.setStatus(InvoiceStatus._Fields.PAID);
 
         invoiceDao.update(invoice);
+
+        invoice.setDescription(invoice.getDescription().replace("\u0000", "\\u0000"));
 
         assertEquals(invoice, invoiceDao.findById(invoice.getId()));
     }
