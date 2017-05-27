@@ -44,12 +44,6 @@ public class DaoConfig {
 
     @Bean
     @DependsOn("dbInitializer")
-    public EventDao eventDao(DataSource ds) {
-        return new EventDaoImpl(ds);
-    }
-
-    @Bean
-    @DependsOn("dbInitializer")
     public InvoiceEventDao invoiceEventDao(DataSource ds) {
         return new InvoiceEventDaoImpl(ds);
     }

@@ -1,19 +1,19 @@
-CREATE TYPE INVOICE_EVENT_CATEGORY AS ENUM ('INVOICE', 'PAYMENT');
+CREATE TYPE mst.INVOICE_EVENT_CATEGORY AS ENUM ('INVOICE', 'PAYMENT');
 
-CREATE TYPE INVOICE_EVENT_TYPE AS ENUM ('INVOICE_CREATED', 'INVOICE_STATUS_CHANGED',
+CREATE TYPE mst.INVOICE_EVENT_TYPE AS ENUM ('INVOICE_CREATED', 'INVOICE_STATUS_CHANGED',
   'INVOICE_PAYMENT_STARTED', 'INVOICE_PAYMENT_STATUS_CHANGED');
 
-CREATE TYPE INVOICE_PAYMENT_STATUS AS ENUM ('pending', 'processed',
+CREATE TYPE mst.INVOICE_PAYMENT_STATUS AS ENUM ('pending', 'processed',
   'captured', 'cancelled', 'failed');
 
-CREATE TYPE INVOICE_STATUS AS ENUM ('unpaid', 'paid',
+CREATE TYPE mst.INVOICE_STATUS AS ENUM ('unpaid', 'paid',
   'cancelled', 'fulfilled');
 
 
 CREATE TABLE mst.invoice_event_stat (
   event_id                           BIGINT                      NOT NULL,
-  event_category                     INVOICE_EVENT_CATEGORY      NOT NULL,
-  event_type                         INVOICE_EVENT_TYPE          NOT NULL,
+  event_category                     mst.INVOICE_EVENT_CATEGORY  NOT NULL,
+  event_type                         mst.INVOICE_EVENT_TYPE      NOT NULL,
   event_created_at                   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   party_id                           CHARACTER VARYING           NOT NULL,
   party_email                        CHARACTER VARYING           NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE mst.invoice_event_stat (
   party_contract_registered_number   CHARACTER VARYING           NOT NULL,
   party_contract_inn                 CHARACTER VARYING           NOT NULL,
   invoice_id                         CHARACTER VARYING           NOT NULL,
-  invoice_status                     INVOICE_STATUS              NOT NULL,
+  invoice_status                     mst.INVOICE_STATUS          NOT NULL,
   invoice_status_details             CHARACTER VARYING,
   invoice_product                    CHARACTER VARYING           NOT NULL,
   invoice_description                CHARACTER VARYING,
@@ -35,9 +35,9 @@ CREATE TABLE mst.invoice_event_stat (
   invoice_currency_code              CHARACTER VARYING           NOT NULL,
   invoice_due                        TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   invoice_created_at                 TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  invoice_context                    CHARACTER VARYING,
+  invoice_context                    BYTEA,
   payment_id                         CHARACTER VARYING,
-  payment_status                     INVOICE_PAYMENT_STATUS,
+  payment_status                     mst.INVOICE_PAYMENT_STATUS,
   payment_status_failure_code        CHARACTER VARYING,
   payment_status_failure_description CHARACTER VARYING,
   payment_amount                     BIGINT,
@@ -55,6 +55,6 @@ CREATE TABLE mst.invoice_event_stat (
   payment_email                      CHARACTER VARYING,
   payment_fingerprint                CHARACTER VARYING,
   payment_created_at                 TIMESTAMP WITHOUT TIME ZONE,
-  payment_context                    CHARACTER VARYING,
+  payment_context                    BYTEA,
   CONSTRAINT invoice_event_pkey PRIMARY KEY (event_id)
 );

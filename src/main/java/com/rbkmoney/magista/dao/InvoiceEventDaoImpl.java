@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.damsel.domain.PaymentTool;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
@@ -8,14 +7,17 @@ import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.*;
+import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import javax.sql.DataSource;
@@ -30,7 +32,6 @@ import static com.rbkmoney.magista.domain.Tables.INVOICE_EVENT_STAT;
  */
 public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements InvoiceEventDao {
 
-    @Autowired
     private final DSLContext dslContext;
 
     public InvoiceEventDaoImpl(DataSource dataSource) {
@@ -42,7 +43,8 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
 
     @Override
     public Long getLastEventId() throws DaoException {
-        return null;
+        Query query = dslContext.select(INVOICE_EVENT_STAT.EVENT_ID.max()).from(INVOICE_EVENT_STAT);
+        return fetchOne(query, Long.class, getNamedParameterJdbcTemplate());
     }
 
     @Override
@@ -51,7 +53,7 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
                 .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
                         .and(INVOICE_EVENT_STAT.PAYMENT_ID.eq(paymentId))
                         .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)));
-        return getJdbcTemplate().queryForObject(query.toString(), getRowMapper());
+        return fetchOne(query, getRowMapper(), getNamedParameterJdbcTemplate());
     }
 
     @Override
@@ -59,7 +61,73 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
         Query query = dslContext.selectFrom(INVOICE_EVENT_STAT)
                 .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
                         .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE)));
-        return getJdbcTemplate().queryForObject(query.toString(), getRowMapper());
+        return fetchOne(query, getRowMapper(), getNamedParameterJdbcTemplate());
+    }
+
+    @Override
+    public void insert(InvoiceEventStat invoiceEventStat) throws DaoException {
+        Query query = dslContext.insertInto(INVOICE_EVENT_STAT)
+                .set(dslContext.newRecord(INVOICE_EVENT_STAT, invoiceEventStat));
+
+        execute(query, getNamedParameterJdbcTemplate());
+    }
+
+    @Override
+    public void update(InvoiceEventStat invoiceEventStat) throws DaoException {
+        Query query = dslContext.update(INVOICE_EVENT_STAT)
+                .set(dslContext.newRecord(INVOICE_EVENT_STAT, invoiceEventStat))
+                .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceEventStat.getInvoiceId()))
+                .and(
+                        INVOICE_EVENT_STAT.PAYMENT_ID.isNull()
+                                .or(INVOICE_EVENT_STAT.PAYMENT_ID.eq(invoiceEventStat.getPaymentId()))
+                );
+
+        execute(query, getNamedParameterJdbcTemplate());
+    }
+
+    public <T> T fetchOne(Query query, Class<T> type, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
+        return fetchOne(query, new SingleColumnRowMapper<>(type), namedParameterJdbcTemplate);
+    }
+
+    public <T> T fetchOne(Query query, RowMapper<T> rowMapper, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
+        try {
+            return namedParameterJdbcTemplate.queryForObject(
+                    query.getSQL(ParamType.NAMED),
+                    toSqlParameterSource(query.getParams()),
+                    rowMapper
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        } catch (NestedRuntimeException ex) {
+            throw new DaoException(ex);
+        }
+    }
+
+    public void execute(Query query, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
+        try {
+            int rowsAffected = namedParameterJdbcTemplate.update(
+                    query.getSQL(ParamType.NAMED),
+                    toSqlParameterSource(query.getParams()));
+
+            if (rowsAffected != 1) {
+                throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(query.toString(), 1, rowsAffected);
+            }
+        } catch (NestedRuntimeException ex) {
+            throw new DaoException(ex);
+        }
+    }
+
+    private SqlParameterSource toSqlParameterSource(Map<String, Param<?>> params) {
+        MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
+        for (Map.Entry<String, Param<?>> entry : params.entrySet()) {
+            Param<?> param = entry.getValue();
+            if (param.getValue() instanceof LocalDateTime || param.getValue() instanceof EnumType) {
+                sqlParameterSource.addValue(entry.getKey(), param.getValue(), Types.OTHER);
+            } else {
+                sqlParameterSource.addValue(entry.getKey(), param.getValue());
+            }
+        }
+        return sqlParameterSource;
     }
 
     private RowMapper<InvoiceEventStat> getRowMapper() {
@@ -89,7 +157,7 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
             invoiceEventStat.setInvoiceCurrencyCode(rs.getString("invoice_currency_code"));
             invoiceEventStat.setInvoiceDue(rs.getObject("invoice_due", LocalDateTime.class));
             invoiceEventStat.setInvoiceCreatedAt(rs.getObject("invoice_created_at", LocalDateTime.class));
-            invoiceEventStat.setInvoiceContext(rs.getString("invoice_context"));
+            invoiceEventStat.setInvoiceContext(rs.getBytes("invoice_context"));
             invoiceEventStat.setPaymentId(rs.getString("payment_id"));
             invoiceEventStat.setPaymentStatus(InvoicePaymentStatus.valueOf(rs.getString("payment_status")));
             invoiceEventStat.setPaymentStatusFailureCode(rs.getString("payment_status_failure_code"));
@@ -109,60 +177,8 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
             invoiceEventStat.setPaymentEmail(rs.getString("payment_email"));
             invoiceEventStat.setPaymentFingerprint(rs.getString("payment_fingerprint"));
             invoiceEventStat.setPaymentCreatedAt(rs.getObject("payment_created_at", LocalDateTime.class));
-            invoiceEventStat.setPaymentContext(rs.getString("payment_context"));
+            invoiceEventStat.setPaymentContext(rs.getBytes("payment_context"));
             return invoiceEventStat;
         };
-    }
-
-    @Override
-    public void insert(InvoiceEventStat invoiceEventStat) throws DaoException {
-
-        Query query = dslContext.insertInto(INVOICE_EVENT_STAT)
-                .set(dslContext.newRecord(INVOICE_EVENT_STAT, invoiceEventStat));
-
-        //TODO jooq prepared statement
-        //getNamedParameterJdbcTemplate().update(query.getSQL(ParamType.NAMED), toSqlParameterSource(query.getParams()));
-        System.out.println(query.toString());
-        execute(query.toString());
-    }
-
-    @Override
-    public void update(InvoiceEventStat invoiceEventStat) throws DaoException {
-        Query query = dslContext.update(INVOICE_EVENT_STAT)
-                .set(dslContext.newRecord(INVOICE_EVENT_STAT, invoiceEventStat))
-                .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceEventStat.getInvoiceId()))
-                .and(
-                        INVOICE_EVENT_STAT.PAYMENT_ID.isNull()
-                                .or(INVOICE_EVENT_STAT.PAYMENT_ID.eq(invoiceEventStat.getPaymentId()))
-                );
-
-        execute(query.toString());
-    }
-
-    public void execute(String updateSql) throws DaoException {
-        try {
-            int rowsAffected = getJdbcTemplate().update(updateSql);
-
-            if (rowsAffected != 1) {
-                throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(updateSql, 1, rowsAffected);
-            }
-        } catch (NestedRuntimeException ex) {
-            throw new DaoException(ex);
-        }
-    }
-
-    private SqlParameterSource toSqlParameterSource(Map<String, Param<?>> params) {
-        MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
-        for (Map.Entry<String, Param<?>> entry : params.entrySet()) {
-            Param<?> param = entry.getValue();
-            if (param.getValue() instanceof LocalDateTime) {
-                sqlParameterSource.addValue(entry.getKey(), param.getValue(), Types.OTHER);
-            } else if (param.getValue() instanceof EnumType) {
-                sqlParameterSource.addValue(entry.getKey(), param.getValue(), Types.VARCHAR);
-            } else {
-                sqlParameterSource.addValue(entry.getKey(), param.getValue());
-            }
-        }
-        return sqlParameterSource;
     }
 }
