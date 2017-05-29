@@ -23,7 +23,8 @@
         <dockerfile.base.service.tag>f26fcc19d1941ab74f1c72dd8a408be17a769333</dockerfile.base.service.tag>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <db.name>magista</db.name>
-        <db.url>jdbc:postgresql://localhost:5432/${db.name}</db.url>
+        <db.port>${container.http.port}</db.port>
+        <db.url>jdbc:postgresql://localhost:${db.port}/${db.name}</db.url>
         <db.user>postgres</db.user>
         <db.password>postgres</db.password>
         <db.schema>mst</db.schema>
@@ -132,7 +133,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.2.0</version>
+            <version>1.2.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -228,7 +229,7 @@
                                     <POSTGRES_PASSWORD>${db.password}</POSTGRES_PASSWORD>
                                 </env>
                                 <ports>
-                                    <port>5432:5432</port>
+                                    <port>${db.port}:5432</port>
                                 </ports>
                                 <wait>
                                     <log>ready for start up</log>
