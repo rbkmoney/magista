@@ -8,6 +8,7 @@ import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.PartyException;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,6 +22,7 @@ public class PartyService {
     @Autowired
     PartyManagementSrv.Iface partyManagementSrv;
 
+    @Cacheable(cacheNames="party")
     public Party getParty(String partyId) {
         try {
             return partyManagementSrv.get(userInfo, partyId);
@@ -31,7 +33,7 @@ public class PartyService {
         }
     }
 
-
+    @Cacheable(cacheNames="shop")
     public Shop getShopById(String partyId, int shopId) {
         try {
             return partyManagementSrv.getShop(userInfo, partyId, shopId);
@@ -44,6 +46,7 @@ public class PartyService {
         }
     }
 
+    @Cacheable(cacheNames="contract")
     public Contract getContract(String partyId, int shopId) {
         try {
             return partyManagementSrv.getContract(userInfo, partyId, shopId);

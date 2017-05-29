@@ -13,19 +13,16 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
 
 import static com.rbkmoney.magista.domain.Tables.INVOICE_EVENT_STAT;
-import static com.rbkmoney.magista.util.StorageUtil.execute;
-import static com.rbkmoney.magista.util.StorageUtil.fetchOne;
 
 /**
  * Created by tolkonepiu on 26/05/2017.
  */
-public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements InvoiceEventDao {
+public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao {
 
     private final DSLContext dslContext;
 
@@ -80,7 +77,9 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
         execute(query, getNamedParameterJdbcTemplate());
     }
 
-    public static RowMapper<InvoiceEventStat> getRowMapper() {
+
+    @Override
+    public RowMapper<InvoiceEventStat> getRowMapper() {
         return (rs, i) -> {
             InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
             invoiceEventStat.setEventId(rs.getLong("event_id"));
@@ -118,6 +117,7 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
             invoiceEventStat.setPaymentTool(rs.getString("payment_tool"));
             invoiceEventStat.setPaymentMaskedPan(rs.getString("payment_masked_pan"));
             invoiceEventStat.setPaymentBin(rs.getString("payment_bin"));
+            invoiceEventStat.setPaymentToken(rs.getString("payment_token"));
             invoiceEventStat.setPaymentSystem(rs.getString("payment_system"));
             invoiceEventStat.setPaymentSessionId(rs.getString("payment_session_id"));
             invoiceEventStat.setPaymentCountryId(rs.getInt("payment_country_id"));
