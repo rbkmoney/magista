@@ -13,6 +13,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.concurrent.TimeUnit;
+
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
@@ -26,7 +31,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class AbstractIntegrationTest {
     @ClassRule
-    public static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:9.6");
+    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:9.6")
+            .withStartupTimeout(Duration.of(20, ChronoUnit.SECONDS));
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override

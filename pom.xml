@@ -202,22 +202,22 @@
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.21.0</version>
-                <executions>
-                    <execution>
-                        <id>postgres-start</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>postgres-stop</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>postgres-start</id>-->
+                        <!--<phase>generate-sources</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>start</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                    <!--<execution>-->
+                        <!--<id>postgres-stop</id>-->
+                        <!--<phase>process-sources</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>stop</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
                 <configuration>
                     <images>
                         <image>
@@ -244,15 +244,15 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>${flyway.version}</version>
-                <executions>
-                    <execution>
-                        <id>flyway-migrate</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>migrate</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>flyway-migrate</id>-->
+                        <!--<phase>generate-sources</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>migrate</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
                 <configuration>
                     <url>${db.url}</url>
                     <user>${db.user}</user>
@@ -269,16 +269,16 @@
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
                 <version>${jooq.version}</version>
-                <executions>
-                    <execution>
-                        <id>jooq-generate</id>
-                        <inherited>flyway-migrate</inherited>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>jooq-generate</id>-->
+                        <!--<inherited>flyway-migrate</inherited>-->
+                        <!--<phase>generate-sources</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>generate</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
@@ -301,6 +301,7 @@
                         </database>
                         <target>
                             <packageName>com.rbkmoney.magista.domain</packageName>
+                            <directory>src/main/java/</directory>
                         </target>
                     </generator>
                 </configuration>
