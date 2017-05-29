@@ -4,6 +4,7 @@ import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.damsel.domain.OperationFailure;
 import com.rbkmoney.magista.dao.InvoiceEventDao;
+import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
@@ -46,6 +47,8 @@ public class InvoiceEventService {
                 throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId()));
             }
 
+            invoiceEvent.setEventType(InvoiceEventType.INVOICE_STATUS_CHANGED);
+
             InvoiceStatus status = invoiceStatusChange.getStatus();
             invoiceEvent.setInvoiceStatus(
                     com.rbkmoney.magista.domain.enums.InvoiceStatus.valueOf(status.getSetField().getFieldName())
@@ -76,6 +79,8 @@ public class InvoiceEventService {
                 throw new NotFoundException(String.format("Invoice payment event not found, paymentId='%s', invoiceId='%s', eventId='%d'",
                         paymentStatusChange.getPaymentId(), paymentStatusChange.getInvoiceId(), paymentStatusChange.getEventId()));
             }
+
+            invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED);
 
             InvoicePaymentStatus status = paymentStatusChange.getStatus();
             invoicePaymentEvent.setPaymentStatus(
