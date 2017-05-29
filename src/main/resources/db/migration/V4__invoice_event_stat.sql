@@ -46,6 +46,7 @@ CREATE TABLE mst.invoice_event_stat (
   payment_tool                       CHARACTER VARYING,
   payment_masked_pan                 CHARACTER VARYING,
   payment_bin                        CHARACTER VARYING,
+  payment_token                      CHARACTER VARYING,
   payment_system                     CHARACTER VARYING,
   payment_session_id                 CHARACTER VARYING,
   payment_country_id                 INT,

@@ -76,7 +76,7 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
             invoiceEventStat.setPaymentMaskedPan(bankCard.getMaskedPan());
             invoiceEventStat.setPaymentSystem(bankCard.getPaymentSystem().toString());
             invoiceEventStat.setPaymentBin(bankCard.getBin());
-//TODO            invoiceEventStat.setPa(bankCard.getToken());
+            invoiceEventStat.setPaymentToken(bankCard.getToken());
         }
 
         InvoicePaymentStatus status = invoicePayment.getStatus();
