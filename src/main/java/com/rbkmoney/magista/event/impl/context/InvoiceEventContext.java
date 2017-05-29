@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.event.impl.context;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.event.EventContext;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.InvoiceStatusChange;
@@ -17,6 +18,7 @@ public class InvoiceEventContext implements EventContext<StockEvent> {
     private InvoiceStatusChange invoiceStatusChange;
     private Payment payment;
     private PaymentStatusChange paymentStatusChange;
+    private InvoiceEventStat invoiceEventStat;
 
     public InvoiceEventContext(StockEvent stockEvent) {
         this.stockEvent = stockEvent;
@@ -60,6 +62,15 @@ public class InvoiceEventContext implements EventContext<StockEvent> {
 
     public InvoiceEventContext setPaymentStatusChange(PaymentStatusChange paymentStatusChange) {
         this.paymentStatusChange = paymentStatusChange;
+        return this;
+    }
+
+    public InvoiceEventStat getInvoiceEventStat() {
+        return invoiceEventStat;
+    }
+
+    public InvoiceEventContext setInvoiceEventStat(InvoiceEventStat invoiceEventStat) {
+        this.invoiceEventStat = invoiceEventStat;
         return this;
     }
 }

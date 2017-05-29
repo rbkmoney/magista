@@ -6,26 +6,21 @@ import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import org.jooq.*;
-import org.jooq.conf.ParamType;
+import org.jooq.Configuration;
+import org.jooq.DSLContext;
+import org.jooq.Query;
+import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
-import org.springframework.core.NestedRuntimeException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.SingleColumnRowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import javax.sql.DataSource;
-import java.sql.Types;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import static com.rbkmoney.magista.domain.Tables.INVOICE_EVENT_STAT;
+import static com.rbkmoney.magista.util.StorageUtil.execute;
+import static com.rbkmoney.magista.util.StorageUtil.fetchOne;
 
 /**
  * Created by tolkonepiu on 26/05/2017.
@@ -85,52 +80,7 @@ public class InvoiceEventDaoImpl extends NamedParameterJdbcDaoSupport implements
         execute(query, getNamedParameterJdbcTemplate());
     }
 
-    public <T> T fetchOne(Query query, Class<T> type, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
-        return fetchOne(query, new SingleColumnRowMapper<>(type), namedParameterJdbcTemplate);
-    }
-
-    public <T> T fetchOne(Query query, RowMapper<T> rowMapper, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
-        try {
-            return namedParameterJdbcTemplate.queryForObject(
-                    query.getSQL(ParamType.NAMED),
-                    toSqlParameterSource(query.getParams()),
-                    rowMapper
-            );
-        } catch (EmptyResultDataAccessException ex) {
-            return null;
-        } catch (NestedRuntimeException ex) {
-            throw new DaoException(ex);
-        }
-    }
-
-    public void execute(Query query, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
-        try {
-            int rowsAffected = namedParameterJdbcTemplate.update(
-                    query.getSQL(ParamType.NAMED),
-                    toSqlParameterSource(query.getParams()));
-
-            if (rowsAffected != 1) {
-                throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(query.toString(), 1, rowsAffected);
-            }
-        } catch (NestedRuntimeException ex) {
-            throw new DaoException(ex);
-        }
-    }
-
-    private SqlParameterSource toSqlParameterSource(Map<String, Param<?>> params) {
-        MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
-        for (Map.Entry<String, Param<?>> entry : params.entrySet()) {
-            Param<?> param = entry.getValue();
-            if (param.getValue() instanceof LocalDateTime || param.getValue() instanceof EnumType) {
-                sqlParameterSource.addValue(entry.getKey(), param.getValue(), Types.OTHER);
-            } else {
-                sqlParameterSource.addValue(entry.getKey(), param.getValue());
-            }
-        }
-        return sqlParameterSource;
-    }
-
-    private RowMapper<InvoiceEventStat> getRowMapper() {
+    public static RowMapper<InvoiceEventStat> getRowMapper() {
         return (rs, i) -> {
             InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
             invoiceEventStat.setEventId(rs.getLong("event_id"));
