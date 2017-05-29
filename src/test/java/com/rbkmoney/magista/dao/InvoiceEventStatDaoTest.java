@@ -36,4 +36,13 @@ public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
         assertEquals(invoiceEventStat, invoiceEventDao.findPaymentByInvoiceAndPaymentId(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId()));
     }
 
+    @Test
+    public void insertNullSymbolInString() throws IOException {
+        InvoiceEventStat invoiceEventStat = random(InvoiceEventStat.class);
+
+        invoiceEventStat.setPaymentToken("\u0000kek\u0000eke\u0000");
+
+        invoiceEventDao.insert(invoiceEventStat);
+    }
+
 }
