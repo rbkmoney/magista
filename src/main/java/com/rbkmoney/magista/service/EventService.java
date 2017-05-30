@@ -1,15 +1,17 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.magista.dao.EventDao;
+import com.rbkmoney.eventstock.client.DefaultSubscriberConfig;
+import com.rbkmoney.eventstock.client.EventConstraint;
+import com.rbkmoney.eventstock.client.EventPublisher;
+import com.rbkmoney.eventstock.client.poll.EventFlowFilter;
+import com.rbkmoney.magista.dao.InvoiceEventDao;
 import com.rbkmoney.magista.event.EventSaver;
 import com.rbkmoney.magista.event.HandleTask;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.StorageException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,15 +27,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class EventService {
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
-    private EventDao eventDao;
+    private InvoiceEventDao invoiceEventDao;
 
     @Autowired
     private List<Handler> handlers;
 
+    @Autowired
+    EventPublisher eventPublisher;
+
     private BlockingQueue<Future<Processor>> queue;
+
+    @Value("${bm.pooling.enabled}")
+    private boolean poolingEnabled;
 
     @Value("${bm.pooling.handler.maxPoolSize}")
     private int pollSize;
@@ -67,14 +73,11 @@ public class EventService {
     }
 
     public Long getLastEventId() {
-        Long lastEventId;
         try {
-            log.trace("Get last event id");
-            lastEventId = eventDao.getLastEventId();
+            return invoiceEventDao.getLastEventId();
         } catch (DaoException ex) {
             throw new StorageException("Failed to get last event id", ex);
         }
-        return lastEventId;
     }
 
     public void processEvent(StockEvent stockEvent) {
@@ -104,8 +107,18 @@ public class EventService {
         return null;
     }
 
-    public void start() {
-        Thread newThread = new Thread(eventSaver, "EventSaver");
-        newThread.start();
+    public void startPooling() {
+        if (poolingEnabled) {
+            EventConstraint.EventIDRange eventIDRange = new EventConstraint.EventIDRange();
+            Long lastEventId = getLastEventId();
+            if (lastEventId != null) {
+                eventIDRange.setFromExclusive(lastEventId);
+            }
+            EventFlowFilter eventFlowFilter = new EventFlowFilter(new EventConstraint(eventIDRange));
+            eventPublisher.subscribe(new DefaultSubscriberConfig(eventFlowFilter));
+
+            Thread eventSaverThread = new Thread(eventSaver, "EventSaver");
+            eventSaverThread.start();
+        }
     }
 }

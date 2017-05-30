@@ -6,8 +6,13 @@ import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.event.impl.mapper.InvoiceMapper;
+import com.rbkmoney.magista.event.impl.mapper.InvoicePartyMapper;
+import com.rbkmoney.magista.event.impl.processor.CompositeProcessor;
+import com.rbkmoney.magista.event.impl.processor.InvoiceEventProcessor;
 import com.rbkmoney.magista.event.impl.processor.InvoiceProcessor;
+import com.rbkmoney.magista.service.InvoiceEventService;
 import com.rbkmoney.magista.service.InvoiceService;
+import com.rbkmoney.magista.service.PartyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,10 +28,19 @@ public class InvoiceCreatedHandler extends AbstractInvoiceEventHandler {
     @Autowired
     InvoiceService invoiceService;
 
+    @Autowired
+    InvoiceEventService invoiceEventService;
+
+    @Autowired
+    PartyService partyService;
+
     @Override
     public Processor handle(StockEvent event) {
         InvoiceEventContext context = generateContext(event);
-        return new InvoiceProcessor(invoiceService, context.getInvoice());
+        return new CompositeProcessor(
+                new InvoiceProcessor(invoiceService, context.getInvoice()),
+                new InvoiceEventProcessor(invoiceEventService, context.getInvoiceEventStat())
+        );
     }
 
     @Override
@@ -37,7 +51,8 @@ public class InvoiceCreatedHandler extends AbstractInvoiceEventHandler {
     @Override
     List<Mapper> getMappers() {
         return Arrays.asList(
-                new InvoiceMapper()
+                new InvoiceMapper(),
+                new InvoicePartyMapper(partyService)
         );
     }
 }
