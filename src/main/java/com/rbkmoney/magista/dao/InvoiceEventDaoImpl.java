@@ -6,10 +6,7 @@ import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import org.jooq.Configuration;
-import org.jooq.DSLContext;
-import org.jooq.Query;
-import org.jooq.SQLDialect;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 import org.springframework.jdbc.core.RowMapper;
@@ -66,13 +63,17 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
 
     @Override
     public void update(InvoiceEventStat invoiceEventStat) throws DaoException {
+        Condition condition;
+        if (invoiceEventStat.getEventCategory() == InvoiceEventCategory.INVOICE) {
+            condition = INVOICE_EVENT_STAT.PAYMENT_ID.isNull();
+        } else {
+            condition = INVOICE_EVENT_STAT.PAYMENT_ID.eq(invoiceEventStat.getPaymentId());
+        }
+
         Query query = dslContext.update(INVOICE_EVENT_STAT)
                 .set(dslContext.newRecord(INVOICE_EVENT_STAT, invoiceEventStat))
                 .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceEventStat.getInvoiceId()))
-                .and(
-                        INVOICE_EVENT_STAT.PAYMENT_ID.isNull()
-                                .or(INVOICE_EVENT_STAT.PAYMENT_ID.eq(invoiceEventStat.getPaymentId()))
-                );
+                .and(condition);
 
         execute(query, getNamedParameterJdbcTemplate());
     }
