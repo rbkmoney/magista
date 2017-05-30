@@ -47,6 +47,7 @@ public class InvoiceEventService {
                 throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId()));
             }
 
+            invoiceEvent.setEventId(invoiceStatusChange.getEventId());
             invoiceEvent.setEventType(InvoiceEventType.INVOICE_STATUS_CHANGED);
 
             InvoiceStatus status = invoiceStatusChange.getStatus();
@@ -80,6 +81,7 @@ public class InvoiceEventService {
                         paymentStatusChange.getPaymentId(), paymentStatusChange.getInvoiceId(), paymentStatusChange.getEventId()));
             }
 
+            invoicePaymentEvent.setEventId(paymentStatusChange.getEventId());
             invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED);
 
             InvoicePaymentStatus status = paymentStatusChange.getStatus();
