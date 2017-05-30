@@ -68,7 +68,11 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
     public void update(InvoiceEventStat invoiceEventStat) throws DaoException {
         Query query = dslContext.update(INVOICE_EVENT_STAT)
                 .set(dslContext.newRecord(INVOICE_EVENT_STAT, invoiceEventStat))
-                .where(INVOICE_EVENT_STAT.EVENT_ID.eq(invoiceEventStat.getEventId()));
+                .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceEventStat.getInvoiceId()))
+                .and(
+                        INVOICE_EVENT_STAT.PAYMENT_ID.isNull()
+                                .or(INVOICE_EVENT_STAT.PAYMENT_ID.eq(invoiceEventStat.getPaymentId()))
+                );
 
         execute(query, getNamedParameterJdbcTemplate());
     }
