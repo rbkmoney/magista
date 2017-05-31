@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.dao;
 
+import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.model.Invoice;
 import com.rbkmoney.magista.model.Payment;
@@ -13,7 +14,7 @@ import java.util.Optional;
  * Created by vpankrashkin on 10.08.16.
  */
 public interface StatisticsDao {
-    Collection<Invoice> getInvoices(
+    Collection<InvoiceEventStat> getInvoices(
             String merchantId,
             int shopId,
             Optional<String> invoiceId,
