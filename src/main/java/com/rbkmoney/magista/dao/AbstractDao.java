@@ -107,6 +107,19 @@ public class AbstractDao extends NamedParameterJdbcDaoSupport {
         }
     }
 
+    public Condition appendConditions(Condition condition, Operator operator, ConditionParameterSource conditionParameterSource) {
+        for (ConditionParameterSource.ConditionField field : conditionParameterSource.getConditionFields()) {
+            if (field.getValue() != null) {
+                condition = DSL.condition(operator, condition,
+                        field.getField().compare(
+                                field.getComparator(),
+                                field.getValue()
+                        ));
+            }
+        }
+        return condition;
+    }
+
     public SqlParameterSource toSqlParameterSource(Map<String, Param<?>> params) {
         MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
         for (Map.Entry<String, Param<?>> entry : params.entrySet()) {

@@ -50,7 +50,7 @@ public interface StatisticsDao {
                          Optional<Integer> limit,
                          Optional<Integer> offset) throws DaoException;
 
-    Collection<Payment> getPayments(
+    Collection<InvoiceEventStat> getPayments(
             String merchantId,
             int shopId,
             Optional<String> invoiceId,

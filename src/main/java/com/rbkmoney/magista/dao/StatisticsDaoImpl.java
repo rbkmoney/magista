@@ -4,11 +4,8 @@ import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.model.Payment;
-import org.jooq.Condition;
-import org.jooq.Query;
+import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.util.postgres.PostgresDSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -20,9 +17,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 
@@ -55,62 +53,22 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> limit,
             Optional<Integer> offset) throws DaoException {
 
-        Condition condition = INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId)
-                .and(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(shopId));
+        ConditionParameterSource conditionParameterSource = buildOptionalConditionParameters(
+                invoiceId,
+                paymentId,
+                invoiceStatus,
+                paymentStatus,
+                invoiceAmount,
+                paymentAmount,
+                paymentEmail,
+                paymentIp,
+                paymentFingerprint,
+                paymentPanMask,
+                fromTime,
+                toTime
+        );
 
-        if (invoiceId.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId.get()));
-        }
-
-        if (paymentId.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PAYMENT_ID.eq(paymentId.get()));
-        }
-
-        if (invoiceStatus.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.INVOICE_STATUS.eq(
-                    InvoiceStatus.valueOf(invoiceStatus.get())
-            ));
-        }
-
-        if (invoiceAmount.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.INVOICE_AMOUNT.eq(invoiceAmount.get()));
-        }
-
-        if (paymentAmount.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PAYMENT_AMOUNT.eq(paymentAmount.get()));
-        }
-
-        if (paymentEmail.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PAYMENT_EMAIL.like(paymentEmail.get()));
-        }
-
-        if (paymentIp.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PAYMENT_IP.like(paymentIp.get()));
-        }
-
-        if (paymentFingerprint.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT.like(paymentFingerprint.get()));
-        }
-
-        if (paymentPanMask.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN.like(paymentPanMask.get()));
-        }
-
-        if (fromTime.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.ge(
-                    LocalDateTime.ofInstant(fromTime.get(), ZoneOffset.UTC)
-            ));
-        }
-
-        if (toTime.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.lt(
-                    LocalDateTime.ofInstant(toTime.get(), ZoneOffset.UTC)
-            ));
-        }
-
-        Query query = getDslContext().select().from(INVOICE_EVENT_STAT)
-                .where(condition)
-                .limit(limit.orElse(1000))
+        Query query = buildInvoiceSelectConditionStepQuery(merchantId, shopId, conditionParameterSource)
                 .offset(offset.orElse(0));
 
         return fetch(query, InvoiceEventDaoImpl.getRowMapper());
@@ -134,81 +92,29 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Instant> toTime,
             Optional<Integer> limit,
             Optional<Integer> offset) throws DaoException {
-        Function<StringBuilder, StringBuilder> func = head -> {
-            head.append(" where (TRUE) ");
-            addCondition(head, "merchant_id", true);
-            addCondition(head, "shop_id", true);
-            addInCondition(head, "id", "invoice_ids", "and",
-                    invoiceId.isPresent()
-                            || (paymentAmount.isPresent() || paymentEmail.isPresent()
-                            || paymentFingerprint.isPresent() || paymentId.isPresent()
-                            || paymentIp.isPresent() || paymentPanMask.isPresent()
-                            || paymentStatus.isPresent()));
-            addCondition(head, "status", invoiceStatus.isPresent());
-            addCondition(head, "amount", invoiceAmount.isPresent());
-            addCondition(head, "created_at", "from_time", "and", ">=", fromTime.isPresent());
-            addCondition(head, "created_at", "to_time", "and", "<", toTime.isPresent());
-            return head;
-        };
 
-        StringBuilder countSb = new StringBuilder("select count(*) from mst.invoice");
-        countSb = func.apply(countSb);
-
-        String countSql = countSb.toString();
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("merchant_id", merchantId);
-        params.addValue("shop_id", shopId);
-
-        Collection<Payment> payments = getPayments(
-                merchantId,
-                shopId,
+        ConditionParameterSource conditionParameterSource = buildOptionalConditionParameters(
                 invoiceId,
                 paymentId,
+                invoiceStatus,
                 paymentStatus,
+                invoiceAmount,
+                paymentAmount,
                 paymentEmail,
                 paymentIp,
                 paymentFingerprint,
                 paymentPanMask,
-                paymentAmount,
                 fromTime,
-                toTime,
-                limit,
-                offset
+                toTime
         );
 
-        Set<String> invoiceIds = payments.stream().map(t -> t.getInvoiceId()).collect(Collectors.toSet());
-        if (invoiceId.isPresent()) {
-            invoiceIds.add(invoiceId.get());
-        }
-        if (!invoiceIds.isEmpty()) {
-            params.addValue("invoice_ids", invoiceIds);
-        } else {
-            params.addValue("invoice_ids", null);
-        }
+        Query query = buildInvoiceSelectConditionStepQuery(merchantId, shopId, conditionParameterSource, DSL.count());
 
-        params.addValue("status", invoiceStatus.orElse(null));
-        params.addValue("amount", invoiceAmount.orElse(null));
-
-        if (fromTime.isPresent()) {
-            params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
-        } else {
-            params.addValue("from_time", null);
-        }
-        if (toTime.isPresent()) {
-            params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
-        } else {
-            params.addValue("to_time", null);
-        }
-        try {
-            Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
-            return count.intValue();
-        } catch (NestedRuntimeException e) {
-            throw new DaoException(e);
-        }
+        return fetchOne(query, Integer.class);
     }
 
     @Override
-    public Collection<Payment> getPayments(
+    public Collection<InvoiceEventStat> getPayments(
             String merchantId,
             int shopId,
             Optional<String> invoiceId,
@@ -223,58 +129,26 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Instant> toTime,
             Optional<Integer> limit,
             Optional<Integer> offset) throws DaoException {
-        Function<StringBuilder, StringBuilder> func = head -> {
-            head.append(" where (TRUE) ");
-            addCondition(head, "merchant_id", true);
-            addCondition(head, "shop_id", true);
-            addCondition(head, "invoice_id", invoiceId.isPresent());
-            addCondition(head, "payment_id", paymentId.isPresent());
-            addCondition(head, "status", paymentStatus.isPresent());
-            addCondition(head, "masked_pan", "like", paymentPanMask.isPresent());
-            addCondition(head, "ip", "like", paymentIp.isPresent());
-            addCondition(head, "customer_id", "like", paymentFingerprint.isPresent());
-            addCondition(head, "email", "like", paymentEmail.isPresent());
 
-            addCondition(head, "created_at", "from_time", "and", ">=", fromTime.isPresent());
-            addCondition(head, "created_at", "to_time", "and", "<", toTime.isPresent());
-            return head;
-        };
+        ConditionParameterSource parameterSource = buildOptionalConditionParameters(
+                invoiceId,
+                paymentId,
+                Optional.empty(),
+                paymentStatus,
+                Optional.empty(),
+                paymentAmount,
+                paymentEmail,
+                paymentIp,
+                paymentFingerprint,
+                paymentPanMask,
+                fromTime,
+                toTime
+        );
 
-        StringBuilder dataSb = new StringBuilder("select * from mst.payment");
+        Query query = buildPaymentSelectConditionStepQuery(merchantId, shopId, parameterSource)
+                .offset(offset.orElse(0));
 
-        dataSb = func.apply(dataSb);
-        addPagination(dataSb, "event_id desc", limit, offset);
-
-
-        String dataSql = dataSb.toString();
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("merchant_id", merchantId);
-        params.addValue("shop_id", shopId);
-        params.addValue("invoice_id", invoiceId.orElse(null));
-        params.addValue("payment_id", paymentId.orElse(null));
-        params.addValue("status", paymentStatus.orElse(null));
-        params.addValue("masked_pan", paymentPanMask.orElse("").replaceAll("\\*", "_"));
-        params.addValue("ip", paymentIp.orElse("").replaceAll("\\*", "_"));
-        params.addValue("customer_id", paymentFingerprint.orElse("").replaceAll("\\*", "_"));
-        params.addValue("email", paymentEmail.orElse("").replaceAll("\\*", "_"));
-
-        if (fromTime.isPresent()) {
-            params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
-        } else {
-            params.addValue("from_time", null);
-        }
-        if (toTime.isPresent()) {
-            params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
-        } else {
-            params.addValue("to_time", null);
-        }
-
-        try {
-            List<Payment> payments = getNamedParameterJdbcTemplate().query(dataSql, params, PaymentDaoImpl.getRowMapper());
-            return payments;
-        } catch (NestedRuntimeException e) {
-            throw new DaoException(e);
-        }
+        return fetch(query, InvoiceEventDaoImpl.getRowMapper());
     }
 
     @Override
@@ -293,56 +167,91 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Instant> toTime,
             Optional<Integer> limit,
             Optional<Integer> offset) throws DaoException {
-        Function<StringBuilder, StringBuilder> func = head -> {
-            head.append(" where (TRUE) ");
-            addCondition(head, "merchant_id", true);
-            addCondition(head, "shop_id", true);
-            addCondition(head, "invoice_id", invoiceId.isPresent());
-            addCondition(head, "payment_id", paymentId.isPresent());
-            addCondition(head, "status", paymentStatus.isPresent());
-            addCondition(head, "masked_pan", "like", paymentPanMask.isPresent());
-            addCondition(head, "ip", "like", paymentIp.isPresent());
-            addCondition(head, "customer_id", "like", paymentFingerprint.isPresent());
-            addCondition(head, "email", "like", paymentEmail.isPresent());
 
-            addCondition(head, "created_at", "from_time", "and", ">=", fromTime.isPresent());
-            addCondition(head, "created_at", "to_time", "and", "<", toTime.isPresent());
-            return head;
-        };
+        ConditionParameterSource parameterSource = buildOptionalConditionParameters(
+                invoiceId,
+                paymentId,
+                Optional.empty(),
+                paymentStatus,
+                Optional.empty(),
+                paymentAmount,
+                paymentEmail,
+                paymentIp,
+                paymentFingerprint,
+                paymentPanMask,
+                fromTime,
+                toTime
+        );
 
-        StringBuilder countSb = new StringBuilder("select count(*) from mst.payment");
+        Query query = buildPaymentSelectConditionStepQuery(merchantId, shopId, parameterSource, DSL.count());
 
-        countSb = func.apply(countSb);
+        return fetchOne(query, Integer.class);
+    }
 
-        String countSql = countSb.toString();
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("merchant_id", merchantId);
-        params.addValue("shop_id", shopId);
-        params.addValue("invoice_id", invoiceId.orElse(null));
-        params.addValue("payment_id", paymentId.orElse(null));
-        params.addValue("status", paymentStatus.orElse(null));
-        params.addValue("masked_pan", paymentPanMask.orElse("").replaceAll("\\*", "_"));
-        params.addValue("ip", paymentIp.orElse("").replaceAll("\\*", "_"));
-        params.addValue("customer_id", paymentFingerprint.orElse("").replaceAll("\\*", "_"));
-        params.addValue("email", paymentEmail.orElse("").replaceAll("\\*", "_"));
+    private SelectConditionStep buildInvoiceSelectConditionStepQuery(
+            String merchantId,
+            int shopId,
+            ConditionParameterSource parameterSource,
+            SelectField<?>... fields) {
+        Condition condition = INVOICE_EVENT_STAT.INVOICE_ID
+                .in(buildPaymentSelectConditionStepQuery(merchantId,
+                        shopId,
+                        parameterSource,
+                        INVOICE_EVENT_STAT.INVOICE_ID));
+        return getDslContext().select(fields).from(INVOICE_EVENT_STAT)
+                .where(condition);
+    }
 
-        if (fromTime.isPresent()) {
-            params.addValue("from_time", LocalDateTime.ofInstant(fromTime.get(), ZoneId.of("UTC")), Types.OTHER);
-        } else {
-            params.addValue("from_time", null);
-        }
-        if (toTime.isPresent()) {
-            params.addValue("to_time", LocalDateTime.ofInstant(toTime.get(), ZoneId.of("UTC")), Types.OTHER);
-        } else {
-            params.addValue("to_time", null);
-        }
+    private SelectConditionStep buildPaymentSelectConditionStepQuery(String merchantId,
+                                                                     int shopId,
+                                                                     ConditionParameterSource parameterSource,
+                                                                     SelectField<?>... fields) {
+        Condition condition = INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId)
+                .and(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(shopId));
 
-        try {
-            Number count = getNamedParameterJdbcTemplate().queryForObject(countSql, params, Number.class);
-            return count.intValue();
-        } catch (NestedRuntimeException e) {
-            throw new DaoException(e);
-        }
+        condition = appendConditions(condition, Operator.AND, parameterSource);
+
+        return getDslContext().select(fields).from(INVOICE_EVENT_STAT)
+                .where(condition);
+    }
+
+    private ConditionParameterSource buildOptionalConditionParameters(
+            Optional<String> invoiceId,
+            Optional<String> paymentId,
+            Optional<String> invoiceStatus,
+            Optional<String> paymentStatus,
+            Optional<Long> invoiceAmount,
+            Optional<Long> paymentAmount,
+            Optional<String> paymentEmail,
+            Optional<String> paymentIp,
+            Optional<String> paymentFingerprint,
+            Optional<String> paymentPanMask,
+            Optional<Instant> fromTime,
+            Optional<Instant> toTime
+    ) {
+        return new ConditionParameterSource()
+                .addValue(INVOICE_EVENT_STAT.INVOICE_ID, invoiceId.get(), Comparator.EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_ID, paymentId.get(), Comparator.EQUALS)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_STATUS,
+                        invoiceStatus.isPresent() ? InvoiceStatus.valueOf(invoiceStatus.get()) : null,
+                        Comparator.EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_STATUS,
+                        paymentStatus.isPresent() ?
+                                com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.valueOf(paymentStatus.get()) : null,
+                        Comparator.EQUALS)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_AMOUNT, invoiceAmount.get(), Comparator.EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_AMOUNT, paymentAmount.get(), Comparator.EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_EMAIL, paymentEmail.get(), Comparator.LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_IP, paymentIp.get(), Comparator.LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, paymentFingerprint.get(), Comparator.LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, paymentPanMask.get(), Comparator.LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, paymentPanMask.get(), Comparator.LIKE)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                        fromTime.isPresent() ? LocalDateTime.ofInstant(fromTime.get(), ZoneOffset.UTC) : null,
+                        Comparator.GREATER_OR_EQUAL)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                        toTime.isPresent() ? LocalDateTime.ofInstant(toTime.get(), ZoneOffset.UTC) : null,
+                        Comparator.LESS);
     }
 
     @Override
