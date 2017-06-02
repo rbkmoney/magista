@@ -46,7 +46,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         String json = "{'query': {'invoices': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1', 'payment_status': 'captured', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(2, statResponse.getData().getInvoices().size());
-        assertEquals(5, statResponse.getTotalCount());
+        assertEquals(4, statResponse.getTotalCount());
     }
 
     @Test
