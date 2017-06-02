@@ -1,11 +1,10 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import org.jooq.EnumType;
-import org.jooq.Param;
-import org.jooq.Query;
+import org.jooq.*;
 import org.jooq.conf.ParamType;
+import org.jooq.impl.DSL;
+import org.jooq.impl.DefaultConfiguration;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
@@ -16,20 +15,43 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
+import javax.sql.DataSource;
 import java.sql.Types;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by tolkonepiu on 29/05/2017.
  */
-public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
+public class AbstractDao extends NamedParameterJdbcDaoSupport {
 
-    public static <T> T fetchOne(Query query, Class<T> type, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
+    private final DSLContext dslContext;
+
+    public AbstractDao(DataSource dataSource) {
+        setDataSource(dataSource);
+        Configuration configuration = new DefaultConfiguration();
+        configuration.set(SQLDialect.POSTGRES_9_5);
+        this.dslContext = DSL.using(configuration);
+    }
+
+    public DSLContext getDslContext() {
+        return dslContext;
+    }
+
+    public <T> T fetchOne(Query query, Class<T> type) throws DaoException {
+        return fetchOne(query, type, getNamedParameterJdbcTemplate());
+    }
+
+    public <T> T fetchOne(Query query, Class<T> type, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
         return fetchOne(query, new SingleColumnRowMapper<>(type), namedParameterJdbcTemplate);
     }
 
-    public static <T> T fetchOne(Query query, RowMapper<T> rowMapper, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
+    public <T> T fetchOne(Query query, RowMapper<T> rowMapper) throws DaoException {
+        return fetchOne(query, rowMapper, getNamedParameterJdbcTemplate());
+    }
+
+    public <T> T fetchOne(Query query, RowMapper<T> rowMapper, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
         try {
             return namedParameterJdbcTemplate.queryForObject(
                     query.getSQL(ParamType.NAMED),
@@ -43,21 +65,62 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
         }
     }
 
-    public static void execute(Query query, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
+    public <T> List<T> fetch(Query query, RowMapper<T> rowMapper) throws DaoException {
+        return fetch(query, rowMapper, getNamedParameterJdbcTemplate());
+    }
+
+    public <T> List<T> fetch(Query query, RowMapper<T> rowMapper, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
+        try {
+            return namedParameterJdbcTemplate.query(
+                    query.getSQL(ParamType.NAMED),
+                    toSqlParameterSource(query.getParams()),
+                    rowMapper
+            );
+        } catch (NestedRuntimeException e) {
+            throw new DaoException(e);
+        }
+    }
+
+    public void executeOne(Query query) throws DaoException {
+        execute(query, 1);
+    }
+
+    public void execute(Query query) throws DaoException {
+        execute(query, -1);
+    }
+
+    public void execute(Query query, int expectedRowsAffected) throws DaoException {
+        execute(query, expectedRowsAffected, getNamedParameterJdbcTemplate());
+    }
+
+    public void execute(Query query, int expectedRowsAffected, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
         try {
             int rowsAffected = namedParameterJdbcTemplate.update(
                     query.getSQL(ParamType.NAMED),
                     toSqlParameterSource(query.getParams()));
 
-            if (rowsAffected != 1) {
-                throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(query.toString(), 1, rowsAffected);
+            if (expectedRowsAffected != -1 && rowsAffected != expectedRowsAffected) {
+                throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(query.toString(), expectedRowsAffected, rowsAffected);
             }
         } catch (NestedRuntimeException ex) {
             throw new DaoException(ex);
         }
     }
 
-    public static SqlParameterSource toSqlParameterSource(Map<String, Param<?>> params) {
+    public Condition appendConditions(Condition condition, Operator operator, ConditionParameterSource conditionParameterSource) {
+        for (ConditionParameterSource.ConditionField field : conditionParameterSource.getConditionFields()) {
+            if (field.getValue() != null) {
+                condition = DSL.condition(operator, condition,
+                        field.getField().compare(
+                                field.getComparator(),
+                                field.getValue()
+                        ));
+            }
+        }
+        return condition;
+    }
+
+    public SqlParameterSource toSqlParameterSource(Map<String, Param<?>> params) {
         MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
         for (Map.Entry<String, Param<?>> entry : params.entrySet()) {
             Param<?> param = entry.getValue();
@@ -71,7 +134,5 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
         }
         return sqlParameterSource;
     }
-
-    public abstract RowMapper<InvoiceEventStat> getRowMapper();
 
 }

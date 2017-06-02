@@ -6,9 +6,8 @@ import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import org.jooq.*;
-import org.jooq.impl.DSL;
-import org.jooq.impl.DefaultConfiguration;
+import org.jooq.Condition;
+import org.jooq.Query;
 import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
@@ -21,33 +20,28 @@ import static com.rbkmoney.magista.domain.Tables.INVOICE_EVENT_STAT;
  */
 public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao {
 
-    private final DSLContext dslContext;
-
     public InvoiceEventDaoImpl(DataSource dataSource) {
-        setDataSource(dataSource);
-        Configuration configuration = new DefaultConfiguration();
-        configuration.set(SQLDialect.POSTGRES_9_5);
-        this.dslContext = DSL.using(configuration);
+        super(dataSource);
     }
 
     @Override
     public Long getLastEventId() throws DaoException {
-        Query query = dslContext.select(INVOICE_EVENT_STAT.EVENT_ID.max()).from(INVOICE_EVENT_STAT);
-        return fetchOne(query, Long.class, getNamedParameterJdbcTemplate());
+        Query query = getDslContext().select(INVOICE_EVENT_STAT.EVENT_ID.max()).from(INVOICE_EVENT_STAT);
+        return fetchOne(query, Long.class);
     }
 
     @Override
     public InvoiceEventStat findPaymentByInvoiceAndPaymentId(String invoiceId, String paymentId) throws DaoException {
-        Query query = dslContext.selectFrom(INVOICE_EVENT_STAT)
+        Query query = getDslContext().selectFrom(INVOICE_EVENT_STAT)
                 .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
                         .and(INVOICE_EVENT_STAT.PAYMENT_ID.eq(paymentId))
                         .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)));
-        return fetchOne(query, getRowMapper(), getNamedParameterJdbcTemplate());
+        return fetchOne(query, getRowMapper());
     }
 
     @Override
     public InvoiceEventStat findInvoiceById(String invoiceId) throws DaoException {
-        Query query = dslContext.selectFrom(INVOICE_EVENT_STAT)
+        Query query = getDslContext().selectFrom(INVOICE_EVENT_STAT)
                 .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
                         .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE)));
         return fetchOne(query, getRowMapper(), getNamedParameterJdbcTemplate());
@@ -55,10 +49,10 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
 
     @Override
     public void insert(InvoiceEventStat invoiceEventStat) throws DaoException {
-        Query query = dslContext.insertInto(INVOICE_EVENT_STAT)
-                .set(dslContext.newRecord(INVOICE_EVENT_STAT, invoiceEventStat));
+        Query query = getDslContext().insertInto(INVOICE_EVENT_STAT)
+                .set(getDslContext().newRecord(INVOICE_EVENT_STAT, invoiceEventStat));
 
-        execute(query, getNamedParameterJdbcTemplate());
+        executeOne(query);
     }
 
     @Override
@@ -70,17 +64,15 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             condition = INVOICE_EVENT_STAT.PAYMENT_ID.eq(invoiceEventStat.getPaymentId());
         }
 
-        Query query = dslContext.update(INVOICE_EVENT_STAT)
-                .set(dslContext.newRecord(INVOICE_EVENT_STAT, invoiceEventStat))
+        Query query = getDslContext().update(INVOICE_EVENT_STAT)
+                .set(getDslContext().newRecord(INVOICE_EVENT_STAT, invoiceEventStat))
                 .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceEventStat.getInvoiceId()))
                 .and(condition);
 
-        execute(query, getNamedParameterJdbcTemplate());
+        executeOne(query);
     }
 
-
-    @Override
-    public RowMapper<InvoiceEventStat> getRowMapper() {
+    public static RowMapper<InvoiceEventStat> getRowMapper() {
         return (rs, i) -> {
             InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
             invoiceEventStat.setEventId(rs.getLong("event_id"));

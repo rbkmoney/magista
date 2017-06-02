@@ -4,6 +4,7 @@ import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.model.Payment;
@@ -18,6 +19,7 @@ import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.apache.http.entity.ContentType;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,7 +30,7 @@ import static com.rbkmoney.magista.query.impl.Parameters.*;
 /**
  * Created by vpankrashkin on 03.08.16.
  */
-public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> implements CompositeQuery<Payment, StatResponse> {
+public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatResponse> implements CompositeQuery<InvoiceEventStat, StatResponse> {
 
     public static final String FUNC_NAME = "payments";
 
@@ -40,19 +42,19 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
     }
 
     @Override
-    public QueryResult<Payment, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+    public QueryResult<InvoiceEventStat, StatResponse> execute(QueryContext context) throws QueryExecutionException {
         QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
 
         return execute(context, collectedResults.getCollectedStream());
     }
 
     @Override
-    public QueryResult<Payment, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
+    public QueryResult<InvoiceEventStat, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
         if (collectedResults.size() != 2) {
             throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
         }
 
-        QueryResult<Payment, List<Payment>> paymentsResult = (QueryResult<Payment, List<Payment>>) collectedResults.get(0);
+        QueryResult<InvoiceEventStat, List<InvoiceEventStat>> paymentsResult = (QueryResult<InvoiceEventStat, List<InvoiceEventStat>>) collectedResults.get(0);
         QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
@@ -67,48 +69,56 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
         );
     }
 
-    private StatPayment toStatPayment(Payment payment) {
+    private StatPayment toStatPayment(InvoiceEventStat invoicePaymentStat) {
         StatPayment statPayment = new StatPayment();
 
-        statPayment.setId(payment.getId());
-        statPayment.setInvoiceId(payment.getInvoiceId());
-        statPayment.setOwnerId(payment.getMerchantId());
-        statPayment.setShopId(payment.getShopId());
-        statPayment.setCreatedAt(TemporalConverter.temporalToString(payment.getCreatedAt()));
+        statPayment.setId(invoicePaymentStat.getPaymentId());
+        statPayment.setInvoiceId(invoicePaymentStat.getInvoiceId());
+        statPayment.setOwnerId(invoicePaymentStat.getPartyId());
+        statPayment.setShopId(invoicePaymentStat.getPartyShopId());
+        statPayment.setCreatedAt(TemporalConverter.temporalToString(invoicePaymentStat.getPaymentCreatedAt()
+                .toInstant(ZoneOffset.UTC)));
         statPayment.setStatus(toStatPaymentStatus(
-                payment.getStatus(),
-                payment.getFailureCode(),
-                payment.getFailureDescription()
+                com.rbkmoney.damsel.domain.InvoicePaymentStatus._Fields.findByName(
+                        invoicePaymentStat.getPaymentStatus().getLiteral()
+                ),
+                invoicePaymentStat.getPaymentStatusFailureCode(),
+                invoicePaymentStat.getPaymentStatusFailureDescription()
         ));
 
-        statPayment.setAmount(payment.getAmount());
-        statPayment.setFee(payment.getFee());
-        statPayment.setCurrencySymbolicCode(payment.getCurrencyCode());
+        statPayment.setAmount(invoicePaymentStat.getPaymentAmount());
+        statPayment.setFee(invoicePaymentStat.getPaymentFee());
+        statPayment.setCurrencySymbolicCode(invoicePaymentStat.getPaymentCurrencyCode());
 
         statPayment.setPaymentTool(toStatPaymentTool(
-                payment.getPaymentTool(),
-                payment.getToken(),
-                payment.getPaymentSystem(),
-                payment.getBin(),
-                payment.getMaskedPan()
+                com.rbkmoney.damsel.domain.PaymentTool._Fields.findByName(
+                        invoicePaymentStat.getPaymentTool()
+                ),
+                invoicePaymentStat.getPaymentToken(),
+                BankCardPaymentSystem.valueOf(invoicePaymentStat.getPaymentSystem()),
+                invoicePaymentStat.getPaymentBin(),
+                invoicePaymentStat.getPaymentMaskedPan()
         ));
 
-        statPayment.setIpAddress(payment.getIp());
-        statPayment.setFingerprint(payment.getCustomerId());
-        statPayment.setPhoneNumber(payment.getPhoneNumber());
-        statPayment.setEmail(payment.getEmail());
-        statPayment.setSessionId(payment.getSessionId());
+        statPayment.setIpAddress(invoicePaymentStat.getPaymentIp());
+        statPayment.setFingerprint(invoicePaymentStat.getPaymentFingerprint());
+        statPayment.setPhoneNumber(invoicePaymentStat.getPaymentPhoneNumber());
+        statPayment.setEmail(invoicePaymentStat.getPaymentEmail());
+        statPayment.setSessionId(invoicePaymentStat.getPaymentSessionId());
 
-        if (payment.getContext() != null) {
+        if (invoicePaymentStat.getPaymentContext() != null) {
             Content content = new Content();
             //TODO we know about content type in this, its always json
             content.setType(ContentType.APPLICATION_JSON.getMimeType());
-            content.setData(payment.getContext());
+            content.setData(invoicePaymentStat.getPaymentContext());
             statPayment.setContext(content);
         }
 
 
-        LocationInfo locationInfo = new LocationInfo(payment.getCityId(), payment.getCountryId());
+        LocationInfo locationInfo = new LocationInfo(
+                invoicePaymentStat.getPaymentCityId(),
+                invoicePaymentStat.getPaymentCountryId()
+        );
         statPayment.setLocationInfo(locationInfo);
 
         return statPayment;
@@ -296,7 +306,7 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
         return paymentsFunction;
     }
 
-    private static class GetDataFunction extends PagedBaseFunction<Payment, Collection<Payment>> {
+    private static class GetDataFunction extends PagedBaseFunction<InvoiceEventStat, Collection<InvoiceEventStat>> {
         private static final String FUNC_NAME = PaymentsFunction.FUNC_NAME + "_data";
 
         public GetDataFunction(Object descriptor, QueryParameters params) {
@@ -304,11 +314,11 @@ public class PaymentsFunction extends PagedBaseFunction<Payment, StatResponse> i
         }
 
         @Override
-        public QueryResult<Payment, Collection<Payment>> execute(QueryContext context) throws QueryExecutionException {
+        public QueryResult<InvoiceEventStat, Collection<InvoiceEventStat>> execute(QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
             PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Collection<Payment> result = functionContext.getDao().getPayments(
+                Collection<InvoiceEventStat> result = functionContext.getDao().getPayments(
                         parameters.getMerchantId(),
                         parameters.getShopId(),
                         Optional.ofNullable(parameters.getInvoiceId()),

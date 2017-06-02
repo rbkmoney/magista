@@ -2,6 +2,7 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.model.Invoice;
@@ -16,6 +17,7 @@ import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.apache.http.entity.ContentType;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,7 +27,7 @@ import static com.rbkmoney.magista.query.impl.Parameters.*;
 /**
  * Created by vpankrashkin on 03.08.16.
  */
-public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> implements CompositeQuery<Invoice, StatResponse> {
+public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatResponse> implements CompositeQuery<InvoiceEventStat, StatResponse> {
 
     public static final String FUNC_NAME = "invoices";
 
@@ -37,19 +39,19 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
     }
 
     @Override
-    public QueryResult<Invoice, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+    public QueryResult<InvoiceEventStat, StatResponse> execute(QueryContext context) throws QueryExecutionException {
         QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
 
         return execute(context, collectedResults.getCollectedStream());
     }
 
     @Override
-    public QueryResult<Invoice, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
+    public QueryResult<InvoiceEventStat, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
         if (collectedResults.size() != 2) {
             throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
         }
 
-        QueryResult<Invoice, List<Invoice>> invoicesResult = (QueryResult<Invoice, List<Invoice>>) collectedResults.get(0);
+        QueryResult<InvoiceEventStat, List<InvoiceEventStat>> invoicesResult = (QueryResult<InvoiceEventStat, List<InvoiceEventStat>>) collectedResults.get(0);
         QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
@@ -62,27 +64,34 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
                 });
     }
 
-    private StatInvoice toStatInvoice(Invoice invoice) {
+    private StatInvoice toStatInvoice(InvoiceEventStat invoiceEventStat) {
         StatInvoice statInvoice = new StatInvoice();
-        statInvoice.setId(invoice.getId());
-        statInvoice.setOwnerId(invoice.getMerchantId());
-        statInvoice.setShopId(invoice.getShopId());
-        statInvoice.setCreatedAt(TemporalConverter.temporalToString(invoice.getCreatedAt()));
+        statInvoice.setId(invoiceEventStat.getInvoiceId());
+        statInvoice.setOwnerId(invoiceEventStat.getPartyId());
+        statInvoice.setShopId(invoiceEventStat.getPartyShopId());
+        statInvoice.setCreatedAt(TemporalConverter.temporalToString(
+                invoiceEventStat.getInvoiceCreatedAt().toInstant(ZoneOffset.UTC)
+        ));
 
-        statInvoice.setStatus(toStatInvoiceStatus(invoice.getStatus(), invoice.getStatusDetails()));
+        statInvoice.setStatus(toStatInvoiceStatus(
+                com.rbkmoney.damsel.domain.InvoiceStatus._Fields.findByName(
+                        invoiceEventStat.getInvoiceStatus().getLiteral()
+                ), invoiceEventStat.getInvoiceStatusDetails()));
 
-        statInvoice.setProduct(invoice.getProduct());
-        statInvoice.setDescription(invoice.getDescription());
+        statInvoice.setProduct(invoiceEventStat.getInvoiceProduct());
+        statInvoice.setDescription(invoiceEventStat.getInvoiceDescription());
 
-        statInvoice.setDue(TemporalConverter.temporalToString(invoice.getDue()));
-        statInvoice.setAmount(invoice.getAmount());
-        statInvoice.setCurrencySymbolicCode(invoice.getCurrencyCode());
+        statInvoice.setDue(
+                TemporalConverter.temporalToString(invoiceEventStat.getInvoiceDue().toInstant(ZoneOffset.UTC))
+        );
+        statInvoice.setAmount(invoiceEventStat.getInvoiceAmount());
+        statInvoice.setCurrencySymbolicCode(invoiceEventStat.getInvoiceCurrencyCode());
 
-        if (invoice.getContext() != null) {
+        if (invoiceEventStat.getInvoiceContext() != null) {
             Content content = new Content();
             //TODO we know about content type in this, its always json
             content.setType(ContentType.APPLICATION_JSON.getMimeType());
-            content.setData(invoice.getContext());
+            content.setData(invoiceEventStat.getInvoiceContext());
             statInvoice.setContext(content);
         }
 
@@ -233,11 +242,11 @@ public class InvoicesFunction extends PagedBaseFunction<Invoice, StatResponse> i
         }
 
         @Override
-        public QueryResult<Invoice, Collection<Invoice>> execute(QueryContext context) throws QueryExecutionException {
+        public QueryResult<InvoiceEventStat, Collection<InvoiceEventStat>> execute(QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
             InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Collection<Invoice> result = functionContext.getDao().getInvoices(
+                Collection<InvoiceEventStat> result = functionContext.getDao().getInvoices(
                         parameters.getMerchantId(),
                         parameters.getShopId(),
                         Optional.ofNullable(parameters.getInvoiceId()),
