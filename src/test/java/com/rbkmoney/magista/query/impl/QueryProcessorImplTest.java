@@ -2,19 +2,24 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.magista.AbstractIntegrationTest;
+import com.rbkmoney.magista.dao.InvoiceEventDao;
 import com.rbkmoney.magista.dao.StatisticsDao;
+import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
+import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
-import org.junit.After;
+import io.github.benas.randombeans.EnhancedRandomBuilder;
+import io.github.benas.randombeans.api.EnhancedRandom;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,9 +35,6 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     @Autowired
     StatisticsDao statisticsDao;
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
     @Before
     public void before() {
         QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao);
@@ -41,7 +43,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
 
     @Test
     public void testInvoices() {
-        String json = "{'query': {'invoices': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
+        String json = "{'query': {'invoices': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1', 'payment_status': 'captured', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(2, statResponse.getData().getInvoices().size());
         assertEquals(5, statResponse.getTotalCount());
@@ -51,8 +53,8 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     public void testPayments() {
         String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(1, statResponse.getData().getPayments().size());
-        assertEquals(2, statResponse.getTotalCount());
+        assertEquals(2, statResponse.getData().getPayments().size());
+        assertEquals(6, statResponse.getTotalCount());
     }
 
     @Test
@@ -128,10 +130,6 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertEquals(0, statResponse.getTotalCount());
     }
 
-//    @After
-//    public void after() {
-//        JdbcTestUtils.deleteFromTables(jdbcTemplate, "mst.invoice", "mst.payment", "mst.customer");
-//    }
 }
 
 
