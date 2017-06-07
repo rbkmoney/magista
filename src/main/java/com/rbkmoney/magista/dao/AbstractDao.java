@@ -51,11 +51,19 @@ public class AbstractDao extends NamedParameterJdbcDaoSupport {
         return fetchOne(query, rowMapper, getNamedParameterJdbcTemplate());
     }
 
+    public <T> T fetchOne(String namedSql, SqlParameterSource parameterSource, RowMapper<T> rowMapper) throws DaoException {
+        return fetchOne(namedSql, parameterSource, rowMapper, getNamedParameterJdbcTemplate());
+    }
+
     public <T> T fetchOne(Query query, RowMapper<T> rowMapper, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
+        return fetchOne(query.getSQL(ParamType.NAMED), toSqlParameterSource(query.getParams()), rowMapper, namedParameterJdbcTemplate);
+    }
+
+    public <T> T fetchOne(String namedSql, SqlParameterSource parameterSource, RowMapper<T> rowMapper, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
         try {
             return namedParameterJdbcTemplate.queryForObject(
-                    query.getSQL(ParamType.NAMED),
-                    toSqlParameterSource(query.getParams()),
+                    namedSql,
+                    parameterSource,
                     rowMapper
             );
         } catch (EmptyResultDataAccessException ex) {
@@ -69,11 +77,19 @@ public class AbstractDao extends NamedParameterJdbcDaoSupport {
         return fetch(query, rowMapper, getNamedParameterJdbcTemplate());
     }
 
+    public <T> List<T> fetch(String namedSql, SqlParameterSource parameterSource, RowMapper<T> rowMapper) throws DaoException {
+        return fetch(namedSql, parameterSource, rowMapper, getNamedParameterJdbcTemplate());
+    }
+
     public <T> List<T> fetch(Query query, RowMapper<T> rowMapper, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
+        return fetch(query.getSQL(ParamType.NAMED), toSqlParameterSource(query.getParams()), rowMapper, namedParameterJdbcTemplate);
+    }
+
+    public <T> List<T> fetch(String namedSql, SqlParameterSource parameterSource, RowMapper<T> rowMapper, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
         try {
             return namedParameterJdbcTemplate.query(
-                    query.getSQL(ParamType.NAMED),
-                    toSqlParameterSource(query.getParams()),
+                    namedSql,
+                    parameterSource,
                     rowMapper
             );
         } catch (NestedRuntimeException e) {
