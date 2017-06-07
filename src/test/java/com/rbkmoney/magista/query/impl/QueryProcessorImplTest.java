@@ -43,18 +43,18 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
 
     @Test
     public void testInvoices() {
-        String json = "{'query': {'invoices': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1', 'payment_status': 'captured', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
+        String json = "{'query': {'invoices': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(2, statResponse.getData().getInvoices().size());
-        assertEquals(4, statResponse.getTotalCount());
+        assertEquals(5, statResponse.getTotalCount());
     }
 
     @Test
     public void testPayments() {
         String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(2, statResponse.getData().getPayments().size());
-        assertEquals(6, statResponse.getTotalCount());
+        assertEquals(1, statResponse.getData().getPayments().size());
+        assertEquals(2, statResponse.getTotalCount());
     }
 
     @Test
