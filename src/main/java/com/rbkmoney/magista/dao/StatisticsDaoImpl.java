@@ -9,7 +9,6 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.NestedRuntimeException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 import javax.sql.DataSource;
@@ -201,129 +200,105 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Collection<Map<String, String>> getPaymentsTurnoverStat(String merchantId, int shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT currency_code AS currency_symbolic_code, SUM(amount - fee) AS amount_with_fee, SUM(amount) AS amount_without_fee, trunc(EXTRACT(EPOCH FROM (created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.payment WHERE shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time AND status = :succeeded_status GROUP BY sp_val, currency_code ORDER BY sp_val";
+        String sql = "SELECT payment_currency_code AS currency_symbolic_code, SUM(payment_amount - payment_fee) AS amount_with_fee, SUM(payment_amount) AS amount_without_fee, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat WHERE party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time AND payment_status = :succeeded_status::mst.invoice_payment_status GROUP BY sp_val, payment_currency_code ORDER BY sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
-        try {
-            return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
-                Map<String, String> map = new HashMap<>();
-                map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
-                map.put("currency_symbolic_code", rs.getString("currency_symbolic_code"));
-                map.put("amount_with_fee", rs.getString("amount_with_fee"));
-                map.put("amount_without_fee", rs.getString("amount_without_fee"));
-                return map;
-            });
-        } catch (NestedRuntimeException e) {
-            throw new DaoException(e);
-        }
+        return fetch(sql, params, (rs, i) -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
+            map.put("currency_symbolic_code", rs.getString("currency_symbolic_code"));
+            map.put("amount_with_fee", rs.getString("amount_with_fee"));
+            map.put("amount_without_fee", rs.getString("amount_without_fee"));
+            return map;
+        });
     }
 
     @Override
     public Collection<Map<String, String>> getPaymentsGeoStat(String merchantId, int shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT city_id, country_id, currency_code as currency_symbolic_code, SUM(amount - fee) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time  group by sp_val, city_id, country_id, currency_code order by sp_val";
+        String sql = "SELECT payment_city_id as city_id, payment_country_id as country_id, payment_currency_code as currency_symbolic_code, SUM(payment_amount - payment_fee) as amount_with_fee, SUM(payment_amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (payment_created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat where payment_status = :succeeded_status::mst.invoice_payment_status and party_shop_id = :shop_id AND party_id = :merchant_id and payment_created_at >= :from_time AND payment_created_at < :to_time  group by sp_val, payment_city_id, payment_country_id, payment_currency_code order by sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
-        try {
-            return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
-                Map<String, String> map = new HashMap<>();
-                map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
-                map.put("city_id", rs.getString("city_id"));
-                map.put("country_id", rs.getString("country_id"));
-                map.put("currency_symbolic_code", rs.getString("currency_symbolic_code"));
-                map.put("amount_with_fee", rs.getString("amount_with_fee"));
-                map.put("amount_without_fee", rs.getString("amount_without_fee"));
-                return map;
-            });
-        } catch (NestedRuntimeException e) {
-            throw new DaoException(e);
-        }
+        return fetch(sql, params, (rs, i) -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
+            map.put("city_id", rs.getString("city_id"));
+            map.put("country_id", rs.getString("country_id"));
+            map.put("currency_symbolic_code", rs.getString("currency_symbolic_code"));
+            map.put("amount_with_fee", rs.getString("amount_with_fee"));
+            map.put("amount_without_fee", rs.getString("amount_without_fee"));
+            return map;
+        });
     }
 
     @Override
     public Collection<Map<String, String>> getPaymentsConversionStat(String merchantId, int shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "select t.*, t.successful_count::float / greatest(t.total_count, 1) as conversion from (SELECT SUM(case WHEN (status = :succeeded_status or status = :failed_status) then 1 else 0 end) as total_count, SUM(CASE WHEN status = :succeeded_status THEN 1 ELSE 0 END) as successful_count, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.payment where shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time GROUP BY sp_val order by sp_val) as t";
+        String sql = "SELECT t.*, t.successful_count::FLOAT / greatest(t.total_count, 1) AS conversion FROM (SELECT SUM(CASE WHEN (payment_status = :succeeded_status::mst.invoice_payment_status OR payment_status = :failed_status::mst.invoice_payment_status) THEN 1 ELSE 0 END) AS total_count, SUM(CASE WHEN payment_status = :succeeded_status::mst.invoice_payment_status THEN 1 ELSE 0 END) AS successful_count, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat WHERE party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time GROUP BY sp_val ORDER BY sp_val) AS t";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         params.addValue("failed_status", InvoicePaymentStatus._Fields.FAILED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
-        try {
-            return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
-                Map<String, String> map = new HashMap<>();
-                map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
-                map.put("conversion", rs.getString("conversion"));
-                map.put("total_count", rs.getString("total_count"));
-                map.put("successful_count", rs.getString("successful_count"));
-                return map;
-            });
-        } catch (NestedRuntimeException e) {
-            throw new DaoException(e);
-        }
+        return fetch(sql, params, (rs, i) -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
+            map.put("conversion", rs.getString("conversion"));
+            map.put("total_count", rs.getString("total_count"));
+            map.put("successful_count", rs.getString("successful_count"));
+            return map;
+        });
     }
 
     @Override
     public Collection<Map<String, String>> getCustomersRateStat(String merchantId, int shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT count(id) as unic_count, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '" + splitInterval + " sec')) AS sp_val from mst.customer WHERE shop_id = :shop_id AND merchant_id = :merchant_id and created_at >= :from_time AND created_at < :to_time GROUP BY sp_val ORDER BY sp_val";
+        String sql = "SELECT count(payment_fingerprint) AS unic_count, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + " sec')) AS sp_val FROM mst.invoice_event_stat WHERE party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time GROUP BY sp_val ORDER BY sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         log.trace("SQL: {}, Params: {}", sql, params);
-        try {
-            return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
-                Map<String, String> map = new HashMap<>();
-                map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
-                map.put("unic_count", rs.getString("unic_count"));
-                return map;
-            });
-        } catch (NestedRuntimeException e) {
-            throw new DaoException(e);
-        }
+        return fetch(sql, params, (rs, i) -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
+            map.put("unic_count", rs.getString("unic_count"));
+            return map;
+        });
     }
 
     @Override
     public Collection<Map<String, String>> getPaymentsCardTypesStat(String merchantId, int shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT count(payment_system) as total_count, payment_system as payment_system, SUM(amount - fee) as amount_with_fee, SUM(amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.payment where status = :succeeded_status and shop_id = :shop_id AND merchant_id = :merchant_id AND created_at >= :from_time AND created_at < :to_time GROUP BY sp_val, payment_system order by sp_val";
+        String sql = "SELECT count(payment_system) AS total_count, payment_system AS payment_system, SUM(payment_amount - payment_fee) AS amount_with_fee, SUM(payment_amount) AS amount_without_fee, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT'::mst.invoice_event_category and payment_status = :succeeded_status::mst.invoice_payment_status AND party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time GROUP BY sp_val, payment_system ORDER BY sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
-        try {
-            return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
-                Map<String, String> map = new HashMap<>();
-                map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
-                map.put("total_count", rs.getString("total_count"));
-                map.put("payment_system", rs.getString("payment_system"));
-                map.put("amount_with_fee", rs.getString("amount_with_fee"));
-                map.put("amount_without_fee", rs.getString("amount_without_fee"));
-                return map;
-            });
-        } catch (NestedRuntimeException e) {
-            throw new DaoException(e);
-        }
+        return fetch(sql, params, (rs, i) -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("offset", (rs.getLong("sp_val") * splitInterval) + "");
+            map.put("total_count", rs.getString("total_count"));
+            map.put("payment_system", rs.getString("payment_system"));
+            map.put("amount_with_fee", rs.getString("amount_with_fee"));
+            map.put("amount_without_fee", rs.getString("amount_without_fee"));
+            return map;
+        });
     }
 
     @Override
     public Collection<Map<String, String>> getAccountingDataByPeriod(Instant fromTime, Instant toTime) throws DaoException {
-        String sql = "SELECT part1.merchant_id, part1.shop_id, part1.currency_code, funds_acquired, fee_charged, coalesce(opening_balance, 0) AS opening_balance, (coalesce(opening_balance, 0) + funds_acquired - fee_charged) AS closing_balance FROM (SELECT merchant_id, shop_id, currency_code, sum(amount) AS funds_acquired, sum(fee) AS fee_charged FROM mst.payment WHERE status = :succeeded_status AND created_at >= :from_time AND created_at < :to_time GROUP BY shop_id, currency_code, merchant_id) part1 LEFT JOIN (SELECT merchant_id, shop_id, sum(amount - fee) AS opening_balance FROM mst.payment WHERE status = :succeeded_status AND created_at < :from_time GROUP BY shop_id, merchant_id) part2 ON part1.merchant_id = part2.merchant_id AND part1.shop_id = part2.shop_id ORDER BY merchant_id, shop_id";
+        String sql = "SELECT part1.party_id as merchant_id, part1.party_shop_id as shop_id, part1.payment_currency_code as currency_code, funds_acquired, fee_charged, coalesce(opening_balance, 0) AS opening_balance, (coalesce(opening_balance, 0) + funds_acquired - fee_charged) AS closing_balance FROM (SELECT party_id, party_shop_id, payment_currency_code, sum(payment_amount) AS funds_acquired, sum(payment_fee) AS fee_charged FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT'::mst.invoice_event_category and payment_status = :succeeded_status::mst.invoice_payment_status AND payment_created_at >= :from_time AND payment_created_at < :to_time GROUP BY party_shop_id, payment_currency_code, party_id) part1 LEFT JOIN (SELECT party_id, party_shop_id, sum(payment_amount - payment_fee) AS opening_balance FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT'::mst.invoice_event_category and payment_status = :succeeded_status::mst.invoice_payment_status AND payment_created_at < :from_time GROUP BY party_shop_id, party_id) part2 ON part1.party_id = part2.party_id AND part1.party_shop_id = part2.party_shop_id ORDER BY merchant_id, shop_id";
         MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("from_time", LocalDateTime.ofInstant(fromTime, ZoneId.of("UTC")), Types.OTHER)
-                .addValue("to_time", LocalDateTime.ofInstant(toTime, ZoneId.of("UTC")), Types.OTHER)
+                .addValue("from_time", LocalDateTime.ofInstant(fromTime, ZoneOffset.UTC), Types.OTHER)
+                .addValue("to_time", LocalDateTime.ofInstant(toTime, ZoneOffset.UTC), Types.OTHER)
                 .addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params.getValues());
 
-        try {
-            return getNamedParameterJdbcTemplate().query(sql, params, (rs, i) -> {
-                Map<String, String> map = new HashMap<>();
-                map.put("merchant_id", rs.getString("merchant_id"));
-                map.put("shop_id", rs.getString("shop_id"));
-                map.put("currency_code", rs.getString("currency_code"));
-                map.put("opening_balance", rs.getString("opening_balance"));
-                map.put("funds_acquired", rs.getString("funds_acquired"));
-                map.put("fee_charged", rs.getString("fee_charged"));
-                map.put("closing_balance", rs.getString("closing_balance"));
-                return map;
-            });
-        } catch (NestedRuntimeException e) {
-            throw new DaoException(e);
-        }
+        return fetch(sql, params, (rs, i) -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("merchant_id", rs.getString("merchant_id"));
+            map.put("shop_id", rs.getString("shop_id"));
+            map.put("currency_code", rs.getString("currency_code"));
+            map.put("opening_balance", rs.getString("opening_balance"));
+            map.put("funds_acquired", rs.getString("funds_acquired"));
+            map.put("fee_charged", rs.getString("fee_charged"));
+            map.put("closing_balance", rs.getString("closing_balance"));
+            return map;
+        });
     }
 
     private MapSqlParameterSource createParamsMap(String merchantId, int shopId, Instant fromTime, Instant toTime, Integer splitInterval) {
@@ -366,7 +341,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         filter(t -> t.getField() != INVOICE_EVENT_STAT.INVOICE_ID)
                 .count();
 
-        if(paymentParamsCount > 0) {
+        if (paymentParamsCount > 0) {
             condition = condition.and(INVOICE_EVENT_STAT.INVOICE_ID
                     .in(buildPaymentSelectConditionStepQuery(merchantId,
                             shopId,
