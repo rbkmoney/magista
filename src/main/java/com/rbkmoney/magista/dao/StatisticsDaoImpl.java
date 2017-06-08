@@ -78,6 +78,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         Query query = buildInvoiceSelectConditionStepQuery(merchantId, shopId,
                 invoiceSource, paymentSource)
+                .orderBy(INVOICE_EVENT_STAT.EVENT_ID.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
         return fetch(query, InvoiceEventDaoImpl.getRowMapper());
@@ -159,6 +160,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         );
 
         Query query = buildPaymentSelectConditionStepQuery(merchantId, shopId, paymentSource)
+                .orderBy(INVOICE_EVENT_STAT.EVENT_ID.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
         return fetch(query, InvoiceEventDaoImpl.getRowMapper());
@@ -337,8 +339,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         long paymentParamsCount = paymentSource
                 .getConditionFields()
-                .stream().
-                        filter(t -> t.getField() != INVOICE_EVENT_STAT.INVOICE_ID)
+                .stream()
+                .filter(t -> t.getField() != INVOICE_EVENT_STAT.INVOICE_ID)
                 .count();
 
         if (paymentParamsCount > 0) {
