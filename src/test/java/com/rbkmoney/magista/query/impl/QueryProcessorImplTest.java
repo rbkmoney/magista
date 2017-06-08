@@ -1,27 +1,24 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.damsel.merch_stat.StatInvoice;
+import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.magista.AbstractIntegrationTest;
-import com.rbkmoney.magista.dao.InvoiceEventDao;
 import com.rbkmoney.magista.dao.StatisticsDao;
-import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
-import io.github.benas.randombeans.EnhancedRandomBuilder;
-import io.github.benas.randombeans.api.EnhancedRandom;
+import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by vpankrashkin on 29.08.16.
@@ -50,11 +47,37 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testOrderByEventIdInvoices() {
+        String json = "{'query': {'invoices': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(5, statResponse.getData().getInvoices().size());
+        Instant instant = Instant.MAX;
+        for (StatInvoice statInvoice : statResponse.getData().getInvoices()) {
+            Instant statInstant = Instant.from(TemporalConverter.stringToTemporal(statInvoice.getCreatedAt()));
+            assertTrue(statInstant.isBefore(instant));
+            instant = statInstant;
+        }
+    }
+
+    @Test
     public void testPayments() {
         String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getData().getPayments().size());
         assertEquals(2, statResponse.getTotalCount());
+    }
+
+    @Test
+    public void testOrderByEventIdPayments() {
+        String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(2, statResponse.getData().getPayments().size());
+        Instant instant = Instant.MAX;
+        for (StatPayment statPayment : statResponse.getData().getPayments()) {
+            Instant statInstant = Instant.from(TemporalConverter.stringToTemporal(statPayment.getCreatedAt()));
+            assertTrue(statInstant.isBefore(instant));
+            instant = statInstant;
+        }
     }
 
     @Test
