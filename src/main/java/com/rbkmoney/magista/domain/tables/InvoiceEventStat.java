@@ -39,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 250298667;
+    private static final long serialVersionUID = -286875487;
 
     /**
      * The reference instance of <code>mst.invoice_event_stat</code>
@@ -82,7 +82,7 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     /**
      * The column <code>mst.invoice_event_stat.party_email</code>.
      */
-    public final TableField<InvoiceEventStatRecord, String> PARTY_EMAIL = createField("party_email", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
+    public final TableField<InvoiceEventStatRecord, String> PARTY_EMAIL = createField("party_email", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.party_shop_id</code>.
@@ -92,7 +92,7 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     /**
      * The column <code>mst.invoice_event_stat.party_shop_name</code>.
      */
-    public final TableField<InvoiceEventStatRecord, String> PARTY_SHOP_NAME = createField("party_shop_name", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
+    public final TableField<InvoiceEventStatRecord, String> PARTY_SHOP_NAME = createField("party_shop_name", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.party_shop_description</code>.
@@ -107,7 +107,7 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     /**
      * The column <code>mst.invoice_event_stat.party_shop_category_id</code>.
      */
-    public final TableField<InvoiceEventStatRecord, Integer> PARTY_SHOP_CATEGORY_ID = createField("party_shop_category_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<InvoiceEventStatRecord, Integer> PARTY_SHOP_CATEGORY_ID = createField("party_shop_category_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.party_shop_payout_tool_id</code>.
@@ -117,17 +117,17 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     /**
      * The column <code>mst.invoice_event_stat.party_contract_id</code>.
      */
-    public final TableField<InvoiceEventStatRecord, Integer> PARTY_CONTRACT_ID = createField("party_contract_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<InvoiceEventStatRecord, Integer> PARTY_CONTRACT_ID = createField("party_contract_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.party_contract_registered_number</code>.
      */
-    public final TableField<InvoiceEventStatRecord, String> PARTY_CONTRACT_REGISTERED_NUMBER = createField("party_contract_registered_number", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
+    public final TableField<InvoiceEventStatRecord, String> PARTY_CONTRACT_REGISTERED_NUMBER = createField("party_contract_registered_number", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.party_contract_inn</code>.
      */
-    public final TableField<InvoiceEventStatRecord, String> PARTY_CONTRACT_INN = createField("party_contract_inn", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
+    public final TableField<InvoiceEventStatRecord, String> PARTY_CONTRACT_INN = createField("party_contract_inn", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.invoice_id</code>.
@@ -283,6 +283,16 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
      * The column <code>mst.invoice_event_stat.payment_context</code>.
      */
     public final TableField<InvoiceEventStatRecord, byte[]> PAYMENT_CONTEXT = createField("payment_context", org.jooq.impl.SQLDataType.BLOB, this, "");
+
+    /**
+     * The column <code>mst.invoice_event_stat.payment_provider_fee</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_PROVIDER_FEE = createField("payment_provider_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column <code>mst.invoice_event_stat.payment_external_fee</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_EXTERNAL_FEE = createField("payment_external_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * Create a <code>mst.invoice_event_stat</code> table reference

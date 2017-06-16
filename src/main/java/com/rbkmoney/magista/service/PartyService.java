@@ -1,8 +1,6 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.damsel.domain.Contract;
 import com.rbkmoney.damsel.domain.Party;
-import com.rbkmoney.damsel.domain.Shop;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.PartyException;
@@ -22,7 +20,7 @@ public class PartyService {
     @Autowired
     PartyManagementSrv.Iface partyManagementSrv;
 
-    @Cacheable(cacheNames="party")
+    @Cacheable(cacheNames = "party")
     public Party getParty(String partyId) {
         try {
             return partyManagementSrv.get(userInfo, partyId);
@@ -30,32 +28,6 @@ public class PartyService {
             throw new NotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
         } catch (TException ex) {
             throw new PartyException("Exception with get party from hg", ex);
-        }
-    }
-
-    @Cacheable(cacheNames="shop")
-    public Shop getShopById(String partyId, int shopId) {
-        try {
-            return partyManagementSrv.getShop(userInfo, partyId, shopId);
-        } catch (ShopNotFound ex) {
-            throw new NotFoundException(String.format("Shop not found, partyId='%s', shopId='%d'", partyId, shopId), ex);
-        } catch (PartyNotFound ex) {
-            throw new NotFoundException(String.format("Party not found, partyId='%s', shopId='%d'", partyId, shopId), ex);
-        } catch (TException ex) {
-            throw new PartyException("Exception with get shop from hg", ex);
-        }
-    }
-
-    @Cacheable(cacheNames="contract")
-    public Contract getContract(String partyId, int shopId) {
-        try {
-            return partyManagementSrv.getContract(userInfo, partyId, shopId);
-        } catch (PartyNotFound ex) {
-            throw new NotFoundException(String.format("Party not found, partyId='%s', shopId='%d'", partyId, shopId), ex);
-        } catch (ContractNotFound ex) {
-            throw new NotFoundException(String.format("Contract not found, partyId='%s', shopId='%d'", partyId, shopId), ex);
-        } catch (TException ex) {
-            throw new PartyException("Exception with get contract from hg", ex);
         }
     }
 

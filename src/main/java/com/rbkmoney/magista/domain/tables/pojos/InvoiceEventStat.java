@@ -29,7 +29,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = -1567062498;
+    private static final long serialVersionUID = 1826206916;
 
     private Long                 eventId;
     private InvoiceEventCategory eventCategory;
@@ -77,6 +77,8 @@ public class InvoiceEventStat implements Serializable {
     private String               paymentFingerprint;
     private LocalDateTime        paymentCreatedAt;
     private byte[]               paymentContext;
+    private Long                 paymentProviderFee;
+    private Long                 paymentExternalFee;
 
     public InvoiceEventStat() {}
 
@@ -127,6 +129,8 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFingerprint = value.paymentFingerprint;
         this.paymentCreatedAt = value.paymentCreatedAt;
         this.paymentContext = value.paymentContext;
+        this.paymentProviderFee = value.paymentProviderFee;
+        this.paymentExternalFee = value.paymentExternalFee;
     }
 
     public InvoiceEventStat(
@@ -175,7 +179,9 @@ public class InvoiceEventStat implements Serializable {
         String               paymentEmail,
         String               paymentFingerprint,
         LocalDateTime        paymentCreatedAt,
-        byte[]               paymentContext
+        byte[]               paymentContext,
+        Long                 paymentProviderFee,
+        Long                 paymentExternalFee
     ) {
         this.eventId = eventId;
         this.eventCategory = eventCategory;
@@ -223,6 +229,8 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFingerprint = paymentFingerprint;
         this.paymentCreatedAt = paymentCreatedAt;
         this.paymentContext = paymentContext;
+        this.paymentProviderFee = paymentProviderFee;
+        this.paymentExternalFee = paymentExternalFee;
     }
 
     public Long getEventId() {
@@ -593,6 +601,22 @@ public class InvoiceEventStat implements Serializable {
         this.paymentContext = paymentContext;
     }
 
+    public Long getPaymentProviderFee() {
+        return this.paymentProviderFee;
+    }
+
+    public void setPaymentProviderFee(Long paymentProviderFee) {
+        this.paymentProviderFee = paymentProviderFee;
+    }
+
+    public Long getPaymentExternalFee() {
+        return this.paymentExternalFee;
+    }
+
+    public void setPaymentExternalFee(Long paymentExternalFee) {
+        this.paymentExternalFee = paymentExternalFee;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -878,6 +902,18 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!Arrays.equals(paymentContext, other.paymentContext))
             return false;
+        if (paymentProviderFee == null) {
+            if (other.paymentProviderFee != null)
+                return false;
+        }
+        else if (!paymentProviderFee.equals(other.paymentProviderFee))
+            return false;
+        if (paymentExternalFee == null) {
+            if (other.paymentExternalFee != null)
+                return false;
+        }
+        else if (!paymentExternalFee.equals(other.paymentExternalFee))
+            return false;
         return true;
     }
 
@@ -931,6 +967,8 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentFingerprint == null) ? 0 : paymentFingerprint.hashCode());
         result = prime * result + ((paymentCreatedAt == null) ? 0 : paymentCreatedAt.hashCode());
         result = prime * result + ((paymentContext == null) ? 0 : Arrays.hashCode(paymentContext));
+        result = prime * result + ((paymentProviderFee == null) ? 0 : paymentProviderFee.hashCode());
+        result = prime * result + ((paymentExternalFee == null) ? 0 : paymentExternalFee.hashCode());
         return result;
     }
 
@@ -984,6 +1022,8 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentFingerprint);
         sb.append(", ").append(paymentCreatedAt);
         sb.append(", ").append("[binary...]");
+        sb.append(", ").append(paymentProviderFee);
+        sb.append(", ").append(paymentExternalFee);
 
         sb.append(")");
         return sb.toString();

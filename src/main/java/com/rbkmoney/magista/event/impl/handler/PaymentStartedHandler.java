@@ -8,12 +8,9 @@ import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.event.impl.mapper.PaymentCommissionMapper;
 import com.rbkmoney.magista.event.impl.mapper.PaymentGeoMapper;
 import com.rbkmoney.magista.event.impl.mapper.PaymentMapper;
-import com.rbkmoney.magista.event.impl.processor.CompositeProcessor;
 import com.rbkmoney.magista.event.impl.processor.InvoicePaymentEventProcessor;
-import com.rbkmoney.magista.event.impl.processor.PaymentProcessor;
 import com.rbkmoney.magista.provider.GeoProvider;
 import com.rbkmoney.magista.service.InvoiceEventService;
-import com.rbkmoney.magista.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,18 +27,12 @@ public class PaymentStartedHandler extends AbstractInvoiceEventHandler {
     GeoProvider geoProvider;
 
     @Autowired
-    PaymentService paymentService;
-
-    @Autowired
     InvoiceEventService invoiceEventService;
 
     @Override
     public Processor handle(StockEvent event) {
         InvoiceEventContext context = generateContext(event);
-        return new CompositeProcessor(
-                new PaymentProcessor(paymentService, context.getPayment()),
-                new InvoicePaymentEventProcessor(invoiceEventService, context.getInvoiceEventStat())
-        );
+        return new InvoicePaymentEventProcessor(invoiceEventService, context.getInvoiceEventStat());
     }
 
     @Override

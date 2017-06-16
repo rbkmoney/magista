@@ -4,10 +4,7 @@
 package com.rbkmoney.magista.domain;
 
 
-import com.rbkmoney.magista.domain.tables.Customer;
-import com.rbkmoney.magista.domain.tables.Invoice;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
-import com.rbkmoney.magista.domain.tables.Payment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +30,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Mst extends SchemaImpl {
 
-    private static final long serialVersionUID = 1270863610;
+    private static final long serialVersionUID = 794070135;
 
     /**
      * The reference instance of <code>mst</code>
@@ -41,24 +38,9 @@ public class Mst extends SchemaImpl {
     public static final Mst MST = new Mst();
 
     /**
-     * The table <code>mst.customer</code>.
-     */
-    public final Customer CUSTOMER = com.rbkmoney.magista.domain.tables.Customer.CUSTOMER;
-
-    /**
-     * The table <code>mst.invoice</code>.
-     */
-    public final Invoice INVOICE = com.rbkmoney.magista.domain.tables.Invoice.INVOICE;
-
-    /**
      * The table <code>mst.invoice_event_stat</code>.
      */
     public final InvoiceEventStat INVOICE_EVENT_STAT = com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
-
-    /**
-     * The table <code>mst.payment</code>.
-     */
-    public final Payment PAYMENT = com.rbkmoney.magista.domain.tables.Payment.PAYMENT;
 
     /**
      * No further instances allowed
@@ -85,9 +67,6 @@ public class Mst extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
-            Customer.CUSTOMER,
-            Invoice.INVOICE,
-            InvoiceEventStat.INVOICE_EVENT_STAT,
-            Payment.PAYMENT);
+            InvoiceEventStat.INVOICE_EVENT_STAT);
     }
 }

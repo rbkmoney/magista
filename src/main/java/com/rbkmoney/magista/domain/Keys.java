@@ -4,14 +4,8 @@
 package com.rbkmoney.magista.domain;
 
 
-import com.rbkmoney.magista.domain.tables.Customer;
-import com.rbkmoney.magista.domain.tables.Invoice;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
-import com.rbkmoney.magista.domain.tables.Payment;
-import com.rbkmoney.magista.domain.tables.records.CustomerRecord;
 import com.rbkmoney.magista.domain.tables.records.InvoiceEventStatRecord;
-import com.rbkmoney.magista.domain.tables.records.InvoiceRecord;
-import com.rbkmoney.magista.domain.tables.records.PaymentRecord;
 
 import javax.annotation.Generated;
 
@@ -42,10 +36,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<CustomerRecord> CUSTOMER_PKEY = UniqueKeys0.CUSTOMER_PKEY;
-    public static final UniqueKey<InvoiceRecord> INVOICE_PKEY = UniqueKeys0.INVOICE_PKEY;
     public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_PKEY = UniqueKeys0.INVOICE_EVENT_PKEY;
-    public static final UniqueKey<PaymentRecord> PAYMENT_PKEY = UniqueKeys0.PAYMENT_PKEY;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -57,9 +48,6 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     private static class UniqueKeys0 extends AbstractKeys {
-        public static final UniqueKey<CustomerRecord> CUSTOMER_PKEY = createUniqueKey(Customer.CUSTOMER, "customer_pkey", Customer.CUSTOMER.ID, Customer.CUSTOMER.MERCHANT_ID, Customer.CUSTOMER.SHOP_ID);
-        public static final UniqueKey<InvoiceRecord> INVOICE_PKEY = createUniqueKey(Invoice.INVOICE, "invoice_pkey", Invoice.INVOICE.ID);
         public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_PKEY = createUniqueKey(InvoiceEventStat.INVOICE_EVENT_STAT, "invoice_event_pkey", InvoiceEventStat.INVOICE_EVENT_STAT.EVENT_ID);
-        public static final UniqueKey<PaymentRecord> PAYMENT_PKEY = createUniqueKey(Payment.PAYMENT, "payment_pkey", Payment.PAYMENT.INVOICE_ID, Payment.PAYMENT.PAYMENT_ID);
     }
 }

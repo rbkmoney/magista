@@ -94,10 +94,6 @@ public class EventService {
         }
     }
 
-    public boolean isEventQueueEmpty() {
-        return queue.isEmpty();
-    }
-
     private Handler getHandler(StockEvent stockEvent) {
         for (Handler handler : handlers) {
             if (handler.accept(stockEvent)) {

@@ -67,6 +67,7 @@ public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
     public void insertNullSymbolInString() throws IOException {
         InvoiceEventStat invoiceEventStat = random(InvoiceEventStat.class);
 
+        invoiceEventStat.setInvoiceDescription("\u0000\u0000\u0014stman description");
         invoiceEventStat.setPaymentToken("\u0000kek\u0000eke\u0000");
 
         invoiceEventDao.insert(invoiceEventStat);
