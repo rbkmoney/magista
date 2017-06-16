@@ -7,7 +7,6 @@ import com.rbkmoney.damsel.payment_processing.InvoicePaymentEvent;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
-import com.rbkmoney.magista.model.Payment;
 
 import java.util.List;
 
@@ -26,10 +25,6 @@ public class PaymentCommissionMapper implements Mapper<InvoiceEventContext> {
                         && t.getSource().getAccountType().getMerchant() == MerchantCashFlowAccount.settlement
                         && t.getDestination().getAccountType().isSetSystem())
                 .mapToLong(t -> t.getVolume().getAmount()).sum();
-
-        Payment payment = context.getPayment();
-        payment.setFee(fee);
-        context.setPayment(payment);
 
         InvoiceEventStat invoiceEventStat = context.getInvoiceEventStat();
         invoiceEventStat.setPaymentFee(fee);

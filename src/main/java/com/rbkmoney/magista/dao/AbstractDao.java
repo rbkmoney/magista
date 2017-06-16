@@ -110,13 +110,29 @@ public class AbstractDao extends NamedParameterJdbcDaoSupport {
     }
 
     public void execute(Query query, int expectedRowsAffected, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
+        execute(query.getSQL(ParamType.NAMED), toSqlParameterSource(query.getParams()), expectedRowsAffected, namedParameterJdbcTemplate);
+    }
+
+    public void executeOne(String namedSql, SqlParameterSource parameterSource) throws DaoException {
+        execute(namedSql, parameterSource, 1);
+    }
+
+    public void execute(String namedSql, SqlParameterSource parameterSource) throws DaoException {
+        execute(namedSql, parameterSource, -1);
+    }
+
+    public void execute(String namedSql, SqlParameterSource parameterSource, int expectedRowsAffected) throws DaoException {
+        execute(namedSql, parameterSource, expectedRowsAffected, getNamedParameterJdbcTemplate());
+    }
+
+    public void execute(String namedSql, SqlParameterSource parameterSource, int expectedRowsAffected, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
         try {
             int rowsAffected = namedParameterJdbcTemplate.update(
-                    query.getSQL(ParamType.NAMED),
-                    toSqlParameterSource(query.getParams()));
+                    namedSql,
+                    parameterSource);
 
             if (expectedRowsAffected != -1 && rowsAffected != expectedRowsAffected) {
-                throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(query.toString(), expectedRowsAffected, rowsAffected);
+                throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(namedSql, expectedRowsAffected, rowsAffected);
             }
         } catch (NestedRuntimeException ex) {
             throw new DaoException(ex);

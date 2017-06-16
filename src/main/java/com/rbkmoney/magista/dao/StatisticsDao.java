@@ -2,8 +2,6 @@ package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.model.Invoice;
-import com.rbkmoney.magista.model.Payment;
 
 import java.time.Instant;
 import java.util.Collection;

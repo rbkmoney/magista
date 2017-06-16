@@ -7,7 +7,6 @@ import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
-import com.rbkmoney.magista.model.Payment;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
 import com.rbkmoney.magista.query.builder.QueryBuilderException;

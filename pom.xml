@@ -23,7 +23,7 @@
         <dockerfile.base.service.tag>f26fcc19d1941ab74f1c72dd8a408be17a769333</dockerfile.base.service.tag>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <db.name>magista</db.name>
-        <db.port>${container.http.port}</db.port>
+        <db.port>5432</db.port>
         <db.url>jdbc:postgresql://localhost:${db.port}/${db.name}</db.url>
         <db.user>postgres</db.user>
         <db.password>postgres</db.password>
@@ -199,60 +199,9 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.21.0</version>
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>postgres-start</id>-->
-                        <!--<phase>generate-sources</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>start</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                    <!--<execution>-->
-                        <!--<id>postgres-stop</id>-->
-                        <!--<phase>process-sources</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>stop</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-                <configuration>
-                    <images>
-                        <image>
-                            <name>postgres:latest</name>
-                            <run>
-                                <env>
-                                    <POSTGRES_DB>${db.name}</POSTGRES_DB>
-                                    <POSTGRES_USER>${db.user}</POSTGRES_USER>
-                                    <POSTGRES_PASSWORD>${db.password}</POSTGRES_PASSWORD>
-                                </env>
-                                <ports>
-                                    <port>${db.port}:5432</port>
-                                </ports>
-                                <wait>
-                                    <log>ready for start up</log>
-                                    <time>20000</time>
-                                </wait>
-                            </run>
-                        </image>
-                    </images>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>${flyway.version}</version>
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>flyway-migrate</id>-->
-                        <!--<phase>generate-sources</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>migrate</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
                 <configuration>
                     <url>${db.url}</url>
                     <user>${db.user}</user>
@@ -269,16 +218,6 @@
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
                 <version>${jooq.version}</version>
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>jooq-generate</id>-->
-                        <!--<inherited>flyway-migrate</inherited>-->
-                        <!--<phase>generate-sources</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>generate</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>

@@ -6,11 +6,8 @@ import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.event.impl.mapper.PaymentStatusMapper;
-import com.rbkmoney.magista.event.impl.processor.CompositeProcessor;
 import com.rbkmoney.magista.event.impl.processor.InvoicePaymentEventStatusChangeProcessor;
-import com.rbkmoney.magista.event.impl.processor.PaymentStatusChangeProcessor;
 import com.rbkmoney.magista.service.InvoiceEventService;
-import com.rbkmoney.magista.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,18 +21,12 @@ import java.util.List;
 public class PaymentStatusChangedHandler extends AbstractInvoiceEventHandler {
 
     @Autowired
-    PaymentService paymentService;
-
-    @Autowired
     InvoiceEventService invoiceEventService;
 
     @Override
     public Processor handle(StockEvent event) {
         InvoiceEventContext context = generateContext(event);
-        return new CompositeProcessor(
-                new PaymentStatusChangeProcessor(paymentService, context.getPaymentStatusChange()),
-                new InvoicePaymentEventStatusChangeProcessor(invoiceEventService, context.getPaymentStatusChange())
-        );
+        return new InvoicePaymentEventStatusChangeProcessor(invoiceEventService, context.getPaymentStatusChange());
     }
 
     @Override
