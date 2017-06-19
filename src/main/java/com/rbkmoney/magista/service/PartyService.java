@@ -4,10 +4,12 @@ import com.rbkmoney.damsel.domain.Party;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.PartyException;
+import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 /**
  * Created by tolkonepiu on 29/05/2017.
@@ -20,12 +22,13 @@ public class PartyService {
     @Autowired
     PartyManagementSrv.Iface partyManagementSrv;
 
-    @Cacheable(cacheNames = "party")
-    public Party getParty(String partyId) {
+    public Party getParty(String partyId, Instant timestamp) {
         try {
-            return partyManagementSrv.get(userInfo, partyId);
+            return partyManagementSrv.checkout(userInfo, partyId, TemporalConverter.temporalToString(timestamp));
         } catch (PartyNotFound ex) {
             throw new NotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
+        } catch (PartyNotExistsYet ex) {
+            throw new NotFoundException(String.format("Party not exists at this time, partyId='%s', timestamp='%s'", partyId, timestamp), ex);
         } catch (TException ex) {
             throw new PartyException("Exception with get party from hg", ex);
         }
