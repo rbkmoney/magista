@@ -34,7 +34,7 @@ public class InvoicePartyMapper implements Mapper<InvoiceEventContext> {
         try {
             Party party = partyService.getParty(
                     invoiceEventStat.getPartyId(),
-                    invoiceEventStat.getEventCreatedAt().toInstant(ZoneOffset.UTC)
+                    invoiceEventStat.getInvoiceCreatedAt().toInstant(ZoneOffset.UTC)
             );
             invoiceEventStat.setPartyEmail(party.getContactInfo().getEmail());
 
