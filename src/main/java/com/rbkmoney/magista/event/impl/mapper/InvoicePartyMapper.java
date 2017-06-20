@@ -9,6 +9,8 @@ import com.rbkmoney.magista.service.PartyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.ZoneOffset;
+
 /**
  * Created by tolkonepiu on 29/05/2017.
  */
@@ -30,7 +32,10 @@ public class InvoicePartyMapper implements Mapper<InvoiceEventContext> {
                 invoiceEventStat.getInvoiceId(), invoiceEventStat.getPartyId(), invoiceEventStat.getEventId());
 
         try {
-            Party party = partyService.getParty(invoiceEventStat.getPartyId());
+            Party party = partyService.getParty(
+                    invoiceEventStat.getPartyId(),
+                    invoiceEventStat.getInvoiceCreatedAt().toInstant(ZoneOffset.UTC)
+            );
             invoiceEventStat.setPartyEmail(party.getContactInfo().getEmail());
 
             Shop shop = party.getShops().get(invoiceEventStat.getPartyShopId());
