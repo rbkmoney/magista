@@ -12,8 +12,6 @@ ALTER TABLE mst.invoice_event_stat
 ALTER TABLE mst.invoice_event_stat
   ADD COLUMN payment_adjustment_reason CHARACTER VARYING;
 ALTER TABLE mst.invoice_event_stat
-  ADD COLUMN payment_adjustment_amount BIGINT;
-ALTER TABLE mst.invoice_event_stat
   ADD COLUMN payment_adjustment_fee BIGINT;
 ALTER TABLE mst.invoice_event_stat
   ADD COLUMN payment_adjustment_provider_fee BIGINT;
