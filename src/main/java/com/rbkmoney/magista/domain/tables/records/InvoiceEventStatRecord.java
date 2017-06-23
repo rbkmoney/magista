@@ -4,6 +4,7 @@
 package com.rbkmoney.magista.domain.tables.records;
 
 
+import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
@@ -31,7 +32,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = -1769071901;
+    private static final long serialVersionUID = 139981694;
 
     /**
      * Setter for <code>mst.invoice_event_stat.event_id</code>.
@@ -705,6 +706,118 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
         return (Long) get(47);
     }
 
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_adjustment_id</code>.
+     */
+    public void setPaymentAdjustmentId(String value) {
+        set(48, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_adjustment_id</code>.
+     */
+    public String getPaymentAdjustmentId() {
+        return (String) get(48);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_adjustment_status</code>.
+     */
+    public void setPaymentAdjustmentStatus(AdjustmentStatus value) {
+        set(49, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_adjustment_status</code>.
+     */
+    public AdjustmentStatus getPaymentAdjustmentStatus() {
+        return (AdjustmentStatus) get(49);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_adjustment_status_at</code>.
+     */
+    public void setPaymentAdjustmentStatusAt(LocalDateTime value) {
+        set(50, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_adjustment_status_at</code>.
+     */
+    public LocalDateTime getPaymentAdjustmentStatusAt() {
+        return (LocalDateTime) get(50);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_adjustment_created_at</code>.
+     */
+    public void setPaymentAdjustmentCreatedAt(LocalDateTime value) {
+        set(51, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_adjustment_created_at</code>.
+     */
+    public LocalDateTime getPaymentAdjustmentCreatedAt() {
+        return (LocalDateTime) get(51);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_adjustment_reason</code>.
+     */
+    public void setPaymentAdjustmentReason(String value) {
+        set(52, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_adjustment_reason</code>.
+     */
+    public String getPaymentAdjustmentReason() {
+        return (String) get(52);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_adjustment_fee</code>.
+     */
+    public void setPaymentAdjustmentFee(Long value) {
+        set(53, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_adjustment_fee</code>.
+     */
+    public Long getPaymentAdjustmentFee() {
+        return (Long) get(53);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_adjustment_provider_fee</code>.
+     */
+    public void setPaymentAdjustmentProviderFee(Long value) {
+        set(54, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_adjustment_provider_fee</code>.
+     */
+    public Long getPaymentAdjustmentProviderFee() {
+        return (Long) get(54);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_adjustment_external_fee</code>.
+     */
+    public void setPaymentAdjustmentExternalFee(Long value) {
+        set(55, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_adjustment_external_fee</code>.
+     */
+    public Long getPaymentAdjustmentExternalFee() {
+        return (Long) get(55);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -731,7 +844,7 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
     /**
      * Create a detached, initialised InvoiceEventStatRecord
      */
-    public InvoiceEventStatRecord(Long eventId, InvoiceEventCategory eventCategory, InvoiceEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyEmail, Integer partyShopId, String partyShopName, String partyShopDescription, String partyShopUrl, Integer partyShopCategoryId, Integer partyShopPayoutToolId, Integer partyContractId, String partyContractRegisteredNumber, String partyContractInn, String invoiceId, InvoiceStatus invoiceStatus, String invoiceStatusDetails, String invoiceProduct, String invoiceDescription, Long invoiceAmount, String invoiceCurrencyCode, LocalDateTime invoiceDue, LocalDateTime invoiceCreatedAt, byte[] invoiceContext, String paymentId, InvoicePaymentStatus paymentStatus, String paymentStatusFailureCode, String paymentStatusFailureDescription, Long paymentAmount, String paymentCurrencyCode, Long paymentFee, String paymentTool, String paymentMaskedPan, String paymentBin, String paymentToken, String paymentSystem, String paymentSessionId, Integer paymentCountryId, Integer paymentCityId, String paymentIp, String paymentPhoneNumber, String paymentEmail, String paymentFingerprint, LocalDateTime paymentCreatedAt, byte[] paymentContext, Long paymentProviderFee, Long paymentExternalFee) {
+    public InvoiceEventStatRecord(Long eventId, InvoiceEventCategory eventCategory, InvoiceEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyEmail, Integer partyShopId, String partyShopName, String partyShopDescription, String partyShopUrl, Integer partyShopCategoryId, Integer partyShopPayoutToolId, Integer partyContractId, String partyContractRegisteredNumber, String partyContractInn, String invoiceId, InvoiceStatus invoiceStatus, String invoiceStatusDetails, String invoiceProduct, String invoiceDescription, Long invoiceAmount, String invoiceCurrencyCode, LocalDateTime invoiceDue, LocalDateTime invoiceCreatedAt, byte[] invoiceContext, String paymentId, InvoicePaymentStatus paymentStatus, String paymentStatusFailureCode, String paymentStatusFailureDescription, Long paymentAmount, String paymentCurrencyCode, Long paymentFee, String paymentTool, String paymentMaskedPan, String paymentBin, String paymentToken, String paymentSystem, String paymentSessionId, Integer paymentCountryId, Integer paymentCityId, String paymentIp, String paymentPhoneNumber, String paymentEmail, String paymentFingerprint, LocalDateTime paymentCreatedAt, byte[] paymentContext, Long paymentProviderFee, Long paymentExternalFee, String paymentAdjustmentId, AdjustmentStatus paymentAdjustmentStatus, LocalDateTime paymentAdjustmentStatusAt, LocalDateTime paymentAdjustmentCreatedAt, String paymentAdjustmentReason, Long paymentAdjustmentFee, Long paymentAdjustmentProviderFee, Long paymentAdjustmentExternalFee) {
         super(InvoiceEventStat.INVOICE_EVENT_STAT);
 
         set(0, eventId);
@@ -782,5 +895,13 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
         set(45, paymentContext);
         set(46, paymentProviderFee);
         set(47, paymentExternalFee);
+        set(48, paymentAdjustmentId);
+        set(49, paymentAdjustmentStatus);
+        set(50, paymentAdjustmentStatusAt);
+        set(51, paymentAdjustmentCreatedAt);
+        set(52, paymentAdjustmentReason);
+        set(53, paymentAdjustmentFee);
+        set(54, paymentAdjustmentProviderFee);
+        set(55, paymentAdjustmentExternalFee);
     }
 }

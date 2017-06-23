@@ -6,40 +6,33 @@ import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.event.impl.mapper.EventMapper;
-import com.rbkmoney.magista.event.impl.mapper.InvoiceStatusMapper;
-import com.rbkmoney.magista.event.impl.processor.InvoiceEventStatusChangeProcessor;
-import com.rbkmoney.magista.service.InvoiceEventService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.rbkmoney.magista.event.impl.mapper.PaymentAdjustmentStatusMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by tolkonepiu on 03.08.16.
+ * Created by tolkonepiu on 21/06/2017.
  */
 @Component
-public class InvoiceStatusChangedHandler extends AbstractInvoiceEventHandler {
-
-    @Autowired
-    InvoiceEventService invoiceEventService;
-
+public class AdjustmentStatusChangedHandler extends AbstractInvoiceEventHandler  {
     @Override
     public Processor handle(StockEvent event) {
         InvoiceEventContext context = generateContext(event);
-        return new InvoiceEventStatusChangeProcessor(invoiceEventService, context.getInvoiceEventStat());
+        return null;
     }
 
     @Override
     public EventType getEventType() {
-        return EventType.INVOICE_STATUS_CHANGED;
+        return EventType.INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED;
     }
 
     @Override
     List<Mapper> getMappers() {
         return Arrays.asList(
                 new EventMapper(),
-                new InvoiceStatusMapper()
+                new PaymentAdjustmentStatusMapper()
         );
     }
 }

@@ -3,6 +3,8 @@ package com.rbkmoney.magista.event.impl.mapper;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payment_processing.Event;
+import com.rbkmoney.geck.common.util.TBaseUtil;
+import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
@@ -22,27 +24,19 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
     public InvoiceEventContext fill(InvoiceEventContext value) {
 
         StockEvent stockEvent = value.getSource();
+        InvoiceEventStat invoiceEventStat = value.getInvoiceEventStat();
+        invoiceEventStat = createInvoicePaymentEvent(stockEvent, invoiceEventStat);
 
-        InvoiceEventStat invoiceEventStat = createInvoiceEvent(stockEvent);
         value.setInvoiceEventStat(invoiceEventStat);
 
         return value;
     }
 
-    private InvoiceEventStat createInvoiceEvent(StockEvent stockEvent) {
-        InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
-
-        Event event = stockEvent.getSourceEvent().getProcessingEvent();
-        invoiceEventStat.setEventId(event.getId());
-
-        Instant eventCreatedAt = Instant.from(TemporalConverter.stringToTemporal(event.getCreatedAt()));
-        invoiceEventStat.setEventCreatedAt(LocalDateTime.ofInstant(eventCreatedAt, ZoneOffset.UTC));
+    private InvoiceEventStat createInvoicePaymentEvent(StockEvent stockEvent, InvoiceEventStat invoiceEventStat) {
         invoiceEventStat.setEventCategory(InvoiceEventCategory.PAYMENT);
         invoiceEventStat.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
 
         Event processingEvent = stockEvent.getSourceEvent().getProcessingEvent();
-
-        String invoiceId = processingEvent.getSource().getInvoice();
 
         InvoicePayment invoicePayment = processingEvent
                 .getPayload()
@@ -52,7 +46,6 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
                 .getPayment();
 
         invoiceEventStat.setPaymentId(invoicePayment.getId());
-        invoiceEventStat.setInvoiceId(invoiceId);
 
         Payer payer = invoicePayment.getPayer();
 
@@ -68,6 +61,7 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
 
         PaymentTool paymentTool = payer.getPaymentTool();
         invoiceEventStat.setPaymentTool(paymentTool.getSetField().getFieldName());
+
         if (paymentTool.isSetBankCard()) {
             BankCard bankCard = paymentTool.getBankCard();
             invoiceEventStat.setPaymentMaskedPan(bankCard.getMaskedPan());
@@ -78,7 +72,10 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
 
         InvoicePaymentStatus status = invoicePayment.getStatus();
         invoiceEventStat.setPaymentStatus(
-                com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.valueOf(status.getSetField().getFieldName())
+                TBaseUtil.unionFieldToEnum(
+                        status,
+                        com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class
+                )
         );
         if (status.isSetFailed()) {
             OperationFailure operationFailure = status.getFailed().getFailure();
@@ -90,8 +87,9 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
         invoiceEventStat.setPaymentAmount(cost.getAmount());
         invoiceEventStat.setPaymentCurrencyCode(cost.getCurrency().getSymbolicCode());
 
-        Instant createdAt = Instant.from(TemporalConverter.stringToTemporal(invoicePayment.getCreatedAt()));
-        invoiceEventStat.setPaymentCreatedAt(LocalDateTime.ofInstant(createdAt, ZoneOffset.UTC));
+        invoiceEventStat.setPaymentCreatedAt(
+                TypeUtil.stringToLocalDateTime(invoicePayment.getCreatedAt())
+        );
 
         if (invoicePayment.isSetContext()) {
             invoiceEventStat.setPaymentContext(invoicePayment.getContext().getData());

@@ -4,6 +4,7 @@
 package com.rbkmoney.magista.domain.tables.pojos;
 
 
+import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
@@ -29,7 +30,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 1826206916;
+    private static final long serialVersionUID = 1382459384;
 
     private Long                 eventId;
     private InvoiceEventCategory eventCategory;
@@ -79,6 +80,14 @@ public class InvoiceEventStat implements Serializable {
     private byte[]               paymentContext;
     private Long                 paymentProviderFee;
     private Long                 paymentExternalFee;
+    private String               paymentAdjustmentId;
+    private AdjustmentStatus     paymentAdjustmentStatus;
+    private LocalDateTime        paymentAdjustmentStatusAt;
+    private LocalDateTime        paymentAdjustmentCreatedAt;
+    private String               paymentAdjustmentReason;
+    private Long                 paymentAdjustmentFee;
+    private Long                 paymentAdjustmentProviderFee;
+    private Long                 paymentAdjustmentExternalFee;
 
     public InvoiceEventStat() {}
 
@@ -131,6 +140,14 @@ public class InvoiceEventStat implements Serializable {
         this.paymentContext = value.paymentContext;
         this.paymentProviderFee = value.paymentProviderFee;
         this.paymentExternalFee = value.paymentExternalFee;
+        this.paymentAdjustmentId = value.paymentAdjustmentId;
+        this.paymentAdjustmentStatus = value.paymentAdjustmentStatus;
+        this.paymentAdjustmentStatusAt = value.paymentAdjustmentStatusAt;
+        this.paymentAdjustmentCreatedAt = value.paymentAdjustmentCreatedAt;
+        this.paymentAdjustmentReason = value.paymentAdjustmentReason;
+        this.paymentAdjustmentFee = value.paymentAdjustmentFee;
+        this.paymentAdjustmentProviderFee = value.paymentAdjustmentProviderFee;
+        this.paymentAdjustmentExternalFee = value.paymentAdjustmentExternalFee;
     }
 
     public InvoiceEventStat(
@@ -181,7 +198,15 @@ public class InvoiceEventStat implements Serializable {
         LocalDateTime        paymentCreatedAt,
         byte[]               paymentContext,
         Long                 paymentProviderFee,
-        Long                 paymentExternalFee
+        Long                 paymentExternalFee,
+        String               paymentAdjustmentId,
+        AdjustmentStatus     paymentAdjustmentStatus,
+        LocalDateTime        paymentAdjustmentStatusAt,
+        LocalDateTime        paymentAdjustmentCreatedAt,
+        String               paymentAdjustmentReason,
+        Long                 paymentAdjustmentFee,
+        Long                 paymentAdjustmentProviderFee,
+        Long                 paymentAdjustmentExternalFee
     ) {
         this.eventId = eventId;
         this.eventCategory = eventCategory;
@@ -231,6 +256,14 @@ public class InvoiceEventStat implements Serializable {
         this.paymentContext = paymentContext;
         this.paymentProviderFee = paymentProviderFee;
         this.paymentExternalFee = paymentExternalFee;
+        this.paymentAdjustmentId = paymentAdjustmentId;
+        this.paymentAdjustmentStatus = paymentAdjustmentStatus;
+        this.paymentAdjustmentStatusAt = paymentAdjustmentStatusAt;
+        this.paymentAdjustmentCreatedAt = paymentAdjustmentCreatedAt;
+        this.paymentAdjustmentReason = paymentAdjustmentReason;
+        this.paymentAdjustmentFee = paymentAdjustmentFee;
+        this.paymentAdjustmentProviderFee = paymentAdjustmentProviderFee;
+        this.paymentAdjustmentExternalFee = paymentAdjustmentExternalFee;
     }
 
     public Long getEventId() {
@@ -617,6 +650,70 @@ public class InvoiceEventStat implements Serializable {
         this.paymentExternalFee = paymentExternalFee;
     }
 
+    public String getPaymentAdjustmentId() {
+        return this.paymentAdjustmentId;
+    }
+
+    public void setPaymentAdjustmentId(String paymentAdjustmentId) {
+        this.paymentAdjustmentId = paymentAdjustmentId;
+    }
+
+    public AdjustmentStatus getPaymentAdjustmentStatus() {
+        return this.paymentAdjustmentStatus;
+    }
+
+    public void setPaymentAdjustmentStatus(AdjustmentStatus paymentAdjustmentStatus) {
+        this.paymentAdjustmentStatus = paymentAdjustmentStatus;
+    }
+
+    public LocalDateTime getPaymentAdjustmentStatusAt() {
+        return this.paymentAdjustmentStatusAt;
+    }
+
+    public void setPaymentAdjustmentStatusAt(LocalDateTime paymentAdjustmentStatusAt) {
+        this.paymentAdjustmentStatusAt = paymentAdjustmentStatusAt;
+    }
+
+    public LocalDateTime getPaymentAdjustmentCreatedAt() {
+        return this.paymentAdjustmentCreatedAt;
+    }
+
+    public void setPaymentAdjustmentCreatedAt(LocalDateTime paymentAdjustmentCreatedAt) {
+        this.paymentAdjustmentCreatedAt = paymentAdjustmentCreatedAt;
+    }
+
+    public String getPaymentAdjustmentReason() {
+        return this.paymentAdjustmentReason;
+    }
+
+    public void setPaymentAdjustmentReason(String paymentAdjustmentReason) {
+        this.paymentAdjustmentReason = paymentAdjustmentReason;
+    }
+
+    public Long getPaymentAdjustmentFee() {
+        return this.paymentAdjustmentFee;
+    }
+
+    public void setPaymentAdjustmentFee(Long paymentAdjustmentFee) {
+        this.paymentAdjustmentFee = paymentAdjustmentFee;
+    }
+
+    public Long getPaymentAdjustmentProviderFee() {
+        return this.paymentAdjustmentProviderFee;
+    }
+
+    public void setPaymentAdjustmentProviderFee(Long paymentAdjustmentProviderFee) {
+        this.paymentAdjustmentProviderFee = paymentAdjustmentProviderFee;
+    }
+
+    public Long getPaymentAdjustmentExternalFee() {
+        return this.paymentAdjustmentExternalFee;
+    }
+
+    public void setPaymentAdjustmentExternalFee(Long paymentAdjustmentExternalFee) {
+        this.paymentAdjustmentExternalFee = paymentAdjustmentExternalFee;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -914,6 +1011,54 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentExternalFee.equals(other.paymentExternalFee))
             return false;
+        if (paymentAdjustmentId == null) {
+            if (other.paymentAdjustmentId != null)
+                return false;
+        }
+        else if (!paymentAdjustmentId.equals(other.paymentAdjustmentId))
+            return false;
+        if (paymentAdjustmentStatus == null) {
+            if (other.paymentAdjustmentStatus != null)
+                return false;
+        }
+        else if (!paymentAdjustmentStatus.equals(other.paymentAdjustmentStatus))
+            return false;
+        if (paymentAdjustmentStatusAt == null) {
+            if (other.paymentAdjustmentStatusAt != null)
+                return false;
+        }
+        else if (!paymentAdjustmentStatusAt.equals(other.paymentAdjustmentStatusAt))
+            return false;
+        if (paymentAdjustmentCreatedAt == null) {
+            if (other.paymentAdjustmentCreatedAt != null)
+                return false;
+        }
+        else if (!paymentAdjustmentCreatedAt.equals(other.paymentAdjustmentCreatedAt))
+            return false;
+        if (paymentAdjustmentReason == null) {
+            if (other.paymentAdjustmentReason != null)
+                return false;
+        }
+        else if (!paymentAdjustmentReason.equals(other.paymentAdjustmentReason))
+            return false;
+        if (paymentAdjustmentFee == null) {
+            if (other.paymentAdjustmentFee != null)
+                return false;
+        }
+        else if (!paymentAdjustmentFee.equals(other.paymentAdjustmentFee))
+            return false;
+        if (paymentAdjustmentProviderFee == null) {
+            if (other.paymentAdjustmentProviderFee != null)
+                return false;
+        }
+        else if (!paymentAdjustmentProviderFee.equals(other.paymentAdjustmentProviderFee))
+            return false;
+        if (paymentAdjustmentExternalFee == null) {
+            if (other.paymentAdjustmentExternalFee != null)
+                return false;
+        }
+        else if (!paymentAdjustmentExternalFee.equals(other.paymentAdjustmentExternalFee))
+            return false;
         return true;
     }
 
@@ -969,6 +1114,14 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentContext == null) ? 0 : Arrays.hashCode(paymentContext));
         result = prime * result + ((paymentProviderFee == null) ? 0 : paymentProviderFee.hashCode());
         result = prime * result + ((paymentExternalFee == null) ? 0 : paymentExternalFee.hashCode());
+        result = prime * result + ((paymentAdjustmentId == null) ? 0 : paymentAdjustmentId.hashCode());
+        result = prime * result + ((paymentAdjustmentStatus == null) ? 0 : paymentAdjustmentStatus.hashCode());
+        result = prime * result + ((paymentAdjustmentStatusAt == null) ? 0 : paymentAdjustmentStatusAt.hashCode());
+        result = prime * result + ((paymentAdjustmentCreatedAt == null) ? 0 : paymentAdjustmentCreatedAt.hashCode());
+        result = prime * result + ((paymentAdjustmentReason == null) ? 0 : paymentAdjustmentReason.hashCode());
+        result = prime * result + ((paymentAdjustmentFee == null) ? 0 : paymentAdjustmentFee.hashCode());
+        result = prime * result + ((paymentAdjustmentProviderFee == null) ? 0 : paymentAdjustmentProviderFee.hashCode());
+        result = prime * result + ((paymentAdjustmentExternalFee == null) ? 0 : paymentAdjustmentExternalFee.hashCode());
         return result;
     }
 
@@ -1024,6 +1177,14 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append("[binary...]");
         sb.append(", ").append(paymentProviderFee);
         sb.append(", ").append(paymentExternalFee);
+        sb.append(", ").append(paymentAdjustmentId);
+        sb.append(", ").append(paymentAdjustmentStatus);
+        sb.append(", ").append(paymentAdjustmentStatusAt);
+        sb.append(", ").append(paymentAdjustmentCreatedAt);
+        sb.append(", ").append(paymentAdjustmentReason);
+        sb.append(", ").append(paymentAdjustmentFee);
+        sb.append(", ").append(paymentAdjustmentProviderFee);
+        sb.append(", ").append(paymentAdjustmentExternalFee);
 
         sb.append(")");
         return sb.toString();

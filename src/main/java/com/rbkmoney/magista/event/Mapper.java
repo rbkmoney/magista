@@ -5,6 +5,6 @@ package com.rbkmoney.magista.event;
  */
 public interface Mapper<T extends EventContext> {
 
-    T fill(T value);
+    T fill(T context);
 
 }
