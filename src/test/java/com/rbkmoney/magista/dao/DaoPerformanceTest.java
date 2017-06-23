@@ -4,6 +4,7 @@ import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ Result updates of 10000 events (pojo), time = 140430 ms, average = 14.043, min =
 Result insertion of 10000 events (record), time = 147695 ms, average = 14.7695, min = 9, max = 452
 Result updates of 10000 events (record), time = 136864 ms, average = 13.6864, min = 9, max = 45
  */
+@Ignore
 public class DaoPerformanceTest extends AbstractIntegrationTest {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());

@@ -32,7 +32,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 139981694;
+    private static final long serialVersionUID = -294771946;
 
     /**
      * Setter for <code>mst.invoice_event_stat.event_id</code>.
@@ -735,16 +735,16 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
     }
 
     /**
-     * Setter for <code>mst.invoice_event_stat.payment_adjustment_status_at</code>.
+     * Setter for <code>mst.invoice_event_stat.payment_adjustment_status_created_at</code>.
      */
-    public void setPaymentAdjustmentStatusAt(LocalDateTime value) {
+    public void setPaymentAdjustmentStatusCreatedAt(LocalDateTime value) {
         set(50, value);
     }
 
     /**
-     * Getter for <code>mst.invoice_event_stat.payment_adjustment_status_at</code>.
+     * Getter for <code>mst.invoice_event_stat.payment_adjustment_status_created_at</code>.
      */
-    public LocalDateTime getPaymentAdjustmentStatusAt() {
+    public LocalDateTime getPaymentAdjustmentStatusCreatedAt() {
         return (LocalDateTime) get(50);
     }
 
@@ -844,7 +844,7 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
     /**
      * Create a detached, initialised InvoiceEventStatRecord
      */
-    public InvoiceEventStatRecord(Long eventId, InvoiceEventCategory eventCategory, InvoiceEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyEmail, Integer partyShopId, String partyShopName, String partyShopDescription, String partyShopUrl, Integer partyShopCategoryId, Integer partyShopPayoutToolId, Integer partyContractId, String partyContractRegisteredNumber, String partyContractInn, String invoiceId, InvoiceStatus invoiceStatus, String invoiceStatusDetails, String invoiceProduct, String invoiceDescription, Long invoiceAmount, String invoiceCurrencyCode, LocalDateTime invoiceDue, LocalDateTime invoiceCreatedAt, byte[] invoiceContext, String paymentId, InvoicePaymentStatus paymentStatus, String paymentStatusFailureCode, String paymentStatusFailureDescription, Long paymentAmount, String paymentCurrencyCode, Long paymentFee, String paymentTool, String paymentMaskedPan, String paymentBin, String paymentToken, String paymentSystem, String paymentSessionId, Integer paymentCountryId, Integer paymentCityId, String paymentIp, String paymentPhoneNumber, String paymentEmail, String paymentFingerprint, LocalDateTime paymentCreatedAt, byte[] paymentContext, Long paymentProviderFee, Long paymentExternalFee, String paymentAdjustmentId, AdjustmentStatus paymentAdjustmentStatus, LocalDateTime paymentAdjustmentStatusAt, LocalDateTime paymentAdjustmentCreatedAt, String paymentAdjustmentReason, Long paymentAdjustmentFee, Long paymentAdjustmentProviderFee, Long paymentAdjustmentExternalFee) {
+    public InvoiceEventStatRecord(Long eventId, InvoiceEventCategory eventCategory, InvoiceEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyEmail, Integer partyShopId, String partyShopName, String partyShopDescription, String partyShopUrl, Integer partyShopCategoryId, Integer partyShopPayoutToolId, Integer partyContractId, String partyContractRegisteredNumber, String partyContractInn, String invoiceId, InvoiceStatus invoiceStatus, String invoiceStatusDetails, String invoiceProduct, String invoiceDescription, Long invoiceAmount, String invoiceCurrencyCode, LocalDateTime invoiceDue, LocalDateTime invoiceCreatedAt, byte[] invoiceContext, String paymentId, InvoicePaymentStatus paymentStatus, String paymentStatusFailureCode, String paymentStatusFailureDescription, Long paymentAmount, String paymentCurrencyCode, Long paymentFee, String paymentTool, String paymentMaskedPan, String paymentBin, String paymentToken, String paymentSystem, String paymentSessionId, Integer paymentCountryId, Integer paymentCityId, String paymentIp, String paymentPhoneNumber, String paymentEmail, String paymentFingerprint, LocalDateTime paymentCreatedAt, byte[] paymentContext, Long paymentProviderFee, Long paymentExternalFee, String paymentAdjustmentId, AdjustmentStatus paymentAdjustmentStatus, LocalDateTime paymentAdjustmentStatusCreatedAt, LocalDateTime paymentAdjustmentCreatedAt, String paymentAdjustmentReason, Long paymentAdjustmentFee, Long paymentAdjustmentProviderFee, Long paymentAdjustmentExternalFee) {
         super(InvoiceEventStat.INVOICE_EVENT_STAT);
 
         set(0, eventId);
@@ -897,7 +897,7 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
         set(47, paymentExternalFee);
         set(48, paymentAdjustmentId);
         set(49, paymentAdjustmentStatus);
-        set(50, paymentAdjustmentStatusAt);
+        set(50, paymentAdjustmentStatusCreatedAt);
         set(51, paymentAdjustmentCreatedAt);
         set(52, paymentAdjustmentReason);
         set(53, paymentAdjustmentFee);

@@ -1,9 +1,6 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
-import com.rbkmoney.magista.domain.enums.InvoiceEventType;
-import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
-import com.rbkmoney.magista.domain.enums.InvoiceStatus;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Condition;
@@ -123,6 +120,19 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setPaymentFingerprint(rs.getString("payment_fingerprint"));
             invoiceEventStat.setPaymentCreatedAt(rs.getObject("payment_created_at", LocalDateTime.class));
             invoiceEventStat.setPaymentContext(rs.getBytes("payment_context"));
+            invoiceEventStat.setPaymentAdjustmentId(rs.getString("payment_adjustment_id"));
+            invoiceEventStat.setPaymentAdjustmentStatus(
+                    rs.getString("payment_adjustment_status") != null ?
+                            AdjustmentStatus.valueOf(rs.getString("payment_adjustment_status")) : null
+            );
+            invoiceEventStat.setPaymentAdjustmentStatusCreatedAt(
+                    rs.getObject("payment_adjustment_status_created_at", LocalDateTime.class)
+            );
+            invoiceEventStat.setPaymentAdjustmentReason(rs.getString("payment_adjustment_reason"));
+            invoiceEventStat.setPaymentAdjustmentFee(rs.getLong("payment_adjustment_fee"));
+            invoiceEventStat.setPaymentAdjustmentProviderFee(rs.getLong("payment_adjustment_provider_fee"));
+            invoiceEventStat.setPaymentAdjustmentExternalFee(rs.getLong("payment_adjustment_external_fee"));
+
             return invoiceEventStat;
         };
     }

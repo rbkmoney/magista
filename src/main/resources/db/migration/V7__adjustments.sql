@@ -20,7 +20,7 @@ ALTER TABLE mst.invoice_event_stat
 ALTER TABLE mst.invoice_event_stat
   ADD COLUMN payment_adjustment_status mst.ADJUSTMENT_STATUS;
 ALTER TABLE mst.invoice_event_stat
-  ADD COLUMN payment_adjustment_status_at TIMESTAMP WITHOUT TIME ZONE;
+  ADD COLUMN payment_adjustment_status_created_at TIMESTAMP WITHOUT TIME ZONE;
 ALTER TABLE mst.invoice_event_stat
   ADD COLUMN payment_adjustment_created_at TIMESTAMP WITHOUT TIME ZONE;
 ALTER TABLE mst.invoice_event_stat

@@ -35,7 +35,7 @@ public class PaymentAdjustmentStatusMapper implements Mapper<InvoiceEventContext
                 TBaseUtil.unionFieldToEnum(adjustmentStatusChanged.getStatus(), AdjustmentStatus.class)
         );
 
-        invoicePaymentAdjustmentStatusEvent.setPaymentAdjustmentStatusAt(
+        invoicePaymentAdjustmentStatusEvent.setPaymentAdjustmentStatusCreatedAt(
                 DamselUtil.getAdjustmentStatusCreatedAt(adjustmentStatusChanged.getStatus())
         );
 

@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = -2120372125;
+    private static final long serialVersionUID = 1625752958;
 
     /**
      * The reference instance of <code>mst.invoice_event_stat</code>
@@ -306,9 +306,9 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     public final TableField<InvoiceEventStatRecord, AdjustmentStatus> PAYMENT_ADJUSTMENT_STATUS = createField("payment_adjustment_status", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.AdjustmentStatus.class), this, "");
 
     /**
-     * The column <code>mst.invoice_event_stat.payment_adjustment_status_at</code>.
+     * The column <code>mst.invoice_event_stat.payment_adjustment_status_created_at</code>.
      */
-    public final TableField<InvoiceEventStatRecord, LocalDateTime> PAYMENT_ADJUSTMENT_STATUS_AT = createField("payment_adjustment_status_at", org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
+    public final TableField<InvoiceEventStatRecord, LocalDateTime> PAYMENT_ADJUSTMENT_STATUS_CREATED_AT = createField("payment_adjustment_status_created_at", org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.payment_adjustment_created_at</code>.

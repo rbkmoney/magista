@@ -30,7 +30,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 1382459384;
+    private static final long serialVersionUID = 850553262;
 
     private Long                 eventId;
     private InvoiceEventCategory eventCategory;
@@ -82,7 +82,7 @@ public class InvoiceEventStat implements Serializable {
     private Long                 paymentExternalFee;
     private String               paymentAdjustmentId;
     private AdjustmentStatus     paymentAdjustmentStatus;
-    private LocalDateTime        paymentAdjustmentStatusAt;
+    private LocalDateTime        paymentAdjustmentStatusCreatedAt;
     private LocalDateTime        paymentAdjustmentCreatedAt;
     private String               paymentAdjustmentReason;
     private Long                 paymentAdjustmentFee;
@@ -142,7 +142,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentExternalFee = value.paymentExternalFee;
         this.paymentAdjustmentId = value.paymentAdjustmentId;
         this.paymentAdjustmentStatus = value.paymentAdjustmentStatus;
-        this.paymentAdjustmentStatusAt = value.paymentAdjustmentStatusAt;
+        this.paymentAdjustmentStatusCreatedAt = value.paymentAdjustmentStatusCreatedAt;
         this.paymentAdjustmentCreatedAt = value.paymentAdjustmentCreatedAt;
         this.paymentAdjustmentReason = value.paymentAdjustmentReason;
         this.paymentAdjustmentFee = value.paymentAdjustmentFee;
@@ -201,7 +201,7 @@ public class InvoiceEventStat implements Serializable {
         Long                 paymentExternalFee,
         String               paymentAdjustmentId,
         AdjustmentStatus     paymentAdjustmentStatus,
-        LocalDateTime        paymentAdjustmentStatusAt,
+        LocalDateTime        paymentAdjustmentStatusCreatedAt,
         LocalDateTime        paymentAdjustmentCreatedAt,
         String               paymentAdjustmentReason,
         Long                 paymentAdjustmentFee,
@@ -258,7 +258,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentExternalFee = paymentExternalFee;
         this.paymentAdjustmentId = paymentAdjustmentId;
         this.paymentAdjustmentStatus = paymentAdjustmentStatus;
-        this.paymentAdjustmentStatusAt = paymentAdjustmentStatusAt;
+        this.paymentAdjustmentStatusCreatedAt = paymentAdjustmentStatusCreatedAt;
         this.paymentAdjustmentCreatedAt = paymentAdjustmentCreatedAt;
         this.paymentAdjustmentReason = paymentAdjustmentReason;
         this.paymentAdjustmentFee = paymentAdjustmentFee;
@@ -666,12 +666,12 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentStatus = paymentAdjustmentStatus;
     }
 
-    public LocalDateTime getPaymentAdjustmentStatusAt() {
-        return this.paymentAdjustmentStatusAt;
+    public LocalDateTime getPaymentAdjustmentStatusCreatedAt() {
+        return this.paymentAdjustmentStatusCreatedAt;
     }
 
-    public void setPaymentAdjustmentStatusAt(LocalDateTime paymentAdjustmentStatusAt) {
-        this.paymentAdjustmentStatusAt = paymentAdjustmentStatusAt;
+    public void setPaymentAdjustmentStatusCreatedAt(LocalDateTime paymentAdjustmentStatusCreatedAt) {
+        this.paymentAdjustmentStatusCreatedAt = paymentAdjustmentStatusCreatedAt;
     }
 
     public LocalDateTime getPaymentAdjustmentCreatedAt() {
@@ -1023,11 +1023,11 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentAdjustmentStatus.equals(other.paymentAdjustmentStatus))
             return false;
-        if (paymentAdjustmentStatusAt == null) {
-            if (other.paymentAdjustmentStatusAt != null)
+        if (paymentAdjustmentStatusCreatedAt == null) {
+            if (other.paymentAdjustmentStatusCreatedAt != null)
                 return false;
         }
-        else if (!paymentAdjustmentStatusAt.equals(other.paymentAdjustmentStatusAt))
+        else if (!paymentAdjustmentStatusCreatedAt.equals(other.paymentAdjustmentStatusCreatedAt))
             return false;
         if (paymentAdjustmentCreatedAt == null) {
             if (other.paymentAdjustmentCreatedAt != null)
@@ -1116,7 +1116,7 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentExternalFee == null) ? 0 : paymentExternalFee.hashCode());
         result = prime * result + ((paymentAdjustmentId == null) ? 0 : paymentAdjustmentId.hashCode());
         result = prime * result + ((paymentAdjustmentStatus == null) ? 0 : paymentAdjustmentStatus.hashCode());
-        result = prime * result + ((paymentAdjustmentStatusAt == null) ? 0 : paymentAdjustmentStatusAt.hashCode());
+        result = prime * result + ((paymentAdjustmentStatusCreatedAt == null) ? 0 : paymentAdjustmentStatusCreatedAt.hashCode());
         result = prime * result + ((paymentAdjustmentCreatedAt == null) ? 0 : paymentAdjustmentCreatedAt.hashCode());
         result = prime * result + ((paymentAdjustmentReason == null) ? 0 : paymentAdjustmentReason.hashCode());
         result = prime * result + ((paymentAdjustmentFee == null) ? 0 : paymentAdjustmentFee.hashCode());
@@ -1179,7 +1179,7 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentExternalFee);
         sb.append(", ").append(paymentAdjustmentId);
         sb.append(", ").append(paymentAdjustmentStatus);
-        sb.append(", ").append(paymentAdjustmentStatusAt);
+        sb.append(", ").append(paymentAdjustmentStatusCreatedAt);
         sb.append(", ").append(paymentAdjustmentCreatedAt);
         sb.append(", ").append(paymentAdjustmentReason);
         sb.append(", ").append(paymentAdjustmentFee);
