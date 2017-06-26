@@ -22,7 +22,7 @@ public class PartyService {
     @Autowired
     PartyManagementSrv.Iface partyManagementSrv;
 
-    public Party getParty(String partyId, Instant timestamp) {
+    public Party getParty(String partyId, Instant timestamp) throws NotFoundException, PartyException {
         try {
             return partyManagementSrv.checkout(userInfo, partyId, TemporalConverter.temporalToString(timestamp));
         } catch (PartyNotFound ex) {
