@@ -71,10 +71,6 @@ public class InvoiceEventService {
                         invoiceAdjustmentEvent.getPaymentId(), invoiceAdjustmentEvent.getInvoiceId(), invoiceAdjustmentEvent.getEventId()));
             }
 
-            if (invoicePaymentEvent.getPaymentAmount() != invoiceAdjustmentEvent.getPaymentAmount()) {
-                // TODO
-            }
-
             invoicePaymentEvent.setEventId(invoiceAdjustmentEvent.getEventId());
             invoicePaymentEvent.setEventCreatedAt(invoiceAdjustmentEvent.getEventCreatedAt());
             invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_CREATED);
@@ -109,7 +105,13 @@ public class InvoiceEventService {
             }
 
             if (!invoicePaymentEvent.getPaymentAdjustmentId().equals(invoiceAdjustmentStatusEvent.getPaymentAdjustmentId())) {
-                //TODO
+                throw new NotFoundException(
+                        String.format("Adjustment not found, adjustmentId='%s', invoiceId='%s', paymentId='%s', eventId='%d'",
+                                invoiceAdjustmentStatusEvent.getPaymentAdjustmentId(),
+                                invoiceAdjustmentStatusEvent.getInvoiceId(),
+                                invoiceAdjustmentStatusEvent.getPaymentId(),
+                                invoiceAdjustmentStatusEvent.getEventId())
+                );
             }
 
             invoicePaymentEvent.setPaymentAdjustmentStatus(invoiceAdjustmentStatusEvent.getPaymentAdjustmentStatus());

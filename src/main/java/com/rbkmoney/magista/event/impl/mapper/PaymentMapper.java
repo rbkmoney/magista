@@ -10,11 +10,6 @@ import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
-import com.rbkmoney.thrift.filter.converter.TemporalConverter;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 /**
  * Created by tolkonepiu on 10/11/2016.

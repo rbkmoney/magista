@@ -1,9 +1,7 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
 import com.rbkmoney.damsel.domain.CashFlowAccount;
-import com.rbkmoney.damsel.domain.ExternalCashFlowAccount;
 import com.rbkmoney.damsel.domain.FinalCashFlowPosting;
-import com.rbkmoney.damsel.domain.MerchantCashFlowAccount;
 import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentEvent;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
@@ -13,7 +11,6 @@ import com.rbkmoney.magista.util.DamselUtil;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by tolkonepiu on 09/12/2016.
