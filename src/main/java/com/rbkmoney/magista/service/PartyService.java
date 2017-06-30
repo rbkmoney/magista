@@ -2,9 +2,9 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.damsel.domain.Party;
 import com.rbkmoney.damsel.payment_processing.*;
+import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.PartyException;
-import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class PartyService {
 
     public Party getParty(String partyId, Instant timestamp) throws NotFoundException, PartyException {
         try {
-            return partyManagementSrv.checkout(userInfo, partyId, TemporalConverter.temporalToString(timestamp));
+            return partyManagementSrv.checkout(userInfo, partyId, TypeUtil.temporalToString(timestamp));
         } catch (PartyNotFound ex) {
             throw new NotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
         } catch (PartyNotExistsYet ex) {

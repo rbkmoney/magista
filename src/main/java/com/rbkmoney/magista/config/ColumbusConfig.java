@@ -24,9 +24,6 @@ public class ColumbusConfig {
     @Bean
     public GeoIpServiceSrv.Iface columbusClient() throws IOException {
         return new THSpawnClientBuilder()
-                .withEventListener(new CompositeClientEventListener(
-                        new ClientEventLogListener(),
-                        new HttpClientEventLogListener()))
                 .withAddress(resource.getURI()).build(GeoIpServiceSrv.Iface.class);
     }
 

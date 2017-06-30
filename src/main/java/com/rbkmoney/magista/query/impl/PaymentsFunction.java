@@ -4,6 +4,7 @@ import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
@@ -14,7 +15,6 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.apache.http.entity.ContentType;
 
 import java.time.Instant;
@@ -75,7 +75,7 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         statPayment.setInvoiceId(invoicePaymentStat.getInvoiceId());
         statPayment.setOwnerId(invoicePaymentStat.getPartyId());
         statPayment.setShopId(invoicePaymentStat.getPartyShopId());
-        statPayment.setCreatedAt(TemporalConverter.temporalToString(invoicePaymentStat.getPaymentCreatedAt()
+        statPayment.setCreatedAt(TypeUtil.temporalToString(invoicePaymentStat.getPaymentCreatedAt()
                 .toInstant(ZoneOffset.UTC)));
         statPayment.setStatus(toStatPaymentStatus(
                 com.rbkmoney.damsel.domain.InvoicePaymentStatus._Fields.findByName(

@@ -124,6 +124,9 @@ public class InvoiceEventService {
                 invoicePaymentEvent.setPaymentExternalFee(invoicePaymentEvent.getPaymentAdjustmentExternalFee());
             }
 
+            invoiceEventDao.update(invoicePaymentEvent);
+            log.info("Adjustment event status have been changed, invoiceId='{}', eventId='{}', AdjustmentStatus='{}'",
+                    invoicePaymentEvent.getInvoiceId(), invoicePaymentEvent.getEventId(), invoicePaymentEvent.getPaymentAdjustmentStatus());
         } catch (DaoException ex) {
             String message = String.format("Failed to change adjustment event status, paymentId='%s', invoiceId='%s', eventId='%d'",
                     invoiceAdjustmentStatusEvent.getPaymentId(), invoiceAdjustmentStatusEvent.getInvoiceId(), invoiceAdjustmentStatusEvent.getEventId());
