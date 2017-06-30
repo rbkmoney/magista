@@ -71,9 +71,9 @@ public class InvoiceEventService {
                         invoiceAdjustmentEvent.getPaymentId(), invoiceAdjustmentEvent.getInvoiceId(), invoiceAdjustmentEvent.getEventId()));
             }
 
+            invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_CREATED);
             invoicePaymentEvent.setEventId(invoiceAdjustmentEvent.getEventId());
             invoicePaymentEvent.setEventCreatedAt(invoiceAdjustmentEvent.getEventCreatedAt());
-            invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_CREATED);
 
             invoicePaymentEvent.setPaymentAdjustmentId(invoiceAdjustmentEvent.getPaymentAdjustmentId());
             invoicePaymentEvent.setPaymentAdjustmentReason(invoiceAdjustmentEvent.getPaymentAdjustmentReason());
@@ -114,9 +114,12 @@ public class InvoiceEventService {
                 );
             }
 
+            invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED);
+            invoicePaymentEvent.setEventId(invoiceAdjustmentStatusEvent.getEventId());
+            invoicePaymentEvent.setEventCreatedAt(invoiceAdjustmentStatusEvent.getEventCreatedAt());
+
             invoicePaymentEvent.setPaymentAdjustmentStatus(invoiceAdjustmentStatusEvent.getPaymentAdjustmentStatus());
             invoicePaymentEvent.setPaymentAdjustmentStatusCreatedAt(invoiceAdjustmentStatusEvent.getPaymentAdjustmentStatusCreatedAt());
-            invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED);
 
             if (invoicePaymentEvent.getPaymentAdjustmentStatus() == AdjustmentStatus.captured) {
                 invoicePaymentEvent.setPaymentFee(invoicePaymentEvent.getPaymentAdjustmentFee());
