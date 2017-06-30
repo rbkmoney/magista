@@ -4,6 +4,7 @@ import com.rbkmoney.magista.dao.InvoiceEventDao;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
+import com.rbkmoney.magista.exception.AdjustmentException;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
@@ -93,7 +94,7 @@ public class InvoiceEventService {
         }
     }
 
-    public void changeInvoicePaymentAdjustmentStatus(InvoiceEventStat invoiceAdjustmentStatusEvent) {
+    public void changeInvoicePaymentAdjustmentStatus(InvoiceEventStat invoiceAdjustmentStatusEvent) throws NotFoundException, StorageException {
         log.debug("Change adjustment event status, adjustmentId='{}', paymentId='{}', invoiceId='{}', eventId='{}'",
                 invoiceAdjustmentStatusEvent.getPaymentAdjustmentId(), invoiceAdjustmentStatusEvent.getPaymentId(), invoiceAdjustmentStatusEvent.getInvoiceId(), invoiceAdjustmentStatusEvent.getEventId());
 
@@ -111,6 +112,17 @@ public class InvoiceEventService {
                                 invoiceAdjustmentStatusEvent.getInvoiceId(),
                                 invoiceAdjustmentStatusEvent.getPaymentId(),
                                 invoiceAdjustmentStatusEvent.getEventId())
+                );
+            }
+
+            if (invoicePaymentEvent.getPaymentAdjustmentStatus() != AdjustmentStatus.pending) {
+                throw new AdjustmentException(
+                        String.format("Illegal adjustment status, adjustmentId='%s', invoiceId='%s', paymentId='%s', eventId='%d', adjustmentStatus='%s'",
+                                invoiceAdjustmentStatusEvent.getPaymentAdjustmentId(),
+                                invoiceAdjustmentStatusEvent.getInvoiceId(),
+                                invoiceAdjustmentStatusEvent.getPaymentId(),
+                                invoiceAdjustmentStatusEvent.getEventId(),
+                                invoiceAdjustmentStatusEvent.getPaymentAdjustmentStatus())
                 );
             }
 

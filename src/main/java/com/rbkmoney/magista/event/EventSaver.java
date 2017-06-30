@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.event;
 
+import com.rbkmoney.magista.exception.AdjustmentException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class EventSaver implements Runnable {
                     } else {
                         TimeUnit.MILLISECONDS.sleep(timeout);
                     }
-                } catch (NotFoundException ex) {
+                } catch (AdjustmentException | NotFoundException ex) {
                     queue.take();
                     log.error("Failed to handle event, skipped", ex);
                 } catch (ExecutionException | StorageException ex) {
