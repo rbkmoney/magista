@@ -3,11 +3,11 @@ package com.rbkmoney.magista.query.impl;
 import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
-import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertEquals(5, statResponse.getData().getInvoices().size());
         Instant instant = Instant.MAX;
         for (StatInvoice statInvoice : statResponse.getData().getInvoices()) {
-            Instant statInstant = Instant.from(TemporalConverter.stringToTemporal(statInvoice.getCreatedAt()));
+            Instant statInstant = Instant.from(TypeUtil.stringToTemporal(statInvoice.getCreatedAt()));
             assertTrue(statInstant.isBefore(instant));
             instant = statInstant;
         }
@@ -74,7 +74,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertEquals(2, statResponse.getData().getPayments().size());
         Instant instant = Instant.MAX;
         for (StatPayment statPayment : statResponse.getData().getPayments()) {
-            Instant statInstant = Instant.from(TemporalConverter.stringToTemporal(statPayment.getCreatedAt()));
+            Instant statInstant = Instant.from(TypeUtil.stringToTemporal(statPayment.getCreatedAt()));
             assertTrue(statInstant.isBefore(instant));
             instant = statInstant;
         }

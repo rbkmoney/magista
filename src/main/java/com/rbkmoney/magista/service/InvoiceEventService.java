@@ -1,23 +1,17 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
-import com.rbkmoney.damsel.domain.InvoiceStatus;
-import com.rbkmoney.damsel.domain.OperationFailure;
 import com.rbkmoney.magista.dao.InvoiceEventDao;
+import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
+import com.rbkmoney.magista.exception.AdjustmentException;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
-import com.rbkmoney.magista.model.InvoiceStatusChange;
-import com.rbkmoney.magista.model.PaymentStatusChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 /**
  * Created by tolkonepiu on 29/05/2017.
@@ -38,70 +32,149 @@ public class InvoiceEventService {
         return invoiceEventDao.findPaymentByInvoiceAndPaymentId(invoiceId, paymentId);
     }
 
-    public void changeInvoiceEventStatus(InvoiceStatusChange invoiceStatusChange) throws NotFoundException, StorageException {
-        log.debug("Change invoice event status, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
+    public void changeInvoiceEventStatus(InvoiceEventStat invoiceStatusEvent) throws NotFoundException, StorageException {
+        log.debug("Change invoice event status, invoiceId='{}', eventId='{}', invoiceStatus='{}'",
+                invoiceStatusEvent.getInvoiceId(), invoiceStatusEvent.getEventId(), invoiceStatusEvent.getInvoiceStatus());
 
         try {
-            InvoiceEventStat invoiceEvent = invoiceEventDao.findInvoiceById(invoiceStatusChange.getInvoiceId());
+            InvoiceEventStat invoiceEvent = invoiceEventDao.findInvoiceById(invoiceStatusEvent.getInvoiceId());
             if (invoiceEvent == null) {
-                throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId()));
+                throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'",
+                        invoiceStatusEvent.getInvoiceId(), invoiceStatusEvent.getEventId()));
             }
 
-            invoiceEvent.setEventId(invoiceStatusChange.getEventId());
             invoiceEvent.setEventType(InvoiceEventType.INVOICE_STATUS_CHANGED);
+            invoiceEvent.setEventId(invoiceStatusEvent.getEventId());
+            invoiceEvent.setEventCreatedAt(invoiceStatusEvent.getEventCreatedAt());
 
-            InvoiceStatus status = invoiceStatusChange.getStatus();
-            invoiceEvent.setInvoiceStatus(
-                    com.rbkmoney.magista.domain.enums.InvoiceStatus.valueOf(status.getSetField().getFieldName())
-            );
-            if (status.isSetCancelled()) {
-                invoiceEvent.setInvoiceStatusDetails(status.getCancelled().getDetails());
-            } else if (status.isSetFulfilled()) {
-                invoiceEvent.setInvoiceStatusDetails(status.getFulfilled().getDetails());
-            }
-            invoiceEvent.setEventCreatedAt(LocalDateTime.ofInstant(invoiceStatusChange.getChangedAt(), ZoneOffset.UTC));
+            invoiceEvent.setInvoiceStatus(invoiceStatusEvent.getInvoiceStatus());
+            invoiceEvent.setInvoiceStatusDetails(invoiceStatusEvent.getInvoiceStatusDetails());
 
             invoiceEventDao.update(invoiceEvent);
-            log.info("Invoice event status have been changed, invoiceId='{}', eventId='{}', invoiceStatus='{}'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
+            log.info("Invoice event status have been changed, invoiceId='{}', eventId='{}', invoiceStatus='{}'",
+                    invoiceEvent.getInvoiceId(), invoiceEvent.getEventId(), invoiceEvent.getInvoiceStatus());
 
         } catch (DaoException ex) {
-            String message = String.format("Failed to change invoice event status, invoiceId='%s', eventId='%d', invoiceStatus='%s'", invoiceStatusChange.getInvoiceId(), invoiceStatusChange.getEventId(), invoiceStatusChange.getStatus().getSetField().getFieldName());
+            String message = String.format("Failed to change invoice event status, invoiceId='%s', eventId='%d', invoiceStatus='%s'",
+                    invoiceStatusEvent.getInvoiceId(), invoiceStatusEvent.getEventId(), invoiceStatusEvent.getInvoiceStatus());
             throw new StorageException(message, ex);
         }
     }
 
-    public void changeInvoicePaymentStatus(PaymentStatusChange paymentStatusChange) throws NotFoundException, StorageException {
-        log.debug("Change invoice payment event status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'",
-                paymentStatusChange.getPaymentId(), paymentStatusChange.getInvoiceId(), paymentStatusChange.getEventId(), paymentStatusChange.getStatus().getSetField().getFieldName());
+    public void saveInvoicePaymentAdjustment(InvoiceEventStat invoiceAdjustmentEvent) throws NotFoundException, StorageException {
+        log.debug("Save adjustment event, adjustmentId='{}', paymentId='{}', invoiceId='{}', eventId='{}'",
+                invoiceAdjustmentEvent.getPaymentAdjustmentId(), invoiceAdjustmentEvent.getPaymentId(), invoiceAdjustmentEvent.getInvoiceId(), invoiceAdjustmentEvent.getEventId());
 
         try {
-            InvoiceEventStat invoicePaymentEvent = invoiceEventDao.findPaymentByInvoiceAndPaymentId(paymentStatusChange.getInvoiceId(), paymentStatusChange.getPaymentId());
+            InvoiceEventStat invoicePaymentEvent = invoiceEventDao.findPaymentByInvoiceAndPaymentId(invoiceAdjustmentEvent.getInvoiceId(), invoiceAdjustmentEvent.getPaymentId());
             if (invoicePaymentEvent == null) {
                 throw new NotFoundException(String.format("Invoice payment event not found, paymentId='%s', invoiceId='%s', eventId='%d'",
-                        paymentStatusChange.getPaymentId(), paymentStatusChange.getInvoiceId(), paymentStatusChange.getEventId()));
+                        invoiceAdjustmentEvent.getPaymentId(), invoiceAdjustmentEvent.getInvoiceId(), invoiceAdjustmentEvent.getEventId()));
             }
 
-            invoicePaymentEvent.setEventId(paymentStatusChange.getEventId());
+            invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_CREATED);
+            invoicePaymentEvent.setEventId(invoiceAdjustmentEvent.getEventId());
+            invoicePaymentEvent.setEventCreatedAt(invoiceAdjustmentEvent.getEventCreatedAt());
+
+            invoicePaymentEvent.setPaymentAdjustmentId(invoiceAdjustmentEvent.getPaymentAdjustmentId());
+            invoicePaymentEvent.setPaymentAdjustmentReason(invoiceAdjustmentEvent.getPaymentAdjustmentReason());
+            invoicePaymentEvent.setPaymentAdjustmentStatus(invoiceAdjustmentEvent.getPaymentAdjustmentStatus());
+            invoicePaymentEvent.setPaymentAdjustmentStatusCreatedAt(invoiceAdjustmentEvent.getPaymentAdjustmentStatusCreatedAt());
+            invoicePaymentEvent.setPaymentAdjustmentCreatedAt(invoiceAdjustmentEvent.getPaymentAdjustmentCreatedAt());
+            invoicePaymentEvent.setPaymentAdjustmentFee(invoiceAdjustmentEvent.getPaymentAdjustmentFee());
+            invoicePaymentEvent.setPaymentAdjustmentProviderFee(invoiceAdjustmentEvent.getPaymentAdjustmentProviderFee());
+            invoicePaymentEvent.setPaymentAdjustmentExternalFee(invoiceAdjustmentEvent.getPaymentAdjustmentExternalFee());
+
+            invoiceEventDao.update(invoicePaymentEvent);
+            log.info("Adjustment event have been saved, event='{}'", invoicePaymentEvent);
+        } catch (DaoException ex) {
+            String message = String.format("Failed to save adjustment event, paymentId='%s', invoiceId='%s', eventId='%d'",
+                    invoiceAdjustmentEvent.getPaymentId(), invoiceAdjustmentEvent.getInvoiceId(), invoiceAdjustmentEvent.getEventId());
+            throw new StorageException(message, ex);
+        }
+    }
+
+    public void changeInvoicePaymentAdjustmentStatus(InvoiceEventStat invoiceAdjustmentStatusEvent) throws NotFoundException, StorageException {
+        log.debug("Change adjustment event status, adjustmentId='{}', paymentId='{}', invoiceId='{}', eventId='{}'",
+                invoiceAdjustmentStatusEvent.getPaymentAdjustmentId(), invoiceAdjustmentStatusEvent.getPaymentId(), invoiceAdjustmentStatusEvent.getInvoiceId(), invoiceAdjustmentStatusEvent.getEventId());
+
+        try {
+            InvoiceEventStat invoicePaymentEvent = invoiceEventDao.findPaymentByInvoiceAndPaymentId(invoiceAdjustmentStatusEvent.getInvoiceId(), invoiceAdjustmentStatusEvent.getPaymentId());
+            if (invoicePaymentEvent == null) {
+                throw new NotFoundException(String.format("Invoice payment event not found, paymentId='%s', invoiceId='%s', eventId='%d'",
+                        invoiceAdjustmentStatusEvent.getPaymentId(), invoiceAdjustmentStatusEvent.getInvoiceId(), invoiceAdjustmentStatusEvent.getEventId()));
+            }
+
+            if (!invoicePaymentEvent.getPaymentAdjustmentId().equals(invoiceAdjustmentStatusEvent.getPaymentAdjustmentId())) {
+                throw new NotFoundException(
+                        String.format("Adjustment not found, adjustmentId='%s', invoiceId='%s', paymentId='%s', eventId='%d'",
+                                invoiceAdjustmentStatusEvent.getPaymentAdjustmentId(),
+                                invoiceAdjustmentStatusEvent.getInvoiceId(),
+                                invoiceAdjustmentStatusEvent.getPaymentId(),
+                                invoiceAdjustmentStatusEvent.getEventId())
+                );
+            }
+
+            if (invoicePaymentEvent.getPaymentAdjustmentStatus() != AdjustmentStatus.pending) {
+                throw new AdjustmentException(
+                        String.format("Illegal adjustment status, adjustmentId='%s', invoiceId='%s', paymentId='%s', eventId='%d', adjustmentStatus='%s'",
+                                invoiceAdjustmentStatusEvent.getPaymentAdjustmentId(),
+                                invoiceAdjustmentStatusEvent.getInvoiceId(),
+                                invoiceAdjustmentStatusEvent.getPaymentId(),
+                                invoiceAdjustmentStatusEvent.getEventId(),
+                                invoiceAdjustmentStatusEvent.getPaymentAdjustmentStatus())
+                );
+            }
+
+            invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED);
+            invoicePaymentEvent.setEventId(invoiceAdjustmentStatusEvent.getEventId());
+            invoicePaymentEvent.setEventCreatedAt(invoiceAdjustmentStatusEvent.getEventCreatedAt());
+
+            invoicePaymentEvent.setPaymentAdjustmentStatus(invoiceAdjustmentStatusEvent.getPaymentAdjustmentStatus());
+            invoicePaymentEvent.setPaymentAdjustmentStatusCreatedAt(invoiceAdjustmentStatusEvent.getPaymentAdjustmentStatusCreatedAt());
+
+            if (invoicePaymentEvent.getPaymentAdjustmentStatus() == AdjustmentStatus.captured) {
+                invoicePaymentEvent.setPaymentFee(invoicePaymentEvent.getPaymentAdjustmentFee());
+                invoicePaymentEvent.setPaymentProviderFee(invoicePaymentEvent.getPaymentAdjustmentProviderFee());
+                invoicePaymentEvent.setPaymentExternalFee(invoicePaymentEvent.getPaymentAdjustmentExternalFee());
+            }
+
+            invoiceEventDao.update(invoicePaymentEvent);
+            log.info("Adjustment event status have been changed, invoiceId='{}', eventId='{}', AdjustmentStatus='{}'",
+                    invoicePaymentEvent.getInvoiceId(), invoicePaymentEvent.getEventId(), invoicePaymentEvent.getPaymentAdjustmentStatus());
+        } catch (DaoException ex) {
+            String message = String.format("Failed to change adjustment event status, paymentId='%s', invoiceId='%s', eventId='%d'",
+                    invoiceAdjustmentStatusEvent.getPaymentId(), invoiceAdjustmentStatusEvent.getInvoiceId(), invoiceAdjustmentStatusEvent.getEventId());
+            throw new StorageException(message, ex);
+        }
+    }
+
+    public void changeInvoicePaymentStatus(InvoiceEventStat invoicePaymentStatusEvent) throws NotFoundException, StorageException {
+        log.debug("Change invoice payment event status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'",
+                invoicePaymentStatusEvent.getPaymentId(), invoicePaymentStatusEvent.getInvoiceId(), invoicePaymentStatusEvent.getEventId(), invoicePaymentStatusEvent.getPaymentStatus());
+
+        try {
+            InvoiceEventStat invoicePaymentEvent = invoiceEventDao.findPaymentByInvoiceAndPaymentId(invoicePaymentStatusEvent.getInvoiceId(), invoicePaymentStatusEvent.getPaymentId());
+            if (invoicePaymentEvent == null) {
+                throw new NotFoundException(String.format("Invoice payment event not found, paymentId='%s', invoiceId='%s', eventId='%d'",
+                        invoicePaymentStatusEvent.getPaymentId(), invoicePaymentStatusEvent.getInvoiceId(), invoicePaymentStatusEvent.getEventId()));
+            }
+
             invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED);
+            invoicePaymentEvent.setEventId(invoicePaymentStatusEvent.getEventId());
+            invoicePaymentEvent.setEventCreatedAt(invoicePaymentStatusEvent.getEventCreatedAt());
 
-            InvoicePaymentStatus status = paymentStatusChange.getStatus();
-            invoicePaymentEvent.setPaymentStatus(
-                    com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.valueOf(status.getSetField().getFieldName())
-            );
-            if (status.isSetFailed()) {
-                OperationFailure operationFailure = status.getFailed().getFailure();
-                invoicePaymentEvent.setPaymentStatusFailureCode(operationFailure.getCode());
-                invoicePaymentEvent.setPaymentStatusFailureDescription(operationFailure.getDescription());
-            }
-            invoicePaymentEvent.setEventCreatedAt(LocalDateTime.ofInstant(paymentStatusChange.getChangedAt(), ZoneOffset.UTC));
+            invoicePaymentEvent.setPaymentStatus(invoicePaymentStatusEvent.getPaymentStatus());
+            invoicePaymentEvent.setPaymentStatusFailureCode(invoicePaymentStatusEvent.getPaymentStatusFailureCode());
+            invoicePaymentEvent.setPaymentStatusFailureDescription(invoicePaymentStatusEvent.getPaymentStatusFailureDescription());
 
             invoiceEventDao.update(invoicePaymentEvent);
             log.info("Invoice payment event status have been changed, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'",
-                    paymentStatusChange.getPaymentId(), paymentStatusChange.getInvoiceId(), paymentStatusChange.getEventId(), paymentStatusChange.getStatus().getSetField().getFieldName());
+                    invoicePaymentEvent.getPaymentId(), invoicePaymentEvent.getInvoiceId(), invoicePaymentEvent.getEventId(), invoicePaymentEvent.getPaymentStatus());
 
         } catch (DaoException ex) {
             String message = String.format("Failed to change invoice payment event status, paymentId='%s', invoiceId='%s', eventId='%d', invoiceStatus='%s'",
-                    paymentStatusChange.getPaymentId(), paymentStatusChange.getInvoiceId(), paymentStatusChange.getEventId(), paymentStatusChange.getStatus().getSetField().getFieldName());
+                    invoicePaymentStatusEvent.getPaymentId(), invoicePaymentStatusEvent.getInvoiceId(), invoicePaymentStatusEvent.getEventId(), invoicePaymentStatusEvent.getPaymentStatus());
             throw new StorageException(message, ex);
         }
     }
@@ -111,6 +184,7 @@ public class InvoiceEventService {
 
         try {
             invoiceEventDao.insert(invoiceEvent);
+            log.info("Invoice event have been saved, event='{}'", invoiceEvent);
         } catch (DaoException ex) {
             String message = String.format("Failed to save invoice event, event='%s'", invoiceEvent);
             throw new StorageException(message, ex);

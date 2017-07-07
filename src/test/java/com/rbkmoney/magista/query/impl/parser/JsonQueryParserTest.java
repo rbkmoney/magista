@@ -1,9 +1,9 @@
 package com.rbkmoney.magista.query.impl.parser;
 
+import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.query.impl.*;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.junit.Test;
 
 import java.util.List;
@@ -52,8 +52,8 @@ public class JsonQueryParserTest {
         assertEquals("A", parameters.getInvoiceId());
         assertEquals("B", parameters.getPaymentId());
         assertEquals("12**12", parameters.getPanMask());
-        assertEquals("2016-03-22T00:12:00Z", TemporalConverter.temporalToString(parameters.getFromTime()));
-        assertEquals("2016-03-22T01:12:00Z", TemporalConverter.temporalToString(parameters.getToTime()));
+        assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
+        assertEquals("2016-03-22T01:12:00Z", TypeUtil.temporalToString(parameters.getToTime()));
         assertNull(parameters.getSize());
         assertNull(parameters.getFrom());
 
@@ -78,8 +78,8 @@ public class JsonQueryParserTest {
         assertEquals("A", parameters.getInvoiceId());
         assertEquals("B", parameters.getPaymentId());
         assertEquals("12**12", parameters.getPanMask());
-        assertEquals("2016-03-22T00:12:00Z", TemporalConverter.temporalToString(parameters.getFromTime()));
-        assertEquals("2016-03-22T01:12:00Z", TemporalConverter.temporalToString(parameters.getToTime()));
+        assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
+        assertEquals("2016-03-22T01:12:00Z", TypeUtil.temporalToString(parameters.getToTime()));
         assertEquals(new Integer(2), parameters.getSize());
         assertEquals(new Integer(1), parameters.getFrom());
 
@@ -124,7 +124,7 @@ public class JsonQueryParserTest {
         assertEquals(Integer.valueOf(2), parameters.getShopId());
         assertEquals("A", parameters.getInvoiceId());
         assertEquals("paid", parameters.getInvoiceStatus());
-        assertEquals("2016-03-22T00:12:00Z", TemporalConverter.temporalToString(parameters.getFromTime()));
+        assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
         assertNull(parameters.getToTime());
         assertNull(parameters.getFrom());
         assertNull(parameters.getSize());
@@ -150,8 +150,8 @@ public class JsonQueryParserTest {
         assertEquals("paid", parameters.getInvoiceStatus());
         assertEquals(1, parameters.getFrom().intValue());
         assertEquals(2, parameters.getSize().intValue());
-        assertEquals("2016-03-22T00:12:00Z", TemporalConverter.temporalToString(parameters.getFromTime()));
-        assertEquals("2016-03-22T01:12:00Z", TemporalConverter.temporalToString(parameters.getToTime()));
+        assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
+        assertEquals("2016-03-22T01:12:00Z", TypeUtil.temporalToString(parameters.getToTime()));
         assertEquals(new Integer(2), parameters.getSize());
         assertEquals(new Integer(1), parameters.getFrom());
 
@@ -195,8 +195,8 @@ public class JsonQueryParserTest {
         assertEquals("1", parameters.getMerchantId());
         assertEquals(Integer.valueOf(2), parameters.getShopId());
         assertEquals((Integer) 1, parameters.getSplitInterval());
-        assertEquals("2016-03-22T00:12:00Z", TemporalConverter.temporalToString(parameters.getFromTime()));
-        assertEquals("2016-03-22T01:00:00Z", TemporalConverter.temporalToString(parameters.getToTime()));
+        assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
+        assertEquals("2016-03-22T01:00:00Z", TypeUtil.temporalToString(parameters.getToTime()));
     }
 
     @Test

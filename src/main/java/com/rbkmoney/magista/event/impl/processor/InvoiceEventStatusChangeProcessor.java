@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.event.impl.processor;
 
+import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.event.Processor;
-import com.rbkmoney.magista.model.InvoiceStatusChange;
 import com.rbkmoney.magista.service.InvoiceEventService;
 
 /**
@@ -10,15 +10,15 @@ import com.rbkmoney.magista.service.InvoiceEventService;
 public class InvoiceEventStatusChangeProcessor implements Processor {
 
     private final InvoiceEventService invoiceEventService;
-    private final InvoiceStatusChange invoiceStatusChange;
+    private final InvoiceEventStat invoiceStatusEvent;
 
-    public InvoiceEventStatusChangeProcessor(InvoiceEventService invoiceEventService, InvoiceStatusChange invoiceStatusChange) {
+    public InvoiceEventStatusChangeProcessor(InvoiceEventService invoiceEventService, InvoiceEventStat invoiceStatusEvent) {
         this.invoiceEventService = invoiceEventService;
-        this.invoiceStatusChange = invoiceStatusChange;
+        this.invoiceStatusEvent = invoiceStatusEvent;
     }
 
     @Override
     public void execute() {
-        invoiceEventService.changeInvoiceEventStatus(invoiceStatusChange);
+        invoiceEventService.changeInvoiceEventStatus(invoiceStatusEvent);
     }
 }

@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.query;
 
-import com.rbkmoney.thrift.filter.converter.TemporalConverter;
+import com.rbkmoney.geck.common.util.TypeUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ public class QueryParameters {
 
     public <T extends QueryParameters> T removeParameters(QueryParametersRef<T> parametersRef, String... keys) {
         Map<String, Object> newParameters = new HashMap<>(parameters);
-        for (String key: keys) {
+        for (String key : keys) {
             newParameters.remove(key);
         }
         return parametersRef.newInstance(newParameters, derivedParameters);
@@ -47,7 +47,7 @@ public class QueryParameters {
             try {
                 return Long.parseLong(val.toString());
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Field:"+key +" has incorrect value", e);
+                throw new IllegalArgumentException("Field:" + key + " has incorrect value", e);
             }
         } else {
             return null;
@@ -62,7 +62,7 @@ public class QueryParameters {
             try {
                 return Integer.parseInt(val.toString());
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Field:"+key +" has incorrect value", e);
+                throw new IllegalArgumentException("Field:" + key + " has incorrect value", e);
             }
         } else {
             return null;
@@ -70,7 +70,7 @@ public class QueryParameters {
     }
 
     public String getStringParameter(String key, boolean deepSearch) {
-        Object val =  getParameter(key, deepSearch);
+        Object val = getParameter(key, deepSearch);
         return val != null ? val.toString() : null;
     }
 
@@ -79,7 +79,7 @@ public class QueryParameters {
         if (val instanceof TemporalAccessor) {
             return (TemporalAccessor) val;
         } else if (val instanceof String) {
-            return TemporalConverter.stringToTemporal(val.toString());
+            return TypeUtil.stringToTemporal(val.toString());
         } else {
             return null;
         }

@@ -2,6 +2,7 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
@@ -12,7 +13,6 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.thrift.filter.converter.TemporalConverter;
 import org.apache.http.entity.ContentType;
 
 import java.time.Instant;
@@ -68,7 +68,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         statInvoice.setId(invoiceEventStat.getInvoiceId());
         statInvoice.setOwnerId(invoiceEventStat.getPartyId());
         statInvoice.setShopId(invoiceEventStat.getPartyShopId());
-        statInvoice.setCreatedAt(TemporalConverter.temporalToString(
+        statInvoice.setCreatedAt(TypeUtil.temporalToString(
                 invoiceEventStat.getInvoiceCreatedAt().toInstant(ZoneOffset.UTC)
         ));
 
@@ -81,7 +81,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         statInvoice.setDescription(invoiceEventStat.getInvoiceDescription());
 
         statInvoice.setDue(
-                TemporalConverter.temporalToString(invoiceEventStat.getInvoiceDue().toInstant(ZoneOffset.UTC))
+                TypeUtil.temporalToString(invoiceEventStat.getInvoiceDue())
         );
         statInvoice.setAmount(invoiceEventStat.getInvoiceAmount());
         statInvoice.setCurrencySymbolicCode(invoiceEventStat.getInvoiceCurrencyCode());

@@ -1,34 +1,41 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
-import com.rbkmoney.damsel.payment_processing.Event;
+import com.rbkmoney.damsel.domain.OperationFailure;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStatusChanged;
+import com.rbkmoney.geck.common.util.TBaseUtil;
+import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
+import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
-import com.rbkmoney.magista.model.PaymentStatusChange;
-import com.rbkmoney.thrift.filter.converter.TemporalConverter;
-
-import java.time.Instant;
 
 /**
  * Created by tolkonepiu on 14/11/2016.
  */
 public class PaymentStatusMapper implements Mapper<InvoiceEventContext> {
     @Override
-    public InvoiceEventContext fill(InvoiceEventContext value) {
-        Event event = value.getSource().getSourceEvent().getProcessingEvent();
-        String invoiceId = event.getSource().getInvoice();
-        Instant changedAt = Instant.from(TemporalConverter.stringToTemporal(event.getCreatedAt()));
-        InvoicePaymentStatusChanged invoicePaymentStatusChanged = event.getPayload().getInvoiceEvent().getInvoicePaymentEvent().getInvoicePaymentStatusChanged();
+    public InvoiceEventContext fill(InvoiceEventContext context) {
+        InvoiceEventStat invoiceEventStat = context.getInvoiceEventStat();
 
-        PaymentStatusChange paymentStatusChange = new PaymentStatusChange();
-        paymentStatusChange.setEventId(event.getId());
-        paymentStatusChange.setInvoiceId(invoiceId);
-        paymentStatusChange.setPaymentId(invoicePaymentStatusChanged.getPaymentId());
-        paymentStatusChange.setChangedAt(changedAt);
-        paymentStatusChange.setStatus(invoicePaymentStatusChanged.getStatus());
+        InvoicePaymentStatusChanged invoicePaymentStatusChanged = context
+                .getSource()
+                .getSourceEvent()
+                .getProcessingEvent()
+                .getPayload()
+                .getInvoiceEvent()
+                .getInvoicePaymentEvent()
+                .getInvoicePaymentStatusChanged();
 
-        value.setPaymentStatusChange(paymentStatusChange);
+        invoiceEventStat.setPaymentId(invoicePaymentStatusChanged.getPaymentId());
+        invoiceEventStat.setPaymentStatus(
+                TBaseUtil.unionFieldToEnum(invoicePaymentStatusChanged.getStatus(), InvoicePaymentStatus.class)
+        );
 
-        return value;
+        if (invoicePaymentStatusChanged.getStatus().isSetFailed()) {
+            OperationFailure operationFailure = invoicePaymentStatusChanged.getStatus().getFailed().getFailure();
+            invoiceEventStat.setPaymentStatusFailureCode(operationFailure.getCode());
+            invoiceEventStat.setPaymentStatusFailureDescription(operationFailure.getDescription());
+        }
+
+        return context.setInvoiceEventStat(invoiceEventStat);
     }
 }

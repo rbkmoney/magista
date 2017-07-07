@@ -2,7 +2,6 @@ package com.rbkmoney.magista.config;
 
 import com.rbkmoney.eventstock.client.EventPublisher;
 import com.rbkmoney.eventstock.client.poll.PollingEventPublisherBuilder;
-import com.rbkmoney.magista.event.impl.poller.EventStockErrorHandler;
 import com.rbkmoney.magista.event.impl.poller.EventStockHandler;
 import com.rbkmoney.magista.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,6 @@ public class EventStockPollerConfig {
         return new PollingEventPublisherBuilder()
                 .withURI(bmUri.getURI())
                 .withEventHandler(new EventStockHandler(eventService))
-                .withErrorHandler(new EventStockErrorHandler())
                 .withMaxPoolSize(maxPoolSize)
                 .withPollDelay(pollDelay)
                 .build();

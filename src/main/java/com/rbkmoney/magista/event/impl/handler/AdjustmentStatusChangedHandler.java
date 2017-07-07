@@ -6,11 +6,8 @@ import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.event.impl.mapper.EventMapper;
-import com.rbkmoney.magista.event.impl.mapper.PaymentCommissionMapper;
-import com.rbkmoney.magista.event.impl.mapper.PaymentGeoMapper;
-import com.rbkmoney.magista.event.impl.mapper.PaymentMapper;
-import com.rbkmoney.magista.event.impl.processor.InvoicePaymentEventProcessor;
-import com.rbkmoney.magista.provider.GeoProvider;
+import com.rbkmoney.magista.event.impl.mapper.PaymentAdjustmentStatusMapper;
+import com.rbkmoney.magista.event.impl.processor.PaymentAdjustmentEventStatusChangeProcessor;
 import com.rbkmoney.magista.service.InvoiceEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,13 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by tolkonepiu on 04.08.16.
+ * Created by tolkonepiu on 21/06/2017.
  */
 @Component
-public class PaymentStartedHandler extends AbstractInvoiceEventHandler {
-
-    @Autowired
-    GeoProvider geoProvider;
+public class AdjustmentStatusChangedHandler extends AbstractInvoiceEventHandler {
 
     @Autowired
     InvoiceEventService invoiceEventService;
@@ -33,21 +27,19 @@ public class PaymentStartedHandler extends AbstractInvoiceEventHandler {
     @Override
     public Processor handle(StockEvent event) {
         InvoiceEventContext context = generateContext(event);
-        return new InvoicePaymentEventProcessor(invoiceEventService, context.getInvoiceEventStat());
+        return new PaymentAdjustmentEventStatusChangeProcessor(invoiceEventService, context.getInvoiceEventStat());
     }
 
     @Override
     public EventType getEventType() {
-        return EventType.INVOICE_PAYMENT_STARTED;
+        return EventType.INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED;
     }
 
     @Override
     List<Mapper> getMappers() {
         return Arrays.asList(
                 new EventMapper(),
-                new PaymentMapper(),
-                new PaymentCommissionMapper(),
-                new PaymentGeoMapper(geoProvider)
+                new PaymentAdjustmentStatusMapper()
         );
     }
 }

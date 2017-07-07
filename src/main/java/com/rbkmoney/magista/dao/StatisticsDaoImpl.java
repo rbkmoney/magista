@@ -30,7 +30,7 @@ import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_
 public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public final static int MAX_LIMIT = 1000;
+    public static final int MAX_LIMIT = 1000;
 
     public StatisticsDaoImpl(DataSource ds) {
         super(ds);

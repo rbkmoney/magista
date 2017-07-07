@@ -1,8 +1,6 @@
 package com.rbkmoney.magista.config;
 
 import com.rbkmoney.damsel.geo_ip.GeoIpServiceSrv;
-import com.rbkmoney.woody.api.ClientBuilder;
-import com.rbkmoney.woody.api.event.ClientEventListener;
 import com.rbkmoney.woody.api.event.CompositeClientEventListener;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import com.rbkmoney.woody.thrift.impl.http.event.ClientEventLogListener;
@@ -25,20 +23,8 @@ public class ColumbusConfig {
 
     @Bean
     public GeoIpServiceSrv.Iface columbusClient() throws IOException {
-        return clientBuilder()
-                .withEventListener(eventListener())
+        return new THSpawnClientBuilder()
                 .withAddress(resource.getURI()).build(GeoIpServiceSrv.Iface.class);
     }
 
-    @Bean
-    public ClientEventListener eventListener() {
-        return new CompositeClientEventListener(
-                new ClientEventLogListener(),
-                new HttpClientEventLogListener());
-    }
-
-    @Bean
-    public ClientBuilder clientBuilder() {
-        return new THSpawnClientBuilder();
-    }
 }
