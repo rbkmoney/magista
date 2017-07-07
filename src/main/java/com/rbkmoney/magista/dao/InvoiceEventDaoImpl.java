@@ -72,6 +72,7 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
     public static RowMapper<InvoiceEventStat> getRowMapper() {
         return (rs, i) -> {
             InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
+            invoiceEventStat.setId(rs.getLong("id"));
             invoiceEventStat.setEventId(rs.getLong("event_id"));
             invoiceEventStat.setEventCategory(InvoiceEventCategory.valueOf(rs.getString("event_category")));
             invoiceEventStat.setEventType(InvoiceEventType.valueOf(rs.getString("event_type")));
