@@ -78,7 +78,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         Query query = buildInvoiceSelectConditionStepQuery(merchantId, shopId,
                 invoiceSource, paymentSource)
-                .orderBy(INVOICE_EVENT_STAT.EVENT_ID.desc())
+                .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
         return fetch(query, InvoiceEventDaoImpl.getRowMapper());
@@ -160,7 +160,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         );
 
         Query query = buildPaymentSelectConditionStepQuery(merchantId, shopId, paymentSource)
-                .orderBy(INVOICE_EVENT_STAT.EVENT_ID.desc())
+                .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
         return fetch(query, InvoiceEventDaoImpl.getRowMapper());
