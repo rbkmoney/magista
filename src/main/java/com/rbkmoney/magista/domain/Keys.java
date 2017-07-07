@@ -4,13 +4,7 @@
 package com.rbkmoney.magista.domain;
 
 
-import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
-import com.rbkmoney.magista.domain.tables.records.InvoiceEventStatRecord;
-
 import javax.annotation.Generated;
-
-import org.jooq.UniqueKey;
-import org.jooq.impl.AbstractKeys;
 
 
 /**
@@ -36,7 +30,6 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_PKEY = UniqueKeys0.INVOICE_EVENT_PKEY;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -46,8 +39,4 @@ public class Keys {
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
-
-    private static class UniqueKeys0 extends AbstractKeys {
-        public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_PKEY = createUniqueKey(InvoiceEventStat.INVOICE_EVENT_STAT, "invoice_event_pkey", InvoiceEventStat.INVOICE_EVENT_STAT.EVENT_ID);
-    }
 }

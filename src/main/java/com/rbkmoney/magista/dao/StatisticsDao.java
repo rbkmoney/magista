@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface StatisticsDao {
     Collection<InvoiceEventStat> getInvoices(
             String merchantId,
-            int shopId,
+            String shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> invoiceStatus,
@@ -32,7 +32,7 @@ public interface StatisticsDao {
     ) throws DaoException;
 
     int getInvoicesCount(String merchantId,
-                         int shopId,
+                         String shopId,
                          Optional<String> invoiceId,
                          Optional<String> paymentId,
                          Optional<String> invoiceStatus,
@@ -50,7 +50,7 @@ public interface StatisticsDao {
 
     Collection<InvoiceEventStat> getPayments(
             String merchantId,
-            int shopId,
+            String shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
@@ -67,7 +67,7 @@ public interface StatisticsDao {
 
     Integer getPaymentsCount(
             String merchantId,
-            int shopId,
+            String shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
@@ -84,7 +84,7 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getPaymentsTurnoverStat(
             String merchantId,
-            int shopId,
+            String shopId,
             Instant fromTime,
             Instant toTime,
             int splitInterval
@@ -92,7 +92,7 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getPaymentsGeoStat(
             String merchantId,
-            int shopId,
+            String shopId,
             Instant fromTime,
             Instant toTime,
             int splitInterval
@@ -100,7 +100,7 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getPaymentsConversionStat(
             String merchantId,
-            int shopId,
+            String shopId,
             Instant fromTime,
             Instant toTime,
             int splitInterval
@@ -108,7 +108,7 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getCustomersRateStat(
             String merchantId,
-            int shopId,
+            String shopId,
             Instant fromTime,
             Instant toTime,
             int splitInterval
@@ -116,7 +116,7 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getPaymentsCardTypesStat(
             String merchantId,
-            int shopId,
+            String shopId,
             Instant fromTime,
             Instant toTime,
             int splitInterval

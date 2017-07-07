@@ -4,7 +4,6 @@
 package com.rbkmoney.magista.domain.tables;
 
 
-import com.rbkmoney.magista.domain.Keys;
 import com.rbkmoney.magista.domain.Mst;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
@@ -14,8 +13,6 @@ import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.records.InvoiceEventStatRecord;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.annotation.Generated;
 
@@ -23,7 +20,6 @@ import org.jooq.Field;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
-import org.jooq.UniqueKey;
 import org.jooq.impl.TableImpl;
 
 
@@ -40,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 1625752958;
+    private static final long serialVersionUID = 1652551977;
 
     /**
      * The reference instance of <code>mst.invoice_event_stat</code>
@@ -88,7 +84,7 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     /**
      * The column <code>mst.invoice_event_stat.party_shop_id</code>.
      */
-    public final TableField<InvoiceEventStatRecord, Integer> PARTY_SHOP_ID = createField("party_shop_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<InvoiceEventStatRecord, String> PARTY_SHOP_ID = createField("party_shop_id", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.party_shop_name</code>.
@@ -216,6 +212,16 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     public final TableField<InvoiceEventStatRecord, Long> PAYMENT_FEE = createField("payment_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
+     * The column <code>mst.invoice_event_stat.payment_provider_fee</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_PROVIDER_FEE = createField("payment_provider_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column <code>mst.invoice_event_stat.payment_external_fee</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_EXTERNAL_FEE = createField("payment_external_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
      * The column <code>mst.invoice_event_stat.payment_tool</code>.
      */
     public final TableField<InvoiceEventStatRecord, String> PAYMENT_TOOL = createField("payment_tool", org.jooq.impl.SQLDataType.VARCHAR, this, "");
@@ -286,16 +292,6 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     public final TableField<InvoiceEventStatRecord, byte[]> PAYMENT_CONTEXT = createField("payment_context", org.jooq.impl.SQLDataType.BLOB, this, "");
 
     /**
-     * The column <code>mst.invoice_event_stat.payment_provider_fee</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_PROVIDER_FEE = createField("payment_provider_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_external_fee</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_EXTERNAL_FEE = createField("payment_external_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
      * The column <code>mst.invoice_event_stat.payment_adjustment_id</code>.
      */
     public final TableField<InvoiceEventStatRecord, String> PAYMENT_ADJUSTMENT_ID = createField("payment_adjustment_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
@@ -363,22 +359,6 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     @Override
     public Schema getSchema() {
         return Mst.MST;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public UniqueKey<InvoiceEventStatRecord> getPrimaryKey() {
-        return Keys.INVOICE_EVENT_PKEY;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<UniqueKey<InvoiceEventStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<InvoiceEventStatRecord>>asList(Keys.INVOICE_EVENT_PKEY);
     }
 
     /**
