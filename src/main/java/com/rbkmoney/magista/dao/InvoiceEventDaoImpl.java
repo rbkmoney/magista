@@ -83,7 +83,7 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setPartyShopDescription(rs.getString("party_shop_description"));
             invoiceEventStat.setPartyShopUrl(rs.getString("party_shop_url"));
             invoiceEventStat.setPartyShopCategoryId(rs.getInt("party_shop_category_id"));
-            invoiceEventStat.setPartyShopPayoutToolId(rs.getInt("party_shop_payout_tool_id"));
+            invoiceEventStat.setPartyShopPayoutToolId(rs.getString("party_shop_payout_tool_id"));
             invoiceEventStat.setPartyContractId(rs.getInt("party_contract_id"));
             invoiceEventStat.setPartyContractRegisteredNumber(rs.getString("party_contract_registered_number"));
             invoiceEventStat.setPartyContractInn(rs.getString("party_contract_inn"));
