@@ -49,7 +49,7 @@ public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
         invoiceEventStat.setEventCategory(InvoiceEventCategory.INVOICE);
         invoiceEventStat.setEventCreatedAt(LocalDateTime.now());
         invoiceEventStat.setPartyId(UUID.randomUUID().toString());
-        invoiceEventStat.setPartyShopId(Integer.MAX_VALUE);
+        invoiceEventStat.setPartyShopId("drop mst.invoice_event_stat;");
         invoiceEventStat.setInvoiceId("-- \u0000");
         invoiceEventStat.setInvoiceStatus(InvoiceStatus.unpaid);
         invoiceEventStat.setInvoiceProduct("\000");

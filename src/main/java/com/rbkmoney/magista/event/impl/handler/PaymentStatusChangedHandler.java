@@ -1,7 +1,8 @@
 package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.magista.event.EventType;
+import com.rbkmoney.damsel.payment_processing.InvoiceChange;
+import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
@@ -25,14 +26,14 @@ public class PaymentStatusChangedHandler extends AbstractInvoiceEventHandler {
     InvoiceEventService invoiceEventService;
 
     @Override
-    public Processor handle(StockEvent event) {
-        InvoiceEventContext context = generateContext(event);
+    public Processor handle(InvoiceChange change, StockEvent event) {
+        InvoiceEventContext context = generateContext(change, event);
         return new InvoicePaymentEventStatusChangeProcessor(invoiceEventService, context.getInvoiceEventStat());
     }
 
     @Override
-    public EventType getEventType() {
-        return EventType.INVOICE_PAYMENT_STATUS_CHANGED;
+    public ChangeType getChangeType() {
+        return ChangeType.INVOICE_PAYMENT_STATUS_CHANGED;
     }
 
     @Override

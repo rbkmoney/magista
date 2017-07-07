@@ -28,7 +28,7 @@ CREATE TABLE mst.invoice_event_stat (
   party_shop_url                       CHARACTER VARYING,
   party_shop_category_id               INT,
   party_shop_payout_tool_id            CHARACTER VARYING,
-  party_contract_id                    INT,
+  party_contract_id                    CHARACTER VARYING,
   party_contract_registered_number     CHARACTER VARYING,
   party_contract_inn                   CHARACTER VARYING,
   invoice_id                           CHARACTER VARYING           NOT NULL,
@@ -78,9 +78,9 @@ CREATE TABLE mst.invoice_event_stat (
 -- indexes
 CREATE INDEX event_invoice_ms_key
   ON mst.invoice_event_stat
-  USING btree
+  USING BTREE
   (invoice_id, payment_id);
 CREATE INDEX event_party_ms_key
   ON mst.invoice_event_stat
-  USING btree
+  USING BTREE
   (party_id, party_shop_id);

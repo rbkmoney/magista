@@ -42,33 +42,37 @@ public class InvoicePartyMapper implements Mapper<InvoiceEventContext> {
 
             if (shop == null) {
                 throw new NotFoundException(
-                        String.format("Shop not found, partyId='%s', shopId='%d'",
+                        String.format("Shop not found, partyId='%s', shopId='%s'",
                                 invoiceEventStat.getPartyId(), invoiceEventStat.getPartyShopId())
                 );
             }
 
             invoiceEventStat.setPartyShopCategoryId(shop.getCategory().getId());
             invoiceEventStat.setPartyShopPayoutToolId(shop.getPayoutToolId());
+            if (shop.getLocation().isSetUrl()) {
+                invoiceEventStat.setPartyShopUrl(shop.getLocation().getUrl());
+            }
 
             ShopDetails shopDetails = shop.getDetails();
             invoiceEventStat.setPartyShopName(shopDetails.getName());
             invoiceEventStat.setPartyShopDescription(shopDetails.getDescription());
-            if (shopDetails.isSetLocation() && shopDetails.getLocation().isSetUrl()) {
-                invoiceEventStat.setPartyShopUrl(shopDetails.getLocation().getUrl());
-            }
 
             Contract contract = party.getContracts().get(shop.getContractId());
 
             if (contract == null) {
                 throw new NotFoundException(
-                        String.format("Contract not found, contractId='%s', partyId='%s', shopId='%d'",
+                        String.format("Contract not found, contractId='%s', partyId='%s', shopId='%s'",
                                 shop.getContractId(), invoiceEventStat.getPartyId(), shop.getId())
                 );
             }
 
             invoiceEventStat.setPartyContractId(contract.getId());
-            if (contract.isSetContractor() && contract.getContractor().getEntity().isSetRussianLegalEntity()) {
-                RussianLegalEntity entity = contract.getContractor().getEntity().getRussianLegalEntity();
+            if (contract.isSetContractor()
+                    && contract.getContractor().isSetLegalEntity()
+                    && contract.getContractor().getLegalEntity().isSetRussianLegalEntity()) {
+                RussianLegalEntity entity = contract.getContractor()
+                        .getLegalEntity()
+                        .getRussianLegalEntity();
                 invoiceEventStat.setPartyContractInn(entity.getInn());
                 invoiceEventStat.setPartyContractRegisteredNumber(entity.getRegisteredNumber());
             }

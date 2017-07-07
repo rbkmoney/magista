@@ -2,8 +2,7 @@ package com.rbkmoney.magista.event.impl.mapper;
 
 import com.rbkmoney.damsel.domain.CashFlowAccount;
 import com.rbkmoney.damsel.domain.FinalCashFlowPosting;
-import com.rbkmoney.damsel.payment_processing.Event;
-import com.rbkmoney.damsel.payment_processing.InvoicePaymentEvent;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
@@ -19,11 +18,15 @@ public class PaymentCommissionMapper implements Mapper<InvoiceEventContext> {
 
     @Override
     public InvoiceEventContext fill(InvoiceEventContext context) {
-        Event event = context.getSource().getSourceEvent().getProcessingEvent();
         InvoiceEventStat invoiceEventStat = context.getInvoiceEventStat();
 
-        InvoicePaymentEvent invoicePaymentEvent = event.getPayload().getInvoiceEvent().getInvoicePaymentEvent();
-        List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentEvent.getInvoicePaymentStarted().getCashFlow();
+        InvoicePaymentStarted invoicePaymentStarted = context
+                .getInvoiceChange()
+                .getInvoicePaymentChange()
+                .getPayload()
+                .getInvoicePaymentStarted();
+
+        List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentStarted.getCashFlow();
 
         Map<CashFlowAccount._Fields, Long> commissions = DamselUtil.calculateCommissions(finalCashFlowPostings);
 

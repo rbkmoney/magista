@@ -1,8 +1,7 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
 import com.rbkmoney.damsel.domain.*;
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
+import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
@@ -18,25 +17,22 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
     @Override
     public InvoiceEventContext fill(InvoiceEventContext value) {
 
-        StockEvent stockEvent = value.getSource();
+        InvoiceChange invoiceChange = value.getInvoiceChange();
         InvoiceEventStat invoiceEventStat = value.getInvoiceEventStat();
-        invoiceEventStat = createInvoicePaymentEvent(stockEvent, invoiceEventStat);
+        invoiceEventStat = createInvoicePaymentEvent(invoiceChange, invoiceEventStat);
 
         value.setInvoiceEventStat(invoiceEventStat);
 
         return value;
     }
 
-    private InvoiceEventStat createInvoicePaymentEvent(StockEvent stockEvent, InvoiceEventStat invoiceEventStat) {
+    private InvoiceEventStat createInvoicePaymentEvent(InvoiceChange invoiceChange, InvoiceEventStat invoiceEventStat) {
         invoiceEventStat.setEventCategory(InvoiceEventCategory.PAYMENT);
         invoiceEventStat.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
 
-        Event processingEvent = stockEvent.getSourceEvent().getProcessingEvent();
-
-        InvoicePayment invoicePayment = processingEvent
+        InvoicePayment invoicePayment = invoiceChange
+                .getInvoicePaymentChange()
                 .getPayload()
-                .getInvoiceEvent()
-                .getInvoicePaymentEvent()
                 .getInvoicePaymentStarted()
                 .getPayment();
 
@@ -74,8 +70,11 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
         );
         if (status.isSetFailed()) {
             OperationFailure operationFailure = status.getFailed().getFailure();
-            invoiceEventStat.setPaymentStatusFailureCode(operationFailure.getCode());
-            invoiceEventStat.setPaymentStatusFailureDescription(operationFailure.getDescription());
+            if (operationFailure.isSetExternalFailure()) {
+                ExternalFailure externalFailure = operationFailure.getExternalFailure();
+                invoiceEventStat.setPaymentStatusFailureCode(externalFailure.getCode());
+                invoiceEventStat.setPaymentStatusFailureDescription(externalFailure.getDescription());
+            }
         }
 
         Cash cost = invoicePayment.getCost();

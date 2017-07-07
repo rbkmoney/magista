@@ -2,7 +2,7 @@ package com.rbkmoney.magista.event.impl.mapper;
 
 import com.rbkmoney.damsel.domain.InvoiceDetails;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
-import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
@@ -20,24 +20,20 @@ public class InvoiceMapper implements Mapper<InvoiceEventContext> {
     @Override
     public InvoiceEventContext fill(InvoiceEventContext value) {
 
-        StockEvent stockEvent = value.getSource();
+        InvoiceChange invoiceChange = value.getInvoiceChange();
         InvoiceEventStat invoiceEventStat = value.getInvoiceEventStat();
-        invoiceEventStat = createInvoiceEvent(stockEvent, invoiceEventStat);
+        invoiceEventStat = createInvoiceEvent(invoiceChange, invoiceEventStat);
 
         value.setInvoiceEventStat(invoiceEventStat);
 
         return value;
     }
 
-    private InvoiceEventStat createInvoiceEvent(StockEvent stockEvent, InvoiceEventStat invoiceEventStat) {
+    private InvoiceEventStat createInvoiceEvent(InvoiceChange invoiceChange, InvoiceEventStat invoiceEventStat) {
         invoiceEventStat.setEventCategory(InvoiceEventCategory.INVOICE);
         invoiceEventStat.setEventType(InvoiceEventType.INVOICE_CREATED);
 
-        com.rbkmoney.damsel.domain.Invoice invoice = stockEvent
-                .getSourceEvent()
-                .getProcessingEvent()
-                .getPayload()
-                .getInvoiceEvent()
+        com.rbkmoney.damsel.domain.Invoice invoice = invoiceChange
                 .getInvoiceCreated().getInvoice();
 
         invoiceEventStat.setInvoiceId(invoice.getId());

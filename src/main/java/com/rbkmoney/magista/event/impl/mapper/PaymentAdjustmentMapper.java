@@ -2,7 +2,9 @@ package com.rbkmoney.magista.event.impl.mapper;
 
 import com.rbkmoney.damsel.domain.CashFlowAccount;
 import com.rbkmoney.damsel.domain.InvoicePaymentAdjustment;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentAdjustmentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentAdjustmentCreated;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
@@ -21,21 +23,23 @@ public class PaymentAdjustmentMapper implements Mapper<InvoiceEventContext> {
     public InvoiceEventContext fill(InvoiceEventContext context) {
         InvoiceEventStat invoiceEventStat = context.getInvoiceEventStat();
 
-        InvoicePaymentAdjustmentCreated adjustmentCreated = context.getSource()
-                .getSourceEvent()
-                .getProcessingEvent()
-                .getPayload()
-                .getInvoiceEvent()
-                .getInvoicePaymentEvent()
-                .getInvoicePaymentAdjustmentEvent()
-                .getInvoicePaymentAdjustmentCreated();
+        InvoicePaymentChange invoicePaymentChange = context
+                .getInvoiceChange()
+                .getInvoicePaymentChange();
 
-
-        String paymentId = adjustmentCreated.getPaymentId();
+        String paymentId = invoicePaymentChange.getId();
         invoiceEventStat.setPaymentId(paymentId);
 
-        InvoicePaymentAdjustment adjustment = adjustmentCreated.getAdjustment();
-        invoiceEventStat.setPaymentAdjustmentId(adjustment.getId());
+        InvoicePaymentAdjustmentChange adjustmentChange = invoicePaymentChange
+                .getPayload()
+                .getInvoicePaymentAdjustmentChange();
+        invoiceEventStat.setPaymentAdjustmentId(adjustmentChange.getId());
+
+        InvoicePaymentAdjustment adjustment = adjustmentChange
+                .getPayload()
+                .getInvoicePaymentAdjustmentCreated()
+                .getAdjustment();
+
         invoiceEventStat.setPaymentAdjustmentReason(adjustment.getReason());
 
         invoiceEventStat.setPaymentAdjustmentStatus(TBaseUtil.unionFieldToEnum(adjustment.getStatus(), AdjustmentStatus.class));

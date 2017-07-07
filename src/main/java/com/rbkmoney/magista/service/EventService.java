@@ -1,6 +1,8 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.payment_processing.Event;
+import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.eventstock.client.DefaultSubscriberConfig;
 import com.rbkmoney.eventstock.client.EventConstraint;
 import com.rbkmoney.eventstock.client.EventPublisher;
@@ -81,15 +83,20 @@ public class EventService {
     }
 
     public void processEvent(StockEvent stockEvent) {
-        Handler handler = getHandler(stockEvent);
-        if (handler != null) {
-            HandleTask handleTask = new HandleTask(stockEvent, handler);
+        Event event = stockEvent.getSourceEvent().getProcessingEvent();
+        if (event.getPayload().isSetInvoiceChanges()) {
+            for (InvoiceChange invoiceChange : event.getPayload().getInvoiceChanges()) {
+                Handler handler = getHandler(stockEvent);
+                if (handler != null) {
+                    HandleTask handleTask = new HandleTask(invoiceChange, stockEvent, handler);
 
-            Future<Processor> processorFuture = executorService.submit(handleTask);
-            try {
-                queue.put(processorFuture);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+                    Future<Processor> processorFuture = executorService.submit(handleTask);
+                    try {
+                        queue.put(processorFuture);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
             }
         }
     }
