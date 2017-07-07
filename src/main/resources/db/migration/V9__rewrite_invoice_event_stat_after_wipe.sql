@@ -15,6 +15,7 @@ CREATE TYPE mst.ADJUSTMENT_STATUS AS ENUM ('pending', 'captured', 'cancelled');
 
 
 CREATE TABLE mst.invoice_event_stat (
+  id                                   BIGSERIAL                   NOT NULL,
   event_id                             BIGINT                      NOT NULL,
   event_category                       mst.INVOICE_EVENT_CATEGORY  NOT NULL,
   event_type                           mst.INVOICE_EVENT_TYPE      NOT NULL,
@@ -70,11 +71,16 @@ CREATE TABLE mst.invoice_event_stat (
   payment_adjustment_reason            CHARACTER VARYING,
   payment_adjustment_fee               BIGINT,
   payment_adjustment_provider_fee      BIGINT,
-  payment_adjustment_external_fee      BIGINT
+  payment_adjustment_external_fee      BIGINT,
+  CONSTRAINT invoice_event_pkey PRIMARY KEY (id)
 );
 
 -- indexes
 CREATE INDEX event_invoice_ms_key
-  ON mst.invoice_event_stat (invoice_id, payment_id);
+  ON mst.invoice_event_stat
+  USING btree
+  (invoice_id, payment_id);
 CREATE INDEX event_party_ms_key
-  ON mst.invoice_event_stat (party_id, party_shop_id);
+  ON mst.invoice_event_stat
+  USING btree
+  (party_id, party_shop_id);

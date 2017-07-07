@@ -4,6 +4,7 @@
 package com.rbkmoney.magista.domain.tables;
 
 
+import com.rbkmoney.magista.domain.Keys;
 import com.rbkmoney.magista.domain.Mst;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
@@ -13,13 +14,17 @@ import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.records.InvoiceEventStatRecord;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.Identity;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.UniqueKey;
 import org.jooq.impl.TableImpl;
 
 
@@ -36,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 1652551977;
+    private static final long serialVersionUID = 1288361132;
 
     /**
      * The reference instance of <code>mst.invoice_event_stat</code>
@@ -50,6 +55,11 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     public Class<InvoiceEventStatRecord> getRecordType() {
         return InvoiceEventStatRecord.class;
     }
+
+    /**
+     * The column <code>mst.invoice_event_stat.id</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('mst.invoice_event_stat_id_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.event_id</code>.
@@ -359,6 +369,30 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     @Override
     public Schema getSchema() {
         return Mst.MST;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Identity<InvoiceEventStatRecord, Long> getIdentity() {
+        return Keys.IDENTITY_INVOICE_EVENT_STAT;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UniqueKey<InvoiceEventStatRecord> getPrimaryKey() {
+        return Keys.INVOICE_EVENT_PKEY;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UniqueKey<InvoiceEventStatRecord>> getKeys() {
+        return Arrays.<UniqueKey<InvoiceEventStatRecord>>asList(Keys.INVOICE_EVENT_PKEY);
     }
 
     /**
