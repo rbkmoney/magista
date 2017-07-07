@@ -27,7 +27,7 @@ CREATE TABLE mst.invoice_event_stat (
   party_shop_description               CHARACTER VARYING,
   party_shop_url                       CHARACTER VARYING,
   party_shop_category_id               INT,
-  party_shop_payout_tool_id            INT,
+  party_shop_payout_tool_id            CHARACTER VARYING,
   party_contract_id                    INT,
   party_contract_registered_number     CHARACTER VARYING,
   party_contract_inn                   CHARACTER VARYING,

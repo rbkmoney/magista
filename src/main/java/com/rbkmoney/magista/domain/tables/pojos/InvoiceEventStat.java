@@ -30,7 +30,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = -571756557;
+    private static final long serialVersionUID = 1759303717;
 
     private Long                 id;
     private Long                 eventId;
@@ -44,7 +44,7 @@ public class InvoiceEventStat implements Serializable {
     private String               partyShopDescription;
     private String               partyShopUrl;
     private Integer              partyShopCategoryId;
-    private Integer              partyShopPayoutToolId;
+    private String               partyShopPayoutToolId;
     private Integer              partyContractId;
     private String               partyContractRegisteredNumber;
     private String               partyContractInn;
@@ -165,7 +165,7 @@ public class InvoiceEventStat implements Serializable {
         String               partyShopDescription,
         String               partyShopUrl,
         Integer              partyShopCategoryId,
-        Integer              partyShopPayoutToolId,
+        String               partyShopPayoutToolId,
         Integer              partyContractId,
         String               partyContractRegisteredNumber,
         String               partyContractInn,
@@ -366,11 +366,11 @@ public class InvoiceEventStat implements Serializable {
         this.partyShopCategoryId = partyShopCategoryId;
     }
 
-    public Integer getPartyShopPayoutToolId() {
+    public String getPartyShopPayoutToolId() {
         return this.partyShopPayoutToolId;
     }
 
-    public void setPartyShopPayoutToolId(Integer partyShopPayoutToolId) {
+    public void setPartyShopPayoutToolId(String partyShopPayoutToolId) {
         this.partyShopPayoutToolId = partyShopPayoutToolId;
     }
 
