@@ -36,7 +36,7 @@ public class EventService {
     private List<Handler> handlers;
 
     @Autowired
-    EventPublisher eventPublisher;
+    private EventPublisher eventPublisher;
 
     private BlockingQueue<Future<Processor>> queue;
 
@@ -52,9 +52,9 @@ public class EventService {
     @Value("${bm.pooling.handler.timeout}")
     private long timeout;
 
-    EventSaver eventSaver;
+    private EventSaver eventSaver;
 
-    ExecutorService executorService;
+    private ExecutorService executorService;
 
     @PostConstruct
     public void init() {
@@ -86,7 +86,7 @@ public class EventService {
         Event event = stockEvent.getSourceEvent().getProcessingEvent();
         if (event.getPayload().isSetInvoiceChanges()) {
             for (InvoiceChange invoiceChange : event.getPayload().getInvoiceChanges()) {
-                Handler handler = getHandler(stockEvent);
+                Handler handler = getHandler(invoiceChange);
                 if (handler != null) {
                     HandleTask handleTask = new HandleTask(invoiceChange, stockEvent, handler);
 
@@ -101,9 +101,9 @@ public class EventService {
         }
     }
 
-    private Handler getHandler(StockEvent stockEvent) {
+    private Handler getHandler(InvoiceChange invoiceChange) {
         for (Handler handler : handlers) {
-            if (handler.accept(stockEvent)) {
+            if (handler.accept(invoiceChange)) {
                 return handler;
             }
         }

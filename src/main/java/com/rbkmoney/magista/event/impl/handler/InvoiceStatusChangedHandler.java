@@ -23,7 +23,7 @@ import java.util.List;
 public class InvoiceStatusChangedHandler extends AbstractInvoiceEventHandler {
 
     @Autowired
-    InvoiceEventService invoiceEventService;
+    private InvoiceEventService invoiceEventService;
 
     @Override
     public Processor handle(InvoiceChange change, StockEvent event) {

@@ -13,10 +13,10 @@ public enum ChangeType {
 
     INVOICE_CREATED("invoice_created", new IsNullCondition().not()),
     INVOICE_STATUS_CHANGED("invoice_status_changed", new IsNullCondition().not()),
-    INVOICE_PAYMENT_STARTED("invoice_payment_change.invoice_payment_started", new IsNullCondition().not()),
-    INVOICE_PAYMENT_STATUS_CHANGED("invoice_payment_change.invoice_payment_status_changed", new IsNullCondition().not()),
-    INVOICE_PAYMENT_ADJUSTMENT_CREATED("invoice_payment_change.invoice_payment_adjustment_change.invoice_payment_adjustment_created", new IsNullCondition().not()),
-    INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED("invoice_payment_change.invoice_payment_adjustment_change.invoice_payment_adjustment_status_changed", new IsNullCondition().not());
+    INVOICE_PAYMENT_STARTED("invoice_payment_change.payload.invoice_payment_started", new IsNullCondition().not()),
+    INVOICE_PAYMENT_STATUS_CHANGED("invoice_payment_change.payload.invoice_payment_status_changed", new IsNullCondition().not()),
+    INVOICE_PAYMENT_ADJUSTMENT_CREATED("invoice_payment_change.payload.invoice_payment_adjustment_change.payload.invoice_payment_adjustment_created", new IsNullCondition().not()),
+    INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED("invoice_payment_change.payload.invoice_payment_adjustment_change.payload.invoice_payment_adjustment_status_changed", new IsNullCondition().not());
 
     Filter filter;
 

@@ -26,10 +26,10 @@ import java.util.List;
 public class PaymentStartedHandler extends AbstractInvoiceEventHandler {
 
     @Autowired
-    GeoProvider geoProvider;
+    private GeoProvider geoProvider;
 
     @Autowired
-    InvoiceEventService invoiceEventService;
+    private InvoiceEventService invoiceEventService;
 
     @Override
     public Processor handle(InvoiceChange change, StockEvent event) {

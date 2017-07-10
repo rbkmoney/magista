@@ -25,10 +25,10 @@ import java.util.List;
 public class InvoiceCreatedHandler extends AbstractInvoiceEventHandler {
 
     @Autowired
-    InvoiceEventService invoiceEventService;
+    private InvoiceEventService invoiceEventService;
 
     @Autowired
-    PartyService partyService;
+    private PartyService partyService;
 
     @Override
     public Processor handle(InvoiceChange change, StockEvent event) {

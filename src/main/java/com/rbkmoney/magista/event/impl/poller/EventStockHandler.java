@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EventStockHandler implements EventHandler<StockEvent> {
 
-    EventService eventService;
+    private EventService eventService;
 
     public EventStockHandler(EventService eventService) {
         this.eventService = eventService;
