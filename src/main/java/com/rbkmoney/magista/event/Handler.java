@@ -3,14 +3,14 @@ package com.rbkmoney.magista.event;
 /**
  * Created by tolkonepiu on 03.08.16.
  */
-public interface Handler<T> {
+public interface Handler<C, P> {
 
-    default boolean accept(T event) {
-        return getEventType().getFilter().match(event);
+    default boolean accept(C change) {
+        return getChangeType().getFilter().match(change);
     }
 
-    Processor handle(T event);
+    Processor handle(C change, P parent);
 
-    EventType getEventType();
+    ChangeType getChangeType();
 
 }

@@ -17,7 +17,7 @@ public class PaymentGeoMapper implements Mapper<InvoiceEventContext> {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    GeoProvider geoProvider;
+    private GeoProvider geoProvider;
 
     public PaymentGeoMapper(GeoProvider geoProvider) {
         this.geoProvider = geoProvider;

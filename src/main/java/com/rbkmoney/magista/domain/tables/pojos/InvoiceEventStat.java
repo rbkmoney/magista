@@ -30,21 +30,22 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 850553262;
+    private static final long serialVersionUID = 1878901299;
 
+    private Long                 id;
     private Long                 eventId;
     private InvoiceEventCategory eventCategory;
     private InvoiceEventType     eventType;
     private LocalDateTime        eventCreatedAt;
     private String               partyId;
     private String               partyEmail;
-    private Integer              partyShopId;
+    private String               partyShopId;
     private String               partyShopName;
     private String               partyShopDescription;
     private String               partyShopUrl;
     private Integer              partyShopCategoryId;
-    private Integer              partyShopPayoutToolId;
-    private Integer              partyContractId;
+    private String               partyShopPayoutToolId;
+    private String               partyContractId;
     private String               partyContractRegisteredNumber;
     private String               partyContractInn;
     private String               invoiceId;
@@ -64,6 +65,8 @@ public class InvoiceEventStat implements Serializable {
     private Long                 paymentAmount;
     private String               paymentCurrencyCode;
     private Long                 paymentFee;
+    private Long                 paymentProviderFee;
+    private Long                 paymentExternalFee;
     private String               paymentTool;
     private String               paymentMaskedPan;
     private String               paymentBin;
@@ -78,8 +81,6 @@ public class InvoiceEventStat implements Serializable {
     private String               paymentFingerprint;
     private LocalDateTime        paymentCreatedAt;
     private byte[]               paymentContext;
-    private Long                 paymentProviderFee;
-    private Long                 paymentExternalFee;
     private String               paymentAdjustmentId;
     private AdjustmentStatus     paymentAdjustmentStatus;
     private LocalDateTime        paymentAdjustmentStatusCreatedAt;
@@ -92,6 +93,7 @@ public class InvoiceEventStat implements Serializable {
     public InvoiceEventStat() {}
 
     public InvoiceEventStat(InvoiceEventStat value) {
+        this.id = value.id;
         this.eventId = value.eventId;
         this.eventCategory = value.eventCategory;
         this.eventType = value.eventType;
@@ -124,6 +126,8 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAmount = value.paymentAmount;
         this.paymentCurrencyCode = value.paymentCurrencyCode;
         this.paymentFee = value.paymentFee;
+        this.paymentProviderFee = value.paymentProviderFee;
+        this.paymentExternalFee = value.paymentExternalFee;
         this.paymentTool = value.paymentTool;
         this.paymentMaskedPan = value.paymentMaskedPan;
         this.paymentBin = value.paymentBin;
@@ -138,8 +142,6 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFingerprint = value.paymentFingerprint;
         this.paymentCreatedAt = value.paymentCreatedAt;
         this.paymentContext = value.paymentContext;
-        this.paymentProviderFee = value.paymentProviderFee;
-        this.paymentExternalFee = value.paymentExternalFee;
         this.paymentAdjustmentId = value.paymentAdjustmentId;
         this.paymentAdjustmentStatus = value.paymentAdjustmentStatus;
         this.paymentAdjustmentStatusCreatedAt = value.paymentAdjustmentStatusCreatedAt;
@@ -151,19 +153,20 @@ public class InvoiceEventStat implements Serializable {
     }
 
     public InvoiceEventStat(
+        Long                 id,
         Long                 eventId,
         InvoiceEventCategory eventCategory,
         InvoiceEventType     eventType,
         LocalDateTime        eventCreatedAt,
         String               partyId,
         String               partyEmail,
-        Integer              partyShopId,
+        String               partyShopId,
         String               partyShopName,
         String               partyShopDescription,
         String               partyShopUrl,
         Integer              partyShopCategoryId,
-        Integer              partyShopPayoutToolId,
-        Integer              partyContractId,
+        String               partyShopPayoutToolId,
+        String               partyContractId,
         String               partyContractRegisteredNumber,
         String               partyContractInn,
         String               invoiceId,
@@ -183,6 +186,8 @@ public class InvoiceEventStat implements Serializable {
         Long                 paymentAmount,
         String               paymentCurrencyCode,
         Long                 paymentFee,
+        Long                 paymentProviderFee,
+        Long                 paymentExternalFee,
         String               paymentTool,
         String               paymentMaskedPan,
         String               paymentBin,
@@ -197,8 +202,6 @@ public class InvoiceEventStat implements Serializable {
         String               paymentFingerprint,
         LocalDateTime        paymentCreatedAt,
         byte[]               paymentContext,
-        Long                 paymentProviderFee,
-        Long                 paymentExternalFee,
         String               paymentAdjustmentId,
         AdjustmentStatus     paymentAdjustmentStatus,
         LocalDateTime        paymentAdjustmentStatusCreatedAt,
@@ -208,6 +211,7 @@ public class InvoiceEventStat implements Serializable {
         Long                 paymentAdjustmentProviderFee,
         Long                 paymentAdjustmentExternalFee
     ) {
+        this.id = id;
         this.eventId = eventId;
         this.eventCategory = eventCategory;
         this.eventType = eventType;
@@ -240,6 +244,8 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAmount = paymentAmount;
         this.paymentCurrencyCode = paymentCurrencyCode;
         this.paymentFee = paymentFee;
+        this.paymentProviderFee = paymentProviderFee;
+        this.paymentExternalFee = paymentExternalFee;
         this.paymentTool = paymentTool;
         this.paymentMaskedPan = paymentMaskedPan;
         this.paymentBin = paymentBin;
@@ -254,8 +260,6 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFingerprint = paymentFingerprint;
         this.paymentCreatedAt = paymentCreatedAt;
         this.paymentContext = paymentContext;
-        this.paymentProviderFee = paymentProviderFee;
-        this.paymentExternalFee = paymentExternalFee;
         this.paymentAdjustmentId = paymentAdjustmentId;
         this.paymentAdjustmentStatus = paymentAdjustmentStatus;
         this.paymentAdjustmentStatusCreatedAt = paymentAdjustmentStatusCreatedAt;
@@ -264,6 +268,14 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentFee = paymentAdjustmentFee;
         this.paymentAdjustmentProviderFee = paymentAdjustmentProviderFee;
         this.paymentAdjustmentExternalFee = paymentAdjustmentExternalFee;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getEventId() {
@@ -314,11 +326,11 @@ public class InvoiceEventStat implements Serializable {
         this.partyEmail = partyEmail;
     }
 
-    public Integer getPartyShopId() {
+    public String getPartyShopId() {
         return this.partyShopId;
     }
 
-    public void setPartyShopId(Integer partyShopId) {
+    public void setPartyShopId(String partyShopId) {
         this.partyShopId = partyShopId;
     }
 
@@ -354,19 +366,19 @@ public class InvoiceEventStat implements Serializable {
         this.partyShopCategoryId = partyShopCategoryId;
     }
 
-    public Integer getPartyShopPayoutToolId() {
+    public String getPartyShopPayoutToolId() {
         return this.partyShopPayoutToolId;
     }
 
-    public void setPartyShopPayoutToolId(Integer partyShopPayoutToolId) {
+    public void setPartyShopPayoutToolId(String partyShopPayoutToolId) {
         this.partyShopPayoutToolId = partyShopPayoutToolId;
     }
 
-    public Integer getPartyContractId() {
+    public String getPartyContractId() {
         return this.partyContractId;
     }
 
-    public void setPartyContractId(Integer partyContractId) {
+    public void setPartyContractId(String partyContractId) {
         this.partyContractId = partyContractId;
     }
 
@@ -522,6 +534,22 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFee = paymentFee;
     }
 
+    public Long getPaymentProviderFee() {
+        return this.paymentProviderFee;
+    }
+
+    public void setPaymentProviderFee(Long paymentProviderFee) {
+        this.paymentProviderFee = paymentProviderFee;
+    }
+
+    public Long getPaymentExternalFee() {
+        return this.paymentExternalFee;
+    }
+
+    public void setPaymentExternalFee(Long paymentExternalFee) {
+        this.paymentExternalFee = paymentExternalFee;
+    }
+
     public String getPaymentTool() {
         return this.paymentTool;
     }
@@ -634,22 +662,6 @@ public class InvoiceEventStat implements Serializable {
         this.paymentContext = paymentContext;
     }
 
-    public Long getPaymentProviderFee() {
-        return this.paymentProviderFee;
-    }
-
-    public void setPaymentProviderFee(Long paymentProviderFee) {
-        this.paymentProviderFee = paymentProviderFee;
-    }
-
-    public Long getPaymentExternalFee() {
-        return this.paymentExternalFee;
-    }
-
-    public void setPaymentExternalFee(Long paymentExternalFee) {
-        this.paymentExternalFee = paymentExternalFee;
-    }
-
     public String getPaymentAdjustmentId() {
         return this.paymentAdjustmentId;
     }
@@ -723,6 +735,12 @@ public class InvoiceEventStat implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         final InvoiceEventStat other = (InvoiceEventStat) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        }
+        else if (!id.equals(other.id))
+            return false;
         if (eventId == null) {
             if (other.eventId != null)
                 return false;
@@ -915,6 +933,18 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentFee.equals(other.paymentFee))
             return false;
+        if (paymentProviderFee == null) {
+            if (other.paymentProviderFee != null)
+                return false;
+        }
+        else if (!paymentProviderFee.equals(other.paymentProviderFee))
+            return false;
+        if (paymentExternalFee == null) {
+            if (other.paymentExternalFee != null)
+                return false;
+        }
+        else if (!paymentExternalFee.equals(other.paymentExternalFee))
+            return false;
         if (paymentTool == null) {
             if (other.paymentTool != null)
                 return false;
@@ -999,18 +1029,6 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!Arrays.equals(paymentContext, other.paymentContext))
             return false;
-        if (paymentProviderFee == null) {
-            if (other.paymentProviderFee != null)
-                return false;
-        }
-        else if (!paymentProviderFee.equals(other.paymentProviderFee))
-            return false;
-        if (paymentExternalFee == null) {
-            if (other.paymentExternalFee != null)
-                return false;
-        }
-        else if (!paymentExternalFee.equals(other.paymentExternalFee))
-            return false;
         if (paymentAdjustmentId == null) {
             if (other.paymentAdjustmentId != null)
                 return false;
@@ -1066,6 +1084,7 @@ public class InvoiceEventStat implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + ((eventId == null) ? 0 : eventId.hashCode());
         result = prime * result + ((eventCategory == null) ? 0 : eventCategory.hashCode());
         result = prime * result + ((eventType == null) ? 0 : eventType.hashCode());
@@ -1098,6 +1117,8 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentAmount == null) ? 0 : paymentAmount.hashCode());
         result = prime * result + ((paymentCurrencyCode == null) ? 0 : paymentCurrencyCode.hashCode());
         result = prime * result + ((paymentFee == null) ? 0 : paymentFee.hashCode());
+        result = prime * result + ((paymentProviderFee == null) ? 0 : paymentProviderFee.hashCode());
+        result = prime * result + ((paymentExternalFee == null) ? 0 : paymentExternalFee.hashCode());
         result = prime * result + ((paymentTool == null) ? 0 : paymentTool.hashCode());
         result = prime * result + ((paymentMaskedPan == null) ? 0 : paymentMaskedPan.hashCode());
         result = prime * result + ((paymentBin == null) ? 0 : paymentBin.hashCode());
@@ -1112,8 +1133,6 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentFingerprint == null) ? 0 : paymentFingerprint.hashCode());
         result = prime * result + ((paymentCreatedAt == null) ? 0 : paymentCreatedAt.hashCode());
         result = prime * result + ((paymentContext == null) ? 0 : Arrays.hashCode(paymentContext));
-        result = prime * result + ((paymentProviderFee == null) ? 0 : paymentProviderFee.hashCode());
-        result = prime * result + ((paymentExternalFee == null) ? 0 : paymentExternalFee.hashCode());
         result = prime * result + ((paymentAdjustmentId == null) ? 0 : paymentAdjustmentId.hashCode());
         result = prime * result + ((paymentAdjustmentStatus == null) ? 0 : paymentAdjustmentStatus.hashCode());
         result = prime * result + ((paymentAdjustmentStatusCreatedAt == null) ? 0 : paymentAdjustmentStatusCreatedAt.hashCode());
@@ -1129,7 +1148,8 @@ public class InvoiceEventStat implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder("InvoiceEventStat (");
 
-        sb.append(eventId);
+        sb.append(id);
+        sb.append(", ").append(eventId);
         sb.append(", ").append(eventCategory);
         sb.append(", ").append(eventType);
         sb.append(", ").append(eventCreatedAt);
@@ -1161,6 +1181,8 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentAmount);
         sb.append(", ").append(paymentCurrencyCode);
         sb.append(", ").append(paymentFee);
+        sb.append(", ").append(paymentProviderFee);
+        sb.append(", ").append(paymentExternalFee);
         sb.append(", ").append(paymentTool);
         sb.append(", ").append(paymentMaskedPan);
         sb.append(", ").append(paymentBin);
@@ -1175,8 +1197,6 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentFingerprint);
         sb.append(", ").append(paymentCreatedAt);
         sb.append(", ").append("[binary...]");
-        sb.append(", ").append(paymentProviderFee);
-        sb.append(", ").append(paymentExternalFee);
         sb.append(", ").append(paymentAdjustmentId);
         sb.append(", ").append(paymentAdjustmentStatus);
         sb.append(", ").append(paymentAdjustmentStatusCreatedAt);

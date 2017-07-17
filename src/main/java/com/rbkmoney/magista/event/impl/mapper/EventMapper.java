@@ -18,7 +18,7 @@ public class EventMapper implements Mapper<InvoiceEventContext> {
 
         long eventId = event.getId();
         LocalDateTime eventCreatedAt = TypeUtil.stringToLocalDateTime(event.getCreatedAt());
-        String invoiceId = event.getSource().getInvoice();
+        String invoiceId = event.getSource().getInvoiceId();
 
         InvoiceEventStat invoiceEventStat = context.getInvoiceEventStat();
         invoiceEventStat.setEventId(eventId);

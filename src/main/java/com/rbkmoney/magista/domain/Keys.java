@@ -9,6 +9,7 @@ import com.rbkmoney.magista.domain.tables.records.InvoiceEventStatRecord;
 
 import javax.annotation.Generated;
 
+import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.AbstractKeys;
 
@@ -31,6 +32,7 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
+    public static final Identity<InvoiceEventStatRecord, Long> IDENTITY_INVOICE_EVENT_STAT = Identities0.IDENTITY_INVOICE_EVENT_STAT;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
@@ -47,7 +49,11 @@ public class Keys {
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
 
+    private static class Identities0 extends AbstractKeys {
+        public static Identity<InvoiceEventStatRecord, Long> IDENTITY_INVOICE_EVENT_STAT = createIdentity(InvoiceEventStat.INVOICE_EVENT_STAT, InvoiceEventStat.INVOICE_EVENT_STAT.ID);
+    }
+
     private static class UniqueKeys0 extends AbstractKeys {
-        public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_PKEY = createUniqueKey(InvoiceEventStat.INVOICE_EVENT_STAT, "invoice_event_pkey", InvoiceEventStat.INVOICE_EVENT_STAT.EVENT_ID);
+        public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_PKEY = createUniqueKey(InvoiceEventStat.INVOICE_EVENT_STAT, "invoice_event_pkey", InvoiceEventStat.INVOICE_EVENT_STAT.ID);
     }
 }

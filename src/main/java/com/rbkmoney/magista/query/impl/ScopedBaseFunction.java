@@ -49,8 +49,8 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
             return getStringParameter(MERCHANT_ID_PARAM, false);
         }
 
-        public Integer getShopId() {
-            return getIntParameter(SHOP_ID_PARAM, false);
+        public String getShopId() {
+            return getStringParameter(SHOP_ID_PARAM, false);
         }
 
     }

@@ -22,7 +22,7 @@ public class InvoiceEventService {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    InvoiceEventDao invoiceEventDao;
+    private InvoiceEventDao invoiceEventDao;
 
     public InvoiceEventStat getInvoiceEventById(String invoiceId) {
         return invoiceEventDao.findInvoiceById(invoiceId);

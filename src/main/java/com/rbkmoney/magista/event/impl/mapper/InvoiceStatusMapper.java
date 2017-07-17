@@ -17,11 +17,7 @@ public class InvoiceStatusMapper implements Mapper<InvoiceEventContext> {
         InvoiceEventStat invoiceEventStat = context.getInvoiceEventStat();
 
         InvoiceStatusChanged invoiceStatusChanged = context
-                .getSource()
-                .getSourceEvent()
-                .getProcessingEvent()
-                .getPayload()
-                .getInvoiceEvent()
+                .getInvoiceChange()
                 .getInvoiceStatusChanged();
 
         invoiceEventStat.setInvoiceStatus(

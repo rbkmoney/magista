@@ -1,6 +1,8 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
+import com.rbkmoney.damsel.domain.ExternalFailure;
 import com.rbkmoney.damsel.domain.OperationFailure;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStatusChanged;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
@@ -16,24 +18,28 @@ public class PaymentStatusMapper implements Mapper<InvoiceEventContext> {
     public InvoiceEventContext fill(InvoiceEventContext context) {
         InvoiceEventStat invoiceEventStat = context.getInvoiceEventStat();
 
-        InvoicePaymentStatusChanged invoicePaymentStatusChanged = context
-                .getSource()
-                .getSourceEvent()
-                .getProcessingEvent()
+        InvoicePaymentChange invoicePaymentChange = context
+                .getInvoiceChange()
+                .getInvoicePaymentChange();
+
+        invoiceEventStat.setPaymentId(invoicePaymentChange.getId());
+
+        InvoicePaymentStatusChanged invoicePaymentStatusChanged = invoicePaymentChange
                 .getPayload()
-                .getInvoiceEvent()
-                .getInvoicePaymentEvent()
                 .getInvoicePaymentStatusChanged();
 
-        invoiceEventStat.setPaymentId(invoicePaymentStatusChanged.getPaymentId());
         invoiceEventStat.setPaymentStatus(
                 TBaseUtil.unionFieldToEnum(invoicePaymentStatusChanged.getStatus(), InvoicePaymentStatus.class)
         );
 
         if (invoicePaymentStatusChanged.getStatus().isSetFailed()) {
             OperationFailure operationFailure = invoicePaymentStatusChanged.getStatus().getFailed().getFailure();
-            invoiceEventStat.setPaymentStatusFailureCode(operationFailure.getCode());
-            invoiceEventStat.setPaymentStatusFailureDescription(operationFailure.getDescription());
+            //TODO operation timeout?
+            if (operationFailure.isSetExternalFailure()) {
+                ExternalFailure externalFailure = operationFailure.getExternalFailure();
+                invoiceEventStat.setPaymentStatusFailureCode(externalFailure.getCode());
+                invoiceEventStat.setPaymentStatusFailureDescription(externalFailure.getDescription());
+            }
         }
 
         return context.setInvoiceEventStat(invoiceEventStat);

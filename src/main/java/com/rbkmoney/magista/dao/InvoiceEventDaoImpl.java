@@ -72,19 +72,20 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
     public static RowMapper<InvoiceEventStat> getRowMapper() {
         return (rs, i) -> {
             InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
+            invoiceEventStat.setId(rs.getLong("id"));
             invoiceEventStat.setEventId(rs.getLong("event_id"));
             invoiceEventStat.setEventCategory(InvoiceEventCategory.valueOf(rs.getString("event_category")));
             invoiceEventStat.setEventType(InvoiceEventType.valueOf(rs.getString("event_type")));
             invoiceEventStat.setEventCreatedAt(rs.getObject("event_created_at", LocalDateTime.class));
             invoiceEventStat.setPartyId(rs.getString("party_id"));
             invoiceEventStat.setPartyEmail(rs.getString("party_email"));
-            invoiceEventStat.setPartyShopId(rs.getInt("party_shop_id"));
+            invoiceEventStat.setPartyShopId(rs.getString("party_shop_id"));
             invoiceEventStat.setPartyShopName(rs.getString("party_shop_name"));
             invoiceEventStat.setPartyShopDescription(rs.getString("party_shop_description"));
             invoiceEventStat.setPartyShopUrl(rs.getString("party_shop_url"));
             invoiceEventStat.setPartyShopCategoryId(rs.getInt("party_shop_category_id"));
-            invoiceEventStat.setPartyShopPayoutToolId(rs.getInt("party_shop_payout_tool_id"));
-            invoiceEventStat.setPartyContractId(rs.getInt("party_contract_id"));
+            invoiceEventStat.setPartyShopPayoutToolId(rs.getString("party_shop_payout_tool_id"));
+            invoiceEventStat.setPartyContractId(rs.getString("party_contract_id"));
             invoiceEventStat.setPartyContractRegisteredNumber(rs.getString("party_contract_registered_number"));
             invoiceEventStat.setPartyContractInn(rs.getString("party_contract_inn"));
             invoiceEventStat.setInvoiceId(rs.getString("invoice_id"));

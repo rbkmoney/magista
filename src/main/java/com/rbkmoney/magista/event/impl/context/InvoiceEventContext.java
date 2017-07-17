@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.event.impl.context;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.event.EventContext;
 
@@ -9,10 +10,12 @@ import com.rbkmoney.magista.event.EventContext;
  */
 public class InvoiceEventContext implements EventContext<StockEvent> {
 
-    private StockEvent stockEvent;
+    private final InvoiceChange invoiceChange;
+    private final StockEvent stockEvent;
     private InvoiceEventStat invoiceEventStat;
 
-    public InvoiceEventContext(StockEvent stockEvent) {
+    public InvoiceEventContext(InvoiceChange invoiceChange, StockEvent stockEvent) {
+        this.invoiceChange = invoiceChange;
         this.stockEvent = stockEvent;
         this.invoiceEventStat = new InvoiceEventStat();
     }
@@ -20,6 +23,10 @@ public class InvoiceEventContext implements EventContext<StockEvent> {
     @Override
     public StockEvent getSource() {
         return stockEvent;
+    }
+
+    public InvoiceChange getInvoiceChange() {
+        return invoiceChange;
     }
 
     public InvoiceEventStat getInvoiceEventStat() {
