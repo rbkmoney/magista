@@ -70,10 +70,11 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
         );
         if (status.isSetFailed()) {
             OperationFailure operationFailure = status.getFailed().getFailure();
+            invoiceEventStat.setPaymentFailureClass(operationFailure.getSetField().getFieldName());
             if (operationFailure.isSetExternalFailure()) {
                 ExternalFailure externalFailure = operationFailure.getExternalFailure();
-                invoiceEventStat.setPaymentStatusFailureCode(externalFailure.getCode());
-                invoiceEventStat.setPaymentStatusFailureDescription(externalFailure.getDescription());
+                invoiceEventStat.setPaymentExternalFailureCode(externalFailure.getCode());
+                invoiceEventStat.setPaymentExternalFailureDescription(externalFailure.getDescription());
             }
         }
 
