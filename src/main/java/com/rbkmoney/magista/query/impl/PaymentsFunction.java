@@ -81,8 +81,9 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 com.rbkmoney.damsel.domain.InvoicePaymentStatus._Fields.findByName(
                         invoicePaymentStat.getPaymentStatus().getLiteral()
                 ),
-                invoicePaymentStat.getPaymentStatusFailureCode(),
-                invoicePaymentStat.getPaymentStatusFailureDescription()
+                invoicePaymentStat.getPaymentFailureClass(),
+                invoicePaymentStat.getPaymentExternalFailureCode(),
+                invoicePaymentStat.getPaymentExternalFailureDescription()
         ));
 
         statPayment.setAmount(invoicePaymentStat.getPaymentAmount());
@@ -137,7 +138,12 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         }
     }
 
-    private InvoicePaymentStatus toStatPaymentStatus(com.rbkmoney.damsel.domain.InvoicePaymentStatus._Fields status, String failureCode, String failureDescription) {
+    private InvoicePaymentStatus toStatPaymentStatus(
+            com.rbkmoney.damsel.domain.InvoicePaymentStatus._Fields status,
+            String failureClass,
+            String externalFailureCode,
+            String externalFailureDescription
+    ) {
         switch (status) {
             case PENDING:
                 return InvoicePaymentStatus.pending(new InvoicePaymentPending());
@@ -148,13 +154,26 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             case CANCELLED:
                 return InvoicePaymentStatus.cancelled(new InvoicePaymentCancelled());
             case FAILED:
-                OperationFailure operationFailure = new OperationFailure();
-                operationFailure.setCode(failureCode);
-                operationFailure.setDescription(failureDescription);
-
-                return InvoicePaymentStatus.failed(new InvoicePaymentFailed(operationFailure));
+                return InvoicePaymentStatus.failed(new InvoicePaymentFailed(
+                        toOperationFailure(failureClass, externalFailureCode, externalFailureDescription)
+                ));
             default:
                 throw new NotFoundException(String.format("Payment status '%s' not found", status.getFieldName()));
+        }
+    }
+
+    private OperationFailure toOperationFailure(String failureClass, String externalFailureCode, String externalFailureDescription) {
+        OperationFailure._Fields failureType = OperationFailure._Fields.findByName(failureClass);
+        switch(failureType) {
+            case OPERATION_TIMEOUT:
+                return OperationFailure.operation_timeout(new OperationTimeout());
+            case EXTERNAL_FAILURE:
+                ExternalFailure externalFailure = new ExternalFailure();
+                externalFailure.setCode(externalFailureCode);
+                externalFailure.setDescription(externalFailureDescription);
+                return OperationFailure.external_failure(externalFailure);
+            default:
+                throw new NotFoundException(String.format("Failure type '%s' not found", failureClass));
         }
     }
 

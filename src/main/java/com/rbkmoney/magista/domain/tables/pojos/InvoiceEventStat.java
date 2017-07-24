@@ -30,7 +30,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 1878901299;
+    private static final long serialVersionUID = -2143500991;
 
     private Long                 id;
     private Long                 eventId;
@@ -60,8 +60,8 @@ public class InvoiceEventStat implements Serializable {
     private byte[]               invoiceContext;
     private String               paymentId;
     private InvoicePaymentStatus paymentStatus;
-    private String               paymentStatusFailureCode;
-    private String               paymentStatusFailureDescription;
+    private String               paymentExternalFailureCode;
+    private String               paymentExternalFailureDescription;
     private Long                 paymentAmount;
     private String               paymentCurrencyCode;
     private Long                 paymentFee;
@@ -89,6 +89,7 @@ public class InvoiceEventStat implements Serializable {
     private Long                 paymentAdjustmentFee;
     private Long                 paymentAdjustmentProviderFee;
     private Long                 paymentAdjustmentExternalFee;
+    private String               paymentFailureClass;
 
     public InvoiceEventStat() {}
 
@@ -121,8 +122,8 @@ public class InvoiceEventStat implements Serializable {
         this.invoiceContext = value.invoiceContext;
         this.paymentId = value.paymentId;
         this.paymentStatus = value.paymentStatus;
-        this.paymentStatusFailureCode = value.paymentStatusFailureCode;
-        this.paymentStatusFailureDescription = value.paymentStatusFailureDescription;
+        this.paymentExternalFailureCode = value.paymentExternalFailureCode;
+        this.paymentExternalFailureDescription = value.paymentExternalFailureDescription;
         this.paymentAmount = value.paymentAmount;
         this.paymentCurrencyCode = value.paymentCurrencyCode;
         this.paymentFee = value.paymentFee;
@@ -150,6 +151,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentFee = value.paymentAdjustmentFee;
         this.paymentAdjustmentProviderFee = value.paymentAdjustmentProviderFee;
         this.paymentAdjustmentExternalFee = value.paymentAdjustmentExternalFee;
+        this.paymentFailureClass = value.paymentFailureClass;
     }
 
     public InvoiceEventStat(
@@ -181,8 +183,8 @@ public class InvoiceEventStat implements Serializable {
         byte[]               invoiceContext,
         String               paymentId,
         InvoicePaymentStatus paymentStatus,
-        String               paymentStatusFailureCode,
-        String               paymentStatusFailureDescription,
+        String               paymentExternalFailureCode,
+        String               paymentExternalFailureDescription,
         Long                 paymentAmount,
         String               paymentCurrencyCode,
         Long                 paymentFee,
@@ -209,7 +211,8 @@ public class InvoiceEventStat implements Serializable {
         String               paymentAdjustmentReason,
         Long                 paymentAdjustmentFee,
         Long                 paymentAdjustmentProviderFee,
-        Long                 paymentAdjustmentExternalFee
+        Long                 paymentAdjustmentExternalFee,
+        String               paymentFailureClass
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -239,8 +242,8 @@ public class InvoiceEventStat implements Serializable {
         this.invoiceContext = invoiceContext;
         this.paymentId = paymentId;
         this.paymentStatus = paymentStatus;
-        this.paymentStatusFailureCode = paymentStatusFailureCode;
-        this.paymentStatusFailureDescription = paymentStatusFailureDescription;
+        this.paymentExternalFailureCode = paymentExternalFailureCode;
+        this.paymentExternalFailureDescription = paymentExternalFailureDescription;
         this.paymentAmount = paymentAmount;
         this.paymentCurrencyCode = paymentCurrencyCode;
         this.paymentFee = paymentFee;
@@ -268,6 +271,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentFee = paymentAdjustmentFee;
         this.paymentAdjustmentProviderFee = paymentAdjustmentProviderFee;
         this.paymentAdjustmentExternalFee = paymentAdjustmentExternalFee;
+        this.paymentFailureClass = paymentFailureClass;
     }
 
     public Long getId() {
@@ -494,20 +498,20 @@ public class InvoiceEventStat implements Serializable {
         this.paymentStatus = paymentStatus;
     }
 
-    public String getPaymentStatusFailureCode() {
-        return this.paymentStatusFailureCode;
+    public String getPaymentExternalFailureCode() {
+        return this.paymentExternalFailureCode;
     }
 
-    public void setPaymentStatusFailureCode(String paymentStatusFailureCode) {
-        this.paymentStatusFailureCode = paymentStatusFailureCode;
+    public void setPaymentExternalFailureCode(String paymentExternalFailureCode) {
+        this.paymentExternalFailureCode = paymentExternalFailureCode;
     }
 
-    public String getPaymentStatusFailureDescription() {
-        return this.paymentStatusFailureDescription;
+    public String getPaymentExternalFailureDescription() {
+        return this.paymentExternalFailureDescription;
     }
 
-    public void setPaymentStatusFailureDescription(String paymentStatusFailureDescription) {
-        this.paymentStatusFailureDescription = paymentStatusFailureDescription;
+    public void setPaymentExternalFailureDescription(String paymentExternalFailureDescription) {
+        this.paymentExternalFailureDescription = paymentExternalFailureDescription;
     }
 
     public Long getPaymentAmount() {
@@ -726,6 +730,14 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentExternalFee = paymentAdjustmentExternalFee;
     }
 
+    public String getPaymentFailureClass() {
+        return this.paymentFailureClass;
+    }
+
+    public void setPaymentFailureClass(String paymentFailureClass) {
+        this.paymentFailureClass = paymentFailureClass;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -903,17 +915,17 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentStatus.equals(other.paymentStatus))
             return false;
-        if (paymentStatusFailureCode == null) {
-            if (other.paymentStatusFailureCode != null)
+        if (paymentExternalFailureCode == null) {
+            if (other.paymentExternalFailureCode != null)
                 return false;
         }
-        else if (!paymentStatusFailureCode.equals(other.paymentStatusFailureCode))
+        else if (!paymentExternalFailureCode.equals(other.paymentExternalFailureCode))
             return false;
-        if (paymentStatusFailureDescription == null) {
-            if (other.paymentStatusFailureDescription != null)
+        if (paymentExternalFailureDescription == null) {
+            if (other.paymentExternalFailureDescription != null)
                 return false;
         }
-        else if (!paymentStatusFailureDescription.equals(other.paymentStatusFailureDescription))
+        else if (!paymentExternalFailureDescription.equals(other.paymentExternalFailureDescription))
             return false;
         if (paymentAmount == null) {
             if (other.paymentAmount != null)
@@ -1077,6 +1089,12 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentAdjustmentExternalFee.equals(other.paymentAdjustmentExternalFee))
             return false;
+        if (paymentFailureClass == null) {
+            if (other.paymentFailureClass != null)
+                return false;
+        }
+        else if (!paymentFailureClass.equals(other.paymentFailureClass))
+            return false;
         return true;
     }
 
@@ -1112,8 +1130,8 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((invoiceContext == null) ? 0 : Arrays.hashCode(invoiceContext));
         result = prime * result + ((paymentId == null) ? 0 : paymentId.hashCode());
         result = prime * result + ((paymentStatus == null) ? 0 : paymentStatus.hashCode());
-        result = prime * result + ((paymentStatusFailureCode == null) ? 0 : paymentStatusFailureCode.hashCode());
-        result = prime * result + ((paymentStatusFailureDescription == null) ? 0 : paymentStatusFailureDescription.hashCode());
+        result = prime * result + ((paymentExternalFailureCode == null) ? 0 : paymentExternalFailureCode.hashCode());
+        result = prime * result + ((paymentExternalFailureDescription == null) ? 0 : paymentExternalFailureDescription.hashCode());
         result = prime * result + ((paymentAmount == null) ? 0 : paymentAmount.hashCode());
         result = prime * result + ((paymentCurrencyCode == null) ? 0 : paymentCurrencyCode.hashCode());
         result = prime * result + ((paymentFee == null) ? 0 : paymentFee.hashCode());
@@ -1141,6 +1159,7 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentAdjustmentFee == null) ? 0 : paymentAdjustmentFee.hashCode());
         result = prime * result + ((paymentAdjustmentProviderFee == null) ? 0 : paymentAdjustmentProviderFee.hashCode());
         result = prime * result + ((paymentAdjustmentExternalFee == null) ? 0 : paymentAdjustmentExternalFee.hashCode());
+        result = prime * result + ((paymentFailureClass == null) ? 0 : paymentFailureClass.hashCode());
         return result;
     }
 
@@ -1176,8 +1195,8 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append("[binary...]");
         sb.append(", ").append(paymentId);
         sb.append(", ").append(paymentStatus);
-        sb.append(", ").append(paymentStatusFailureCode);
-        sb.append(", ").append(paymentStatusFailureDescription);
+        sb.append(", ").append(paymentExternalFailureCode);
+        sb.append(", ").append(paymentExternalFailureDescription);
         sb.append(", ").append(paymentAmount);
         sb.append(", ").append(paymentCurrencyCode);
         sb.append(", ").append(paymentFee);
@@ -1205,6 +1224,7 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentAdjustmentFee);
         sb.append(", ").append(paymentAdjustmentProviderFee);
         sb.append(", ").append(paymentAdjustmentExternalFee);
+        sb.append(", ").append(paymentFailureClass);
 
         sb.append(")");
         return sb.toString();

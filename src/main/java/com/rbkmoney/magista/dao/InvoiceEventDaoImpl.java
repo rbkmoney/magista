@@ -100,8 +100,9 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setInvoiceContext(rs.getBytes("invoice_context"));
             invoiceEventStat.setPaymentId(rs.getString("payment_id"));
             invoiceEventStat.setPaymentStatus(rs.getString("payment_status") != null ? InvoicePaymentStatus.valueOf(rs.getString("payment_status")) : null);
-            invoiceEventStat.setPaymentStatusFailureCode(rs.getString("payment_status_failure_code"));
-            invoiceEventStat.setPaymentStatusFailureDescription(rs.getString("payment_status_failure_description"));
+            invoiceEventStat.setPaymentFailureClass(rs.getString("payment_failure_class"));
+            invoiceEventStat.setPaymentExternalFailureCode(rs.getString("payment_external_failure_code"));
+            invoiceEventStat.setPaymentExternalFailureDescription(rs.getString("payment_external_failure_description"));
             invoiceEventStat.setPaymentAmount(rs.getLong("payment_amount"));
             invoiceEventStat.setPaymentCurrencyCode(rs.getString("payment_currency_code"));
             invoiceEventStat.setPaymentFee(rs.getLong("payment_fee"));
