@@ -30,7 +30,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = -2143500991;
+    private static final long serialVersionUID = -1314992563;
 
     private Long                 id;
     private Long                 eventId;
@@ -90,6 +90,7 @@ public class InvoiceEventStat implements Serializable {
     private Long                 paymentAdjustmentProviderFee;
     private Long                 paymentAdjustmentExternalFee;
     private String               paymentFailureClass;
+    private String               invoiceTemplateId;
 
     public InvoiceEventStat() {}
 
@@ -152,6 +153,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentProviderFee = value.paymentAdjustmentProviderFee;
         this.paymentAdjustmentExternalFee = value.paymentAdjustmentExternalFee;
         this.paymentFailureClass = value.paymentFailureClass;
+        this.invoiceTemplateId = value.invoiceTemplateId;
     }
 
     public InvoiceEventStat(
@@ -212,7 +214,8 @@ public class InvoiceEventStat implements Serializable {
         Long                 paymentAdjustmentFee,
         Long                 paymentAdjustmentProviderFee,
         Long                 paymentAdjustmentExternalFee,
-        String               paymentFailureClass
+        String               paymentFailureClass,
+        String               invoiceTemplateId
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -272,6 +275,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentProviderFee = paymentAdjustmentProviderFee;
         this.paymentAdjustmentExternalFee = paymentAdjustmentExternalFee;
         this.paymentFailureClass = paymentFailureClass;
+        this.invoiceTemplateId = invoiceTemplateId;
     }
 
     public Long getId() {
@@ -738,6 +742,14 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFailureClass = paymentFailureClass;
     }
 
+    public String getInvoiceTemplateId() {
+        return this.invoiceTemplateId;
+    }
+
+    public void setInvoiceTemplateId(String invoiceTemplateId) {
+        this.invoiceTemplateId = invoiceTemplateId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -1095,6 +1107,12 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentFailureClass.equals(other.paymentFailureClass))
             return false;
+        if (invoiceTemplateId == null) {
+            if (other.invoiceTemplateId != null)
+                return false;
+        }
+        else if (!invoiceTemplateId.equals(other.invoiceTemplateId))
+            return false;
         return true;
     }
 
@@ -1160,6 +1178,7 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentAdjustmentProviderFee == null) ? 0 : paymentAdjustmentProviderFee.hashCode());
         result = prime * result + ((paymentAdjustmentExternalFee == null) ? 0 : paymentAdjustmentExternalFee.hashCode());
         result = prime * result + ((paymentFailureClass == null) ? 0 : paymentFailureClass.hashCode());
+        result = prime * result + ((invoiceTemplateId == null) ? 0 : invoiceTemplateId.hashCode());
         return result;
     }
 
@@ -1225,6 +1244,7 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentAdjustmentProviderFee);
         sb.append(", ").append(paymentAdjustmentExternalFee);
         sb.append(", ").append(paymentFailureClass);
+        sb.append(", ").append(invoiceTemplateId);
 
         sb.append(")");
         return sb.toString();
