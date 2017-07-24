@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 989851894;
+    private static final long serialVersionUID = -1606796532;
 
     /**
      * The reference instance of <code>mst.invoice_event_stat</code>
@@ -197,14 +197,14 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     public final TableField<InvoiceEventStatRecord, InvoicePaymentStatus> PAYMENT_STATUS = createField("payment_status", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class), this, "");
 
     /**
-     * The column <code>mst.invoice_event_stat.payment_status_failure_code</code>.
+     * The column <code>mst.invoice_event_stat.payment_external_failure_code</code>.
      */
-    public final TableField<InvoiceEventStatRecord, String> PAYMENT_STATUS_FAILURE_CODE = createField("payment_status_failure_code", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+    public final TableField<InvoiceEventStatRecord, String> PAYMENT_EXTERNAL_FAILURE_CODE = createField("payment_external_failure_code", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
-     * The column <code>mst.invoice_event_stat.payment_status_failure_description</code>.
+     * The column <code>mst.invoice_event_stat.payment_external_failure_description</code>.
      */
-    public final TableField<InvoiceEventStatRecord, String> PAYMENT_STATUS_FAILURE_DESCRIPTION = createField("payment_status_failure_description", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+    public final TableField<InvoiceEventStatRecord, String> PAYMENT_EXTERNAL_FAILURE_DESCRIPTION = createField("payment_external_failure_description", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.payment_amount</code>.
@@ -340,6 +340,11 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
      * The column <code>mst.invoice_event_stat.payment_adjustment_external_fee</code>.
      */
     public final TableField<InvoiceEventStatRecord, Long> PAYMENT_ADJUSTMENT_EXTERNAL_FEE = createField("payment_adjustment_external_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column <code>mst.invoice_event_stat.payment_failure_class</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, String> PAYMENT_FAILURE_CLASS = createField("payment_failure_class", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * Create a <code>mst.invoice_event_stat</code> table reference
