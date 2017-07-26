@@ -206,6 +206,7 @@ public class InvoiceEventService {
             invoicePaymentEvent.setInvoiceProduct(invoiceEvent.getInvoiceProduct());
             invoicePaymentEvent.setInvoiceDescription(invoiceEvent.getInvoiceDescription());
             invoicePaymentEvent.setInvoiceCurrencyCode(invoiceEvent.getInvoiceCurrencyCode());
+            invoicePaymentEvent.setInvoiceTemplateId(invoiceEvent.getInvoiceTemplateId());
             invoicePaymentEvent.setInvoiceStatus(invoiceEvent.getInvoiceStatus());
             invoicePaymentEvent.setInvoiceStatusDetails(invoiceEvent.getInvoiceStatusDetails());
             invoicePaymentEvent.setInvoiceAmount(invoiceEvent.getInvoiceAmount());

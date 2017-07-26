@@ -39,6 +39,7 @@ public class InvoiceMapper implements Mapper<InvoiceEventContext> {
         invoiceEventStat.setInvoiceId(invoice.getId());
         invoiceEventStat.setPartyShopId(invoice.getShopId());
         invoiceEventStat.setPartyId(invoice.getOwnerId());
+        invoiceEventStat.setInvoiceTemplateId(invoice.getTemplateId());
 
         InvoiceDetails details = invoice.getDetails();
         invoiceEventStat.setInvoiceProduct(details.getProduct());
