@@ -25,16 +25,13 @@ public class ProcessingService {
 
     private final BlockingQueue<Future<Processor>> queue;
 
-    private final EventSaver eventSaver;
-
     private final ExecutorService executorService;
 
     @Autowired
-    public ProcessingService(ExecutorService executorService, BlockingQueue<Future<Processor>> queue, EventSaver eventSaver, List<Handler> handlers) {
+    public ProcessingService(ExecutorService executorService, BlockingQueue<Future<Processor>> queue, List<Handler> handlers) {
         this.executorService = executorService;
         this.handlers = handlers;
         this.queue = queue;
-        this.eventSaver = eventSaver;
     }
 
     public void processEvent(StockEvent stockEvent) {
