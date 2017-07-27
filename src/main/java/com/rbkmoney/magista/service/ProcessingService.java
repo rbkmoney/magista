@@ -23,13 +23,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Service
 public class ProcessingService {
 
-    private List<Handler> handlers;
+    private final List<Handler> handlers;
 
-    private BlockingQueue<Future<Processor>> queue;
+    private final BlockingQueue<Future<Processor>> queue;
 
-    private EventSaver eventSaver;
+    private final EventSaver eventSaver;
 
-    private ExecutorService executorService;
+    private final ExecutorService executorService;
 
     @Autowired
     public ProcessingService(ExecutorService executorService, BlockingQueue<Future<Processor>> queue, EventSaver eventSaver, List<Handler> handlers) {

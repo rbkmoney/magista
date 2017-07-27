@@ -10,7 +10,7 @@ import com.rbkmoney.magista.service.ProcessingService;
  */
 public class EventStockHandler implements EventHandler<StockEvent> {
 
-    private ProcessingService processingService;
+    private final ProcessingService processingService;
 
     public EventStockHandler(ProcessingService processingService) {
         this.processingService = processingService;
