@@ -8,14 +8,12 @@ import com.rbkmoney.magista.event.HandleTask;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by tolkonepiu on 24.08.16.
@@ -40,8 +38,7 @@ public class ProcessingService {
     }
 
     public void start() {
-        Thread eventSaverThread = new Thread(eventSaver, "EventSaver");
-        eventSaverThread.start();
+
     }
 
     public void processEvent(StockEvent stockEvent) {
