@@ -37,10 +37,6 @@ public class ProcessingService {
         this.eventSaver = eventSaver;
     }
 
-    public void start() {
-
-    }
-
     public void processEvent(StockEvent stockEvent) {
         Event event = stockEvent.getSourceEvent().getProcessingEvent();
         if (event.getPayload().isSetInvoiceChanges()) {
