@@ -86,27 +86,29 @@ public class InvoiceEventFlow {
     public void stop() {
         if (isRun.compareAndSet(true, false)) {
             eventSaver.stop(eventSaverThread);
-            try {
-                eventSaverThread.join(timeout);
-            } catch (InterruptedException e) {
-                log.warn("Waiting for event saver shutdown is interrupted");
-            }
-
-            if (eventSaverThread.isAlive()) {
-                log.warn("Failed to stop event saver thread");
-            } else {
-                log.info("Event saver stopped");
-            }
-
             executorService.shutdownNow();
+
             try {
+                long startTime = System.currentTimeMillis();
                 if (!executorService.awaitTermination(timeout, TimeUnit.MILLISECONDS)) {
                     log.warn("Failed to stop enrichment tasks");
                 } else {
                     log.info("Enrichment tasks stopped");
                 }
+                long newTimeout = timeout - (System.currentTimeMillis() - startTime);
+
+                if (newTimeout > 0) {
+                    eventSaverThread.join(newTimeout);
+                }
+
+                if (eventSaverThread.isAlive()) {
+                    log.warn("Failed to stop event saver thread");
+                } else {
+                    log.info("Event saver stopped");
+                }
+
             } catch (InterruptedException e) {
-                log.warn("Waiting for enrichment tasks shutdown is interrupted");
+                log.warn("Waiting for tasks shutdown is interrupted");
             }
 
             if (!threadGroup.isDestroyed()) {
