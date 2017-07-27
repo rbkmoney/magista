@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * Created by tolkonepiu on 29/05/2017.
  */
@@ -21,15 +23,35 @@ public class InvoiceEventService {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    private InvoiceEventDao invoiceEventDao;
+    private final InvoiceEventDao invoiceEventDao;
 
-    public InvoiceEventStat getInvoiceEventById(String invoiceId) {
-        return invoiceEventDao.findInvoiceById(invoiceId);
+    @Autowired
+    public InvoiceEventService(InvoiceEventDao invoiceEventDao) {
+        this.invoiceEventDao = invoiceEventDao;
     }
 
-    public InvoiceEventStat getInvoicePaymentEventByIds(String invoiceId, String paymentId) {
-        return invoiceEventDao.findPaymentByInvoiceAndPaymentId(invoiceId, paymentId);
+    public Optional<Long> getLastEventId() throws StorageException {
+        try {
+            return Optional.ofNullable(invoiceEventDao.getLastEventId());
+        } catch (DaoException ex) {
+            throw new StorageException("Failed to get last event id", ex);
+        }
+    }
+
+    public InvoiceEventStat getInvoiceEventById(String invoiceId) throws NotFoundException {
+        InvoiceEventStat invoiceEvent = invoiceEventDao.findInvoiceById(invoiceId);
+        if (invoiceEvent == null) {
+            throw new NotFoundException(String.format("Invoice not found, invoiceId='%s'", invoiceId));
+        }
+        return invoiceEvent;
+    }
+
+    public InvoiceEventStat getInvoicePaymentEventByIds(String invoiceId, String paymentId) throws NotFoundException {
+        InvoiceEventStat invoicePaymentEvent = invoiceEventDao.findPaymentByInvoiceAndPaymentId(invoiceId, paymentId);
+        if (invoicePaymentEvent == null) {
+            throw new NotFoundException(String.format("Invoice payment not found, invoiceId='%s', paymentId='%s'", invoiceId, paymentId));
+        }
+        return invoicePaymentEvent;
     }
 
     public void changeInvoiceEventStatus(InvoiceEventStat invoiceStatusEvent) throws NotFoundException, StorageException {
@@ -37,11 +59,7 @@ public class InvoiceEventService {
                 invoiceStatusEvent.getInvoiceId(), invoiceStatusEvent.getEventId(), invoiceStatusEvent.getInvoiceStatus());
 
         try {
-            InvoiceEventStat invoiceEvent = invoiceEventDao.findInvoiceById(invoiceStatusEvent.getInvoiceId());
-            if (invoiceEvent == null) {
-                throw new NotFoundException(String.format("Invoice not found, invoiceId='%s', eventId='%d'",
-                        invoiceStatusEvent.getInvoiceId(), invoiceStatusEvent.getEventId()));
-            }
+            InvoiceEventStat invoiceEvent = getInvoiceEventById(invoiceStatusEvent.getInvoiceId());
 
             invoiceEvent.setEventType(InvoiceEventType.INVOICE_STATUS_CHANGED);
             invoiceEvent.setEventId(invoiceStatusEvent.getEventId());
@@ -66,11 +84,10 @@ public class InvoiceEventService {
                 invoiceAdjustmentEvent.getPaymentAdjustmentId(), invoiceAdjustmentEvent.getPaymentId(), invoiceAdjustmentEvent.getInvoiceId(), invoiceAdjustmentEvent.getEventId());
 
         try {
-            InvoiceEventStat invoicePaymentEvent = invoiceEventDao.findPaymentByInvoiceAndPaymentId(invoiceAdjustmentEvent.getInvoiceId(), invoiceAdjustmentEvent.getPaymentId());
-            if (invoicePaymentEvent == null) {
-                throw new NotFoundException(String.format("Invoice payment event not found, paymentId='%s', invoiceId='%s', eventId='%d'",
-                        invoiceAdjustmentEvent.getPaymentId(), invoiceAdjustmentEvent.getInvoiceId(), invoiceAdjustmentEvent.getEventId()));
-            }
+            InvoiceEventStat invoicePaymentEvent = getInvoicePaymentEventByIds(
+                    invoiceAdjustmentEvent.getInvoiceId(),
+                    invoiceAdjustmentEvent.getPaymentId()
+            );
 
             invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_CREATED);
             invoicePaymentEvent.setEventId(invoiceAdjustmentEvent.getEventId());
@@ -99,11 +116,10 @@ public class InvoiceEventService {
                 invoiceAdjustmentStatusEvent.getPaymentAdjustmentId(), invoiceAdjustmentStatusEvent.getPaymentId(), invoiceAdjustmentStatusEvent.getInvoiceId(), invoiceAdjustmentStatusEvent.getEventId());
 
         try {
-            InvoiceEventStat invoicePaymentEvent = invoiceEventDao.findPaymentByInvoiceAndPaymentId(invoiceAdjustmentStatusEvent.getInvoiceId(), invoiceAdjustmentStatusEvent.getPaymentId());
-            if (invoicePaymentEvent == null) {
-                throw new NotFoundException(String.format("Invoice payment event not found, paymentId='%s', invoiceId='%s', eventId='%d'",
-                        invoiceAdjustmentStatusEvent.getPaymentId(), invoiceAdjustmentStatusEvent.getInvoiceId(), invoiceAdjustmentStatusEvent.getEventId()));
-            }
+            InvoiceEventStat invoicePaymentEvent = getInvoicePaymentEventByIds(
+                    invoiceAdjustmentStatusEvent.getInvoiceId(),
+                    invoiceAdjustmentStatusEvent.getPaymentId()
+            );
 
             if (!invoicePaymentEvent.getPaymentAdjustmentId().equals(invoiceAdjustmentStatusEvent.getPaymentAdjustmentId())) {
                 throw new NotFoundException(
@@ -154,18 +170,17 @@ public class InvoiceEventService {
                 invoicePaymentStatusEvent.getPaymentId(), invoicePaymentStatusEvent.getInvoiceId(), invoicePaymentStatusEvent.getEventId(), invoicePaymentStatusEvent.getPaymentStatus());
 
         try {
-            InvoiceEventStat invoicePaymentEvent = invoiceEventDao.findPaymentByInvoiceAndPaymentId(invoicePaymentStatusEvent.getInvoiceId(), invoicePaymentStatusEvent.getPaymentId());
-            if (invoicePaymentEvent == null) {
-                throw new NotFoundException(String.format("Invoice payment event not found, paymentId='%s', invoiceId='%s', eventId='%d'",
-                        invoicePaymentStatusEvent.getPaymentId(), invoicePaymentStatusEvent.getInvoiceId(), invoicePaymentStatusEvent.getEventId()));
-            }
+            InvoiceEventStat invoicePaymentEvent = getInvoicePaymentEventByIds(
+                    invoicePaymentStatusEvent.getInvoiceId(),
+                    invoicePaymentStatusEvent.getPaymentId()
+            );
 
             invoicePaymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED);
             invoicePaymentEvent.setEventId(invoicePaymentStatusEvent.getEventId());
             invoicePaymentEvent.setEventCreatedAt(invoicePaymentStatusEvent.getEventCreatedAt());
 
             invoicePaymentEvent.setPaymentStatus(invoicePaymentStatusEvent.getPaymentStatus());
-            
+
             invoicePaymentEvent.setPaymentFailureClass(invoicePaymentStatusEvent.getPaymentFailureClass());
             invoicePaymentEvent.setPaymentExternalFailureCode(invoicePaymentStatusEvent.getPaymentExternalFailureCode());
             invoicePaymentEvent.setPaymentExternalFailureDescription(invoicePaymentStatusEvent.getPaymentExternalFailureDescription());
@@ -198,10 +213,7 @@ public class InvoiceEventService {
         log.debug("Save invoice payment event, event='{}'", invoicePaymentEvent);
 
         try {
-            InvoiceEventStat invoiceEvent = invoiceEventDao.findInvoiceById(invoicePaymentEvent.getInvoiceId());
-            if (invoiceEvent == null) {
-                throw new NotFoundException(String.format("Invoice event not found, invoiceId='%s', eventId='%d'", invoicePaymentEvent.getInvoiceId(), invoicePaymentEvent.getEventId()));
-            }
+            InvoiceEventStat invoiceEvent = getInvoiceEventById(invoicePaymentEvent.getInvoiceId());
 
             invoicePaymentEvent.setInvoiceProduct(invoiceEvent.getInvoiceProduct());
             invoicePaymentEvent.setInvoiceDescription(invoiceEvent.getInvoiceDescription());
