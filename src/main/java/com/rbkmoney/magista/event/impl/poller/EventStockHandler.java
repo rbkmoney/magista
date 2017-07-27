@@ -18,7 +18,7 @@ public class EventStockHandler implements EventHandler<StockEvent> {
 
     @Override
     public EventAction handle(StockEvent event, String subsKey) {
-        processingService.processEvent(event);
+        processingService.processInvoiceEvent(event);
         return EventAction.CONTINUE;
     }
 }

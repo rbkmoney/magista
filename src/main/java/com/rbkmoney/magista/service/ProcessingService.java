@@ -1,19 +1,17 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
-import com.rbkmoney.damsel.payment_processing.InvoiceChange;
-import com.rbkmoney.magista.event.EventSaver;
-import com.rbkmoney.magista.event.HandleTask;
 import com.rbkmoney.magista.event.Handler;
-import com.rbkmoney.magista.event.Processor;
+import com.rbkmoney.magista.event.flow.InvoiceEventFlow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PreDestroy;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by tolkonepiu on 24.08.16.
@@ -21,45 +19,46 @@ import java.util.concurrent.Future;
 @Service
 public class ProcessingService {
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
+    @Value("${bm.pooling.handler.threadPoolSize}")
+    int threadPoolSize;
+
+    @Value("${bm.pooling.handler.queue.limit}")
+    int queueLimit;
+
+    @Value("${bm.pooling.handler.timeout}")
+    long timeout;
+
     private final List<Handler> handlers;
 
-    private final BlockingQueue<Future<Processor>> queue;
-
-    private final ExecutorService executorService;
+    private final AtomicReference<InvoiceEventFlow> invoiceEventFlow = new AtomicReference<>();
 
     @Autowired
-    public ProcessingService(ExecutorService executorService, BlockingQueue<Future<Processor>> queue, List<Handler> handlers) {
-        this.executorService = executorService;
+    public ProcessingService(List<Handler> handlers) {
         this.handlers = handlers;
-        this.queue = queue;
     }
 
-    public void processEvent(StockEvent stockEvent) {
-        Event event = stockEvent.getSourceEvent().getProcessingEvent();
-        if (event.getPayload().isSetInvoiceChanges()) {
-            for (InvoiceChange invoiceChange : event.getPayload().getInvoiceChanges()) {
-                Handler handler = getHandler(invoiceChange);
-                if (handler != null) {
-                    HandleTask handleTask = new HandleTask(invoiceChange, stockEvent, handler);
-
-                    Future<Processor> processorFuture = executorService.submit(handleTask);
-                    try {
-                        queue.put(processorFuture);
-                    } catch (InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-            }
+    public void start() {
+        InvoiceEventFlow newInvoiceEventFlow = new InvoiceEventFlow(handlers, threadPoolSize, queueLimit, timeout);
+        if (!invoiceEventFlow.compareAndSet(null, newInvoiceEventFlow)) {
+            newInvoiceEventFlow.start();
         }
     }
 
-    private Handler getHandler(InvoiceChange invoiceChange) {
-        for (Handler handler : handlers) {
-            if (handler.accept(invoiceChange)) {
-                return handler;
-            }
+    public void processInvoiceEvent(StockEvent stockEvent) {
+        if (invoiceEventFlow.get() != null) {
+            invoiceEventFlow.get().processEvent(stockEvent);
+        } else {
+            log.warn("invoice event flow is not running");
         }
-        return null;
+    }
+
+    @PreDestroy
+    public void stop() {
+        if (invoiceEventFlow.get() != null) {
+            invoiceEventFlow.getAndSet(null).stop();
+        }
     }
 
 }

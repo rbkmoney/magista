@@ -10,7 +10,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by tolkonepiu on 31/10/2016.
@@ -21,23 +20,21 @@ public class EventSaver implements Runnable {
 
     private final BlockingQueue<Future<Processor>> queue;
     private final long timeout;
-    private AtomicBoolean started = new AtomicBoolean(false);
+    private volatile boolean isRun = true;
 
     public EventSaver(BlockingQueue<Future<Processor>> queue, long timeout) {
         this.queue = queue;
         this.timeout = timeout;
     }
 
-    public void start() {
-        if (!started.compareAndSet(false, true)) {
-            Thread eventSaverThread = new Thread(this, "EventSaver");
-            eventSaverThread.start();
-        }
+    public void stop(Thread runningThread) {
+        isRun = false;
+        runningThread.interrupt();
     }
 
     @Override
     public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
+        while (isRunning()) {
             try {
                 try {
                     Future<Processor> future = queue.peek();
@@ -60,5 +57,9 @@ public class EventSaver implements Runnable {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    private boolean isRunning() {
+        return isRun && !Thread.currentThread().isInterrupted();
     }
 }

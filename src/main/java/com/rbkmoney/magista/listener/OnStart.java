@@ -4,7 +4,6 @@ import com.rbkmoney.eventstock.client.DefaultSubscriberConfig;
 import com.rbkmoney.eventstock.client.EventConstraint;
 import com.rbkmoney.eventstock.client.EventPublisher;
 import com.rbkmoney.eventstock.client.poll.EventFlowFilter;
-import com.rbkmoney.magista.event.EventSaver;
 import com.rbkmoney.magista.service.InvoiceEventService;
 import com.rbkmoney.magista.service.ProcessingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +22,17 @@ public class OnStart implements ApplicationListener<ApplicationReadyEvent> {
 
     private final EventPublisher eventPublisher;
     private final InvoiceEventService invoiceEventService;
-    private final EventSaver eventSaver;
+    private final ProcessingService processingService;
 
 
     @Value("${bm.pooling.enabled}")
     private boolean poolingEnabled;
 
     @Autowired
-    public OnStart(EventPublisher eventPublisher, EventSaver eventSaver, InvoiceEventService invoiceEventService) {
+    public OnStart(EventPublisher eventPublisher, ProcessingService processingService, InvoiceEventService invoiceEventService) {
         this.eventPublisher = eventPublisher;
         this.invoiceEventService = invoiceEventService;
-        this.eventSaver = eventSaver;
+        this.processingService = processingService;
     }
 
     @Override
@@ -47,7 +46,7 @@ public class OnStart implements ApplicationListener<ApplicationReadyEvent> {
             EventFlowFilter eventFlowFilter = new EventFlowFilter(new EventConstraint(eventIDRange));
             eventPublisher.subscribe(new DefaultSubscriberConfig(eventFlowFilter));
         }
-        eventSaver.start();
+        processingService.start();
     }
 
 }
