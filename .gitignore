@@ -72,3 +72,9 @@ fabric.properties
 hs_err_pid*
 
 env.list
+
+
+# OSX
+*.DS_Store
+.AppleDouble
+.LSOverride

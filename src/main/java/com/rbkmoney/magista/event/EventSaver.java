@@ -18,17 +18,23 @@ public class EventSaver implements Runnable {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private BlockingQueue<Future<Processor>> queue;
-    private long timeout;
+    private final BlockingQueue<Future<Processor>> queue;
+    private final long timeout;
+    private volatile boolean isRun = true;
 
     public EventSaver(BlockingQueue<Future<Processor>> queue, long timeout) {
         this.queue = queue;
         this.timeout = timeout;
     }
 
+    public void stop(Thread runningThread) {
+        isRun = false;
+        runningThread.interrupt();
+    }
+
     @Override
     public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
+        while (isRunning()) {
             try {
                 try {
                     Future<Processor> future = queue.peek();
@@ -51,5 +57,9 @@ public class EventSaver implements Runnable {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    private boolean isRunning() {
+        return isRun && !Thread.currentThread().isInterrupted();
     }
 }

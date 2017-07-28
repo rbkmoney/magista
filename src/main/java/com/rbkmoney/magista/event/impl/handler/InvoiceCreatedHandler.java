@@ -9,7 +9,6 @@ import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.event.impl.mapper.EventMapper;
 import com.rbkmoney.magista.event.impl.mapper.InvoiceMapper;
 import com.rbkmoney.magista.event.impl.mapper.InvoicePartyMapper;
-import com.rbkmoney.magista.event.impl.processor.InvoiceEventProcessor;
 import com.rbkmoney.magista.service.InvoiceEventService;
 import com.rbkmoney.magista.service.PartyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +23,19 @@ import java.util.List;
 @Component
 public class InvoiceCreatedHandler extends AbstractInvoiceEventHandler {
 
-    @Autowired
-    private InvoiceEventService invoiceEventService;
+    private final InvoiceEventService invoiceEventService;
+    private final PartyService partyService;
 
     @Autowired
-    private PartyService partyService;
+    public InvoiceCreatedHandler(InvoiceEventService invoiceEventService, PartyService partyService) {
+        this.invoiceEventService = invoiceEventService;
+        this.partyService = partyService;
+    }
 
     @Override
     public Processor handle(InvoiceChange change, StockEvent event) {
         InvoiceEventContext context = generateContext(change, event);
-        return new InvoiceEventProcessor(invoiceEventService, context.getInvoiceEventStat());
+        return () -> invoiceEventService.saveInvoiceEvent(context.getInvoiceEventStat());
     }
 
     @Override

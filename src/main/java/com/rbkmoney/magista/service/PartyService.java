@@ -19,8 +19,12 @@ public class PartyService {
 
     private final UserInfo userInfo = new UserInfo("admin", UserType.internal_user(new InternalUser()));
 
+    private final PartyManagementSrv.Iface partyManagementSrv;
+
     @Autowired
-    PartyManagementSrv.Iface partyManagementSrv;
+    public PartyService(PartyManagementSrv.Iface partyManagementSrv) {
+        this.partyManagementSrv = partyManagementSrv;
+    }
 
     public Party getParty(String partyId, Instant timestamp) throws NotFoundException, PartyException {
         try {
