@@ -248,4 +248,66 @@ public class InvoiceEventService {
         }
     }
 
+    public void saveInvoicePaymentRefund(InvoiceEventStat refundEventStat) throws StorageException {
+        log.debug("Save invoice payment refund event, refundId='{}', paymentId='{}', invoiceId='{}', eventId='{}'",
+                refundEventStat.getPaymentRefundId(), refundEventStat.getPaymentId(), refundEventStat.getInvoiceId(), refundEventStat.getEventId());
+
+        try {
+            InvoiceEventStat invoicePaymentEvent = getInvoicePaymentEventByIds(
+                    refundEventStat.getInvoiceId(),
+                    refundEventStat.getPaymentId()
+            );
+
+            if (!invoicePaymentEvent.getPaymentRefundId().equals(refundEventStat.getPaymentRefundId())) {
+                throw new NotFoundException(
+                        String.format("Refund not found, refundId='%s', invoiceId='%s', paymentId='%s', eventId='%d'",
+                                refundEventStat.getPaymentRefundId(),
+                                refundEventStat.getInvoiceId(),
+                                refundEventStat.getPaymentId(),
+                                refundEventStat.getEventId())
+                );
+            }
+
+            invoicePaymentEvent.setPaymentRefundStatus(refundEventStat.getPaymentRefundStatus());
+
+            invoiceEventDao.update(invoicePaymentEvent);
+            log.info("Invoice payment refund event have been changed, refundId='{}', paymentId='{}', invoiceId='{}', eventId='{}'",
+                    invoicePaymentEvent.getPaymentRefundId(), invoicePaymentEvent.getPaymentId(), invoicePaymentEvent.getInvoiceId(), invoicePaymentEvent.getEventId());
+
+        } catch (DaoException ex) {
+            String message = String.format("Failed to change invoice payment event status, refundId='%s', paymentId='%s', invoiceId='%s', eventId='%d'",
+                    refundEventStat.getPaymentRefundId(), refundEventStat.getPaymentId(), refundEventStat.getInvoiceId(), refundEventStat.getEventId());
+            throw new StorageException(message, ex);
+        }
+    }
+
+    public void changeInvoicePaymentRefundStatus(InvoiceEventStat refundStatusEvent) throws NotFoundException, StorageException {
+        log.debug("Change invoice payment event status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'",
+                refundStatusEvent.getPaymentId(), refundStatusEvent.getInvoiceId(), refundStatusEvent.getEventId(), refundStatusEvent.getPaymentStatus());
+
+        try {
+            InvoiceEventStat invoicePaymentEvent = getInvoicePaymentEventByIds(
+                    refundStatusEvent.getInvoiceId(),
+                    refundStatusEvent.getPaymentId()
+            );
+
+            invoicePaymentEvent.setPaymentRefundId(refundStatusEvent.getPaymentRefundId());
+            invoicePaymentEvent.setPaymentRefundReason(refundStatusEvent.getPaymentRefundReason());
+            invoicePaymentEvent.setPaymentRefundStatus(refundStatusEvent.getPaymentRefundStatus());
+            invoicePaymentEvent.setPaymentRefundCreatedAt(refundStatusEvent.getPaymentRefundCreatedAt());
+            invoicePaymentEvent.setPaymentRefundFee(refundStatusEvent.getPaymentRefundFee());
+            invoicePaymentEvent.setPaymentRefundExternalFee(refundStatusEvent.getPaymentRefundExternalFee());
+            invoicePaymentEvent.setPaymentRefundProviderFee(refundStatusEvent.getPaymentRefundProviderFee());
+
+            invoiceEventDao.update(invoicePaymentEvent);
+            log.info("Invoice payment refund event status have been changed, refundId='{}', paymentId='{}', invoiceId='{}', eventId='{}', refundStatus='{}'",
+                    invoicePaymentEvent.getPaymentRefundId(), invoicePaymentEvent.getPaymentId(), invoicePaymentEvent.getInvoiceId(), invoicePaymentEvent.getEventId(), invoicePaymentEvent.getPaymentRefundStatus());
+
+        } catch (DaoException ex) {
+            String message = String.format("Failed to change invoice payment refund event status, refundId='%s', paymentId='%s', invoiceId='%s', eventId='%d', refundStatus='%s'",
+                    refundStatusEvent.getPaymentRefundId(), refundStatusEvent.getPaymentId(), refundStatusEvent.getInvoiceId(), refundStatusEvent.getEventId(), refundStatusEvent.getPaymentRefundStatus());
+            throw new StorageException(message, ex);
+        }
+    }
+
 }
