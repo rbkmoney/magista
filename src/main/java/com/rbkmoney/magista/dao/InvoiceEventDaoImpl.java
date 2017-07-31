@@ -124,6 +124,9 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setPaymentCreatedAt(rs.getObject("payment_created_at", LocalDateTime.class));
             invoiceEventStat.setPaymentContext(rs.getBytes("payment_context"));
             invoiceEventStat.setPaymentAdjustmentId(rs.getString("payment_adjustment_id"));
+            invoiceEventStat.setPaymentFlow(rs.getString("payment_flow"));
+            invoiceEventStat.setPaymentHoldOnExpiration(rs.getString("payment_hold_on_expiration"));
+            invoiceEventStat.setPaymentHoldUntil(rs.getObject("payment_hold_until", LocalDateTime.class));
             invoiceEventStat.setPaymentAdjustmentStatus(
                     rs.getString("payment_adjustment_status") != null ?
                             AdjustmentStatus.valueOf(rs.getString("payment_adjustment_status")) : null
