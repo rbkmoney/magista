@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.damsel.merch_stat.OnHoldExpiration;
 import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
@@ -75,6 +76,26 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
                 payment -> payment.getStatus().isSetFailed()
                 && payment.getStatus().getFailed().getFailure().isSetOperationTimeout()
         ));
+    }
+
+    @Test
+    public void testHolds() {
+        String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '2','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertTrue(
+        statResponse.getData().getPayments().stream()
+                .anyMatch(
+                        payment -> payment.getFlow().isSetHold()
+                                && payment.getFlow().getHold().getOnHoldExpiration().equals(OnHoldExpiration.cancel)
+                )
+        );
+        assertTrue(
+                statResponse.getData().getPayments().stream()
+                        .anyMatch(
+                                payment -> payment.getFlow().isSetHold()
+                                        && payment.getFlow().getHold().getOnHoldExpiration().equals(OnHoldExpiration.capture)
+                        )
+        );
     }
 
     @Test
