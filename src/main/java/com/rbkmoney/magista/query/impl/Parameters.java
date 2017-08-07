@@ -26,6 +26,7 @@ public class Parameters {
     public static final String PAYMENT_FINGERPRINT_PARAM = "payment_fingerprint";
     public static final String PAYMENT_PAN_MASK_PARAM = "payment_pan_mask";
     public static final String PAYMENT_AMOUNT_PARAM = "payment_amount";
+    public static final String PAYMENT_FLOW_PARAM = "payment_flow";
 
     public static final String SPLIT_INTERVAL_PARAM = "split_interval";
 

@@ -74,7 +74,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertTrue(statResponse.getData().getPayments().stream().anyMatch(
                 payment -> payment.getStatus().isSetFailed()
-                && payment.getStatus().getFailed().getFailure().isSetOperationTimeout()
+                        && payment.getStatus().getFailed().getFailure().isSetOperationTimeout()
         ));
     }
 
@@ -83,11 +83,11 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '2','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertTrue(
-        statResponse.getData().getPayments().stream()
-                .anyMatch(
-                        payment -> payment.getFlow().isSetHold()
-                                && payment.getFlow().getHold().getOnHoldExpiration().equals(OnHoldExpiration.cancel)
-                )
+                statResponse.getData().getPayments().stream()
+                        .anyMatch(
+                                payment -> payment.getFlow().isSetHold()
+                                        && payment.getFlow().getHold().getOnHoldExpiration().equals(OnHoldExpiration.cancel)
+                        )
         );
         assertTrue(
                 statResponse.getData().getPayments().stream()
@@ -96,6 +96,29 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
                                         && payment.getFlow().getHold().getOnHoldExpiration().equals(OnHoldExpiration.capture)
                         )
         );
+    }
+
+    @Test
+    public void testFindByFlow() {
+        // holds in payment
+        String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '2', 'payment_flow': 'hold', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertTrue(
+                statResponse.getData().getPayments().stream().allMatch(
+                        payment -> payment.getFlow().isSetHold()
+                )
+        );
+        assertEquals(2, statResponse.getTotalCount());
+
+        // instant in payment
+        json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '2', 'payment_flow': 'instant', 'from_time': '2016-10-21T15:45:20Z','to_time': '2016-10-28T18:10:10Z'}}}";
+        statResponse = queryProcessor.processQuery(json);
+        assertTrue(
+                statResponse.getData().getPayments().stream().allMatch(
+                        payment -> payment.getFlow().isSetInstant()
+                )
+        );
+        assertEquals(1, statResponse.getTotalCount());
     }
 
     @Test

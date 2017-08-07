@@ -255,6 +255,10 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             return getStringParameter(PAYMENT_FINGERPRINT_PARAM, false);
         }
 
+        public String getPaymentFlow() {
+            return getStringParameter(PAYMENT_FLOW_PARAM, false);
+        }
+
         public Long getPaymentAmount() {
             return getLongParameter(PAYMENT_AMOUNT_PARAM, false);
         }
@@ -358,6 +362,7 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getPaymentStatus()),
+                        Optional.ofNullable(parameters.getPaymentFlow()),
                         Optional.ofNullable(parameters.getPaymentEmail()),
                         Optional.ofNullable(parameters.getPaymentIp()),
                         Optional.ofNullable(parameters.getPaymentFingerprint()),
@@ -393,6 +398,7 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getPaymentStatus()),
+                        Optional.ofNullable(parameters.getPaymentFlow()),
                         Optional.ofNullable(parameters.getPaymentEmail()),
                         Optional.ofNullable(parameters.getPaymentIp()),
                         Optional.ofNullable(parameters.getPaymentFingerprint()),
