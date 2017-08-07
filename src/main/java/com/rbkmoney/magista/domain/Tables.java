@@ -5,6 +5,7 @@ package com.rbkmoney.magista.domain;
 
 
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
+import com.rbkmoney.magista.domain.tables.PayoutEventStat;
 
 import javax.annotation.Generated;
 
@@ -26,4 +27,9 @@ public class Tables {
      * The table <code>mst.invoice_event_stat</code>.
      */
     public static final InvoiceEventStat INVOICE_EVENT_STAT = com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
+
+    /**
+     * The table <code>mst.payout_event_stat</code>.
+     */
+    public static final PayoutEventStat PAYOUT_EVENT_STAT = com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 }

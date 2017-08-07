@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
+import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 
 import java.time.Instant;
@@ -76,6 +77,30 @@ public interface StatisticsDao {
             Optional<String> paymentFingerprint,
             Optional<String> paymentPanMask,
             Optional<Long> paymentAmount,
+            Optional<Instant> fromTime,
+            Optional<Instant> toTime,
+            Optional<Integer> limit,
+            Optional<Integer> offset
+    ) throws DaoException;
+
+    Collection<PayoutEventStat> getPayouts(
+            String merchantId,
+            String shopId,
+            Optional<String> payoutId,
+            Optional<String> payoutStatus,
+            Optional<String> payoutType,
+            Optional<Instant> fromTime,
+            Optional<Instant> toTime,
+            Optional<Integer> limit,
+            Optional<Integer> offset
+    ) throws DaoException;
+
+    Integer getPayoutsCount(
+            String merchantId,
+            String shopId,
+            Optional<String> payoutId,
+            Optional<String> payoutStatus,
+            Optional<String> payoutType,
             Optional<Instant> fromTime,
             Optional<Instant> toTime,
             Optional<Integer> limit,

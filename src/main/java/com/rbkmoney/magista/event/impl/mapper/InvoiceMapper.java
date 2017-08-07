@@ -2,6 +2,7 @@ package com.rbkmoney.magista.event.impl.mapper;
 
 import com.rbkmoney.damsel.domain.InvoiceDetails;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
+import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
@@ -12,21 +13,33 @@ import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.util.DamselUtil;
 
+import java.time.LocalDateTime;
+
 /**
  * Created by tolkonepiu on 10/11/2016.
  */
 public class InvoiceMapper implements Mapper<InvoiceEventContext> {
 
     @Override
-    public InvoiceEventContext fill(InvoiceEventContext value) {
+    public InvoiceEventContext fill(InvoiceEventContext context) {
 
-        InvoiceChange invoiceChange = value.getInvoiceChange();
-        InvoiceEventStat invoiceEventStat = value.getInvoiceEventStat();
-        invoiceEventStat = createInvoiceEvent(invoiceChange, invoiceEventStat);
+        InvoiceChange invoiceChange = context.getInvoiceChange();
+        InvoiceEventStat invoiceEventStat = context.getInvoiceEventStat();
 
-        value.setInvoiceEventStat(invoiceEventStat);
+        Event event = context.getSource().getSourceEvent().getProcessingEvent();
 
-        return value;
+        long eventId = event.getId();
+        LocalDateTime eventCreatedAt = TypeUtil.stringToLocalDateTime(event.getCreatedAt());
+        String invoiceId = event.getSource().getInvoiceId();
+        invoiceEventStat.setEventId(eventId);
+        invoiceEventStat.setEventCreatedAt(eventCreatedAt);
+        invoiceEventStat.setInvoiceId(invoiceId);
+
+        if (invoiceChange.isSetInvoiceCreated()) {
+            invoiceEventStat = createInvoiceEvent(invoiceChange, invoiceEventStat);
+        }
+
+        return context.setInvoiceEventStat(invoiceEventStat);
     }
 
     private InvoiceEventStat createInvoiceEvent(InvoiceChange invoiceChange, InvoiceEventStat invoiceEventStat) {

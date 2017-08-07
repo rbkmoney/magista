@@ -3,6 +3,7 @@ package com.rbkmoney.magista.service;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.flow.InvoiceEventFlow;
+import com.rbkmoney.magista.event.flow.PayoutEventFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +22,28 @@ public class ProcessingService {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Value("${bm.pooling.handler.threadPoolSize}")
-    int threadPoolSize;
+    @Value("${bm.processing.handler.queue.limit}")
+    private int processingHandlerQueueLimit;
 
-    @Value("${bm.pooling.handler.queue.limit}")
-    int queueLimit;
+    @Value("${bm.processing.handler.threadPoolSize}")
+    private int processingHandlerThreadPoolSize;
 
-    @Value("${bm.pooling.handler.timeout}")
-    long timeout;
+    @Value("${bm.processing.handler.timeout}")
+    private int processingHandlerTimeout;
+
+    @Value("${bm.payout.handler.queue.limit}")
+    private int payoutHandlerQueueLimit;
+
+    @Value("${bm.payout.handler.threadPoolSize}")
+    private int payoutHandlerThreadPoolSize;
+
+    @Value("${bm.payout.handler.timeout}")
+    private int payoutHandlerTimeout;
 
     private final List<Handler> handlers;
 
     private final AtomicReference<InvoiceEventFlow> invoiceEventFlow = new AtomicReference<>();
+    private final AtomicReference<PayoutEventFlow> payoutEventFlow = new AtomicReference<>();
 
     @Autowired
     public ProcessingService(List<Handler> handlers) {
@@ -40,9 +51,14 @@ public class ProcessingService {
     }
 
     public void start() {
-        InvoiceEventFlow newInvoiceEventFlow = new InvoiceEventFlow(handlers, threadPoolSize, queueLimit, timeout);
-        if (!invoiceEventFlow.compareAndSet(null, newInvoiceEventFlow)) {
+        InvoiceEventFlow newInvoiceEventFlow = new InvoiceEventFlow(handlers, processingHandlerThreadPoolSize, processingHandlerQueueLimit, processingHandlerTimeout);
+        PayoutEventFlow newPayoutEventFlow = new PayoutEventFlow(handlers, payoutHandlerThreadPoolSize, payoutHandlerQueueLimit, payoutHandlerTimeout);
+
+        if (invoiceEventFlow.compareAndSet(null, newInvoiceEventFlow)) {
             newInvoiceEventFlow.start();
+        }
+        if (payoutEventFlow.compareAndSet(null, newPayoutEventFlow)) {
+            newPayoutEventFlow.start();
         }
     }
 
@@ -54,10 +70,21 @@ public class ProcessingService {
         }
     }
 
+    public void processPayoutEvent(StockEvent stockEvent) {
+        if (payoutEventFlow.get() != null) {
+            payoutEventFlow.get().processEvent(stockEvent);
+        } else {
+            log.warn("payout event flow is not running");
+        }
+    }
+
     @PreDestroy
     public void stop() {
         if (invoiceEventFlow.get() != null) {
             invoiceEventFlow.getAndSet(null).stop();
+        }
+        if (payoutEventFlow.get() != null) {
+            payoutEventFlow.getAndSet(null).stop();
         }
     }
 

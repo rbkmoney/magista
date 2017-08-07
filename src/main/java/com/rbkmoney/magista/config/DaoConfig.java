@@ -1,9 +1,6 @@
 package com.rbkmoney.magista.config;
 
-import com.rbkmoney.magista.dao.InvoiceEventDao;
-import com.rbkmoney.magista.dao.InvoiceEventDaoImpl;
-import com.rbkmoney.magista.dao.StatisticsDao;
-import com.rbkmoney.magista.dao.StatisticsDaoImpl;
+import com.rbkmoney.magista.dao.*;
 import com.rbkmoney.magista.domain.Mst;
 import org.jooq.Schema;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +25,12 @@ public class DaoConfig {
     @DependsOn("dbInitializer")
     public InvoiceEventDao invoiceEventDao(DataSource ds) {
         return new InvoiceEventDaoImpl(ds);
+    }
+
+    @Bean
+    @DependsOn("dbInitializer")
+    public PayoutEventDao payoutEventDao(DataSource ds) {
+        return new PayoutEventDaoImpl(ds);
     }
 
     @Bean
