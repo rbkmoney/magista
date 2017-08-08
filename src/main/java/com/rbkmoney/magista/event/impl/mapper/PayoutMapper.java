@@ -61,6 +61,8 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
             Map<CashFlowAccount._Fields, Long> commissions = DamselUtil.calculateCommissions(payout.getPayoutFlow());
             payoutEventStat.setPayoutAmount(commissions.get(CashFlowAccount._Fields.MERCHANT));
             payoutEventStat.setPayoutFee(commissions.get(CashFlowAccount._Fields.SYSTEM));
+            //TODO Shit
+            payoutEventStat.setPayoutCurrencyCode(payout.getPayoutFlow().get(0).getVolume().getCurrency().getSymbolicCode());
             //TODO only provider fee?
 //            payoutEventStat.setPayoutProviderFee
             payoutEventStat.setPartyId(payout.getPartyId());

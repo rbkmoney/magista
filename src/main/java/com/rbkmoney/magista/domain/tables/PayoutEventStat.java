@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = 1299476154;
+    private static final long serialVersionUID = -1134987541;
 
     /**
      * The reference instance of <code>mst.payout_event_stat</code>
@@ -114,6 +114,11 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
      * The column <code>mst.payout_event_stat.payout_fee</code>.
      */
     public final TableField<PayoutEventStatRecord, Long> PAYOUT_FEE = createField("payout_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_currency_code</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_CURRENCY_CODE = createField("payout_currency_code", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
 
     /**
      * The column <code>mst.payout_event_stat.payout_type</code>.

@@ -28,7 +28,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat implements Serializable {
 
-    private static final long serialVersionUID = 47172676;
+    private static final long serialVersionUID = 630157506;
 
     private Long                id;
     private Long                eventId;
@@ -42,6 +42,7 @@ public class PayoutEventStat implements Serializable {
     private PayoutStatus        payoutStatus;
     private Long                payoutAmount;
     private Long                payoutFee;
+    private String              payoutCurrencyCode;
     private PayoutType          payoutType;
     private String              payoutPaidDetailsType;
     private String              payoutCardRequestId;
@@ -70,6 +71,7 @@ public class PayoutEventStat implements Serializable {
         this.payoutStatus = value.payoutStatus;
         this.payoutAmount = value.payoutAmount;
         this.payoutFee = value.payoutFee;
+        this.payoutCurrencyCode = value.payoutCurrencyCode;
         this.payoutType = value.payoutType;
         this.payoutPaidDetailsType = value.payoutPaidDetailsType;
         this.payoutCardRequestId = value.payoutCardRequestId;
@@ -97,6 +99,7 @@ public class PayoutEventStat implements Serializable {
         PayoutStatus        payoutStatus,
         Long                payoutAmount,
         Long                payoutFee,
+        String              payoutCurrencyCode,
         PayoutType          payoutType,
         String              payoutPaidDetailsType,
         String              payoutCardRequestId,
@@ -122,6 +125,7 @@ public class PayoutEventStat implements Serializable {
         this.payoutStatus = payoutStatus;
         this.payoutAmount = payoutAmount;
         this.payoutFee = payoutFee;
+        this.payoutCurrencyCode = payoutCurrencyCode;
         this.payoutType = payoutType;
         this.payoutPaidDetailsType = payoutPaidDetailsType;
         this.payoutCardRequestId = payoutCardRequestId;
@@ -230,6 +234,14 @@ public class PayoutEventStat implements Serializable {
 
     public void setPayoutFee(Long payoutFee) {
         this.payoutFee = payoutFee;
+    }
+
+    public String getPayoutCurrencyCode() {
+        return this.payoutCurrencyCode;
+    }
+
+    public void setPayoutCurrencyCode(String payoutCurrencyCode) {
+        this.payoutCurrencyCode = payoutCurrencyCode;
     }
 
     public PayoutType getPayoutType() {
@@ -409,6 +421,12 @@ public class PayoutEventStat implements Serializable {
         }
         else if (!payoutFee.equals(other.payoutFee))
             return false;
+        if (payoutCurrencyCode == null) {
+            if (other.payoutCurrencyCode != null)
+                return false;
+        }
+        else if (!payoutCurrencyCode.equals(other.payoutCurrencyCode))
+            return false;
         if (payoutType == null) {
             if (other.payoutType != null)
                 return false;
@@ -500,6 +518,7 @@ public class PayoutEventStat implements Serializable {
         result = prime * result + ((payoutStatus == null) ? 0 : payoutStatus.hashCode());
         result = prime * result + ((payoutAmount == null) ? 0 : payoutAmount.hashCode());
         result = prime * result + ((payoutFee == null) ? 0 : payoutFee.hashCode());
+        result = prime * result + ((payoutCurrencyCode == null) ? 0 : payoutCurrencyCode.hashCode());
         result = prime * result + ((payoutType == null) ? 0 : payoutType.hashCode());
         result = prime * result + ((payoutPaidDetailsType == null) ? 0 : payoutPaidDetailsType.hashCode());
         result = prime * result + ((payoutCardRequestId == null) ? 0 : payoutCardRequestId.hashCode());
@@ -531,6 +550,7 @@ public class PayoutEventStat implements Serializable {
         sb.append(", ").append(payoutStatus);
         sb.append(", ").append(payoutAmount);
         sb.append(", ").append(payoutFee);
+        sb.append(", ").append(payoutCurrencyCode);
         sb.append(", ").append(payoutType);
         sb.append(", ").append(payoutPaidDetailsType);
         sb.append(", ").append(payoutCardRequestId);

@@ -69,6 +69,7 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
         statPayout.setAmount(payoutEvent.getPayoutAmount());
         statPayout.setStatus(toPayoutStatus(payoutEvent));
         statPayout.setFee(payoutEvent.getPayoutFee());
+        statPayout.setCurrencySymbolicCode(payoutEvent.getPayoutCurrencyCode());
         statPayout.setCreatedAt(
                 TypeUtil.temporalToString(payoutEvent.getPayoutCreatedAt())
         );
@@ -92,7 +93,7 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
 
     private PayoutStatus toPayoutStatus(PayoutEventStat payoutEvent) {
         PayoutStatus._Fields payoutStatus = PayoutStatus._Fields.findByName(payoutEvent.getPayoutStatus().getLiteral());
-        switch(payoutStatus) {
+        switch (payoutStatus) {
             case UNPAID:
                 return PayoutStatus.unpaid(new PayoutUnpaid());
             case PAID:

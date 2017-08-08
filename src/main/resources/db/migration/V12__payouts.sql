@@ -19,6 +19,7 @@ CREATE TABLE mst.payout_event_stat (
   payout_status               mst.PAYOUT_STATUS           NOT NULL,
   payout_amount               BIGINT                      NOT NULL,
   payout_fee                  BIGINT,
+  payout_currency_code        CHARACTER VARYING           NOT NULL,
   payout_type                 mst.PAYOUT_TYPE             NOT NULL,
   payout_paid_details_type    CHARACTER VARYING,
   payout_card_request_id      CHARACTER VARYING,

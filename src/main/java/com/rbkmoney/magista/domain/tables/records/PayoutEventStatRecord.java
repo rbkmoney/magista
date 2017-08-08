@@ -31,7 +31,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = -1675949866;
+    private static final long serialVersionUID = 1146748543;
 
     /**
      * Setter for <code>mst.payout_event_stat.id</code>.
@@ -202,171 +202,185 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
     }
 
     /**
+     * Setter for <code>mst.payout_event_stat.payout_currency_code</code>.
+     */
+    public void setPayoutCurrencyCode(String value) {
+        set(12, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_currency_code</code>.
+     */
+    public String getPayoutCurrencyCode() {
+        return (String) get(12);
+    }
+
+    /**
      * Setter for <code>mst.payout_event_stat.payout_type</code>.
      */
     public void setPayoutType(PayoutType value) {
-        set(12, value);
+        set(13, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_type</code>.
      */
     public PayoutType getPayoutType() {
-        return (PayoutType) get(12);
+        return (PayoutType) get(13);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_paid_details_type</code>.
      */
     public void setPayoutPaidDetailsType(String value) {
-        set(13, value);
+        set(14, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_paid_details_type</code>.
      */
     public String getPayoutPaidDetailsType() {
-        return (String) get(13);
+        return (String) get(14);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_card_request_id</code>.
      */
     public void setPayoutCardRequestId(String value) {
-        set(14, value);
+        set(15, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_card_request_id</code>.
      */
     public String getPayoutCardRequestId() {
-        return (String) get(14);
+        return (String) get(15);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_card_mask_pan</code>.
      */
     public void setPayoutCardMaskPan(String value) {
-        set(15, value);
+        set(16, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_card_mask_pan</code>.
      */
     public String getPayoutCardMaskPan() {
-        return (String) get(15);
+        return (String) get(16);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_card_provider_name</code>.
      */
     public void setPayoutCardProviderName(String value) {
-        set(16, value);
+        set(17, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_card_provider_name</code>.
      */
     public String getPayoutCardProviderName() {
-        return (String) get(16);
+        return (String) get(17);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_card_transaction_id</code>.
      */
     public void setPayoutCardTransactionId(String value) {
-        set(17, value);
+        set(18, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_card_transaction_id</code>.
      */
     public String getPayoutCardTransactionId() {
-        return (String) get(17);
+        return (String) get(18);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_account_id</code>.
      */
     public void setPayoutAccountId(String value) {
-        set(18, value);
+        set(19, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_account_id</code>.
      */
     public String getPayoutAccountId() {
-        return (String) get(18);
+        return (String) get(19);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_account_bank_corr_id</code>.
      */
     public void setPayoutAccountBankCorrId(String value) {
-        set(19, value);
+        set(20, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_account_bank_corr_id</code>.
      */
     public String getPayoutAccountBankCorrId() {
-        return (String) get(19);
+        return (String) get(20);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_account_bank_bik</code>.
      */
     public void setPayoutAccountBankBik(String value) {
-        set(20, value);
+        set(21, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_account_bank_bik</code>.
      */
     public String getPayoutAccountBankBik() {
-        return (String) get(20);
+        return (String) get(21);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_account_bank_inn</code>.
      */
     public void setPayoutAccountBankInn(String value) {
-        set(21, value);
+        set(22, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_account_bank_inn</code>.
      */
     public String getPayoutAccountBankInn() {
-        return (String) get(21);
+        return (String) get(22);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_account_purpose</code>.
      */
     public void setPayoutAccountPurpose(String value) {
-        set(22, value);
+        set(23, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_account_purpose</code>.
      */
     public String getPayoutAccountPurpose() {
-        return (String) get(22);
+        return (String) get(23);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_cancel_details</code>.
      */
     public void setPayoutCancelDetails(String value) {
-        set(23, value);
+        set(24, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_cancel_details</code>.
      */
     public String getPayoutCancelDetails() {
-        return (String) get(23);
+        return (String) get(24);
     }
 
     // -------------------------------------------------------------------------
@@ -395,7 +409,7 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
     /**
      * Create a detached, initialised PayoutEventStatRecord
      */
-    public PayoutEventStatRecord(Long id, Long eventId, PayoutEventCategory eventCategory, PayoutEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyShopId, String payoutId, LocalDateTime payoutCreatedAt, PayoutStatus payoutStatus, Long payoutAmount, Long payoutFee, PayoutType payoutType, String payoutPaidDetailsType, String payoutCardRequestId, String payoutCardMaskPan, String payoutCardProviderName, String payoutCardTransactionId, String payoutAccountId, String payoutAccountBankCorrId, String payoutAccountBankBik, String payoutAccountBankInn, String payoutAccountPurpose, String payoutCancelDetails) {
+    public PayoutEventStatRecord(Long id, Long eventId, PayoutEventCategory eventCategory, PayoutEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyShopId, String payoutId, LocalDateTime payoutCreatedAt, PayoutStatus payoutStatus, Long payoutAmount, Long payoutFee, String payoutCurrencyCode, PayoutType payoutType, String payoutPaidDetailsType, String payoutCardRequestId, String payoutCardMaskPan, String payoutCardProviderName, String payoutCardTransactionId, String payoutAccountId, String payoutAccountBankCorrId, String payoutAccountBankBik, String payoutAccountBankInn, String payoutAccountPurpose, String payoutCancelDetails) {
         super(PayoutEventStat.PAYOUT_EVENT_STAT);
 
         set(0, id);
@@ -410,17 +424,18 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
         set(9, payoutStatus);
         set(10, payoutAmount);
         set(11, payoutFee);
-        set(12, payoutType);
-        set(13, payoutPaidDetailsType);
-        set(14, payoutCardRequestId);
-        set(15, payoutCardMaskPan);
-        set(16, payoutCardProviderName);
-        set(17, payoutCardTransactionId);
-        set(18, payoutAccountId);
-        set(19, payoutAccountBankCorrId);
-        set(20, payoutAccountBankBik);
-        set(21, payoutAccountBankInn);
-        set(22, payoutAccountPurpose);
-        set(23, payoutCancelDetails);
+        set(12, payoutCurrencyCode);
+        set(13, payoutType);
+        set(14, payoutPaidDetailsType);
+        set(15, payoutCardRequestId);
+        set(16, payoutCardMaskPan);
+        set(17, payoutCardProviderName);
+        set(18, payoutCardTransactionId);
+        set(19, payoutAccountId);
+        set(20, payoutAccountBankCorrId);
+        set(21, payoutAccountBankBik);
+        set(22, payoutAccountBankInn);
+        set(23, payoutAccountPurpose);
+        set(24, payoutCancelDetails);
     }
 }
