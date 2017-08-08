@@ -67,6 +67,7 @@ public class PayoutEventDaoImpl extends AbstractDao implements PayoutEventDao {
             payoutEventStat.setPayoutStatus(PayoutStatus.valueOf(rs.getString("payout_status")));
             payoutEventStat.setPayoutAmount(rs.getLong("payout_amount"));
             payoutEventStat.setPayoutFee(rs.getLong("payout_fee"));
+            payoutEventStat.setPayoutCurrencyCode(rs.getString("payout_currency_code"));
             payoutEventStat.setPayoutType(PayoutType.valueOf(rs.getString("payout_type")));
             payoutEventStat.setPayoutPaidDetailsType(rs.getString("payout_paid_details_type"));
             payoutEventStat.setPayoutCardRequestId(rs.getString("payout_card_request_id"));
