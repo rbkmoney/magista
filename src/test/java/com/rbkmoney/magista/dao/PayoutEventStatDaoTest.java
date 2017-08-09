@@ -49,6 +49,7 @@ public class PayoutEventStatDaoTest extends AbstractIntegrationTest {
         payoutEventStat.setPartyId("\0");
         payoutEventStat.setPartyShopId("\000");
         payoutEventStat.setPayoutId("\\000\000\000");
+        payoutEventStat.setPayoutCurrencyCode("RUB");
         payoutEventStat.setPayoutCreatedAt(LocalDateTime.now());
         payoutEventStat.setPayoutStatus(PayoutStatus.paid);
         payoutEventStat.setPayoutAmount(Long.MAX_VALUE);
