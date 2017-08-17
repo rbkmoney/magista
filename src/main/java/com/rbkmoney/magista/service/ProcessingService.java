@@ -41,7 +41,7 @@ public class ProcessingService {
 
     public void start() {
         InvoiceEventFlow newInvoiceEventFlow = new InvoiceEventFlow(handlers, threadPoolSize, queueLimit, timeout);
-        if (!invoiceEventFlow.compareAndSet(null, newInvoiceEventFlow)) {
+        if (invoiceEventFlow.compareAndSet(null, newInvoiceEventFlow)) {
             newInvoiceEventFlow.start();
         }
     }
