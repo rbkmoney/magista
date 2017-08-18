@@ -110,16 +110,16 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
     private PayoutType toPayoutType(PayoutEventStat payoutEvent) {
         PayoutType._Fields payoutType = PayoutType._Fields.findByName(payoutEvent.getPayoutType().getLiteral());
         switch (payoutType) {
-            case ACCOUNT_PAYOUT:
-                AccountPayout accountPayout = new AccountPayout();
-                accountPayout.setAccount(payoutEvent.getPayoutAccountId());
-                accountPayout.setBankBik(payoutEvent.getPayoutAccountBankBik());
-                accountPayout.setBankCorrAccount(payoutEvent.getPayoutAccountBankCorrId());
-                accountPayout.setInn(payoutEvent.getPayoutAccountBankInn());
-                accountPayout.setPurpose(payoutEvent.getPayoutAccountPurpose());
-                return PayoutType.account_payout(accountPayout);
-            case CARD_PAYOUT:
-                return PayoutType.card_payout(new CardPayout());
+            case PAYOUT_ACCOUNT:
+                PayoutAccount payoutAccount = new PayoutAccount();
+                payoutAccount.setAccount(payoutEvent.getPayoutAccountId());
+                payoutAccount.setBankBik(payoutEvent.getPayoutAccountBankBik());
+                payoutAccount.setBankCorrAccount(payoutEvent.getPayoutAccountBankCorrId());
+                payoutAccount.setInn(payoutEvent.getPayoutAccountBankInn());
+                payoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
+                return PayoutType.payout_account(payoutAccount);
+            case PAYOUT_CARD:
+                return PayoutType.payout_card(new PayoutCard());
             default:
                 throw new NotFoundException(String.format("Payout type '%s' not found", payoutType.getFieldName()));
         }

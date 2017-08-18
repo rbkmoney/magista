@@ -157,7 +157,7 @@
 - `from_time`
 - `to_time`
 - `payout_status` - статус выплаты, имена берем из thrift-интерфейса **payout_processing.PayoutStatus**, к примеру: `confirmed`
-- `payout_type` - тип выплаты, имена берем из thrift-интерфейса **payout_processing.PayoutType**, к примеру: `card_payout`
+- `payout_type` - тип выплаты, имена берем из thrift-интерфейса **payout_processing.PayoutType**, к примеру: `payout_card`
 
 ##### `payments` 
 Выборка по платежам. Параметры:
