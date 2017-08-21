@@ -45,6 +45,10 @@ public class InvoiceMapper implements Mapper<InvoiceEventContext> {
         invoiceEventStat.setInvoiceProduct(details.getProduct());
         invoiceEventStat.setInvoiceDescription(details.getDescription());
 
+        if (details.isSetCart()) {
+            invoiceEventStat.setInvoiceCart(DamselUtil.toJson(details.getCart()));
+        }
+
         InvoiceStatus invoiceStatus = invoice.getStatus();
         invoiceEventStat.setInvoiceStatus(
                 TBaseUtil.unionFieldToEnum(
