@@ -44,7 +44,7 @@ public class DamselUtil {
 
     public static String toJson(TBase tBase) {
         try {
-            return new TBaseProcessor().process(tBase, new JsonHandler()).textValue();
+            return new TBaseProcessor().process(tBase, new JsonHandler()).toString();
         } catch (IOException ex) {
             throw new IllegalArgumentException(ex);
         }
