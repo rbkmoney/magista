@@ -31,7 +31,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = -1906629340;
+    private static final long serialVersionUID = -633168735;
 
     private Long                       id;
     private Long                       eventId;
@@ -92,6 +92,7 @@ public class InvoiceEventStat implements Serializable {
     private Long                       paymentAdjustmentExternalFee;
     private String                     paymentFailureClass;
     private String                     invoiceTemplateId;
+    private String                     invoiceCart;
     private String                     paymentRefundId;
     private InvoicePaymentRefundStatus paymentRefundStatus;
     private LocalDateTime              paymentRefundCreatedAt;
@@ -162,6 +163,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentExternalFee = value.paymentAdjustmentExternalFee;
         this.paymentFailureClass = value.paymentFailureClass;
         this.invoiceTemplateId = value.invoiceTemplateId;
+        this.invoiceCart = value.invoiceCart;
         this.paymentRefundId = value.paymentRefundId;
         this.paymentRefundStatus = value.paymentRefundStatus;
         this.paymentRefundCreatedAt = value.paymentRefundCreatedAt;
@@ -231,6 +233,7 @@ public class InvoiceEventStat implements Serializable {
         Long                       paymentAdjustmentExternalFee,
         String                     paymentFailureClass,
         String                     invoiceTemplateId,
+        String                     invoiceCart,
         String                     paymentRefundId,
         InvoicePaymentRefundStatus paymentRefundStatus,
         LocalDateTime              paymentRefundCreatedAt,
@@ -298,6 +301,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentExternalFee = paymentAdjustmentExternalFee;
         this.paymentFailureClass = paymentFailureClass;
         this.invoiceTemplateId = invoiceTemplateId;
+        this.invoiceCart = invoiceCart;
         this.paymentRefundId = paymentRefundId;
         this.paymentRefundStatus = paymentRefundStatus;
         this.paymentRefundCreatedAt = paymentRefundCreatedAt;
@@ -779,6 +783,14 @@ public class InvoiceEventStat implements Serializable {
         this.invoiceTemplateId = invoiceTemplateId;
     }
 
+    public String getInvoiceCart() {
+        return this.invoiceCart;
+    }
+
+    public void setInvoiceCart(String invoiceCart) {
+        this.invoiceCart = invoiceCart;
+    }
+
     public String getPaymentRefundId() {
         return this.paymentRefundId;
     }
@@ -1198,6 +1210,12 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!invoiceTemplateId.equals(other.invoiceTemplateId))
             return false;
+        if (invoiceCart == null) {
+            if (other.invoiceCart != null)
+                return false;
+        }
+        else if (!invoiceCart.equals(other.invoiceCart))
+            return false;
         if (paymentRefundId == null) {
             if (other.paymentRefundId != null)
                 return false;
@@ -1306,6 +1324,7 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentAdjustmentExternalFee == null) ? 0 : paymentAdjustmentExternalFee.hashCode());
         result = prime * result + ((paymentFailureClass == null) ? 0 : paymentFailureClass.hashCode());
         result = prime * result + ((invoiceTemplateId == null) ? 0 : invoiceTemplateId.hashCode());
+        result = prime * result + ((invoiceCart == null) ? 0 : invoiceCart.hashCode());
         result = prime * result + ((paymentRefundId == null) ? 0 : paymentRefundId.hashCode());
         result = prime * result + ((paymentRefundStatus == null) ? 0 : paymentRefundStatus.hashCode());
         result = prime * result + ((paymentRefundCreatedAt == null) ? 0 : paymentRefundCreatedAt.hashCode());
@@ -1379,6 +1398,7 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentAdjustmentExternalFee);
         sb.append(", ").append(paymentFailureClass);
         sb.append(", ").append(invoiceTemplateId);
+        sb.append(", ").append(invoiceCart);
         sb.append(", ").append(paymentRefundId);
         sb.append(", ").append(paymentRefundStatus);
         sb.append(", ").append(paymentRefundCreatedAt);

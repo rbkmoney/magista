@@ -1,8 +1,15 @@
 package com.rbkmoney.magista.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.geck.serializer.kit.json.JsonHandler;
+import com.rbkmoney.geck.serializer.kit.json.JsonProcessor;
+import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
+import com.rbkmoney.geck.serializer.kit.tbase.TBaseProcessor;
+import org.apache.thrift.TBase;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +39,22 @@ public class DamselUtil {
                 return invoiceStatus.getCancelled().getDetails();
             default:
                 return null;
+        }
+    }
+
+    public static String toJson(TBase tBase) {
+        try {
+            return new TBaseProcessor().process(tBase, new JsonHandler()).toString();
+        } catch (IOException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    public static <T extends TBase> T fromJson(String jsonString, Class<T> type) {
+        try {
+            return new JsonProcessor().process(new ObjectMapper().readTree(jsonString), new TBaseHandler<>(type));
+        } catch (IOException ex) {
+            throw new IllegalArgumentException(ex);
         }
     }
 

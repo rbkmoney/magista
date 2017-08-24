@@ -13,11 +13,11 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.9.0-SNAPSHOT</version>
+    <version>1.9.1-SNAPSHOT</version>
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
-        <damsel.version>1.174-fde931b-epic</damsel.version>
+        <damsel.version>1.194-6653f5c-epic</damsel.version>
         <shared.resources.version>0.2.1</shared.resources.version>
         <server.port>8022</server.port>
         <dockerfile.base.service.tag>f26fcc19d1941ab74f1c72dd8a408be17a769333</dockerfile.base.service.tag>
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>eventstock-client</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.4</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -112,6 +112,11 @@
             <groupId>com.rbkmoney</groupId>
             <artifactId>shared-resources</artifactId>
             <version>${shared.resources.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney.geck</groupId>
+            <artifactId>serializer</artifactId>
+            <version>0.6.2</version>
         </dependency>
         <!--Test libs-->
         <dependency>
