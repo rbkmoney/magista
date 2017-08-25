@@ -94,6 +94,7 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setInvoiceStatusDetails(rs.getString("invoice_status_details"));
             invoiceEventStat.setInvoiceProduct(rs.getString("invoice_product"));
             invoiceEventStat.setInvoiceDescription(rs.getString("invoice_description"));
+            invoiceEventStat.setInvoiceCart(rs.getString("invoice_cart"));
             invoiceEventStat.setInvoiceAmount(rs.getLong("invoice_amount"));
             invoiceEventStat.setInvoiceCurrencyCode(rs.getString("invoice_currency_code"));
             invoiceEventStat.setInvoiceDue(rs.getObject("invoice_due", LocalDateTime.class));

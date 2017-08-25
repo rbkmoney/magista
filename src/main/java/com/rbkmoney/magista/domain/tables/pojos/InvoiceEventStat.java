@@ -30,7 +30,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = -402354281;
+    private static final long serialVersionUID = 758583118;
 
     private Long                 id;
     private Long                 eventId;
@@ -91,6 +91,7 @@ public class InvoiceEventStat implements Serializable {
     private Long                 paymentAdjustmentExternalFee;
     private String               paymentFailureClass;
     private String               invoiceTemplateId;
+    private String               invoiceCart;
     private String               paymentFlow;
     private String               paymentHoldOnExpiration;
     private LocalDateTime        paymentHoldUntil;
@@ -157,6 +158,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentExternalFee = value.paymentAdjustmentExternalFee;
         this.paymentFailureClass = value.paymentFailureClass;
         this.invoiceTemplateId = value.invoiceTemplateId;
+        this.invoiceCart = value.invoiceCart;
         this.paymentFlow = value.paymentFlow;
         this.paymentHoldOnExpiration = value.paymentHoldOnExpiration;
         this.paymentHoldUntil = value.paymentHoldUntil;
@@ -222,6 +224,7 @@ public class InvoiceEventStat implements Serializable {
         Long                 paymentAdjustmentExternalFee,
         String               paymentFailureClass,
         String               invoiceTemplateId,
+        String               invoiceCart,
         String               paymentFlow,
         String               paymentHoldOnExpiration,
         LocalDateTime        paymentHoldUntil
@@ -285,6 +288,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentExternalFee = paymentAdjustmentExternalFee;
         this.paymentFailureClass = paymentFailureClass;
         this.invoiceTemplateId = invoiceTemplateId;
+        this.invoiceCart = invoiceCart;
         this.paymentFlow = paymentFlow;
         this.paymentHoldOnExpiration = paymentHoldOnExpiration;
         this.paymentHoldUntil = paymentHoldUntil;
@@ -762,6 +766,14 @@ public class InvoiceEventStat implements Serializable {
         this.invoiceTemplateId = invoiceTemplateId;
     }
 
+    public String getInvoiceCart() {
+        return this.invoiceCart;
+    }
+
+    public void setInvoiceCart(String invoiceCart) {
+        this.invoiceCart = invoiceCart;
+    }
+
     public String getPaymentFlow() {
         return this.paymentFlow;
     }
@@ -1149,6 +1161,12 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!invoiceTemplateId.equals(other.invoiceTemplateId))
             return false;
+        if (invoiceCart == null) {
+            if (other.invoiceCart != null)
+                return false;
+        }
+        else if (!invoiceCart.equals(other.invoiceCart))
+            return false;
         if (paymentFlow == null) {
             if (other.paymentFlow != null)
                 return false;
@@ -1233,6 +1251,7 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentAdjustmentExternalFee == null) ? 0 : paymentAdjustmentExternalFee.hashCode());
         result = prime * result + ((paymentFailureClass == null) ? 0 : paymentFailureClass.hashCode());
         result = prime * result + ((invoiceTemplateId == null) ? 0 : invoiceTemplateId.hashCode());
+        result = prime * result + ((invoiceCart == null) ? 0 : invoiceCart.hashCode());
         result = prime * result + ((paymentFlow == null) ? 0 : paymentFlow.hashCode());
         result = prime * result + ((paymentHoldOnExpiration == null) ? 0 : paymentHoldOnExpiration.hashCode());
         result = prime * result + ((paymentHoldUntil == null) ? 0 : paymentHoldUntil.hashCode());
@@ -1302,6 +1321,7 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentAdjustmentExternalFee);
         sb.append(", ").append(paymentFailureClass);
         sb.append(", ").append(invoiceTemplateId);
+        sb.append(", ").append(invoiceCart);
         sb.append(", ").append(paymentFlow);
         sb.append(", ").append(paymentHoldOnExpiration);
         sb.append(", ").append(paymentHoldUntil);

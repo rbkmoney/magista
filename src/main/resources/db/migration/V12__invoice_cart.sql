@@ -1,0 +1,1 @@
+ALTER TABLE mst.invoice_event_stat ADD COLUMN invoice_cart character varying;
