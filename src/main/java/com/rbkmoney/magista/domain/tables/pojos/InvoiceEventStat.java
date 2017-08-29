@@ -30,7 +30,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 226144076;
+    private static final long serialVersionUID = 758583118;
 
     private Long                 id;
     private Long                 eventId;
@@ -92,6 +92,9 @@ public class InvoiceEventStat implements Serializable {
     private String               paymentFailureClass;
     private String               invoiceTemplateId;
     private String               invoiceCart;
+    private String               paymentFlow;
+    private String               paymentHoldOnExpiration;
+    private LocalDateTime        paymentHoldUntil;
 
     public InvoiceEventStat() {}
 
@@ -156,6 +159,9 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFailureClass = value.paymentFailureClass;
         this.invoiceTemplateId = value.invoiceTemplateId;
         this.invoiceCart = value.invoiceCart;
+        this.paymentFlow = value.paymentFlow;
+        this.paymentHoldOnExpiration = value.paymentHoldOnExpiration;
+        this.paymentHoldUntil = value.paymentHoldUntil;
     }
 
     public InvoiceEventStat(
@@ -218,7 +224,10 @@ public class InvoiceEventStat implements Serializable {
         Long                 paymentAdjustmentExternalFee,
         String               paymentFailureClass,
         String               invoiceTemplateId,
-        String               invoiceCart
+        String               invoiceCart,
+        String               paymentFlow,
+        String               paymentHoldOnExpiration,
+        LocalDateTime        paymentHoldUntil
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -280,6 +289,9 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFailureClass = paymentFailureClass;
         this.invoiceTemplateId = invoiceTemplateId;
         this.invoiceCart = invoiceCart;
+        this.paymentFlow = paymentFlow;
+        this.paymentHoldOnExpiration = paymentHoldOnExpiration;
+        this.paymentHoldUntil = paymentHoldUntil;
     }
 
     public Long getId() {
@@ -762,6 +774,30 @@ public class InvoiceEventStat implements Serializable {
         this.invoiceCart = invoiceCart;
     }
 
+    public String getPaymentFlow() {
+        return this.paymentFlow;
+    }
+
+    public void setPaymentFlow(String paymentFlow) {
+        this.paymentFlow = paymentFlow;
+    }
+
+    public String getPaymentHoldOnExpiration() {
+        return this.paymentHoldOnExpiration;
+    }
+
+    public void setPaymentHoldOnExpiration(String paymentHoldOnExpiration) {
+        this.paymentHoldOnExpiration = paymentHoldOnExpiration;
+    }
+
+    public LocalDateTime getPaymentHoldUntil() {
+        return this.paymentHoldUntil;
+    }
+
+    public void setPaymentHoldUntil(LocalDateTime paymentHoldUntil) {
+        this.paymentHoldUntil = paymentHoldUntil;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -1131,6 +1167,24 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!invoiceCart.equals(other.invoiceCart))
             return false;
+        if (paymentFlow == null) {
+            if (other.paymentFlow != null)
+                return false;
+        }
+        else if (!paymentFlow.equals(other.paymentFlow))
+            return false;
+        if (paymentHoldOnExpiration == null) {
+            if (other.paymentHoldOnExpiration != null)
+                return false;
+        }
+        else if (!paymentHoldOnExpiration.equals(other.paymentHoldOnExpiration))
+            return false;
+        if (paymentHoldUntil == null) {
+            if (other.paymentHoldUntil != null)
+                return false;
+        }
+        else if (!paymentHoldUntil.equals(other.paymentHoldUntil))
+            return false;
         return true;
     }
 
@@ -1198,6 +1252,9 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentFailureClass == null) ? 0 : paymentFailureClass.hashCode());
         result = prime * result + ((invoiceTemplateId == null) ? 0 : invoiceTemplateId.hashCode());
         result = prime * result + ((invoiceCart == null) ? 0 : invoiceCart.hashCode());
+        result = prime * result + ((paymentFlow == null) ? 0 : paymentFlow.hashCode());
+        result = prime * result + ((paymentHoldOnExpiration == null) ? 0 : paymentHoldOnExpiration.hashCode());
+        result = prime * result + ((paymentHoldUntil == null) ? 0 : paymentHoldUntil.hashCode());
         return result;
     }
 
@@ -1265,6 +1322,9 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentFailureClass);
         sb.append(", ").append(invoiceTemplateId);
         sb.append(", ").append(invoiceCart);
+        sb.append(", ").append(paymentFlow);
+        sb.append(", ").append(paymentHoldOnExpiration);
+        sb.append(", ").append(paymentHoldUntil);
 
         sb.append(")");
         return sb.toString();
