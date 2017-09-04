@@ -65,10 +65,7 @@ public class PayoutEventService {
             payoutEvent.setEventCreatedAt(payoutStatusEvent.getEventCreatedAt());
 
             payoutEvent.setPayoutStatus(payoutStatusEvent.getPayoutStatus());
-
             payoutEvent.setPayoutCancelDetails(payoutStatusEvent.getPayoutCancelDetails());
-            payoutEvent.setPayoutPaidDetailsType(payoutStatusEvent.getPayoutPaidDetailsType());
-            payoutEvent.setPayoutCardMaskPan(payoutStatusEvent.getPayoutCardMaskPan());
 
             payoutEventDao.update(payoutEvent);
             log.info("Payout event status have been changed, payoutId='{}', eventId='{}', payoutStatus='{}'",

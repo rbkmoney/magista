@@ -38,17 +38,6 @@ public class PayoutStatusMapper implements Mapper<PayoutEventContext> {
                         statusChanged.getStatus().getCancelled().getDetails()
                 );
             }
-
-            if (statusChanged.getStatus().isSetPaid()) {
-                PayoutPaid payoutPaid = statusChanged.getStatus().getPaid();
-                payoutEventStat.setPayoutPaidDetailsType(
-                        payoutPaid.getDetails().getSetField().getFieldName()
-                );
-                if (payoutPaid.getDetails().isSetCardDetails()) {
-                    CardPaidDetails cardDetails = payoutPaid.getDetails().getCardDetails();
-                    payoutEventStat.setPayoutCardMaskPan(cardDetails.getMaskPan());
-                }
-            }
         }
 
         return context.setPayoutEventStat(payoutEventStat);

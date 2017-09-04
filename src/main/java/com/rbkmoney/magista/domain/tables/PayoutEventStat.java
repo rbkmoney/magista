@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = -1134987541;
+    private static final long serialVersionUID = -1235648841;
 
     /**
      * The reference instance of <code>mst.payout_event_stat</code>
@@ -126,34 +126,29 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
     public final TableField<PayoutEventStatRecord, PayoutType> PAYOUT_TYPE = createField("payout_type", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.PayoutType.class), this, "");
 
     /**
-     * The column <code>mst.payout_event_stat.payout_paid_details_type</code>.
+     * The column <code>mst.payout_event_stat.payout_card_token</code>.
      */
-    public final TableField<PayoutEventStatRecord, String> PAYOUT_PAID_DETAILS_TYPE = createField("payout_paid_details_type", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_CARD_TOKEN = createField("payout_card_token", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
-     * The column <code>mst.payout_event_stat.payout_card_request_id</code>.
+     * The column <code>mst.payout_event_stat.payout_card_masked_pan</code>.
      */
-    public final TableField<PayoutEventStatRecord, String> PAYOUT_CARD_REQUEST_ID = createField("payout_card_request_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_CARD_MASKED_PAN = createField("payout_card_masked_pan", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
-     * The column <code>mst.payout_event_stat.payout_card_mask_pan</code>.
+     * The column <code>mst.payout_event_stat.payout_card_bin</code>.
      */
-    public final TableField<PayoutEventStatRecord, String> PAYOUT_CARD_MASK_PAN = createField("payout_card_mask_pan", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_CARD_BIN = createField("payout_card_bin", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
-     * The column <code>mst.payout_event_stat.payout_card_provider_name</code>.
+     * The column <code>mst.payout_event_stat.payout_card_payment_system</code>.
      */
-    public final TableField<PayoutEventStatRecord, String> PAYOUT_CARD_PROVIDER_NAME = createField("payout_card_provider_name", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_CARD_PAYMENT_SYSTEM = createField("payout_card_payment_system", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
-     * The column <code>mst.payout_event_stat.payout_card_transaction_id</code>.
+     * The column <code>mst.payout_event_stat.payout_account_bank_id</code>.
      */
-    public final TableField<PayoutEventStatRecord, String> PAYOUT_CARD_TRANSACTION_ID = createField("payout_card_transaction_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
-
-    /**
-     * The column <code>mst.payout_event_stat.payout_account_id</code>.
-     */
-    public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_ID = createField("payout_account_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_BANK_ID = createField("payout_account_bank_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * The column <code>mst.payout_event_stat.payout_account_bank_corr_id</code>.
@@ -166,9 +161,9 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
     public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_BANK_BIK = createField("payout_account_bank_bik", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
-     * The column <code>mst.payout_event_stat.payout_account_bank_inn</code>.
+     * The column <code>mst.payout_event_stat.payout_account_inn</code>.
      */
-    public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_BANK_INN = createField("payout_account_bank_inn", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_INN = createField("payout_account_inn", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * The column <code>mst.payout_event_stat.payout_account_purpose</code>.

@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
 import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
@@ -73,22 +74,9 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
         statPayout.setCreatedAt(
                 TypeUtil.temporalToString(payoutEvent.getPayoutCreatedAt())
         );
-        statPayout.setPayoutType(toPayoutType(payoutEvent));
-        statPayout.setPaidDetails(toPayoutPaidDetails(payoutEvent));
+        statPayout.setType(toPayoutType(payoutEvent));
 
         return statPayout;
-    }
-
-    private PaidDetails toPayoutPaidDetails(PayoutEventStat payoutEvent) {
-        PaidDetails._Fields paidDetails = PaidDetails._Fields.findByName(payoutEvent.getPayoutPaidDetailsType());
-        switch (paidDetails) {
-            case CARD_DETAILS:
-                return PaidDetails.card_details(new CardPaidDetails(payoutEvent.getPayoutCardMaskPan()));
-            case ACCOUNT_DETAILS:
-                return PaidDetails.account_details(new AccountPaidDetails());
-            default:
-                throw new NotFoundException(String.format("Payout paid details type '%s' not found", paidDetails.getFieldName()));
-        }
     }
 
     private PayoutStatus toPayoutStatus(PayoutEventStat payoutEvent) {
@@ -110,16 +98,26 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
     private PayoutType toPayoutType(PayoutEventStat payoutEvent) {
         PayoutType._Fields payoutType = PayoutType._Fields.findByName(payoutEvent.getPayoutType().getLiteral());
         switch (payoutType) {
-            case PAYOUT_ACCOUNT:
+            case BANK_ACCOUNT:
                 PayoutAccount payoutAccount = new PayoutAccount();
-                payoutAccount.setAccount(payoutEvent.getPayoutAccountId());
-                payoutAccount.setBankBik(payoutEvent.getPayoutAccountBankBik());
-                payoutAccount.setBankCorrAccount(payoutEvent.getPayoutAccountBankCorrId());
-                payoutAccount.setInn(payoutEvent.getPayoutAccountBankInn());
-                payoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
-                return PayoutType.payout_account(payoutAccount);
-            case PAYOUT_CARD:
-                return PayoutType.payout_card(new PayoutCard());
+                BankAccount bankAccount = new BankAccount();
+                bankAccount.setAccount(payoutEvent.getPayoutAccountBankId());
+                bankAccount.setBankBik(payoutEvent.getPayoutAccountBankBik());
+                bankAccount.setBankPostAccount(payoutEvent.getPayoutAccountBankCorrId());
+                payoutAccount.setAccount(bankAccount);
+                payoutAccount.setInn(payoutEvent.getPayoutAccountInn());
+                payoutAccount.setInn(payoutEvent.getPayoutAccountPurpose());
+
+                return PayoutType.bank_account(payoutAccount);
+            case BANK_CARD:
+                PayoutCard payoutCard = new PayoutCard();
+                BankCard bankCard = new BankCard();
+                bankCard.setToken(payoutEvent.getPayoutCardToken());
+                bankCard.setPaymentSystem(BankCardPaymentSystem.valueOf(payoutEvent.getPayoutCardPaymentSystem()));
+                bankCard.setBin(payoutEvent.getPayoutCardBin());
+                bankCard.setMaskedPan(payoutEvent.getPayoutCardMaskedPan());
+                payoutCard.setCard(bankCard);
+                return PayoutType.bank_card(payoutCard);
             default:
                 throw new NotFoundException(String.format("Payout type '%s' not found", payoutType.getFieldName()));
         }

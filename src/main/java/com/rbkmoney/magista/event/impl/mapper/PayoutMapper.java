@@ -1,10 +1,9 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
+import com.rbkmoney.damsel.domain.BankAccount;
+import com.rbkmoney.damsel.domain.BankCard;
 import com.rbkmoney.damsel.domain.CashFlowAccount;
-import com.rbkmoney.damsel.payout_processing.AccountPayout;
-import com.rbkmoney.damsel.payout_processing.Event;
-import com.rbkmoney.damsel.payout_processing.Payout;
-import com.rbkmoney.damsel.payout_processing.PayoutChange;
+import com.rbkmoney.damsel.payout_processing.*;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
@@ -38,16 +37,27 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
             Payout payout = change.getPayoutCreated().getPayout();
             payoutEventStat.setPayoutId(payout.getId());
             payoutEventStat.setPayoutType(
-                    TBaseUtil.unionFieldToEnum(payout.getPayoutType(), PayoutType.class)
+                    TBaseUtil.unionFieldToEnum(payout.getType(), PayoutType.class)
             );
 
-            if (payout.getPayoutType().isSetAccountPayout()) {
-                AccountPayout accountPayout = payout.getPayoutType().getAccountPayout();
-                payoutEventStat.setPayoutAccountId(accountPayout.getAccount());
-                payoutEventStat.setPayoutAccountBankCorrId(accountPayout.getBankCorrAccount());
-                payoutEventStat.setPayoutAccountPurpose(accountPayout.getPurpose());
-                payoutEventStat.setPayoutAccountBankBik(accountPayout.getBankBik());
-                payoutEventStat.setPayoutAccountBankInn(accountPayout.getInn());
+            if (payout.getType().isSetAccount()) {
+                PayoutAccount payoutAccount = payout.getType().getAccount();
+                BankAccount bankAccount = payoutAccount.getAccount();
+
+                payoutEventStat.setPayoutAccountBankId(bankAccount.getAccount());
+                payoutEventStat.setPayoutAccountBankCorrId(bankAccount.getBankPostAccount());
+                payoutEventStat.setPayoutAccountBankBik(bankAccount.getBankBik());
+                payoutEventStat.setPayoutAccountPurpose(payoutAccount.getPurpose());
+                payoutEventStat.setPayoutAccountInn(payoutAccount.getInn());
+            }
+
+            if (payout.getType().isSetCard()) {
+                PayoutCard payoutCard = payout.getType().getCard();
+                BankCard bankCard = payoutCard.getCard();
+                payoutEventStat.setPayoutCardToken(bankCard.getToken());
+                payoutEventStat.setPayoutCardMaskedPan(bankCard.getMaskedPan());
+                payoutEventStat.setPayoutCardBin(bankCard.getBin());
+                payoutEventStat.setPayoutCardPaymentSystem(bankCard.getPaymentSystem().name());
             }
 
             payoutEventStat.setPayoutStatus(

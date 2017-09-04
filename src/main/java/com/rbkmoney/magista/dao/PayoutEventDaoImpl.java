@@ -69,15 +69,14 @@ public class PayoutEventDaoImpl extends AbstractDao implements PayoutEventDao {
             payoutEventStat.setPayoutFee(rs.getLong("payout_fee"));
             payoutEventStat.setPayoutCurrencyCode(rs.getString("payout_currency_code"));
             payoutEventStat.setPayoutType(PayoutType.valueOf(rs.getString("payout_type")));
-            payoutEventStat.setPayoutPaidDetailsType(rs.getString("payout_paid_details_type"));
-            payoutEventStat.setPayoutCardRequestId(rs.getString("payout_card_request_id"));
-            payoutEventStat.setPayoutCardMaskPan(rs.getString("payout_card_mask_pan"));
-            payoutEventStat.setPayoutCardProviderName(rs.getString("payout_card_provider_name"));
-            payoutEventStat.setPayoutCardTransactionId(rs.getString("payout_card_transaction_id"));
-            payoutEventStat.setPayoutAccountId(rs.getString("payout_account_id"));
+            payoutEventStat.setPayoutCardToken(rs.getString("payout_card_token"));
+            payoutEventStat.setPayoutCardMaskedPan(rs.getString("payout_card_masked_pan"));
+            payoutEventStat.setPayoutCardBin(rs.getString("payout_card_bin"));
+            payoutEventStat.setPayoutCardPaymentSystem(rs.getString("payout_card_payment_system"));
+            payoutEventStat.setPayoutAccountBankId(rs.getString("payout_account_bank_id"));
             payoutEventStat.setPayoutAccountBankCorrId(rs.getString("payout_account_bank_corr_id"));
             payoutEventStat.setPayoutAccountBankBik(rs.getString("payout_account_bank_bik"));
-            payoutEventStat.setPayoutAccountBankInn(rs.getString("payout_account_bank_inn"));
+            payoutEventStat.setPayoutAccountInn(rs.getString("payout_account_inn"));
             payoutEventStat.setPayoutAccountPurpose(rs.getString("payout_account_purpose"));
             payoutEventStat.setPayoutCancelDetails(rs.getString("payout_cancel_details"));
 

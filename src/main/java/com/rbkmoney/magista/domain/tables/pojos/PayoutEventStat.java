@@ -28,7 +28,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat implements Serializable {
 
-    private static final long serialVersionUID = 630157506;
+    private static final long serialVersionUID = 1378591729;
 
     private Long                id;
     private Long                eventId;
@@ -44,15 +44,14 @@ public class PayoutEventStat implements Serializable {
     private Long                payoutFee;
     private String              payoutCurrencyCode;
     private PayoutType          payoutType;
-    private String              payoutPaidDetailsType;
-    private String              payoutCardRequestId;
-    private String              payoutCardMaskPan;
-    private String              payoutCardProviderName;
-    private String              payoutCardTransactionId;
-    private String              payoutAccountId;
+    private String              payoutCardToken;
+    private String              payoutCardMaskedPan;
+    private String              payoutCardBin;
+    private String              payoutCardPaymentSystem;
+    private String              payoutAccountBankId;
     private String              payoutAccountBankCorrId;
     private String              payoutAccountBankBik;
-    private String              payoutAccountBankInn;
+    private String              payoutAccountInn;
     private String              payoutAccountPurpose;
     private String              payoutCancelDetails;
 
@@ -73,15 +72,14 @@ public class PayoutEventStat implements Serializable {
         this.payoutFee = value.payoutFee;
         this.payoutCurrencyCode = value.payoutCurrencyCode;
         this.payoutType = value.payoutType;
-        this.payoutPaidDetailsType = value.payoutPaidDetailsType;
-        this.payoutCardRequestId = value.payoutCardRequestId;
-        this.payoutCardMaskPan = value.payoutCardMaskPan;
-        this.payoutCardProviderName = value.payoutCardProviderName;
-        this.payoutCardTransactionId = value.payoutCardTransactionId;
-        this.payoutAccountId = value.payoutAccountId;
+        this.payoutCardToken = value.payoutCardToken;
+        this.payoutCardMaskedPan = value.payoutCardMaskedPan;
+        this.payoutCardBin = value.payoutCardBin;
+        this.payoutCardPaymentSystem = value.payoutCardPaymentSystem;
+        this.payoutAccountBankId = value.payoutAccountBankId;
         this.payoutAccountBankCorrId = value.payoutAccountBankCorrId;
         this.payoutAccountBankBik = value.payoutAccountBankBik;
-        this.payoutAccountBankInn = value.payoutAccountBankInn;
+        this.payoutAccountInn = value.payoutAccountInn;
         this.payoutAccountPurpose = value.payoutAccountPurpose;
         this.payoutCancelDetails = value.payoutCancelDetails;
     }
@@ -101,15 +99,14 @@ public class PayoutEventStat implements Serializable {
         Long                payoutFee,
         String              payoutCurrencyCode,
         PayoutType          payoutType,
-        String              payoutPaidDetailsType,
-        String              payoutCardRequestId,
-        String              payoutCardMaskPan,
-        String              payoutCardProviderName,
-        String              payoutCardTransactionId,
-        String              payoutAccountId,
+        String              payoutCardToken,
+        String              payoutCardMaskedPan,
+        String              payoutCardBin,
+        String              payoutCardPaymentSystem,
+        String              payoutAccountBankId,
         String              payoutAccountBankCorrId,
         String              payoutAccountBankBik,
-        String              payoutAccountBankInn,
+        String              payoutAccountInn,
         String              payoutAccountPurpose,
         String              payoutCancelDetails
     ) {
@@ -127,15 +124,14 @@ public class PayoutEventStat implements Serializable {
         this.payoutFee = payoutFee;
         this.payoutCurrencyCode = payoutCurrencyCode;
         this.payoutType = payoutType;
-        this.payoutPaidDetailsType = payoutPaidDetailsType;
-        this.payoutCardRequestId = payoutCardRequestId;
-        this.payoutCardMaskPan = payoutCardMaskPan;
-        this.payoutCardProviderName = payoutCardProviderName;
-        this.payoutCardTransactionId = payoutCardTransactionId;
-        this.payoutAccountId = payoutAccountId;
+        this.payoutCardToken = payoutCardToken;
+        this.payoutCardMaskedPan = payoutCardMaskedPan;
+        this.payoutCardBin = payoutCardBin;
+        this.payoutCardPaymentSystem = payoutCardPaymentSystem;
+        this.payoutAccountBankId = payoutAccountBankId;
         this.payoutAccountBankCorrId = payoutAccountBankCorrId;
         this.payoutAccountBankBik = payoutAccountBankBik;
-        this.payoutAccountBankInn = payoutAccountBankInn;
+        this.payoutAccountInn = payoutAccountInn;
         this.payoutAccountPurpose = payoutAccountPurpose;
         this.payoutCancelDetails = payoutCancelDetails;
     }
@@ -252,52 +248,44 @@ public class PayoutEventStat implements Serializable {
         this.payoutType = payoutType;
     }
 
-    public String getPayoutPaidDetailsType() {
-        return this.payoutPaidDetailsType;
+    public String getPayoutCardToken() {
+        return this.payoutCardToken;
     }
 
-    public void setPayoutPaidDetailsType(String payoutPaidDetailsType) {
-        this.payoutPaidDetailsType = payoutPaidDetailsType;
+    public void setPayoutCardToken(String payoutCardToken) {
+        this.payoutCardToken = payoutCardToken;
     }
 
-    public String getPayoutCardRequestId() {
-        return this.payoutCardRequestId;
+    public String getPayoutCardMaskedPan() {
+        return this.payoutCardMaskedPan;
     }
 
-    public void setPayoutCardRequestId(String payoutCardRequestId) {
-        this.payoutCardRequestId = payoutCardRequestId;
+    public void setPayoutCardMaskedPan(String payoutCardMaskedPan) {
+        this.payoutCardMaskedPan = payoutCardMaskedPan;
     }
 
-    public String getPayoutCardMaskPan() {
-        return this.payoutCardMaskPan;
+    public String getPayoutCardBin() {
+        return this.payoutCardBin;
     }
 
-    public void setPayoutCardMaskPan(String payoutCardMaskPan) {
-        this.payoutCardMaskPan = payoutCardMaskPan;
+    public void setPayoutCardBin(String payoutCardBin) {
+        this.payoutCardBin = payoutCardBin;
     }
 
-    public String getPayoutCardProviderName() {
-        return this.payoutCardProviderName;
+    public String getPayoutCardPaymentSystem() {
+        return this.payoutCardPaymentSystem;
     }
 
-    public void setPayoutCardProviderName(String payoutCardProviderName) {
-        this.payoutCardProviderName = payoutCardProviderName;
+    public void setPayoutCardPaymentSystem(String payoutCardPaymentSystem) {
+        this.payoutCardPaymentSystem = payoutCardPaymentSystem;
     }
 
-    public String getPayoutCardTransactionId() {
-        return this.payoutCardTransactionId;
+    public String getPayoutAccountBankId() {
+        return this.payoutAccountBankId;
     }
 
-    public void setPayoutCardTransactionId(String payoutCardTransactionId) {
-        this.payoutCardTransactionId = payoutCardTransactionId;
-    }
-
-    public String getPayoutAccountId() {
-        return this.payoutAccountId;
-    }
-
-    public void setPayoutAccountId(String payoutAccountId) {
-        this.payoutAccountId = payoutAccountId;
+    public void setPayoutAccountBankId(String payoutAccountBankId) {
+        this.payoutAccountBankId = payoutAccountBankId;
     }
 
     public String getPayoutAccountBankCorrId() {
@@ -316,12 +304,12 @@ public class PayoutEventStat implements Serializable {
         this.payoutAccountBankBik = payoutAccountBankBik;
     }
 
-    public String getPayoutAccountBankInn() {
-        return this.payoutAccountBankInn;
+    public String getPayoutAccountInn() {
+        return this.payoutAccountInn;
     }
 
-    public void setPayoutAccountBankInn(String payoutAccountBankInn) {
-        this.payoutAccountBankInn = payoutAccountBankInn;
+    public void setPayoutAccountInn(String payoutAccountInn) {
+        this.payoutAccountInn = payoutAccountInn;
     }
 
     public String getPayoutAccountPurpose() {
@@ -433,41 +421,35 @@ public class PayoutEventStat implements Serializable {
         }
         else if (!payoutType.equals(other.payoutType))
             return false;
-        if (payoutPaidDetailsType == null) {
-            if (other.payoutPaidDetailsType != null)
+        if (payoutCardToken == null) {
+            if (other.payoutCardToken != null)
                 return false;
         }
-        else if (!payoutPaidDetailsType.equals(other.payoutPaidDetailsType))
+        else if (!payoutCardToken.equals(other.payoutCardToken))
             return false;
-        if (payoutCardRequestId == null) {
-            if (other.payoutCardRequestId != null)
+        if (payoutCardMaskedPan == null) {
+            if (other.payoutCardMaskedPan != null)
                 return false;
         }
-        else if (!payoutCardRequestId.equals(other.payoutCardRequestId))
+        else if (!payoutCardMaskedPan.equals(other.payoutCardMaskedPan))
             return false;
-        if (payoutCardMaskPan == null) {
-            if (other.payoutCardMaskPan != null)
+        if (payoutCardBin == null) {
+            if (other.payoutCardBin != null)
                 return false;
         }
-        else if (!payoutCardMaskPan.equals(other.payoutCardMaskPan))
+        else if (!payoutCardBin.equals(other.payoutCardBin))
             return false;
-        if (payoutCardProviderName == null) {
-            if (other.payoutCardProviderName != null)
+        if (payoutCardPaymentSystem == null) {
+            if (other.payoutCardPaymentSystem != null)
                 return false;
         }
-        else if (!payoutCardProviderName.equals(other.payoutCardProviderName))
+        else if (!payoutCardPaymentSystem.equals(other.payoutCardPaymentSystem))
             return false;
-        if (payoutCardTransactionId == null) {
-            if (other.payoutCardTransactionId != null)
+        if (payoutAccountBankId == null) {
+            if (other.payoutAccountBankId != null)
                 return false;
         }
-        else if (!payoutCardTransactionId.equals(other.payoutCardTransactionId))
-            return false;
-        if (payoutAccountId == null) {
-            if (other.payoutAccountId != null)
-                return false;
-        }
-        else if (!payoutAccountId.equals(other.payoutAccountId))
+        else if (!payoutAccountBankId.equals(other.payoutAccountBankId))
             return false;
         if (payoutAccountBankCorrId == null) {
             if (other.payoutAccountBankCorrId != null)
@@ -481,11 +463,11 @@ public class PayoutEventStat implements Serializable {
         }
         else if (!payoutAccountBankBik.equals(other.payoutAccountBankBik))
             return false;
-        if (payoutAccountBankInn == null) {
-            if (other.payoutAccountBankInn != null)
+        if (payoutAccountInn == null) {
+            if (other.payoutAccountInn != null)
                 return false;
         }
-        else if (!payoutAccountBankInn.equals(other.payoutAccountBankInn))
+        else if (!payoutAccountInn.equals(other.payoutAccountInn))
             return false;
         if (payoutAccountPurpose == null) {
             if (other.payoutAccountPurpose != null)
@@ -520,15 +502,14 @@ public class PayoutEventStat implements Serializable {
         result = prime * result + ((payoutFee == null) ? 0 : payoutFee.hashCode());
         result = prime * result + ((payoutCurrencyCode == null) ? 0 : payoutCurrencyCode.hashCode());
         result = prime * result + ((payoutType == null) ? 0 : payoutType.hashCode());
-        result = prime * result + ((payoutPaidDetailsType == null) ? 0 : payoutPaidDetailsType.hashCode());
-        result = prime * result + ((payoutCardRequestId == null) ? 0 : payoutCardRequestId.hashCode());
-        result = prime * result + ((payoutCardMaskPan == null) ? 0 : payoutCardMaskPan.hashCode());
-        result = prime * result + ((payoutCardProviderName == null) ? 0 : payoutCardProviderName.hashCode());
-        result = prime * result + ((payoutCardTransactionId == null) ? 0 : payoutCardTransactionId.hashCode());
-        result = prime * result + ((payoutAccountId == null) ? 0 : payoutAccountId.hashCode());
+        result = prime * result + ((payoutCardToken == null) ? 0 : payoutCardToken.hashCode());
+        result = prime * result + ((payoutCardMaskedPan == null) ? 0 : payoutCardMaskedPan.hashCode());
+        result = prime * result + ((payoutCardBin == null) ? 0 : payoutCardBin.hashCode());
+        result = prime * result + ((payoutCardPaymentSystem == null) ? 0 : payoutCardPaymentSystem.hashCode());
+        result = prime * result + ((payoutAccountBankId == null) ? 0 : payoutAccountBankId.hashCode());
         result = prime * result + ((payoutAccountBankCorrId == null) ? 0 : payoutAccountBankCorrId.hashCode());
         result = prime * result + ((payoutAccountBankBik == null) ? 0 : payoutAccountBankBik.hashCode());
-        result = prime * result + ((payoutAccountBankInn == null) ? 0 : payoutAccountBankInn.hashCode());
+        result = prime * result + ((payoutAccountInn == null) ? 0 : payoutAccountInn.hashCode());
         result = prime * result + ((payoutAccountPurpose == null) ? 0 : payoutAccountPurpose.hashCode());
         result = prime * result + ((payoutCancelDetails == null) ? 0 : payoutCancelDetails.hashCode());
         return result;
@@ -552,15 +533,14 @@ public class PayoutEventStat implements Serializable {
         sb.append(", ").append(payoutFee);
         sb.append(", ").append(payoutCurrencyCode);
         sb.append(", ").append(payoutType);
-        sb.append(", ").append(payoutPaidDetailsType);
-        sb.append(", ").append(payoutCardRequestId);
-        sb.append(", ").append(payoutCardMaskPan);
-        sb.append(", ").append(payoutCardProviderName);
-        sb.append(", ").append(payoutCardTransactionId);
-        sb.append(", ").append(payoutAccountId);
+        sb.append(", ").append(payoutCardToken);
+        sb.append(", ").append(payoutCardMaskedPan);
+        sb.append(", ").append(payoutCardBin);
+        sb.append(", ").append(payoutCardPaymentSystem);
+        sb.append(", ").append(payoutAccountBankId);
         sb.append(", ").append(payoutAccountBankCorrId);
         sb.append(", ").append(payoutAccountBankBik);
-        sb.append(", ").append(payoutAccountBankInn);
+        sb.append(", ").append(payoutAccountInn);
         sb.append(", ").append(payoutAccountPurpose);
         sb.append(", ").append(payoutCancelDetails);
 
