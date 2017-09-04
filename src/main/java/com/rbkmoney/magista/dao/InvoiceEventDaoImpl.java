@@ -94,6 +94,7 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setInvoiceStatusDetails(rs.getString("invoice_status_details"));
             invoiceEventStat.setInvoiceProduct(rs.getString("invoice_product"));
             invoiceEventStat.setInvoiceDescription(rs.getString("invoice_description"));
+            invoiceEventStat.setInvoiceCart(rs.getString("invoice_cart"));
             invoiceEventStat.setInvoiceAmount(rs.getLong("invoice_amount"));
             invoiceEventStat.setInvoiceCurrencyCode(rs.getString("invoice_currency_code"));
             invoiceEventStat.setInvoiceDue(rs.getObject("invoice_due", LocalDateTime.class));
@@ -124,6 +125,9 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setPaymentCreatedAt(rs.getObject("payment_created_at", LocalDateTime.class));
             invoiceEventStat.setPaymentContext(rs.getBytes("payment_context"));
             invoiceEventStat.setPaymentAdjustmentId(rs.getString("payment_adjustment_id"));
+            invoiceEventStat.setPaymentFlow(rs.getString("payment_flow"));
+            invoiceEventStat.setPaymentHoldOnExpiration(rs.getString("payment_hold_on_expiration"));
+            invoiceEventStat.setPaymentHoldUntil(rs.getObject("payment_hold_until", LocalDateTime.class));
             invoiceEventStat.setPaymentAdjustmentStatus(
                     rs.getString("payment_adjustment_status") != null ?
                             AdjustmentStatus.valueOf(rs.getString("payment_adjustment_status")) : null

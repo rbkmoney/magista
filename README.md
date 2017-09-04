@@ -168,7 +168,8 @@
 - `invoice_id`
 - `from_time`
 - `to_time`
-- `payment_email` - почта, полностью или частично 
+- `payment_email` - почта, полностью или частично
+- `payment_flow` - flow платежа, имена берем из thrift-интерфейса **domain.InvoicePaymentFlow**, к примеру: `instant` 
 - `payment_ip` - ip адрес в виде строки
 - `payment_fingerprint` - отпечаток браузера в виде строки
 - `payment_pan_mask` - маска в формате [\d\*]+ где все символы * трактуются как любой символ
@@ -185,6 +186,7 @@
 - `from_time`
 - `to_time`
 - `payment_email` - почта, полностью или частично 
+- `payment_flow` - flow платежа, имена берем из thrift-интерфейса **domain.InvoicePaymentFlow**, к примеру: `instant`
 - `payment_ip` - ip адрес в виде строки
 - `payment_fingerprint` - отпечаток браузера в виде строки
 - `payment_pan_mask` - маска в формате [\d\*]+ где все символы * трактуются как любой символ
@@ -202,7 +204,7 @@
 - `from_time` - начало временного интервала выборки(inclusive).
 - `to_time` - конец временного интервала выборки(exclusive).
 
-####Пример:
+#### Пример:
 
 Запросим данный отчет за период:
 

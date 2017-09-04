@@ -114,6 +114,7 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             statPayment.setContext(content);
         }
 
+        statPayment.setFlow(toInvoicePaymentFlow(invoicePaymentStat));
 
         LocationInfo locationInfo = new LocationInfo(
                 invoicePaymentStat.getPaymentCityId(),
@@ -122,6 +123,21 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         statPayment.setLocationInfo(locationInfo);
 
         return statPayment;
+    }
+
+    private InvoicePaymentFlow toInvoicePaymentFlow(InvoiceEventStat invoiceEventStat) {
+        InvoicePaymentFlow._Fields paymentFlow = InvoicePaymentFlow._Fields.findByName(invoiceEventStat.getPaymentFlow());
+        switch (paymentFlow) {
+            case HOLD:
+                return InvoicePaymentFlow.hold(new InvoicePaymentFlowHold(
+                        OnHoldExpiration.valueOf(invoiceEventStat.getPaymentHoldOnExpiration()),
+                        TypeUtil.temporalToString(invoiceEventStat.getPaymentHoldUntil())
+                ));
+            case INSTANT:
+                return InvoicePaymentFlow.instant(new InvoicePaymentFlowInstant());
+            default:
+                throw new NotFoundException(String.format("Payment flow '%s' not found.", invoiceEventStat.getPaymentFlow()));
+        }
     }
 
     private PaymentTool toStatPaymentTool(com.rbkmoney.damsel.domain.PaymentTool._Fields paymentTool, String token, BankCardPaymentSystem paymentSystem, String bin, String maskedPan) {
@@ -164,7 +180,7 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
 
     private OperationFailure toOperationFailure(String failureClass, String externalFailureCode, String externalFailureDescription) {
         OperationFailure._Fields failureType = OperationFailure._Fields.findByName(failureClass);
-        switch(failureType) {
+        switch (failureType) {
             case OPERATION_TIMEOUT:
                 return OperationFailure.operation_timeout(new OperationTimeout());
             case EXTERNAL_FAILURE:
@@ -237,6 +253,10 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
 
         public String getPaymentFingerprint() {
             return getStringParameter(PAYMENT_FINGERPRINT_PARAM, false);
+        }
+
+        public String getPaymentFlow() {
+            return getStringParameter(PAYMENT_FLOW_PARAM, false);
         }
 
         public Long getPaymentAmount() {
@@ -342,6 +362,7 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getPaymentStatus()),
+                        Optional.ofNullable(parameters.getPaymentFlow()),
                         Optional.ofNullable(parameters.getPaymentEmail()),
                         Optional.ofNullable(parameters.getPaymentIp()),
                         Optional.ofNullable(parameters.getPaymentFingerprint()),
@@ -377,6 +398,7 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getPaymentStatus()),
+                        Optional.ofNullable(parameters.getPaymentFlow()),
                         Optional.ofNullable(parameters.getPaymentEmail()),
                         Optional.ofNullable(parameters.getPaymentIp()),
                         Optional.ofNullable(parameters.getPaymentFingerprint()),

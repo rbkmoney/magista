@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.base.Content;
+import com.rbkmoney.damsel.domain.InvoiceCart;
 import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
@@ -13,6 +14,7 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.magista.util.DamselUtil;
 import org.apache.http.entity.ContentType;
 
 import java.time.Instant;
@@ -85,6 +87,10 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         );
         statInvoice.setAmount(invoiceEventStat.getInvoiceAmount());
         statInvoice.setCurrencySymbolicCode(invoiceEventStat.getInvoiceCurrencyCode());
+
+        if (Objects.nonNull(invoiceEventStat.getInvoiceCart())) {
+            statInvoice.setCart(DamselUtil.fromJson(invoiceEventStat.getInvoiceCart(), InvoiceCart.class));
+        }
 
         if (invoiceEventStat.getInvoiceContext() != null) {
             Content content = new Content();
@@ -254,6 +260,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                         Optional.ofNullable(parameters.getPaymentStatus()),
                         Optional.ofNullable(parameters.getInvoiceAmount()),
                         Optional.ofNullable(parameters.getPaymentAmount()),
+                        Optional.ofNullable(parameters.getPaymentFlow()),
                         Optional.ofNullable(parameters.getPaymentEmail()),
                         Optional.ofNullable(parameters.getPaymentIp()),
                         Optional.ofNullable(parameters.getPaymentFingerprint()),
@@ -291,6 +298,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                         Optional.ofNullable(parameters.getPaymentStatus()),
                         Optional.ofNullable(parameters.getInvoiceAmount()),
                         Optional.ofNullable(parameters.getPaymentAmount()),
+                        Optional.ofNullable(parameters.getPaymentFlow()),
                         Optional.ofNullable(parameters.getPaymentEmail()),
                         Optional.ofNullable(parameters.getPaymentIp()),
                         Optional.ofNullable(parameters.getPaymentFingerprint()),

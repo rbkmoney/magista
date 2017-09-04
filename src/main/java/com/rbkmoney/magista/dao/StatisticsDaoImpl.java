@@ -47,6 +47,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> paymentStatus,
             Optional<Long> invoiceAmount,
             Optional<Long> paymentAmount,
+            Optional<String> paymentFlow,
             Optional<String> paymentEmail,
             Optional<String> paymentIp,
             Optional<String> paymentFingerprint,
@@ -68,6 +69,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 invoiceId,
                 paymentId,
                 paymentStatus,
+                paymentFlow,
                 paymentEmail,
                 paymentIp,
                 paymentFingerprint,
@@ -95,6 +97,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> paymentStatus,
             Optional<Long> invoiceAmount,
             Optional<Long> paymentAmount,
+            Optional<String> paymentFlow,
             Optional<String> paymentEmail,
             Optional<String> paymentIp,
             Optional<String> paymentFingerprint,
@@ -116,6 +119,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 invoiceId,
                 paymentId,
                 paymentStatus,
+                paymentFlow,
                 paymentEmail,
                 paymentIp,
                 paymentFingerprint,
@@ -137,6 +141,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
+            Optional<String> paymentFlow,
             Optional<String> paymentEmail,
             Optional<String> paymentIp,
             Optional<String> paymentFingerprint,
@@ -151,6 +156,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 invoiceId,
                 paymentId,
                 paymentStatus,
+                paymentFlow,
                 paymentEmail,
                 paymentIp,
                 paymentFingerprint,
@@ -174,6 +180,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
+            Optional<String> paymentFlow,
             Optional<String> paymentEmail,
             Optional<String> paymentIp,
             Optional<String> paymentFingerprint,
@@ -188,6 +195,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 invoiceId,
                 paymentId,
                 paymentStatus,
+                paymentFlow,
                 paymentEmail,
                 paymentIp,
                 paymentFingerprint,
@@ -436,6 +444,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
+            Optional<String> paymentFlow,
             Optional<String> paymentEmail,
             Optional<String> paymentIp,
             Optional<String> paymentFingerprint,
@@ -451,6 +460,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         paymentStatus.isPresent() ?
                                 com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.valueOf(paymentStatus.get()) : null,
                         Comparator.EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_FLOW, paymentFlow.orElse(null), Comparator.EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_AMOUNT, paymentAmount.orElse(null), Comparator.EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_EMAIL, paymentEmail.orElse(null), Comparator.LIKE)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_IP, paymentIp.orElse(null), Comparator.LIKE)

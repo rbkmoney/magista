@@ -90,6 +90,16 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
             invoiceEventStat.setPaymentContext(invoicePayment.getContext().getData());
         }
 
+        InvoicePaymentFlow paymentFlow = invoicePayment.getFlow();
+        invoiceEventStat.setPaymentFlow(paymentFlow.getSetField().getFieldName());
+        if (paymentFlow.isSetHold()) {
+            InvoicePaymentFlowHold hold = paymentFlow.getHold();
+            invoiceEventStat.setPaymentHoldOnExpiration(hold.getOnHoldExpiration().name());
+            invoiceEventStat.setPaymentHoldUntil(
+                    TypeUtil.stringToLocalDateTime(hold.getHeldUntil())
+            );
+        }
+
         return invoiceEventStat;
     }
 
