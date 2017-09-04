@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 117334718;
+    private static final long serialVersionUID = 1993981588;
 
     /**
      * The reference instance of <code>mst.invoice_event_stat</code>
@@ -356,6 +356,21 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
      * The column <code>mst.invoice_event_stat.invoice_cart</code>.
      */
     public final TableField<InvoiceEventStatRecord, String> INVOICE_CART = createField("invoice_cart", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.invoice_event_stat.payment_flow</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, String> PAYMENT_FLOW = createField("payment_flow", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.invoice_event_stat.payment_hold_on_expiration</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, String> PAYMENT_HOLD_ON_EXPIRATION = createField("payment_hold_on_expiration", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.invoice_event_stat.payment_hold_until</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, LocalDateTime> PAYMENT_HOLD_UNTIL = createField("payment_hold_until", org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.payment_refund_id</code>.
