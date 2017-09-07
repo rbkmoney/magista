@@ -52,6 +52,11 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
 
         PaymentTool paymentTool = payer.getPaymentTool();
         invoiceEventStat.setPaymentTool(paymentTool.getSetField().getFieldName());
+        if (paymentTool.isSetPaymentTerminal()) {
+            invoiceEventStat.setPaymentTerminalProvider(
+                    paymentTool.getPaymentTerminal().getTerminalType().toString()
+            );
+        }
 
         if (paymentTool.isSetBankCard()) {
             BankCard bankCard = paymentTool.getBankCard();
