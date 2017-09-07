@@ -158,7 +158,9 @@
 - `from_time`
 - `to_time`
 - `payment_email` - почта, полностью или частично
-- `payment_flow` - flow платежа, имена берем из thrift-интерфейса **domain.InvoicePaymentFlow**, к примеру: `instant` 
+- `payment_flow` - flow платежа, имена берем из thrift-интерфейса **domain.InvoicePaymentFlow**, к примеру: `instant`
+- `payment_method` - метод оплаты, имена берем из thrift-интерфейса **domain.PaymentTool**, к примеру: `payment_terminal`
+- `payment_terminal_provider` - провайдер платежного терминалаб имена берем из thrift-интерфейса **domain.TerminalPaymentProvider**, к примеру: `euroset`
 - `payment_ip` - ip адрес в виде строки
 - `payment_fingerprint` - отпечаток браузера в виде строки
 - `payment_pan_mask` - маска в формате [\d\*]+ где все символы * трактуются как любой символ
@@ -176,6 +178,8 @@
 - `to_time`
 - `payment_email` - почта, полностью или частично 
 - `payment_flow` - flow платежа, имена берем из thrift-интерфейса **domain.InvoicePaymentFlow**, к примеру: `instant`
+- `payment_method` - метод оплаты, имена берем из thrift-интерфейса **domain.PaymentTool**, к примеру: `payment_terminal`
+- `payment_terminal_provider` - провайдер платежного терминалаб имена берем из thrift-интерфейса **domain.TerminalPaymentProvider**, к примеру: `euroset`
 - `payment_ip` - ip адрес в виде строки
 - `payment_fingerprint` - отпечаток браузера в виде строки
 - `payment_pan_mask` - маска в формате [\d\*]+ где все символы * трактуются как любой символ
