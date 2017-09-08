@@ -31,7 +31,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = -2039241779;
+    private static final long serialVersionUID = 1703563756;
 
     private Long                       id;
     private Long                       eventId;
@@ -96,6 +96,7 @@ public class InvoiceEventStat implements Serializable {
     private String                     paymentFlow;
     private String                     paymentHoldOnExpiration;
     private LocalDateTime              paymentHoldUntil;
+    private String                     paymentTerminalProvider;
     private String                     paymentRefundId;
     private InvoicePaymentRefundStatus paymentRefundStatus;
     private LocalDateTime              paymentRefundCreatedAt;
@@ -170,6 +171,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFlow = value.paymentFlow;
         this.paymentHoldOnExpiration = value.paymentHoldOnExpiration;
         this.paymentHoldUntil = value.paymentHoldUntil;
+        this.paymentTerminalProvider = value.paymentTerminalProvider;
         this.paymentRefundId = value.paymentRefundId;
         this.paymentRefundStatus = value.paymentRefundStatus;
         this.paymentRefundCreatedAt = value.paymentRefundCreatedAt;
@@ -243,6 +245,7 @@ public class InvoiceEventStat implements Serializable {
         String                     paymentFlow,
         String                     paymentHoldOnExpiration,
         LocalDateTime              paymentHoldUntil,
+        String                     paymentTerminalProvider,
         String                     paymentRefundId,
         InvoicePaymentRefundStatus paymentRefundStatus,
         LocalDateTime              paymentRefundCreatedAt,
@@ -314,6 +317,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFlow = paymentFlow;
         this.paymentHoldOnExpiration = paymentHoldOnExpiration;
         this.paymentHoldUntil = paymentHoldUntil;
+        this.paymentTerminalProvider = paymentTerminalProvider;
         this.paymentRefundId = paymentRefundId;
         this.paymentRefundStatus = paymentRefundStatus;
         this.paymentRefundCreatedAt = paymentRefundCreatedAt;
@@ -827,6 +831,14 @@ public class InvoiceEventStat implements Serializable {
         this.paymentHoldUntil = paymentHoldUntil;
     }
 
+    public String getPaymentTerminalProvider() {
+        return this.paymentTerminalProvider;
+    }
+
+    public void setPaymentTerminalProvider(String paymentTerminalProvider) {
+        this.paymentTerminalProvider = paymentTerminalProvider;
+    }
+
     public String getPaymentRefundId() {
         return this.paymentRefundId;
     }
@@ -1270,6 +1282,12 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentHoldUntil.equals(other.paymentHoldUntil))
             return false;
+        if (paymentTerminalProvider == null) {
+            if (other.paymentTerminalProvider != null)
+                return false;
+        }
+        else if (!paymentTerminalProvider.equals(other.paymentTerminalProvider))
+            return false;
         if (paymentRefundId == null) {
             if (other.paymentRefundId != null)
                 return false;
@@ -1382,6 +1400,7 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentFlow == null) ? 0 : paymentFlow.hashCode());
         result = prime * result + ((paymentHoldOnExpiration == null) ? 0 : paymentHoldOnExpiration.hashCode());
         result = prime * result + ((paymentHoldUntil == null) ? 0 : paymentHoldUntil.hashCode());
+        result = prime * result + ((paymentTerminalProvider == null) ? 0 : paymentTerminalProvider.hashCode());
         result = prime * result + ((paymentRefundId == null) ? 0 : paymentRefundId.hashCode());
         result = prime * result + ((paymentRefundStatus == null) ? 0 : paymentRefundStatus.hashCode());
         result = prime * result + ((paymentRefundCreatedAt == null) ? 0 : paymentRefundCreatedAt.hashCode());
@@ -1459,6 +1478,7 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentFlow);
         sb.append(", ").append(paymentHoldOnExpiration);
         sb.append(", ").append(paymentHoldUntil);
+        sb.append(", ").append(paymentTerminalProvider);
         sb.append(", ").append(paymentRefundId);
         sb.append(", ").append(paymentRefundStatus);
         sb.append(", ").append(paymentRefundCreatedAt);

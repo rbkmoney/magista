@@ -94,10 +94,7 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 com.rbkmoney.damsel.domain.PaymentTool._Fields.findByName(
                         invoicePaymentStat.getPaymentTool()
                 ),
-                invoicePaymentStat.getPaymentToken(),
-                BankCardPaymentSystem.valueOf(invoicePaymentStat.getPaymentSystem()),
-                invoicePaymentStat.getPaymentBin(),
-                invoicePaymentStat.getPaymentMaskedPan()
+                invoicePaymentStat
         ));
 
         statPayment.setIpAddress(invoicePaymentStat.getPaymentIp());
@@ -140,14 +137,18 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         }
     }
 
-    private PaymentTool toStatPaymentTool(com.rbkmoney.damsel.domain.PaymentTool._Fields paymentTool, String token, BankCardPaymentSystem paymentSystem, String bin, String maskedPan) {
+    private PaymentTool toStatPaymentTool(com.rbkmoney.damsel.domain.PaymentTool._Fields paymentTool, InvoiceEventStat invoicePaymentStat) {
         switch (paymentTool) {
             case BANK_CARD:
                 return PaymentTool.bank_card(new BankCard(
-                        token,
-                        paymentSystem,
-                        bin,
-                        maskedPan
+                        invoicePaymentStat.getPaymentToken(),
+                        BankCardPaymentSystem.valueOf(invoicePaymentStat.getPaymentSystem()),
+                        invoicePaymentStat.getPaymentBin(),
+                        invoicePaymentStat.getPaymentMaskedPan()
+                ));
+            case PAYMENT_TERMINAL:
+                return PaymentTool.payment_terminal(new PaymentTerminal(
+                        TerminalPaymentProvider.valueOf(invoicePaymentStat.getPaymentTerminalProvider())
                 ));
             default:
                 throw new NotFoundException(String.format("Payment tool '%s' not found", paymentTool.getFieldName()));
@@ -261,6 +262,14 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             return getStringParameter(PAYMENT_FLOW_PARAM, false);
         }
 
+        public String getPaymentMethod() {
+            return getStringParameter(PAYMENT_METHOD_PARAM, false);
+        }
+
+        public String getPaymentTerminalProvider() {
+            return getStringParameter(PAYMENT_TERMINAL_PROVIDER_PARAM, false);
+        }
+
         public Long getPaymentAmount() {
             return getLongParameter(PAYMENT_AMOUNT_PARAM, false);
         }
@@ -365,6 +374,8 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getPaymentStatus()),
                         Optional.ofNullable(parameters.getPaymentFlow()),
+                        Optional.ofNullable(parameters.getPaymentMethod()),
+                        Optional.ofNullable(parameters.getPaymentTerminalProvider()),
                         Optional.ofNullable(parameters.getPaymentEmail()),
                         Optional.ofNullable(parameters.getPaymentIp()),
                         Optional.ofNullable(parameters.getPaymentFingerprint()),
@@ -401,6 +412,8 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getPaymentStatus()),
                         Optional.ofNullable(parameters.getPaymentFlow()),
+                        Optional.ofNullable(parameters.getPaymentMethod()),
+                        Optional.ofNullable(parameters.getPaymentTerminalProvider()),
                         Optional.ofNullable(parameters.getPaymentEmail()),
                         Optional.ofNullable(parameters.getPaymentIp()),
                         Optional.ofNullable(parameters.getPaymentFingerprint()),
