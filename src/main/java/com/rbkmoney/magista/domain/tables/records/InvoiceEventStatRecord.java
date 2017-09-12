@@ -7,6 +7,7 @@ package com.rbkmoney.magista.domain.tables.records;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
+import com.rbkmoney.magista.domain.enums.InvoicePaymentRefundStatus;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
@@ -32,7 +33,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 1797584248;
+    private static final long serialVersionUID = 764554286;
 
     /**
      * Setter for <code>mst.invoice_event_stat.id</code>.
@@ -930,6 +931,104 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
         return (String) get(63);
     }
 
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_refund_id</code>.
+     */
+    public void setPaymentRefundId(String value) {
+        set(64, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_refund_id</code>.
+     */
+    public String getPaymentRefundId() {
+        return (String) get(64);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_refund_status</code>.
+     */
+    public void setPaymentRefundStatus(InvoicePaymentRefundStatus value) {
+        set(65, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_refund_status</code>.
+     */
+    public InvoicePaymentRefundStatus getPaymentRefundStatus() {
+        return (InvoicePaymentRefundStatus) get(65);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_refund_created_at</code>.
+     */
+    public void setPaymentRefundCreatedAt(LocalDateTime value) {
+        set(66, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_refund_created_at</code>.
+     */
+    public LocalDateTime getPaymentRefundCreatedAt() {
+        return (LocalDateTime) get(66);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_refund_reason</code>.
+     */
+    public void setPaymentRefundReason(String value) {
+        set(67, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_refund_reason</code>.
+     */
+    public String getPaymentRefundReason() {
+        return (String) get(67);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_refund_fee</code>.
+     */
+    public void setPaymentRefundFee(Long value) {
+        set(68, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_refund_fee</code>.
+     */
+    public Long getPaymentRefundFee() {
+        return (Long) get(68);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_refund_provider_fee</code>.
+     */
+    public void setPaymentRefundProviderFee(Long value) {
+        set(69, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_refund_provider_fee</code>.
+     */
+    public Long getPaymentRefundProviderFee() {
+        return (Long) get(69);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_refund_external_fee</code>.
+     */
+    public void setPaymentRefundExternalFee(Long value) {
+        set(70, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_refund_external_fee</code>.
+     */
+    public Long getPaymentRefundExternalFee() {
+        return (Long) get(70);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -956,7 +1055,7 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
     /**
      * Create a detached, initialised InvoiceEventStatRecord
      */
-    public InvoiceEventStatRecord(Long id, Long eventId, InvoiceEventCategory eventCategory, InvoiceEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyEmail, String partyShopId, String partyShopName, String partyShopDescription, String partyShopUrl, Integer partyShopCategoryId, String partyShopPayoutToolId, String partyContractId, String partyContractRegisteredNumber, String partyContractInn, String invoiceId, InvoiceStatus invoiceStatus, String invoiceStatusDetails, String invoiceProduct, String invoiceDescription, Long invoiceAmount, String invoiceCurrencyCode, LocalDateTime invoiceDue, LocalDateTime invoiceCreatedAt, byte[] invoiceContext, String paymentId, InvoicePaymentStatus paymentStatus, String paymentExternalFailureCode, String paymentExternalFailureDescription, Long paymentAmount, String paymentCurrencyCode, Long paymentFee, Long paymentProviderFee, Long paymentExternalFee, String paymentTool, String paymentMaskedPan, String paymentBin, String paymentToken, String paymentSystem, String paymentSessionId, Integer paymentCountryId, Integer paymentCityId, String paymentIp, String paymentPhoneNumber, String paymentEmail, String paymentFingerprint, LocalDateTime paymentCreatedAt, byte[] paymentContext, String paymentAdjustmentId, AdjustmentStatus paymentAdjustmentStatus, LocalDateTime paymentAdjustmentStatusCreatedAt, LocalDateTime paymentAdjustmentCreatedAt, String paymentAdjustmentReason, Long paymentAdjustmentFee, Long paymentAdjustmentProviderFee, Long paymentAdjustmentExternalFee, String paymentFailureClass, String invoiceTemplateId, String invoiceCart, String paymentFlow, String paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentTerminalProvider) {
+    public InvoiceEventStatRecord(Long id, Long eventId, InvoiceEventCategory eventCategory, InvoiceEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyEmail, String partyShopId, String partyShopName, String partyShopDescription, String partyShopUrl, Integer partyShopCategoryId, String partyShopPayoutToolId, String partyContractId, String partyContractRegisteredNumber, String partyContractInn, String invoiceId, InvoiceStatus invoiceStatus, String invoiceStatusDetails, String invoiceProduct, String invoiceDescription, Long invoiceAmount, String invoiceCurrencyCode, LocalDateTime invoiceDue, LocalDateTime invoiceCreatedAt, byte[] invoiceContext, String paymentId, InvoicePaymentStatus paymentStatus, String paymentExternalFailureCode, String paymentExternalFailureDescription, Long paymentAmount, String paymentCurrencyCode, Long paymentFee, Long paymentProviderFee, Long paymentExternalFee, String paymentTool, String paymentMaskedPan, String paymentBin, String paymentToken, String paymentSystem, String paymentSessionId, Integer paymentCountryId, Integer paymentCityId, String paymentIp, String paymentPhoneNumber, String paymentEmail, String paymentFingerprint, LocalDateTime paymentCreatedAt, byte[] paymentContext, String paymentAdjustmentId, AdjustmentStatus paymentAdjustmentStatus, LocalDateTime paymentAdjustmentStatusCreatedAt, LocalDateTime paymentAdjustmentCreatedAt, String paymentAdjustmentReason, Long paymentAdjustmentFee, Long paymentAdjustmentProviderFee, Long paymentAdjustmentExternalFee, String paymentFailureClass, String invoiceTemplateId, String invoiceCart, String paymentFlow, String paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentTerminalProvider, String paymentRefundId, InvoicePaymentRefundStatus paymentRefundStatus, LocalDateTime paymentRefundCreatedAt, String paymentRefundReason, Long paymentRefundFee, Long paymentRefundProviderFee, Long paymentRefundExternalFee) {
         super(InvoiceEventStat.INVOICE_EVENT_STAT);
 
         set(0, id);
@@ -1023,5 +1122,12 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
         set(61, paymentHoldOnExpiration);
         set(62, paymentHoldUntil);
         set(63, paymentTerminalProvider);
+        set(64, paymentRefundId);
+        set(65, paymentRefundStatus);
+        set(66, paymentRefundCreatedAt);
+        set(67, paymentRefundReason);
+        set(68, paymentRefundFee);
+        set(69, paymentRefundProviderFee);
+        set(70, paymentRefundExternalFee);
     }
 }

@@ -34,7 +34,9 @@ public enum InvoicePaymentStatus implements EnumType {
 
     cancelled("cancelled"),
 
-    failed("failed");
+    failed("failed"),
+
+    refunded("refunded");
 
     private final String literal;
 

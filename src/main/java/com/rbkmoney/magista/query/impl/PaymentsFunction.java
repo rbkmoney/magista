@@ -170,6 +170,8 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 return InvoicePaymentStatus.captured(new InvoicePaymentCaptured());
             case CANCELLED:
                 return InvoicePaymentStatus.cancelled(new InvoicePaymentCancelled());
+            case REFUNDED:
+                return InvoicePaymentStatus.refunded(new InvoicePaymentRefunded());
             case FAILED:
                 return InvoicePaymentStatus.failed(new InvoicePaymentFailed(
                         toOperationFailure(failureClass, externalFailureCode, externalFailureDescription)
