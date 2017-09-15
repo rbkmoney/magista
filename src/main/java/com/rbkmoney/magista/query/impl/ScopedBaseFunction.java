@@ -60,6 +60,10 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
         public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
             super.validateParameters(parameters);
             ScopedBaseParameters scopedParameters = super.checkParamsType(parameters, ScopedBaseParameters.class);
+
+            if (!StringUtils.hasLength(scopedParameters.getMerchantId()) && StringUtils.hasLength(scopedParameters.getShopId())) {
+                checkParamsResult(true, SHOP_ID_PARAM, "when searching by shop_id, merchant_id must be set");
+            }
         }
 
     }
