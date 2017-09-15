@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * Created by tolkonepiu on 29/05/2017.
  */
-public class AbstractDao extends NamedParameterJdbcDaoSupport {
+public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
 
     private final DSLContext dslContext;
 
@@ -35,7 +35,7 @@ public class AbstractDao extends NamedParameterJdbcDaoSupport {
         this.dslContext = DSL.using(configuration);
     }
 
-    public DSLContext getDslContext() {
+    protected DSLContext getDslContext() {
         return dslContext;
     }
 
@@ -139,7 +139,7 @@ public class AbstractDao extends NamedParameterJdbcDaoSupport {
         }
     }
 
-    public Condition appendConditions(Condition condition, Operator operator, ConditionParameterSource conditionParameterSource) {
+    protected Condition appendConditions(Condition condition, Operator operator, ConditionParameterSource conditionParameterSource) {
         for (ConditionParameterSource.ConditionField field : conditionParameterSource.getConditionFields()) {
             if (field.getValue() != null) {
                 condition = DSL.condition(operator, condition,
@@ -152,7 +152,7 @@ public class AbstractDao extends NamedParameterJdbcDaoSupport {
         return condition;
     }
 
-    public SqlParameterSource toSqlParameterSource(Map<String, Param<?>> params) {
+    protected SqlParameterSource toSqlParameterSource(Map<String, Param<?>> params) {
         MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
         for (Map.Entry<String, Param<?>> entry : params.entrySet()) {
             Param<?> param = entry.getValue();

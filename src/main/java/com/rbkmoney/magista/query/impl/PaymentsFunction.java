@@ -368,8 +368,8 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Collection<InvoiceEventStat> result = functionContext.getDao().getPayments(
-                        parameters.getMerchantId(),
-                        parameters.getShopId(),
+                        Optional.ofNullable(parameters.getMerchantId()),
+                        Optional.ofNullable(parameters.getShopId()),
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getPaymentStatus()),
@@ -406,8 +406,8 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Integer result = functionContext.getDao().getPaymentsCount(
-                        parameters.getMerchantId(),
-                        parameters.getShopId(),
+                        Optional.ofNullable(parameters.getMerchantId()),
+                        Optional.ofNullable(parameters.getShopId()),
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getPaymentStatus()),
