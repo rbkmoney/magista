@@ -59,7 +59,7 @@ public class DamselUtil {
     }
 
 
-    public static Map<CashFlowAccount._Fields, Long> calculateCommissions(List<FinalCashFlowPosting> finalCashFlowPostings) {
+    public static Map<PostingType, Long> calculateCommissions(List<FinalCashFlowPosting> finalCashFlowPostings) {
         return finalCashFlowPostings.stream()
                 .collect(
                         Collectors.groupingBy(
@@ -69,31 +69,37 @@ public class DamselUtil {
                 );
     }
 
-    public static CashFlowAccount._Fields getCommissionType(FinalCashFlowPosting cashFlowPosting) {
+    public static PostingType getCommissionType(FinalCashFlowPosting cashFlowPosting) {
         CashFlowAccount source = cashFlowPosting.getSource().getAccountType();
         CashFlowAccount destination = cashFlowPosting.getDestination().getAccountType();
 
         if (source.isSetProvider()
                 && destination.isSetMerchant()
                 && destination.getMerchant() == MerchantCashFlowAccount.settlement) {
-            return CashFlowAccount._Fields.MERCHANT;
+            return PostingType.AMOUNT;
+        }
+
+        if (source.isSetMerchant()
+                && source.getMerchant() == MerchantCashFlowAccount.settlement
+                && destination.isSetProvider()) {
+            return PostingType.REFUND_AMOUNT;
         }
 
         if (source.isSetMerchant()
                 && source.getMerchant() == MerchantCashFlowAccount.settlement
                 && destination.isSetSystem()) {
-            return CashFlowAccount._Fields.SYSTEM;
+            return PostingType.FEE;
         }
 
         if (source.isSetSystem()
                 && destination.isSetExternal()
                 && destination.getExternal() == ExternalCashFlowAccount.outcome) {
-            return CashFlowAccount._Fields.EXTERNAL;
+            return PostingType.EXTERNAL_FEE;
         }
 
         if (source.isSetSystem()
                 && destination.isSetProvider()) {
-            return CashFlowAccount._Fields.PROVIDER;
+            return PostingType.PROVIDER_FEE;
         }
 
         throw new IllegalArgumentException(String.format("Unknown posting path, source - '%s', destination - '%s'",
