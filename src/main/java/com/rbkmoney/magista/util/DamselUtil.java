@@ -92,8 +92,7 @@ public class DamselUtil {
         }
 
         if (source.isSetSystem()
-                && destination.isSetExternal()
-                && destination.getExternal() == ExternalCashFlowAccount.outcome) {
+                && destination.isSetExternal()) {
             return PostingType.EXTERNAL_FEE;
         }
 
@@ -103,8 +102,8 @@ public class DamselUtil {
         }
 
         throw new IllegalArgumentException(String.format("Unknown posting path, source - '%s', destination - '%s'",
-                source.getSetField(),
-                destination.getSetField()
+                source,
+                destination
         ));
     }
 

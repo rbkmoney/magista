@@ -5,17 +5,14 @@ import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.PartyException;
-import com.rbkmoney.woody.api.flow.error.WRuntimeException;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Collections;
 
 /**
  * Created by tolkonepiu on 29/05/2017.
@@ -32,13 +29,9 @@ public class PartyService {
     private final RetryTemplate retryTemplate;
 
     @Autowired
-    public PartyService(PartyManagementSrv.Iface partyManagementSrv) {
+    public PartyService(PartyManagementSrv.Iface partyManagementSrv, RetryTemplate retryTemplate) {
         this.partyManagementSrv = partyManagementSrv;
-
-        retryTemplate = new RetryTemplate();
-        retryTemplate.setRetryPolicy(
-                new SimpleRetryPolicy(3, Collections.singletonMap(WRuntimeException.class, true))
-        );
+        this.retryTemplate = retryTemplate;
     }
 
     public Party getParty(String partyId, Instant timestamp) throws NotFoundException, PartyException {
