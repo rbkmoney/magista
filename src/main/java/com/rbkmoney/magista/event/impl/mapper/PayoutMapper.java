@@ -40,8 +40,8 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
                     TBaseUtil.unionFieldToEnum(payout.getType(), PayoutType.class)
             );
 
-            if (payout.getType().isSetAccount()) {
-                PayoutAccount payoutAccount = payout.getType().getAccount();
+            if (payout.getType().isSetBankAccount()) {
+                PayoutAccount payoutAccount = payout.getType().getBankAccount();
                 BankAccount bankAccount = payoutAccount.getAccount();
 
                 payoutEventStat.setPayoutAccountBankId(bankAccount.getAccount());
@@ -51,8 +51,8 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
                 payoutEventStat.setPayoutAccountInn(payoutAccount.getInn());
             }
 
-            if (payout.getType().isSetCard()) {
-                PayoutCard payoutCard = payout.getType().getCard();
+            if (payout.getType().isSetBankCard()) {
+                PayoutCard payoutCard = payout.getType().getBankCard();
                 BankCard bankCard = payoutCard.getCard();
                 payoutEventStat.setPayoutCardToken(bankCard.getToken());
                 payoutEventStat.setPayoutCardMaskedPan(bankCard.getMaskedPan());

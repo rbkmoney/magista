@@ -53,7 +53,7 @@ public class PayoutEventStatDaoTest extends AbstractIntegrationTest {
         payoutEventStat.setPayoutCreatedAt(LocalDateTime.now());
         payoutEventStat.setPayoutStatus(PayoutStatus.paid);
         payoutEventStat.setPayoutAmount(Long.MAX_VALUE);
-        payoutEventStat.setPayoutType(PayoutType.account_payout);
+        payoutEventStat.setPayoutType(PayoutType.bank_account);
 
         payoutEventDao.insert(payoutEventStat);
 

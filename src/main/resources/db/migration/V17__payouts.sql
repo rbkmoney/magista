@@ -4,7 +4,7 @@ CREATE TYPE mst.PAYOUT_EVENT_TYPE AS ENUM ('PAYOUT_CREATED', 'PAYOUT_STATUS_CHAN
 
 CREATE TYPE mst.PAYOUT_STATUS AS ENUM ('unpaid', 'paid', 'cancelled', 'confirmed');
 
-CREATE TYPE mst.PAYOUT_TYPE AS ENUM ('card_payout', 'account_payout');
+CREATE TYPE mst.PAYOUT_TYPE AS ENUM ('bank_card', 'bank_account');
 
 CREATE TABLE mst.payout_event_stat (
   id                          BIGSERIAL                   NOT NULL,
