@@ -111,6 +111,7 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setPaymentExternalFee(rs.getLong("payment_external_fee"));
             invoiceEventStat.setPaymentProviderFee(rs.getLong("payment_provider_fee"));
             invoiceEventStat.setPaymentTool(rs.getString("payment_tool"));
+            invoiceEventStat.setPaymentTerminalProvider(rs.getString("payment_terminal_provider"));
             invoiceEventStat.setPaymentMaskedPan(rs.getString("payment_masked_pan"));
             invoiceEventStat.setPaymentBin(rs.getString("payment_bin"));
             invoiceEventStat.setPaymentToken(rs.getString("payment_token"));
@@ -142,6 +143,14 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setPaymentAdjustmentFee(rs.getLong("payment_adjustment_fee"));
             invoiceEventStat.setPaymentAdjustmentProviderFee(rs.getLong("payment_adjustment_provider_fee"));
             invoiceEventStat.setPaymentAdjustmentExternalFee(rs.getLong("payment_adjustment_external_fee"));
+            invoiceEventStat.setPaymentRefundId(rs.getString("payment_refund_id"));
+            invoiceEventStat.setPaymentRefundStatus(rs.getString("payment_refund_status") != null ?
+            InvoicePaymentRefundStatus.valueOf(rs.getString("payment_refund_status")) : null);
+            invoiceEventStat.setPaymentRefundCreatedAt(rs.getObject("payment_refund_created_at", LocalDateTime.class));
+            invoiceEventStat.setPaymentRefundReason(rs.getString("payment_refund_reason"));
+            invoiceEventStat.setPaymentRefundFee(rs.getLong("payment_refund_fee"));
+            invoiceEventStat.setPaymentRefundExternalFee(rs.getLong("payment_refund_external_fee"));
+            invoiceEventStat.setPaymentRefundProviderFee(rs.getLong("payment_refund_provider_fee"));
 
             return invoiceEventStat;
         };

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Map;
 
+import static com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider.euroset;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -126,6 +127,14 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
                 )
         );
         assertEquals(1, statResponse.getTotalCount());
+    }
+
+    @Test
+    public void testFindByPaymentMethodAndTerminalProvider() {
+        String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1', 'payment_method': 'payment_terminal', 'payment_terminal_provider':'euroset', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-26T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(1, statResponse.getTotalCount());
+        assertEquals(euroset, statResponse.getData().getPayments().get(0).getPaymentTool().getPaymentTerminal().getTerminalType());
     }
 
     @Test
