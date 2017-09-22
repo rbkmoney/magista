@@ -41,7 +41,7 @@ public class MerchantStatisticsHandler implements Iface {
 
     @Override
     public StatResponse getPayouts(StatRequest statRequest) throws InvalidRequest, DatasetTooBig, TException {
-        return null;
+        return getStatResponse(statRequest);
     }
 
     @Override
