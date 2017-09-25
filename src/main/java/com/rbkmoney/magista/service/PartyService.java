@@ -6,7 +6,10 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.PartyException;
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -17,25 +20,37 @@ import java.time.Instant;
 @Service
 public class PartyService {
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     private final UserInfo userInfo = new UserInfo("admin", UserType.internal_user(new InternalUser()));
 
     private final PartyManagementSrv.Iface partyManagementSrv;
 
+    private final RetryTemplate retryTemplate;
+
     @Autowired
-    public PartyService(PartyManagementSrv.Iface partyManagementSrv) {
+    public PartyService(PartyManagementSrv.Iface partyManagementSrv, RetryTemplate retryTemplate) {
         this.partyManagementSrv = partyManagementSrv;
+        this.retryTemplate = retryTemplate;
     }
 
     public Party getParty(String partyId, Instant timestamp) throws NotFoundException, PartyException {
-        try {
-            return partyManagementSrv.checkout(userInfo, partyId, TypeUtil.temporalToString(timestamp));
-        } catch (PartyNotFound ex) {
-            throw new NotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
-        } catch (PartyNotExistsYet ex) {
-            throw new NotFoundException(String.format("Party not exists at this time, partyId='%s', timestamp='%s'", partyId, timestamp), ex);
-        } catch (TException ex) {
-            throw new PartyException("Exception with get party from hg", ex);
-        }
+        return retryTemplate.execute(context -> {
+                    if (context.getLastThrowable() != null) {
+                        log.error("Failed to get party (partyId='{}', timestamp='{}'), retrying ({})...", partyId, timestamp, context.getRetryCount(), context.getLastThrowable());
+                    }
+
+                    try {
+                        return partyManagementSrv.checkout(userInfo, partyId, TypeUtil.temporalToString(timestamp));
+                    } catch (PartyNotFound ex) {
+                        throw new NotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
+                    } catch (PartyNotExistsYet ex) {
+                        throw new NotFoundException(String.format("Party not exists at this time, partyId='%s', timestamp='%s'", partyId, timestamp), ex);
+                    } catch (TException ex) {
+                        throw new PartyException("Exception with get party from hg", ex);
+                    }
+                }
+        );
     }
 
 }
