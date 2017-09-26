@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
-import com.rbkmoney.damsel.domain.CashFlowAccount;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentRefundCreated;
@@ -13,6 +12,7 @@ import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.util.DamselUtil;
+import com.rbkmoney.magista.util.PostingType;
 
 import java.util.Map;
 
@@ -49,11 +49,11 @@ public class PaymentRefundMapper implements Mapper<InvoiceEventContext> {
                 TypeUtil.stringToLocalDateTime(refund.getCreatedAt())
         );
 
-        Map<CashFlowAccount._Fields, Long> commissions = DamselUtil.calculateCommissions(invoicePaymentRefundCreated.getCashFlow());
+        Map<PostingType, Long> commissions = DamselUtil.calculateCommissions(invoicePaymentRefundCreated.getCashFlow());
 
-        paymentRefundEventStat.setPaymentRefundFee(commissions.get(CashFlowAccount._Fields.SYSTEM));
-        paymentRefundEventStat.setPaymentRefundProviderFee(commissions.get(CashFlowAccount._Fields.PROVIDER));
-        paymentRefundEventStat.setPaymentRefundExternalFee(commissions.get(CashFlowAccount._Fields.EXTERNAL));
+        paymentRefundEventStat.setPaymentRefundFee(commissions.get(PostingType.FEE));
+        paymentRefundEventStat.setPaymentRefundProviderFee(commissions.get(PostingType.PROVIDER_FEE));
+        paymentRefundEventStat.setPaymentRefundExternalFee(commissions.get(PostingType.EXTERNAL_FEE));
 
         return context.setInvoiceEventStat(paymentRefundEventStat);
     }
