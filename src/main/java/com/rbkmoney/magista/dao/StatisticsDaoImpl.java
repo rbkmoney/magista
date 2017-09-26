@@ -53,6 +53,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> paymentIp,
             Optional<String> paymentFingerprint,
             Optional<String> paymentPanMask,
+            Optional<String> paymentCustomerId,
             Optional<Instant> fromTime,
             Optional<Instant> toTime,
             Optional<Integer> limit,
@@ -82,6 +83,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 paymentFingerprint,
                 paymentPanMask,
                 paymentAmount,
+                paymentCustomerId,
                 Optional.empty(),
                 Optional.empty()
         );
@@ -110,6 +112,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> paymentIp,
             Optional<String> paymentFingerprint,
             Optional<String> paymentPanMask,
+            Optional<String> paymentCustomerId,
             Optional<Instant> fromTime,
             Optional<Instant> toTime,
             Optional<Integer> limit,
@@ -139,6 +142,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 paymentFingerprint,
                 paymentPanMask,
                 paymentAmount,
+                paymentCustomerId,
                 Optional.empty(),
                 Optional.empty()
         );
@@ -162,6 +166,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> paymentFingerprint,
             Optional<String> paymentPanMask,
             Optional<Long> paymentAmount,
+            Optional<String> paymentCustomerId,
             Optional<Instant> fromTime,
             Optional<Instant> toTime,
             Optional<Integer> limit,
@@ -181,6 +186,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 paymentFingerprint,
                 paymentPanMask,
                 paymentAmount,
+                paymentCustomerId,
                 fromTime,
                 toTime
         );
@@ -207,6 +213,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> paymentFingerprint,
             Optional<String> paymentPanMask,
             Optional<Long> paymentAmount,
+            Optional<String> paymentCustomerId,
             Optional<Instant> fromTime,
             Optional<Instant> toTime,
             Optional<Integer> limit,
@@ -226,6 +233,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 paymentFingerprint,
                 paymentPanMask,
                 paymentAmount,
+                paymentCustomerId,
                 fromTime,
                 toTime
         );
@@ -426,6 +434,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> paymentFingerprint,
             Optional<String> paymentPanMask,
             Optional<Long> paymentAmount,
+            Optional<String> paymentCustomerId,
             Optional<Instant> fromTime,
             Optional<Instant> toTime
     ) {
@@ -446,7 +455,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_IP, paymentIp.orElse(null), Comparator.LIKE)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, paymentFingerprint.orElse(null), Comparator.LIKE)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, paymentPanMask.orElse(null), Comparator.LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, paymentPanMask.orElse(null), Comparator.LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID, paymentCustomerId.orElse(null), Comparator.EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
                         fromTime.isPresent() ? LocalDateTime.ofInstant(fromTime.get(), ZoneOffset.UTC) : null,
                         Comparator.GREATER_OR_EQUAL)
