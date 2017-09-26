@@ -61,14 +61,9 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
             super.validateParameters(parameters);
             ScopedBaseParameters scopedParameters = super.checkParamsType(parameters, ScopedBaseParameters.class);
 
-            if (!StringUtils.hasLength(scopedParameters.getMerchantId())) {
-                checkParamsResult(true, MERCHANT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            if (!StringUtils.hasLength(scopedParameters.getMerchantId()) && StringUtils.hasLength(scopedParameters.getShopId())) {
+                checkParamsResult(true, SHOP_ID_PARAM, "when searching by shop_id, merchant_id must be set");
             }
-
-            if (scopedParameters.getShopId() == null) {
-                checkParamsResult(true, SHOP_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
-            }
-
         }
 
     }
