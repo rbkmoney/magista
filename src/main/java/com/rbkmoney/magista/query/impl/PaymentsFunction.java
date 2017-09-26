@@ -90,18 +90,25 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         statPayment.setFee(invoicePaymentStat.getPaymentFee());
         statPayment.setCurrencySymbolicCode(invoicePaymentStat.getPaymentCurrencyCode());
 
-        statPayment.setPaymentTool(toStatPaymentTool(
-                com.rbkmoney.damsel.domain.PaymentTool._Fields.findByName(
-                        invoicePaymentStat.getPaymentTool()
-                ),
-                invoicePaymentStat
-        ));
+        if (invoicePaymentStat.getPaymentTool() != null) {
+            PaymentResourcePayer paymentResourcePayer = new PaymentResourcePayer();
+            PaymentTool paymentTool = toStatPaymentTool(
+                    com.rbkmoney.damsel.domain.PaymentTool._Fields.findByName(
+                            invoicePaymentStat.getPaymentTool()
+                    ),
+                    invoicePaymentStat
+            );
+            paymentResourcePayer.setPaymentTool(paymentTool);
+            paymentResourcePayer.setIpAddress(invoicePaymentStat.getPaymentIp());
+            paymentResourcePayer.setFingerprint(invoicePaymentStat.getPaymentFingerprint());
+            paymentResourcePayer.setPhoneNumber(invoicePaymentStat.getPaymentPhoneNumber());
+            paymentResourcePayer.setEmail(invoicePaymentStat.getPaymentEmail());
+            paymentResourcePayer.setSessionId(invoicePaymentStat.getPaymentSessionId());
 
-        statPayment.setIpAddress(invoicePaymentStat.getPaymentIp());
-        statPayment.setFingerprint(invoicePaymentStat.getPaymentFingerprint());
-        statPayment.setPhoneNumber(invoicePaymentStat.getPaymentPhoneNumber());
-        statPayment.setEmail(invoicePaymentStat.getPaymentEmail());
-        statPayment.setSessionId(invoicePaymentStat.getPaymentSessionId());
+            statPayment.setPayer(Payer.payment_resource(paymentResourcePayer));
+        } else if (invoicePaymentStat.getPaymentCustomerId() != null) {
+            statPayment.setPayer(Payer.customer(new CustomerPayer(invoicePaymentStat.getPaymentCustomerId())));
+        }
 
         if (invoicePaymentStat.getPaymentContext() != null) {
             Content content = new Content();
