@@ -145,7 +145,7 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setPaymentAdjustmentExternalFee(rs.getLong("payment_adjustment_external_fee"));
             invoiceEventStat.setPaymentRefundId(rs.getString("payment_refund_id"));
             invoiceEventStat.setPaymentRefundStatus(rs.getString("payment_refund_status") != null ?
-            InvoicePaymentRefundStatus.valueOf(rs.getString("payment_refund_status")) : null);
+                    InvoicePaymentRefundStatus.valueOf(rs.getString("payment_refund_status")) : null);
             invoiceEventStat.setPaymentRefundCreatedAt(rs.getObject("payment_refund_created_at", LocalDateTime.class));
             invoiceEventStat.setPaymentRefundReason(rs.getString("payment_refund_reason"));
             invoiceEventStat.setPaymentRefundFee(rs.getLong("payment_refund_fee"));

@@ -91,9 +91,15 @@ public class JsonQueryParserTest {
         parser.parseQuery(json);
     }
 
+    @Test
+    public void testWithoutShopAndMerchantId() throws Exception {
+        String json = "{'query': {'payments': {'invoice_id':'A','payment_id':'B', 'payment_pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
+        parser.parseQuery(json);
+    }
+
     @Test(expected = QueryParserException.class)
-    public void testPaymentsShopParseError() throws Exception {
-        String json = "{'query': {'payments': {'merchant_id': '1','invoice_id':'A','payment_id':'B', 'payment_pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
+    public void testWithoutMerchantButWithShopId() throws Exception {
+        String json = "{'query': {'payments': {'shop_id':'C','invoice_id':'A','payment_id':'B', 'payment_pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
         parser.parseQuery(json);
     }
 
@@ -151,12 +157,6 @@ public class JsonQueryParserTest {
     @Test(expected = QueryParserException.class)
     public void testInvoicesTimeParseError() throws Exception {
         String json = "{'query': {'invoices': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T00:00:00Z'}}}";
-        parser.parseQuery(json);
-    }
-
-    @Test(expected = QueryParserException.class)
-    public void testInvoicesMerchantParseError() throws Exception {
-        String json = "{'query': {'invoices': {'shop_id': '1','invoice_id':'A','payment_id':'B', 'payment_pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
         parser.parseQuery(json);
     }
 

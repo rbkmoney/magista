@@ -38,8 +38,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Collection<InvoiceEventStat> getInvoices(
-            String merchantId,
-            String shopId,
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> invoiceStatus,
@@ -59,6 +59,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset) throws DaoException {
 
         ConditionParameterSource invoiceSource = buildOptionalInvoiceParameters(
+                merchantId,
+                shopId,
                 invoiceId,
                 invoiceStatus,
                 invoiceAmount,
@@ -67,6 +69,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         );
 
         ConditionParameterSource paymentSource = buildOptionalPaymentParameters(
+                merchantId,
+                shopId,
                 invoiceId,
                 paymentId,
                 paymentStatus,
@@ -82,8 +86,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 Optional.empty()
         );
 
-        Query query = buildInvoiceSelectConditionStepQuery(merchantId, shopId,
-                invoiceSource, paymentSource)
+        Query query = buildInvoiceSelectConditionStepQuery(invoiceSource, paymentSource)
                 .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
@@ -92,8 +95,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public int getInvoicesCount(
-            String merchantId,
-            String shopId,
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> invoiceStatus,
@@ -113,6 +116,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset) throws DaoException {
 
         ConditionParameterSource invoiceSource = buildOptionalInvoiceParameters(
+                merchantId,
+                shopId,
                 invoiceId,
                 invoiceStatus,
                 invoiceAmount,
@@ -121,6 +126,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         );
 
         ConditionParameterSource paymentSource = buildOptionalPaymentParameters(
+                merchantId,
+                shopId,
                 invoiceId,
                 paymentId,
                 paymentStatus,
@@ -136,15 +143,14 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 Optional.empty()
         );
 
-        Query query = buildInvoiceSelectConditionStepQuery(merchantId, shopId,
-                invoiceSource, paymentSource, DSL.count());
+        Query query = buildInvoiceSelectConditionStepQuery(invoiceSource, paymentSource, DSL.count());
         return fetchOne(query, Integer.class);
     }
 
     @Override
     public Collection<InvoiceEventStat> getPayments(
-            String merchantId,
-            String shopId,
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
@@ -162,6 +168,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset) throws DaoException {
 
         ConditionParameterSource paymentSource = buildOptionalPaymentParameters(
+                merchantId,
+                shopId,
                 invoiceId,
                 paymentId,
                 paymentStatus,
@@ -177,7 +185,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 toTime
         );
 
-        Query query = buildPaymentSelectConditionStepQuery(merchantId, shopId, paymentSource)
+        Query query = buildPaymentSelectConditionStepQuery(paymentSource)
                 .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
@@ -186,8 +194,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Integer getPaymentsCount(
-            String merchantId,
-            String shopId,
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
@@ -205,6 +213,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset) throws DaoException {
 
         ConditionParameterSource parameterSource = buildOptionalPaymentParameters(
+                merchantId,
+                shopId,
                 invoiceId,
                 paymentId,
                 paymentStatus,
@@ -220,7 +230,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 toTime
         );
 
-        Query query = buildPaymentSelectConditionStepQuery(merchantId, shopId, parameterSource, DSL.count());
+        Query query = buildPaymentSelectConditionStepQuery(parameterSource, DSL.count());
         return fetchOne(query, Integer.class);
     }
 
@@ -338,13 +348,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     private SelectConditionStep buildPaymentSelectConditionStepQuery(
-            String merchantId,
-            String shopId,
             ConditionParameterSource paymentParameterSource,
             SelectField<?>... fields) {
-        Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)
-                .and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId))
-                .and(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(shopId));
+        Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT);
 
         condition = appendConditions(condition, Operator.AND, paymentParameterSource);
 
@@ -352,25 +358,24 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .where(condition);
     }
 
-    private SelectConditionStep buildInvoiceSelectConditionStepQuery(String merchantId,
-                                                                     String shopId,
-                                                                     ConditionParameterSource invoiceSource,
+    private SelectConditionStep buildInvoiceSelectConditionStepQuery(ConditionParameterSource invoiceSource,
                                                                      ConditionParameterSource paymentSource,
                                                                      SelectField<?>... fields) {
-        Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE)
-                .and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId))
-                .and(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(shopId));
+        Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE);
 
         long paymentParamsCount = paymentSource
                 .getConditionFields()
                 .stream()
-                .filter(t -> t.getField() != INVOICE_EVENT_STAT.INVOICE_ID)
+                .filter(
+                        t -> t.getField() != INVOICE_EVENT_STAT.INVOICE_ID
+                                && t.getField() != INVOICE_EVENT_STAT.PARTY_ID
+                                && t.getField() != INVOICE_EVENT_STAT.PARTY_SHOP_ID
+                )
                 .count();
 
         if (paymentParamsCount > 0) {
             condition = condition.and(INVOICE_EVENT_STAT.INVOICE_ID
-                    .in(buildPaymentSelectConditionStepQuery(merchantId,
-                            shopId,
+                    .in(buildPaymentSelectConditionStepQuery(
                             paymentSource,
                             INVOICE_EVENT_STAT.INVOICE_ID)));
         }
@@ -383,6 +388,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     private ConditionParameterSource buildOptionalInvoiceParameters(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> invoiceStatus,
             Optional<Long> invoiceAmount,
@@ -390,6 +397,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Instant> toTime
     ) {
         return new ConditionParameterSource()
+                .addValue(INVOICE_EVENT_STAT.PARTY_ID, merchantId.orElse(null), Comparator.EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PARTY_SHOP_ID, shopId.orElse(null), Comparator.EQUALS)
                 .addValue(INVOICE_EVENT_STAT.INVOICE_ID, invoiceId.orElse(null), Comparator.EQUALS)
                 .addValue(INVOICE_EVENT_STAT.INVOICE_STATUS,
                         invoiceStatus.isPresent() ? InvoiceStatus.valueOf(invoiceStatus.get()) : null,
@@ -404,6 +413,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     private ConditionParameterSource buildOptionalPaymentParameters(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
@@ -419,6 +430,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Instant> toTime
     ) {
         return new ConditionParameterSource()
+                .addValue(INVOICE_EVENT_STAT.PARTY_ID, merchantId.orElse(null), Comparator.EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PARTY_SHOP_ID, shopId.orElse(null), Comparator.EQUALS)
                 .addValue(INVOICE_EVENT_STAT.INVOICE_ID, invoiceId.orElse(null), Comparator.EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_ID, paymentId.orElse(null), Comparator.EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_STATUS,
