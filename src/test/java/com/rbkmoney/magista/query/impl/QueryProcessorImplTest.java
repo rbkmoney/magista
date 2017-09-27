@@ -130,6 +130,20 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testPaymentsWithoutMerchantAndShopId() {
+        String json = "{'query': {'payments': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(8, statResponse.getTotalCount());
+    }
+
+    @Test
+    public void testInvoicesWithoutMerchantAndShopId() {
+        String json = "{'query': {'invoices': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(8, statResponse.getTotalCount());
+    }
+
+    @Test
     public void testFindByPaymentMethodAndTerminalProvider() {
         String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1', 'payment_method': 'payment_terminal', 'payment_terminal_provider':'euroset', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);

@@ -18,7 +18,7 @@ public class ConditionParameterSource {
     }
 
     public <T> ConditionParameterSource addValue(Field<T> field, T value, Comparator comparator) {
-        if(value != null) {
+        if (value != null) {
             ConditionField conditionField = new ConditionField(field, value, comparator);
             conditionFields.add(conditionField);
         }

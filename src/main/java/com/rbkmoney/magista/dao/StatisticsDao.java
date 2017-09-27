@@ -14,8 +14,8 @@ import java.util.Optional;
  */
 public interface StatisticsDao {
     Collection<InvoiceEventStat> getInvoices(
-            String merchantId,
-            String shopId,
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> invoiceStatus,
@@ -35,8 +35,8 @@ public interface StatisticsDao {
             Optional<Integer> offset
     ) throws DaoException;
 
-    int getInvoicesCount(String merchantId,
-                         String shopId,
+    int getInvoicesCount(Optional<String> merchantId,
+                         Optional<String> shopId,
                          Optional<String> invoiceId,
                          Optional<String> paymentId,
                          Optional<String> invoiceStatus,
@@ -56,8 +56,8 @@ public interface StatisticsDao {
                          Optional<Integer> offset) throws DaoException;
 
     Collection<InvoiceEventStat> getPayments(
-            String merchantId,
-            String shopId,
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
@@ -76,8 +76,8 @@ public interface StatisticsDao {
     ) throws DaoException;
 
     Integer getPaymentsCount(
-            String merchantId,
-            String shopId,
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
