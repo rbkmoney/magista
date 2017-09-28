@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentAdjustment;
+import com.rbkmoney.damsel.domain.MerchantCashFlowAccount;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentAdjustmentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
@@ -10,7 +11,7 @@ import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.util.DamselUtil;
-import com.rbkmoney.magista.util.PostingType;
+import com.rbkmoney.magista.util.FeeType;
 
 import java.util.Map;
 
@@ -46,12 +47,18 @@ public class PaymentAdjustmentMapper implements Mapper<InvoiceEventContext> {
                 DamselUtil.getAdjustmentStatusCreatedAt(adjustment.getStatus())
         );
 
-        Map<PostingType, Long> commissions = DamselUtil.calculateCommissions(adjustment.getNewCashFlow());
+        invoiceEventStat.setPaymentAmount(
+                DamselUtil.getAmount(adjustment.getNewCashFlow(),
+                        posting -> posting.getSource().getAccountType().isSetProvider()
+                                && posting.getDestination().getAccountType().isSetMerchant()
+                                && posting.getDestination().getAccountType().getMerchant() == MerchantCashFlowAccount.settlement)
+        );
 
-        invoiceEventStat.setPaymentAmount(commissions.get(PostingType.AMOUNT));
-        invoiceEventStat.setPaymentAdjustmentFee(commissions.get(PostingType.FEE));
-        invoiceEventStat.setPaymentAdjustmentProviderFee(commissions.get(PostingType.PROVIDER_FEE));
-        invoiceEventStat.setPaymentAdjustmentExternalFee(commissions.get(PostingType.EXTERNAL_FEE));
+        Map<FeeType, Long> fees = DamselUtil.getFees(adjustment.getNewCashFlow());
+
+        invoiceEventStat.setPaymentAdjustmentFee(fees.get(FeeType.FEE));
+        invoiceEventStat.setPaymentAdjustmentProviderFee(fees.get(FeeType.PROVIDER_FEE));
+        invoiceEventStat.setPaymentAdjustmentExternalFee(fees.get(FeeType.EXTERNAL_FEE));
 
         invoiceEventStat.setPaymentAdjustmentCreatedAt(
                 TypeUtil.stringToLocalDateTime(adjustment.getCreatedAt())

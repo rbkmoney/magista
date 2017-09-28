@@ -6,6 +6,7 @@ import com.rbkmoney.eventstock.client.EventPublisher;
 import com.rbkmoney.eventstock.client.SubscriberConfig;
 import com.rbkmoney.eventstock.client.poll.EventFlowFilter;
 import com.rbkmoney.magista.service.InvoiceEventService;
+import com.rbkmoney.magista.service.PayoutEventService;
 import com.rbkmoney.magista.service.ProcessingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -23,18 +24,23 @@ public class OnStart implements ApplicationListener<ApplicationReadyEvent> {
     private final EventPublisher processingEventPublisher;
     private final EventPublisher payoutEventPublisher;
 
-    private final InvoiceEventService invoiceEventService;
     private final ProcessingService processingService;
+
+    private final InvoiceEventService invoiceEventService;
+    private final PayoutEventService payoutEventService;
 
     @Autowired
     public OnStart(EventPublisher processingEventPublisher,
                    EventPublisher payoutEventPublisher,
                    ProcessingService processingService,
-                   InvoiceEventService invoiceEventService) {
+                   InvoiceEventService invoiceEventService,
+                   PayoutEventService payoutEventService) {
         this.processingEventPublisher = processingEventPublisher;
         this.payoutEventPublisher = payoutEventPublisher;
 
         this.invoiceEventService = invoiceEventService;
+        this.payoutEventService = payoutEventService;
+
         this.processingService = processingService;
     }
 
@@ -50,7 +56,7 @@ public class OnStart implements ApplicationListener<ApplicationReadyEvent> {
     }
 
     private void subscribeToPayoutEventStock() {
-        payoutEventPublisher.subscribe(buildSubscriberConfig(Optional.of(0L)));
+        payoutEventPublisher.subscribe(buildSubscriberConfig(payoutEventService.getLastEventId()));
     }
 
     private SubscriberConfig buildSubscriberConfig(Optional<Long> lastEventIdOptional) {

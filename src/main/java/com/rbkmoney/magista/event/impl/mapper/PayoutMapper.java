@@ -2,7 +2,6 @@ package com.rbkmoney.magista.event.impl.mapper;
 
 import com.rbkmoney.damsel.domain.BankAccount;
 import com.rbkmoney.damsel.domain.BankCard;
-import com.rbkmoney.damsel.domain.CashFlowAccount;
 import com.rbkmoney.damsel.payout_processing.*;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
@@ -14,6 +13,7 @@ import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.PayoutEventContext;
 import com.rbkmoney.magista.util.DamselUtil;
+import com.rbkmoney.magista.util.FeeType;
 
 import java.util.Map;
 
@@ -67,14 +67,16 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
                     TypeUtil.stringToLocalDateTime(payout.getCreatedAt())
             );
 
+            payoutEventStat.setPayoutAmount(DamselUtil.getAmount(payout.getPayoutFlow(),
+                    posting -> posting.getSource().getAccountType().isSetMerchant()
+                            && posting.getDestination().getAccountType().isSetMerchant()));
+
             //TODO merchant -> provider
-            Map<CashFlowAccount._Fields, Long> commissions = DamselUtil.calculateCommissions(payout.getPayoutFlow());
-            payoutEventStat.setPayoutAmount(commissions.get(CashFlowAccount._Fields.MERCHANT));
-            payoutEventStat.setPayoutFee(commissions.get(CashFlowAccount._Fields.SYSTEM));
+            Map<FeeType, Long> commissions = DamselUtil.getFees(payout.getPayoutFlow());
+            payoutEventStat.setPayoutFee(commissions.get(FeeType.FEE));
+
             //TODO Shit
             payoutEventStat.setPayoutCurrencyCode(payout.getPayoutFlow().get(0).getVolume().getCurrency().getSymbolicCode());
-            //TODO only provider fee?
-//            payoutEventStat.setPayoutProviderFee
             payoutEventStat.setPartyId(payout.getPartyId());
             payoutEventStat.setPartyShopId(payout.getShopId());
         }
