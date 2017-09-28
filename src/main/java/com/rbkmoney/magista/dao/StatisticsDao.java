@@ -96,8 +96,8 @@ public interface StatisticsDao {
     ) throws DaoException;
 
     Collection<PayoutEventStat> getPayouts(
-            String merchantId,
-            String shopId,
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> payoutId,
             Optional<String> payoutStatus,
             Optional<String> payoutType,
@@ -108,8 +108,8 @@ public interface StatisticsDao {
     ) throws DaoException;
 
     Integer getPayoutsCount(
-            String merchantId,
-            String shopId,
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> payoutId,
             Optional<String> payoutStatus,
             Optional<String> payoutType,

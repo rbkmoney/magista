@@ -260,8 +260,8 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
             PayoutsParameters parameters = new PayoutsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Collection<PayoutEventStat> result = functionContext.getDao().getPayouts(
-                        parameters.getMerchantId(),
-                        parameters.getShopId(),
+                        Optional.ofNullable(parameters.getMerchantId()),
+                        Optional.ofNullable(parameters.getShopId()),
                         Optional.ofNullable(parameters.getPayoutId()),
                         Optional.ofNullable(parameters.getPayoutStatus()),
                         Optional.ofNullable(parameters.getPayoutType()),
@@ -290,8 +290,8 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
             PayoutsParameters parameters = new PayoutsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Integer result = functionContext.getDao().getPayoutsCount(
-                        parameters.getMerchantId(),
-                        parameters.getShopId(),
+                        Optional.ofNullable(parameters.getMerchantId()),
+                        Optional.ofNullable(parameters.getShopId()),
                         Optional.ofNullable(parameters.getPayoutId()),
                         Optional.ofNullable(parameters.getPayoutStatus()),
                         Optional.ofNullable(parameters.getPayoutType()),

@@ -97,10 +97,7 @@ public class DamselUtil {
             return FeeType.PROVIDER_FEE;
         }
 
-        throw new IllegalArgumentException(String.format("Unknown posting path, source - '%s', destination - '%s'",
-                source,
-                destination
-        ));
+        return FeeType.UNKNOWN;
     }
 
 }

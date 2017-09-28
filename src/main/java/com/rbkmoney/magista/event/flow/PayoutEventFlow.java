@@ -24,7 +24,7 @@ public class PayoutEventFlow extends AbstractEventFlow {
                 Handler handler = getHandler(payoutChange);
                 if (handler != null) {
                     log.info("Start payout event handling, id='{}', type='{}'",
-                            stockEvent.getSourceEvent().getProcessingEvent().getId(), handler.getChangeType());
+                            stockEvent.getSourceEvent().getPayoutEvent().getId(), handler.getChangeType());
                     submitAndPutInQueue(() -> handler.handle(payoutChange, stockEvent));
                 }
             }

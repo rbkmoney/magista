@@ -237,8 +237,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Collection<PayoutEventStat> getPayouts(
-            String merchantId,
-            String shopId,
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> payoutId,
             Optional<String> payoutStatus,
             Optional<String> payoutType,
@@ -248,6 +248,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset) throws DaoException {
 
         ConditionParameterSource parameterSource = buildOptionalPayoutParameters(
+                merchantId,
+                shopId,
                 payoutId,
                 payoutStatus,
                 payoutType,
@@ -255,7 +257,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 toTime
         );
 
-        Query query = buildPayoutSelectConditionStepQuery(merchantId, shopId, parameterSource)
+        Query query = buildPayoutSelectConditionStepQuery(parameterSource)
                 .orderBy(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
@@ -265,8 +267,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Integer getPayoutsCount(
-            String merchantId,
-            String shopId,
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> payoutId,
             Optional<String> payoutStatus,
             Optional<String> payoutType,
@@ -276,6 +278,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset) throws DaoException {
 
         ConditionParameterSource parameterSource = buildOptionalPayoutParameters(
+                merchantId,
+                shopId,
                 payoutId,
                 payoutStatus,
                 payoutType,
@@ -283,7 +287,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 toTime
         );
 
-        Query query = buildPayoutSelectConditionStepQuery(merchantId, shopId, parameterSource, DSL.count());
+        Query query = buildPayoutSelectConditionStepQuery(parameterSource, DSL.count());
         return fetchOne(query, Integer.class);
     }
 
@@ -509,13 +513,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     private SelectConditionStep buildPayoutSelectConditionStepQuery(
-            String merchantId,
-            String shopId,
             ConditionParameterSource paymentParameterSource,
             SelectField<?>... fields) {
-        Condition condition = PAYOUT_EVENT_STAT.EVENT_CATEGORY.eq(PayoutEventCategory.PAYOUT)
-                .and(PAYOUT_EVENT_STAT.PARTY_ID.eq(merchantId))
-                .and(PAYOUT_EVENT_STAT.PARTY_SHOP_ID.eq(shopId));
+        Condition condition = PAYOUT_EVENT_STAT.EVENT_CATEGORY.eq(PayoutEventCategory.PAYOUT);
 
         condition = appendConditions(condition, Operator.AND, paymentParameterSource);
 
@@ -524,6 +524,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     private ConditionParameterSource buildOptionalPayoutParameters(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             Optional<String> payoutId,
             Optional<String> payoutStatus,
             Optional<String> payoutType,
@@ -531,6 +533,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Instant> toTime
     ) {
         return new ConditionParameterSource()
+                .addValue(PAYOUT_EVENT_STAT.PARTY_ID, merchantId.orElse(null), Comparator.EQUALS)
+                .addValue(PAYOUT_EVENT_STAT.PARTY_SHOP_ID, shopId.orElse(null), Comparator.EQUALS)
                 .addValue(PAYOUT_EVENT_STAT.PAYOUT_ID, payoutId.orElse(null), Comparator.EQUALS)
                 .addValue(PAYOUT_EVENT_STAT.PAYOUT_STATUS,
                         payoutStatus.isPresent() ? PayoutStatus.valueOf(payoutStatus.get()) : null,
