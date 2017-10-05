@@ -28,6 +28,7 @@ public abstract class AbstractEventFlow {
 
     public AbstractEventFlow(String name, List<Handler> handlers, int threadPoolSize, int queueLimit, long timeout) {
         this.threadGroup = new ThreadGroup(name + "Flow");
+        this.threadGroup.setDaemon(true);
         this.handlers = handlers;
         this.queue = new LinkedBlockingQueue<>(queueLimit);
         this.executorService = Executors.newFixedThreadPool(threadPoolSize, new ThreadFactory() {
