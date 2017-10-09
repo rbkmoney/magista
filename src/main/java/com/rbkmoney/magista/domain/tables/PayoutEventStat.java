@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = -1235648841;
+    private static final long serialVersionUID = 1412515555;
 
     /**
      * The reference instance of <code>mst.payout_event_stat</code>
@@ -161,9 +161,24 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
     public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_BANK_BIK = createField("payout_account_bank_bik", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
+     * The column <code>mst.payout_event_stat.payout_account_bank_name</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_BANK_NAME = createField("payout_account_bank_name", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
      * The column <code>mst.payout_event_stat.payout_account_inn</code>.
      */
     public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_INN = createField("payout_account_inn", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_account_legal_agreement_id</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_LEGAL_AGREEMENT_ID = createField("payout_account_legal_agreement_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_account_legal_agreement_signed_at</code>.
+     */
+    public final TableField<PayoutEventStatRecord, LocalDateTime> PAYOUT_ACCOUNT_LEGAL_AGREEMENT_SIGNED_AT = createField("payout_account_legal_agreement_signed_at", org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
 
     /**
      * The column <code>mst.payout_event_stat.payout_account_purpose</code>.

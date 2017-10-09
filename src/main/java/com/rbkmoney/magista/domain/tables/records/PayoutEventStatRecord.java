@@ -31,7 +31,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = -48674668;
+    private static final long serialVersionUID = 986112190;
 
     /**
      * Setter for <code>mst.payout_event_stat.id</code>.
@@ -328,45 +328,87 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
     }
 
     /**
+     * Setter for <code>mst.payout_event_stat.payout_account_bank_name</code>.
+     */
+    public void setPayoutAccountBankName(String value) {
+        set(21, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_bank_name</code>.
+     */
+    public String getPayoutAccountBankName() {
+        return (String) get(21);
+    }
+
+    /**
      * Setter for <code>mst.payout_event_stat.payout_account_inn</code>.
      */
     public void setPayoutAccountInn(String value) {
-        set(21, value);
+        set(22, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_account_inn</code>.
      */
     public String getPayoutAccountInn() {
-        return (String) get(21);
+        return (String) get(22);
+    }
+
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_account_legal_agreement_id</code>.
+     */
+    public void setPayoutAccountLegalAgreementId(String value) {
+        set(23, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_legal_agreement_id</code>.
+     */
+    public String getPayoutAccountLegalAgreementId() {
+        return (String) get(23);
+    }
+
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_account_legal_agreement_signed_at</code>.
+     */
+    public void setPayoutAccountLegalAgreementSignedAt(LocalDateTime value) {
+        set(24, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_legal_agreement_signed_at</code>.
+     */
+    public LocalDateTime getPayoutAccountLegalAgreementSignedAt() {
+        return (LocalDateTime) get(24);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_account_purpose</code>.
      */
     public void setPayoutAccountPurpose(String value) {
-        set(22, value);
+        set(25, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_account_purpose</code>.
      */
     public String getPayoutAccountPurpose() {
-        return (String) get(22);
+        return (String) get(25);
     }
 
     /**
      * Setter for <code>mst.payout_event_stat.payout_cancel_details</code>.
      */
     public void setPayoutCancelDetails(String value) {
-        set(23, value);
+        set(26, value);
     }
 
     /**
      * Getter for <code>mst.payout_event_stat.payout_cancel_details</code>.
      */
     public String getPayoutCancelDetails() {
-        return (String) get(23);
+        return (String) get(26);
     }
 
     // -------------------------------------------------------------------------
@@ -395,7 +437,7 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
     /**
      * Create a detached, initialised PayoutEventStatRecord
      */
-    public PayoutEventStatRecord(Long id, Long eventId, PayoutEventCategory eventCategory, PayoutEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyShopId, String payoutId, LocalDateTime payoutCreatedAt, PayoutStatus payoutStatus, Long payoutAmount, Long payoutFee, String payoutCurrencyCode, PayoutType payoutType, String payoutCardToken, String payoutCardMaskedPan, String payoutCardBin, String payoutCardPaymentSystem, String payoutAccountBankId, String payoutAccountBankCorrId, String payoutAccountBankBik, String payoutAccountInn, String payoutAccountPurpose, String payoutCancelDetails) {
+    public PayoutEventStatRecord(Long id, Long eventId, PayoutEventCategory eventCategory, PayoutEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyShopId, String payoutId, LocalDateTime payoutCreatedAt, PayoutStatus payoutStatus, Long payoutAmount, Long payoutFee, String payoutCurrencyCode, PayoutType payoutType, String payoutCardToken, String payoutCardMaskedPan, String payoutCardBin, String payoutCardPaymentSystem, String payoutAccountBankId, String payoutAccountBankCorrId, String payoutAccountBankBik, String payoutAccountBankName, String payoutAccountInn, String payoutAccountLegalAgreementId, LocalDateTime payoutAccountLegalAgreementSignedAt, String payoutAccountPurpose, String payoutCancelDetails) {
         super(PayoutEventStat.PAYOUT_EVENT_STAT);
 
         set(0, id);
@@ -419,8 +461,11 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
         set(18, payoutAccountBankId);
         set(19, payoutAccountBankCorrId);
         set(20, payoutAccountBankBik);
-        set(21, payoutAccountInn);
-        set(22, payoutAccountPurpose);
-        set(23, payoutCancelDetails);
+        set(21, payoutAccountBankName);
+        set(22, payoutAccountInn);
+        set(23, payoutAccountLegalAgreementId);
+        set(24, payoutAccountLegalAgreementSignedAt);
+        set(25, payoutAccountPurpose);
+        set(26, payoutCancelDetails);
     }
 }

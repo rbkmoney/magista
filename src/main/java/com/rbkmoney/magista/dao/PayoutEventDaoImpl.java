@@ -76,9 +76,12 @@ public class PayoutEventDaoImpl extends AbstractDao implements PayoutEventDao {
             payoutEventStat.setPayoutAccountBankId(rs.getString("payout_account_bank_id"));
             payoutEventStat.setPayoutAccountBankCorrId(rs.getString("payout_account_bank_corr_id"));
             payoutEventStat.setPayoutAccountBankBik(rs.getString("payout_account_bank_bik"));
+            payoutEventStat.setPayoutAccountBankName(rs.getString("payout_account_bank_name"));
             payoutEventStat.setPayoutAccountInn(rs.getString("payout_account_inn"));
             payoutEventStat.setPayoutAccountPurpose(rs.getString("payout_account_purpose"));
             payoutEventStat.setPayoutCancelDetails(rs.getString("payout_cancel_details"));
+            payoutEventStat.setPayoutAccountLegalAgreementId(rs.getString("payout_account_legal_agreement_id"));
+            payoutEventStat.setPayoutAccountLegalAgreementSignedAt(rs.getObject("payout_account_legal_agreement_signed_at", LocalDateTime.class));
 
             return payoutEventStat;
         };

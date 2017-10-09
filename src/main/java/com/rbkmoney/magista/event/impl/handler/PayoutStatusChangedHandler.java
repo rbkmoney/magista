@@ -9,10 +9,12 @@ import com.rbkmoney.magista.event.impl.context.PayoutEventContext;
 import com.rbkmoney.magista.event.impl.mapper.PayoutStatusMapper;
 import com.rbkmoney.magista.service.PayoutEventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
+@Component
 public class PayoutStatusChangedHandler extends AbstractPayoutEventHandler {
 
     private final PayoutEventService payoutEventService;

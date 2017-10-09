@@ -104,9 +104,10 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
                 bankAccount.setAccount(payoutEvent.getPayoutAccountBankId());
                 bankAccount.setBankBik(payoutEvent.getPayoutAccountBankBik());
                 bankAccount.setBankPostAccount(payoutEvent.getPayoutAccountBankCorrId());
+                bankAccount.setBankName(payoutEvent.getPayoutAccountBankName());
                 payoutAccount.setAccount(bankAccount);
                 payoutAccount.setInn(payoutEvent.getPayoutAccountInn());
-                payoutAccount.setInn(payoutEvent.getPayoutAccountPurpose());
+                payoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
 
                 return PayoutType.bank_account(payoutAccount);
             case BANK_CARD:

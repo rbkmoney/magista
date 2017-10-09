@@ -28,7 +28,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat implements Serializable {
 
-    private static final long serialVersionUID = 1378591729;
+    private static final long serialVersionUID = 1241801447;
 
     private Long                id;
     private Long                eventId;
@@ -51,7 +51,10 @@ public class PayoutEventStat implements Serializable {
     private String              payoutAccountBankId;
     private String              payoutAccountBankCorrId;
     private String              payoutAccountBankBik;
+    private String              payoutAccountBankName;
     private String              payoutAccountInn;
+    private String              payoutAccountLegalAgreementId;
+    private LocalDateTime       payoutAccountLegalAgreementSignedAt;
     private String              payoutAccountPurpose;
     private String              payoutCancelDetails;
 
@@ -79,7 +82,10 @@ public class PayoutEventStat implements Serializable {
         this.payoutAccountBankId = value.payoutAccountBankId;
         this.payoutAccountBankCorrId = value.payoutAccountBankCorrId;
         this.payoutAccountBankBik = value.payoutAccountBankBik;
+        this.payoutAccountBankName = value.payoutAccountBankName;
         this.payoutAccountInn = value.payoutAccountInn;
+        this.payoutAccountLegalAgreementId = value.payoutAccountLegalAgreementId;
+        this.payoutAccountLegalAgreementSignedAt = value.payoutAccountLegalAgreementSignedAt;
         this.payoutAccountPurpose = value.payoutAccountPurpose;
         this.payoutCancelDetails = value.payoutCancelDetails;
     }
@@ -106,7 +112,10 @@ public class PayoutEventStat implements Serializable {
         String              payoutAccountBankId,
         String              payoutAccountBankCorrId,
         String              payoutAccountBankBik,
+        String              payoutAccountBankName,
         String              payoutAccountInn,
+        String              payoutAccountLegalAgreementId,
+        LocalDateTime       payoutAccountLegalAgreementSignedAt,
         String              payoutAccountPurpose,
         String              payoutCancelDetails
     ) {
@@ -131,7 +140,10 @@ public class PayoutEventStat implements Serializable {
         this.payoutAccountBankId = payoutAccountBankId;
         this.payoutAccountBankCorrId = payoutAccountBankCorrId;
         this.payoutAccountBankBik = payoutAccountBankBik;
+        this.payoutAccountBankName = payoutAccountBankName;
         this.payoutAccountInn = payoutAccountInn;
+        this.payoutAccountLegalAgreementId = payoutAccountLegalAgreementId;
+        this.payoutAccountLegalAgreementSignedAt = payoutAccountLegalAgreementSignedAt;
         this.payoutAccountPurpose = payoutAccountPurpose;
         this.payoutCancelDetails = payoutCancelDetails;
     }
@@ -304,12 +316,36 @@ public class PayoutEventStat implements Serializable {
         this.payoutAccountBankBik = payoutAccountBankBik;
     }
 
+    public String getPayoutAccountBankName() {
+        return this.payoutAccountBankName;
+    }
+
+    public void setPayoutAccountBankName(String payoutAccountBankName) {
+        this.payoutAccountBankName = payoutAccountBankName;
+    }
+
     public String getPayoutAccountInn() {
         return this.payoutAccountInn;
     }
 
     public void setPayoutAccountInn(String payoutAccountInn) {
         this.payoutAccountInn = payoutAccountInn;
+    }
+
+    public String getPayoutAccountLegalAgreementId() {
+        return this.payoutAccountLegalAgreementId;
+    }
+
+    public void setPayoutAccountLegalAgreementId(String payoutAccountLegalAgreementId) {
+        this.payoutAccountLegalAgreementId = payoutAccountLegalAgreementId;
+    }
+
+    public LocalDateTime getPayoutAccountLegalAgreementSignedAt() {
+        return this.payoutAccountLegalAgreementSignedAt;
+    }
+
+    public void setPayoutAccountLegalAgreementSignedAt(LocalDateTime payoutAccountLegalAgreementSignedAt) {
+        this.payoutAccountLegalAgreementSignedAt = payoutAccountLegalAgreementSignedAt;
     }
 
     public String getPayoutAccountPurpose() {
@@ -463,11 +499,29 @@ public class PayoutEventStat implements Serializable {
         }
         else if (!payoutAccountBankBik.equals(other.payoutAccountBankBik))
             return false;
+        if (payoutAccountBankName == null) {
+            if (other.payoutAccountBankName != null)
+                return false;
+        }
+        else if (!payoutAccountBankName.equals(other.payoutAccountBankName))
+            return false;
         if (payoutAccountInn == null) {
             if (other.payoutAccountInn != null)
                 return false;
         }
         else if (!payoutAccountInn.equals(other.payoutAccountInn))
+            return false;
+        if (payoutAccountLegalAgreementId == null) {
+            if (other.payoutAccountLegalAgreementId != null)
+                return false;
+        }
+        else if (!payoutAccountLegalAgreementId.equals(other.payoutAccountLegalAgreementId))
+            return false;
+        if (payoutAccountLegalAgreementSignedAt == null) {
+            if (other.payoutAccountLegalAgreementSignedAt != null)
+                return false;
+        }
+        else if (!payoutAccountLegalAgreementSignedAt.equals(other.payoutAccountLegalAgreementSignedAt))
             return false;
         if (payoutAccountPurpose == null) {
             if (other.payoutAccountPurpose != null)
@@ -509,7 +563,10 @@ public class PayoutEventStat implements Serializable {
         result = prime * result + ((payoutAccountBankId == null) ? 0 : payoutAccountBankId.hashCode());
         result = prime * result + ((payoutAccountBankCorrId == null) ? 0 : payoutAccountBankCorrId.hashCode());
         result = prime * result + ((payoutAccountBankBik == null) ? 0 : payoutAccountBankBik.hashCode());
+        result = prime * result + ((payoutAccountBankName == null) ? 0 : payoutAccountBankName.hashCode());
         result = prime * result + ((payoutAccountInn == null) ? 0 : payoutAccountInn.hashCode());
+        result = prime * result + ((payoutAccountLegalAgreementId == null) ? 0 : payoutAccountLegalAgreementId.hashCode());
+        result = prime * result + ((payoutAccountLegalAgreementSignedAt == null) ? 0 : payoutAccountLegalAgreementSignedAt.hashCode());
         result = prime * result + ((payoutAccountPurpose == null) ? 0 : payoutAccountPurpose.hashCode());
         result = prime * result + ((payoutCancelDetails == null) ? 0 : payoutCancelDetails.hashCode());
         return result;
@@ -540,7 +597,10 @@ public class PayoutEventStat implements Serializable {
         sb.append(", ").append(payoutAccountBankId);
         sb.append(", ").append(payoutAccountBankCorrId);
         sb.append(", ").append(payoutAccountBankBik);
+        sb.append(", ").append(payoutAccountBankName);
         sb.append(", ").append(payoutAccountInn);
+        sb.append(", ").append(payoutAccountLegalAgreementId);
+        sb.append(", ").append(payoutAccountLegalAgreementSignedAt);
         sb.append(", ").append(payoutAccountPurpose);
         sb.append(", ").append(payoutCancelDetails);
 
