@@ -100,6 +100,14 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testShopCategoryIds() {
+        String json = "{'query': {'payments': {'shop_category_ids': [4, 5], 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(4, statResponse.getData().getPayments().size());
+        assertEquals(4, statResponse.getTotalCount());
+    }
+
+    @Test
     public void testFindByFlow() {
         // holds in payment
         String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '2', 'payment_flow': 'hold', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";

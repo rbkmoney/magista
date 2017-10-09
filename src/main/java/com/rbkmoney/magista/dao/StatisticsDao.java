@@ -5,6 +5,7 @@ import com.rbkmoney.magista.exception.DaoException;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ public interface StatisticsDao {
     Collection<InvoiceEventStat> getInvoices(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<List<Integer>> shopCategoryIds,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> invoiceStatus,
@@ -36,6 +38,7 @@ public interface StatisticsDao {
 
     int getInvoicesCount(Optional<String> merchantId,
                          Optional<String> shopId,
+                         Optional<List<Integer>> shopCategoryIds,
                          Optional<String> invoiceId,
                          Optional<String> paymentId,
                          Optional<String> invoiceStatus,
@@ -57,6 +60,7 @@ public interface StatisticsDao {
     Collection<InvoiceEventStat> getPayments(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<List<Integer>> shopCategoryIds,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
@@ -77,6 +81,7 @@ public interface StatisticsDao {
     Integer getPaymentsCount(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<List<Integer>> shopCategoryIds,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,

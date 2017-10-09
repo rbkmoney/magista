@@ -4,6 +4,7 @@ import org.jooq.Comparator;
 import org.jooq.Field;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**

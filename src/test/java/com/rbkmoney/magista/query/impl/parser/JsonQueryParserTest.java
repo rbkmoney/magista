@@ -6,6 +6,7 @@ import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -101,6 +102,13 @@ public class JsonQueryParserTest {
     public void testWithoutMerchantButWithShopId() throws Exception {
         String json = "{'query': {'payments': {'shop_id':'C','invoice_id':'A','payment_id':'B', 'payment_pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
         parser.parseQuery(json);
+    }
+
+    @Test
+    public void testShopCategoryId() throws Exception {
+        String json = "{'query': {'payments': {'shop_category_ids': [1, 2, 3, 4, 5]}}}";
+        PaymentsFunction.PaymentsParameters paymentsParameters = (PaymentsFunction.PaymentsParameters) parser.parseQuery(json).get(0).getChildren().get(0).getParameters();
+        assertEquals(Arrays.asList(1, 2, 3, 4, 5), paymentsParameters.getShopCategoryIds());
     }
 
     @Test
