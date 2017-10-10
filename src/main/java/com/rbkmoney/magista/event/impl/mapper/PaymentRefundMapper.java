@@ -45,7 +45,7 @@ public class PaymentRefundMapper implements Mapper<InvoiceEventContext> {
                 TBaseUtil.unionFieldToEnum(refund.getStatus(), InvoicePaymentRefundStatus.class)
         );
         paymentRefundEventStat.setPaymentRefundReason(refund.getReason());
-        paymentRefundEventStat.setEventCreatedAt(
+        paymentRefundEventStat.setPaymentRefundCreatedAt(
                 TypeUtil.stringToLocalDateTime(refund.getCreatedAt())
         );
 
