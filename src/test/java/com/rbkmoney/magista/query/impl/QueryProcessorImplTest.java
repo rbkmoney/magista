@@ -9,6 +9,11 @@ import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TJSONProtocol;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -189,6 +194,15 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
+    }
+
+    @Test
+    public void testPaymentsCardTypeWithEmptyPaymentSystem() throws TException {
+        String json = "{'query': {'payments_pmt_cards_stat': {'merchant_id': '349d01f8-9349-4b50-b071-567c8204ff63','shop_id': '1','from_time': '2015-10-25T15:45:20Z','to_time': '2018-10-25T18:10:10Z', 'split_interval':'60'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(0, statResponse.getData().getRecords().size());
+        assertEquals(0, statResponse.getTotalCount());
+        assertEquals("{\"data\":{\"records\":[]}}", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse));
     }
 
     @Test
