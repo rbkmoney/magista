@@ -9,6 +9,9 @@ import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,7 +139,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     public void testPaymentsWithoutMerchantAndShopId() {
         String json = "{'query': {'payments': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(8, statResponse.getTotalCount());
+        assertEquals(9, statResponse.getTotalCount());
     }
 
     @Test
@@ -202,6 +205,15 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testPaymentsCardTypeWithEmptyPaymentSystem() throws TException {
+        String json = "{'query': {'payments_pmt_cards_stat': {'merchant_id': '349d01f8-9349-4b50-b071-567c8204ff63','shop_id': '1','from_time': '2015-10-25T15:45:20Z','to_time': '2018-10-25T18:10:10Z', 'split_interval':'60'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(0, statResponse.getData().getRecords().size());
+        assertEquals(0, statResponse.getTotalCount());
+        assertEquals("{\"data\":{\"records\":[]}}", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse));
+    }
+
+    @Test
     public void testPaymentsConversionStat() {
         String json = "{'query': {'payments_conversion_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
@@ -221,9 +233,13 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     public void testAccountingReport() {
         String json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(3, statResponse.getData().getRecords().size());
+        assertEquals(4, statResponse.getData().getRecords().size());
 
-        Map<String, String> result1 = statResponse.getData().getRecords().get(0);
+        Map<String, String> result1 = statResponse.getData().getRecords().stream().filter(
+                t ->
+                        t.get("merchant_id").equals("74480e4f-1a36-4edd-8175-7a9e984313b0")
+                                && t.get("shop_id").equals("1")
+        ).findFirst().get();
         assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result1.get("merchant_id"));
         assertEquals("1", result1.get("shop_id"));
         assertEquals("444000", result1.get("funds_acquired"));
@@ -231,7 +247,11 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertEquals("2259530", result1.get("opening_balance"));
         assertEquals("2683550", result1.get("closing_balance"));
 
-        Map<String, String> result2 = statResponse.getData().getRecords().get(1);
+        Map<String, String> result2 = statResponse.getData().getRecords().stream().filter(
+                t ->
+                        t.get("merchant_id").equals("74480e4f-1a36-4edd-8175-7a9e984313b0")
+                                && t.get("shop_id").equals("2")
+        ).findFirst().get();
         assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result2.get("merchant_id"));
         assertEquals("2", result2.get("shop_id"));
         assertEquals("3631200", result2.get("funds_acquired"));
@@ -239,7 +259,11 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertEquals("0", result2.get("opening_balance"));
         assertEquals("3467797", result2.get("closing_balance"));
 
-        Map<String, String> result3 = statResponse.getData().getRecords().get(2);
+        Map<String, String> result3 = statResponse.getData().getRecords().stream().filter(
+                t ->
+                        t.get("merchant_id").equals("74480e4f-1a36-4edd-8175-7a9e984313b0")
+                                && t.get("shop_id").equals("3")
+        ).findFirst().get();
         assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result3.get("merchant_id"));
         assertEquals("3", result3.get("shop_id"));
         assertEquals("450000", result3.get("funds_acquired"));
