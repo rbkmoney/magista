@@ -18,6 +18,7 @@ public class QueryBuilderImpl extends BaseQueryBuilder {
                         new RootQuery.RootBuilder(),
                         new PaymentsFunction.PaymentsBuilder(),
                         new InvoicesFunction.InvoicesBuilder(),
+                        new PayoutsFunction.PayoutsBuilder(),
                         new PaymentsGeoStatFunction.PaymentsGeoStatBuilder(),
                         new PaymentsCardTypesStatFunction.PaymentsCardTypesStatBuilder(),
                         new CustomersRateStatFunction.CustomersRateStatBuilder(),

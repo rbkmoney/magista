@@ -5,6 +5,7 @@ package com.rbkmoney.magista.domain;
 
 
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
+import com.rbkmoney.magista.domain.tables.PayoutEventStat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +32,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Mst extends SchemaImpl {
 
-    private static final long serialVersionUID = 771015017;
+    private static final long serialVersionUID = 1871334162;
 
     /**
      * The reference instance of <code>mst</code>
@@ -42,6 +43,11 @@ public class Mst extends SchemaImpl {
      * The table <code>mst.invoice_event_stat</code>.
      */
     public final InvoiceEventStat INVOICE_EVENT_STAT = com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
+
+    /**
+     * The table <code>mst.payout_event_stat</code>.
+     */
+    public final PayoutEventStat PAYOUT_EVENT_STAT = com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 
     /**
      * No further instances allowed
@@ -68,7 +74,8 @@ public class Mst extends SchemaImpl {
 
     private final List<Sequence<?>> getSequences0() {
         return Arrays.<Sequence<?>>asList(
-            Sequences.INVOICE_EVENT_STAT_ID_SEQ);
+            Sequences.INVOICE_EVENT_STAT_ID_SEQ,
+            Sequences.PAYOUT_EVENT_STAT_ID_SEQ);
     }
 
     @Override
@@ -80,6 +87,7 @@ public class Mst extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
-            InvoiceEventStat.INVOICE_EVENT_STAT);
+            InvoiceEventStat.INVOICE_EVENT_STAT,
+            PayoutEventStat.PAYOUT_EVENT_STAT);
     }
 }

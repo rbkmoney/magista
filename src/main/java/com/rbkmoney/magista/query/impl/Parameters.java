@@ -30,6 +30,10 @@ public class Parameters {
     public static final String PAYMENT_AMOUNT_PARAM = "payment_amount";
     public static final String PAYMENT_FLOW_PARAM = "payment_flow";
 
+    public static final String PAYOUT_ID_PARAM = "payout_id";
+    public static final String PAYOUT_STATUS_PARAM = "payout_status";
+    public static final String PAYOUT_TYPE_PARAM = "payout_type";
+
     public static final String SPLIT_INTERVAL_PARAM = "split_interval";
 
 

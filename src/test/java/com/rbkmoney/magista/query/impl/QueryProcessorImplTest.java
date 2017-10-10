@@ -65,6 +65,16 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testPayouts() {
+        String json = "{'query': {'payouts': {'merchant_id': '281220eb-a4ef-4d03-b666-bdec4b26c5f7', 'shop_id': '1507555501740', 'from_time': '2016-10-25T15:45:20Z','to_time': '2018-10-25T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(1, statResponse.getTotalCount());
+        assertEquals(1, statResponse.getData().getPayouts().size());
+        assertEquals("281220eb-a4ef-4d03-b666-bdec4b26c5f7", statResponse.getData().getPayouts().get(0).getPartyId());
+        assertEquals("1507555501740", statResponse.getData().getPayouts().get(0).getShopId());
+    }
+
+    @Test
     public void testPayments() {
         String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);

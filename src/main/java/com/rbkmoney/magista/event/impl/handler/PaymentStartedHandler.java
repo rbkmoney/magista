@@ -6,7 +6,7 @@ import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
-import com.rbkmoney.magista.event.impl.mapper.EventMapper;
+import com.rbkmoney.magista.event.impl.mapper.InvoiceMapper;
 import com.rbkmoney.magista.event.impl.mapper.PaymentCommissionMapper;
 import com.rbkmoney.magista.event.impl.mapper.PaymentGeoMapper;
 import com.rbkmoney.magista.event.impl.mapper.PaymentMapper;
@@ -47,7 +47,7 @@ public class PaymentStartedHandler extends AbstractInvoiceEventHandler {
     @Override
     List<Mapper> getMappers() {
         return Arrays.asList(
-                new EventMapper(),
+                new InvoiceMapper(),
                 new PaymentMapper(),
                 new PaymentCommissionMapper(),
                 new PaymentGeoMapper(geoProvider)

@@ -1,9 +1,9 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
-import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
-import com.rbkmoney.magista.domain.enums.InvoiceStatus;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
+import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
+import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 
 /**
  * Created by vpankrashkin on 10.08.16.
@@ -231,6 +232,62 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         );
 
         Query query = buildPaymentSelectConditionStepQuery(parameterSource, DSL.count());
+        return fetchOne(query, Integer.class);
+    }
+
+    @Override
+    public Collection<PayoutEventStat> getPayouts(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            Optional<String> payoutId,
+            Optional<String> payoutStatus,
+            Optional<String> payoutType,
+            Optional<Instant> fromTime,
+            Optional<Instant> toTime,
+            Optional<Integer> limit,
+            Optional<Integer> offset) throws DaoException {
+
+        ConditionParameterSource parameterSource = buildOptionalPayoutParameters(
+                merchantId,
+                shopId,
+                payoutId,
+                payoutStatus,
+                payoutType,
+                fromTime,
+                toTime
+        );
+
+        Query query = buildPayoutSelectConditionStepQuery(parameterSource)
+                .orderBy(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT.desc())
+                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
+                .offset(offset.orElse(0));
+
+        return fetch(query, PayoutEventDaoImpl.getRowMapper());
+    }
+
+    @Override
+    public Integer getPayoutsCount(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            Optional<String> payoutId,
+            Optional<String> payoutStatus,
+            Optional<String> payoutType,
+            Optional<Instant> fromTime,
+            Optional<Instant> toTime,
+            Optional<Integer> limit,
+            Optional<Integer> offset) throws DaoException {
+
+        ConditionParameterSource parameterSource = buildOptionalPayoutParameters(
+                merchantId,
+                shopId,
+                payoutId,
+                payoutStatus,
+                payoutType,
+                fromTime,
+                toTime
+        );
+
+        Query query = buildPayoutSelectConditionStepQuery(parameterSource, DSL.count());
         return fetchOne(query, Integer.class);
     }
 
@@ -453,6 +510,45 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
                         toTime.isPresent() ? LocalDateTime.ofInstant(toTime.get(), ZoneOffset.UTC) : null,
                         Comparator.LESS);
+    }
+
+    private SelectConditionStep buildPayoutSelectConditionStepQuery(
+            ConditionParameterSource paymentParameterSource,
+            SelectField<?>... fields) {
+        Condition condition = PAYOUT_EVENT_STAT.EVENT_CATEGORY.eq(PayoutEventCategory.PAYOUT);
+
+        condition = appendConditions(condition, Operator.AND, paymentParameterSource);
+
+        return getDslContext().select(fields).from(PAYOUT_EVENT_STAT)
+                .where(condition);
+    }
+
+    private ConditionParameterSource buildOptionalPayoutParameters(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            Optional<String> payoutId,
+            Optional<String> payoutStatus,
+            Optional<String> payoutType,
+            Optional<Instant> fromTime,
+            Optional<Instant> toTime
+    ) {
+        return new ConditionParameterSource()
+                .addValue(PAYOUT_EVENT_STAT.PARTY_ID, merchantId.orElse(null), Comparator.EQUALS)
+                .addValue(PAYOUT_EVENT_STAT.PARTY_SHOP_ID, shopId.orElse(null), Comparator.EQUALS)
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_ID, payoutId.orElse(null), Comparator.EQUALS)
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_STATUS,
+                        payoutStatus.isPresent() ? PayoutStatus.valueOf(payoutStatus.get()) : null,
+                        Comparator.EQUALS)
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_TYPE,
+                        payoutType.isPresent() ? PayoutType.valueOf(payoutType.get()) : null,
+                        Comparator.EQUALS)
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT,
+                        fromTime.isPresent() ? LocalDateTime.ofInstant(fromTime.get(), ZoneOffset.UTC) : null,
+                        Comparator.GREATER_OR_EQUAL)
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT,
+                        toTime.isPresent() ? LocalDateTime.ofInstant(toTime.get(), ZoneOffset.UTC) : null,
+                        Comparator.LESS);
+
     }
 
 }

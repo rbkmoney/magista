@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -58,53 +59,45 @@ public class DamselUtil {
         }
     }
 
+    public static long getAmount(List<FinalCashFlowPosting> finalCashFlowPostings, Predicate<FinalCashFlowPosting> predicate) {
+        return finalCashFlowPostings.stream()
+                .filter(predicate)
+                .mapToLong(posting -> posting.getVolume().getAmount())
+                .sum();
+    }
 
-    public static Map<PostingType, Long> calculateCommissions(List<FinalCashFlowPosting> finalCashFlowPostings) {
+
+    public static Map<FeeType, Long> getFees(List<FinalCashFlowPosting> finalCashFlowPostings) {
         return finalCashFlowPostings.stream()
                 .collect(
                         Collectors.groupingBy(
-                                DamselUtil::getCommissionType,
+                                DamselUtil::getFeeType,
                                 Collectors.summingLong(posting -> posting.getVolume().getAmount())
                         )
                 );
     }
 
-    public static PostingType getCommissionType(FinalCashFlowPosting cashFlowPosting) {
+    public static FeeType getFeeType(FinalCashFlowPosting cashFlowPosting) {
         CashFlowAccount source = cashFlowPosting.getSource().getAccountType();
         CashFlowAccount destination = cashFlowPosting.getDestination().getAccountType();
-
-        if (source.isSetProvider()
-                && destination.isSetMerchant()
-                && destination.getMerchant() == MerchantCashFlowAccount.settlement) {
-            return PostingType.AMOUNT;
-        }
-
-        if (source.isSetMerchant()
-                && source.getMerchant() == MerchantCashFlowAccount.settlement
-                && destination.isSetProvider()) {
-            return PostingType.REFUND_AMOUNT;
-        }
 
         if (source.isSetMerchant()
                 && source.getMerchant() == MerchantCashFlowAccount.settlement
                 && destination.isSetSystem()) {
-            return PostingType.FEE;
+            return FeeType.FEE;
         }
 
         if (source.isSetSystem()
                 && destination.isSetExternal()) {
-            return PostingType.EXTERNAL_FEE;
+            return FeeType.EXTERNAL_FEE;
         }
 
         if (source.isSetSystem()
                 && destination.isSetProvider()) {
-            return PostingType.PROVIDER_FEE;
+            return FeeType.PROVIDER_FEE;
         }
 
-        throw new IllegalArgumentException(String.format("Unknown posting path, source - '%s', destination - '%s'",
-                source,
-                destination
-        ));
+        return FeeType.UNKNOWN;
     }
 
 }
