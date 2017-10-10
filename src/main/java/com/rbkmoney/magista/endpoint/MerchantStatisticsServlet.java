@@ -27,10 +27,6 @@ public class MerchantStatisticsServlet extends GenericServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         thriftServlet = new THServiceBuilder()
-                .withEventListener(
-                        new CompositeServiceEventListener(
-                                new ServiceEventLogListener(),
-                                new HttpServiceEventLogListener()))
                 .build(MerchantStatisticsSrv.Iface.class, requestHandler);
     }
 
