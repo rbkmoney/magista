@@ -5,6 +5,7 @@ import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
+import org.jooq.Comparator;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -17,10 +18,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
@@ -41,6 +39,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     public Collection<InvoiceEventStat> getInvoices(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<List<Integer>> shopCategoryIds,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> invoiceStatus,
@@ -87,7 +86,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 Optional.empty()
         );
 
-        Query query = buildInvoiceSelectConditionStepQuery(invoiceSource, paymentSource)
+        Query query = buildInvoiceSelectConditionStepQuery(invoiceSource, paymentSource, shopCategoryIds)
                 .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
@@ -98,6 +97,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     public int getInvoicesCount(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<List<Integer>> shopCategoryIds,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> invoiceStatus,
@@ -144,7 +144,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 Optional.empty()
         );
 
-        Query query = buildInvoiceSelectConditionStepQuery(invoiceSource, paymentSource, DSL.count());
+        Query query = buildInvoiceSelectConditionStepQuery(invoiceSource, paymentSource, shopCategoryIds, DSL.count());
         return fetchOne(query, Integer.class);
     }
 
@@ -152,6 +152,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     public Collection<InvoiceEventStat> getPayments(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<List<Integer>> shopCategoryIds,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
@@ -186,7 +187,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 toTime
         );
 
-        Query query = buildPaymentSelectConditionStepQuery(paymentSource)
+        Query query = buildPaymentSelectConditionStepQuery(paymentSource, shopCategoryIds)
                 .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
@@ -197,6 +198,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     public Integer getPaymentsCount(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<List<Integer>> shopCategoryIds,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> paymentStatus,
@@ -231,7 +233,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 toTime
         );
 
-        Query query = buildPaymentSelectConditionStepQuery(parameterSource, DSL.count());
+        Query query = buildPaymentSelectConditionStepQuery(parameterSource, shopCategoryIds, DSL.count());
         return fetchOne(query, Integer.class);
     }
 
@@ -406,8 +408,13 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     private SelectConditionStep buildPaymentSelectConditionStepQuery(
             ConditionParameterSource paymentParameterSource,
+            Optional<List<Integer>> shopCategoryIds,
             SelectField<?>... fields) {
         Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT);
+
+        if (shopCategoryIds.isPresent() && !shopCategoryIds.get().isEmpty()) {
+            condition = condition.and(INVOICE_EVENT_STAT.PARTY_SHOP_CATEGORY_ID.in(shopCategoryIds.get()));
+        }
 
         condition = appendConditions(condition, Operator.AND, paymentParameterSource);
 
@@ -417,6 +424,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     private SelectConditionStep buildInvoiceSelectConditionStepQuery(ConditionParameterSource invoiceSource,
                                                                      ConditionParameterSource paymentSource,
+                                                                     Optional<List<Integer>> shopCategoryIds,
                                                                      SelectField<?>... fields) {
         Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE);
 
@@ -434,6 +442,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             condition = condition.and(INVOICE_EVENT_STAT.INVOICE_ID
                     .in(buildPaymentSelectConditionStepQuery(
                             paymentSource,
+                            shopCategoryIds,
                             INVOICE_EVENT_STAT.INVOICE_ID)));
         }
 

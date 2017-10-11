@@ -4,6 +4,7 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +68,11 @@ public class QueryParameters {
         } else {
             return null;
         }
+    }
+
+    public List getArrayParameter(String key, boolean deepSearch) {
+        Object val = getParameter(key, deepSearch);
+        return val != null ? (List) val : null;
     }
 
     public String getStringParameter(String key, boolean deepSearch) {
