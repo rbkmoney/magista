@@ -258,17 +258,13 @@ public class InvoiceEventService {
                     refundEventStat.getPaymentId()
             );
 
-            if (!invoicePaymentEvent.getPaymentRefundId().equals(refundEventStat.getPaymentRefundId())) {
-                throw new NotFoundException(
-                        String.format("Refund not found, refundId='%s', invoiceId='%s', paymentId='%s', eventId='%d'",
-                                refundEventStat.getPaymentRefundId(),
-                                refundEventStat.getInvoiceId(),
-                                refundEventStat.getPaymentId(),
-                                refundEventStat.getEventId())
-                );
-            }
-
+            invoicePaymentEvent.setPaymentRefundId(refundEventStat.getPaymentRefundId());
+            invoicePaymentEvent.setPaymentRefundReason(refundEventStat.getPaymentRefundReason());
             invoicePaymentEvent.setPaymentRefundStatus(refundEventStat.getPaymentRefundStatus());
+            invoicePaymentEvent.setPaymentRefundCreatedAt(refundEventStat.getPaymentRefundCreatedAt());
+            invoicePaymentEvent.setPaymentRefundFee(refundEventStat.getPaymentRefundFee());
+            invoicePaymentEvent.setPaymentRefundExternalFee(refundEventStat.getPaymentRefundExternalFee());
+            invoicePaymentEvent.setPaymentRefundProviderFee(refundEventStat.getPaymentRefundProviderFee());
 
             invoiceEventDao.update(invoicePaymentEvent);
             log.info("Invoice payment refund event have been changed, refundId='{}', paymentId='{}', invoiceId='{}', eventId='{}'",
@@ -284,20 +280,23 @@ public class InvoiceEventService {
     public void changeInvoicePaymentRefundStatus(InvoiceEventStat refundStatusEvent) throws NotFoundException, StorageException {
         log.debug("Change invoice payment event status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'",
                 refundStatusEvent.getPaymentId(), refundStatusEvent.getInvoiceId(), refundStatusEvent.getEventId(), refundStatusEvent.getPaymentStatus());
-
         try {
             InvoiceEventStat invoicePaymentEvent = getInvoicePaymentEventByIds(
                     refundStatusEvent.getInvoiceId(),
                     refundStatusEvent.getPaymentId()
             );
 
-            invoicePaymentEvent.setPaymentRefundId(refundStatusEvent.getPaymentRefundId());
-            invoicePaymentEvent.setPaymentRefundReason(refundStatusEvent.getPaymentRefundReason());
+            if (!refundStatusEvent.getPaymentRefundId().equals(invoicePaymentEvent.getPaymentRefundId())) {
+                throw new NotFoundException(
+                        String.format("Refund not found, refundId='%s', invoiceId='%s', paymentId='%s', eventId='%d'",
+                                refundStatusEvent.getPaymentRefundId(),
+                                refundStatusEvent.getInvoiceId(),
+                                refundStatusEvent.getPaymentId(),
+                                refundStatusEvent.getEventId())
+                );
+            }
+
             invoicePaymentEvent.setPaymentRefundStatus(refundStatusEvent.getPaymentRefundStatus());
-            invoicePaymentEvent.setPaymentRefundCreatedAt(refundStatusEvent.getPaymentRefundCreatedAt());
-            invoicePaymentEvent.setPaymentRefundFee(refundStatusEvent.getPaymentRefundFee());
-            invoicePaymentEvent.setPaymentRefundExternalFee(refundStatusEvent.getPaymentRefundExternalFee());
-            invoicePaymentEvent.setPaymentRefundProviderFee(refundStatusEvent.getPaymentRefundProviderFee());
 
             invoiceEventDao.update(invoicePaymentEvent);
             log.info("Invoice payment refund event status have been changed, refundId='{}', paymentId='{}', invoiceId='{}', eventId='{}', refundStatus='{}'",

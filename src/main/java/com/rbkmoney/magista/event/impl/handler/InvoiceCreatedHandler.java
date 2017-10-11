@@ -6,7 +6,6 @@ import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
-import com.rbkmoney.magista.event.impl.mapper.EventMapper;
 import com.rbkmoney.magista.event.impl.mapper.InvoiceMapper;
 import com.rbkmoney.magista.event.impl.mapper.InvoicePartyMapper;
 import com.rbkmoney.magista.service.InvoiceEventService;
@@ -46,7 +45,6 @@ public class InvoiceCreatedHandler extends AbstractInvoiceEventHandler {
     @Override
     List<Mapper> getMappers() {
         return Arrays.asList(
-                new EventMapper(),
                 new InvoiceMapper(),
                 new InvoicePartyMapper(partyService)
         );
