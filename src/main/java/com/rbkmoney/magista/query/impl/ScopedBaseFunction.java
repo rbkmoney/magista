@@ -6,10 +6,10 @@ import com.rbkmoney.magista.query.QueryContext;
 import com.rbkmoney.magista.query.QueryParameters;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Map;
 
-import static com.rbkmoney.magista.query.impl.Parameters.MERCHANT_ID_PARAM;
-import static com.rbkmoney.magista.query.impl.Parameters.SHOP_ID_PARAM;
+import static com.rbkmoney.magista.query.impl.Parameters.*;
 
 /**
  * Created by vpankrashkin on 08.08.16.
@@ -51,6 +51,10 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
 
         public String getShopId() {
             return getStringParameter(SHOP_ID_PARAM, false);
+        }
+
+        public List<Integer> getShopCategoryIds() {
+            return getArrayParameter(SHOP_CATEGORY_IDS_PARAM, false);
         }
 
     }

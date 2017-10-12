@@ -254,6 +254,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 Collection<InvoiceEventStat> result = functionContext.getDao().getInvoices(
                         Optional.ofNullable(parameters.getMerchantId()),
                         Optional.ofNullable(parameters.getShopId()),
+                        Optional.ofNullable(parameters.getShopCategoryIds()),
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getInvoiceStatus()),
@@ -295,6 +296,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 Integer result = functionContext.getDao().getInvoicesCount(
                         Optional.ofNullable(parameters.getMerchantId()),
                         Optional.ofNullable(parameters.getShopId()),
+                        Optional.ofNullable(parameters.getShopCategoryIds()),
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getInvoiceStatus()),

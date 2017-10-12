@@ -1,8 +1,7 @@
 package com.rbkmoney.magista.util;
 
-public enum PostingType {
-    AMOUNT,
-    REFUND_AMOUNT,
+public enum FeeType {
+    UNKNOWN,
     FEE,
     PROVIDER_FEE,
     EXTERNAL_FEE

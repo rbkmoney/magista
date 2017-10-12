@@ -12,6 +12,7 @@ public class Parameters {
 
     public static final String MERCHANT_ID_PARAM = "merchant_id";
     public static final String SHOP_ID_PARAM = "shop_id";
+    public static final String SHOP_CATEGORY_IDS_PARAM = "shop_category_ids";
     public static final String FROM_TIME_PARAM = "from_time";
     public static final String TO_TIME_PARAM = "to_time";
 
@@ -30,6 +31,10 @@ public class Parameters {
     public static final String PAYMENT_AMOUNT_PARAM = "payment_amount";
     public static final String PAYMENT_FLOW_PARAM = "payment_flow";
     public static final String PAYMENT_CUSTOMER_ID_PARAM = "payment_customer_id";
+
+    public static final String PAYOUT_ID_PARAM = "payout_id";
+    public static final String PAYOUT_STATUS_PARAM = "payout_status";
+    public static final String PAYOUT_TYPE_PARAM = "payout_type";
 
     public static final String SPLIT_INTERVAL_PARAM = "split_interval";
 

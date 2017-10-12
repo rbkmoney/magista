@@ -27,4 +27,9 @@ public class Sequences {
      * The sequence <code>mst.invoice_event_stat_id_seq</code>
      */
     public static final Sequence<Long> INVOICE_EVENT_STAT_ID_SEQ = new SequenceImpl<Long>("invoice_event_stat_id_seq", Mst.MST, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
+     * The sequence <code>mst.payout_event_stat_id_seq</code>
+     */
+    public static final Sequence<Long> PAYOUT_EVENT_STAT_ID_SEQ = new SequenceImpl<Long>("payout_event_stat_id_seq", Mst.MST, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 }

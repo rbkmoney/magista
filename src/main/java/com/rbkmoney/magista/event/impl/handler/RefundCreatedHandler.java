@@ -6,7 +6,8 @@ import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
-import com.rbkmoney.magista.event.impl.mapper.EventMapper;
+import com.rbkmoney.magista.event.impl.mapper.InvoiceMapper;
+import com.rbkmoney.magista.event.impl.mapper.PaymentMapper;
 import com.rbkmoney.magista.event.impl.mapper.PaymentRefundMapper;
 import com.rbkmoney.magista.service.InvoiceEventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class RefundCreatedHandler extends AbstractInvoiceEventHandler {
     @Override
     List<Mapper> getMappers() {
         return Arrays.asList(
-                new EventMapper(),
+                new InvoiceMapper(),
                 new PaymentRefundMapper()
         );
     }
