@@ -1,4 +1,4 @@
-## Magista query DSL
+## Magista query DSL (test)
 
 Для формирования запросов к данным сервис предоставляет DSL в JSON формате, который основан на Elasticsearch [Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/_introducing_the_query_language.html). 
 
