@@ -147,7 +147,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     public void testPaymentsWithoutMerchantAndShopId() {
         String json = "{'query': {'payments': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(9, statResponse.getTotalCount());
+        assertEquals(10, statResponse.getTotalCount());
     }
 
     @Test
@@ -162,7 +162,19 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1', 'payment_method': 'payment_terminal', 'payment_terminal_provider':'euroset', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getTotalCount());
-        assertEquals(euroset, statResponse.getData().getPayments().get(0).getPaymentTool().getPaymentTerminal().getTerminalType());
+        assertEquals(euroset, statResponse.getData().getPayments().get(0).getPayer().getPaymentResource().getPaymentTool().getPaymentTerminal().getTerminalType());
+    }
+
+    @Test
+    public void testFindByCustomerId() {
+        String json = "{'query': {'invoices': {'payment_customer_id': 'test', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-26T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(1, statResponse.getTotalCount());
+
+        json = "{'query': {'payments': {'payment_customer_id': 'test', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-26T18:10:10Z'}}}";
+        statResponse = queryProcessor.processQuery(json);
+        assertEquals(1, statResponse.getTotalCount());
+        assertEquals("test", statResponse.getData().getPayments().get(0).getPayer().getCustomer().getCustomerId());
     }
 
     @Test
@@ -205,6 +217,15 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testPaymentsWithEmptyGeoStat() throws TException {
+        String json = "{'query': {'payments_geo_stat': {'merchant_id': '7e77621d-6f43-46b5-9e61-188363def06b','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(0, statResponse.getData().getRecords().size());
+        assertEquals(0, statResponse.getTotalCount());
+        assertEquals("{\"data\":{\"records\":[]}}", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse));
+    }
+
+    @Test
     public void testPaymentsCardTypesStat() {
         String json = "{'query': {'payments_pmt_cards_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
@@ -238,10 +259,19 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testCustomersRateStatWithEmptyFingerprint() throws TException {
+        String json = "{'query': {'customers_rate_stat': {'merchant_id': '7e77621d-6f43-46b5-9e61-188363def06b','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(1, statResponse.getData().getRecords().size());
+        assertEquals(0, statResponse.getTotalCount());
+        assertEquals("{\"data\":{\"records\":[{\"unic_count\":\"0\",\"offset\":\"180\"}]}}", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse));
+    }
+
+    @Test
     public void testAccountingReport() {
         String json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(4, statResponse.getData().getRecords().size());
+        assertEquals(5, statResponse.getData().getRecords().size());
 
         Map<String, String> result1 = statResponse.getData().getRecords().stream().filter(
                 t ->

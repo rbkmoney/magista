@@ -31,7 +31,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 1703563756;
+    private static final long serialVersionUID = -114498967;
 
     private Long                       id;
     private Long                       eventId;
@@ -104,6 +104,7 @@ public class InvoiceEventStat implements Serializable {
     private Long                       paymentRefundFee;
     private Long                       paymentRefundProviderFee;
     private Long                       paymentRefundExternalFee;
+    private String                     paymentCustomerId;
 
     public InvoiceEventStat() {}
 
@@ -179,6 +180,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentRefundFee = value.paymentRefundFee;
         this.paymentRefundProviderFee = value.paymentRefundProviderFee;
         this.paymentRefundExternalFee = value.paymentRefundExternalFee;
+        this.paymentCustomerId = value.paymentCustomerId;
     }
 
     public InvoiceEventStat(
@@ -252,7 +254,8 @@ public class InvoiceEventStat implements Serializable {
         String                     paymentRefundReason,
         Long                       paymentRefundFee,
         Long                       paymentRefundProviderFee,
-        Long                       paymentRefundExternalFee
+        Long                       paymentRefundExternalFee,
+        String                     paymentCustomerId
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -325,6 +328,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentRefundFee = paymentRefundFee;
         this.paymentRefundProviderFee = paymentRefundProviderFee;
         this.paymentRefundExternalFee = paymentRefundExternalFee;
+        this.paymentCustomerId = paymentCustomerId;
     }
 
     public Long getId() {
@@ -895,6 +899,14 @@ public class InvoiceEventStat implements Serializable {
         this.paymentRefundExternalFee = paymentRefundExternalFee;
     }
 
+    public String getPaymentCustomerId() {
+        return this.paymentCustomerId;
+    }
+
+    public void setPaymentCustomerId(String paymentCustomerId) {
+        this.paymentCustomerId = paymentCustomerId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -1330,6 +1342,12 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentRefundExternalFee.equals(other.paymentRefundExternalFee))
             return false;
+        if (paymentCustomerId == null) {
+            if (other.paymentCustomerId != null)
+                return false;
+        }
+        else if (!paymentCustomerId.equals(other.paymentCustomerId))
+            return false;
         return true;
     }
 
@@ -1408,6 +1426,7 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((paymentRefundFee == null) ? 0 : paymentRefundFee.hashCode());
         result = prime * result + ((paymentRefundProviderFee == null) ? 0 : paymentRefundProviderFee.hashCode());
         result = prime * result + ((paymentRefundExternalFee == null) ? 0 : paymentRefundExternalFee.hashCode());
+        result = prime * result + ((paymentCustomerId == null) ? 0 : paymentCustomerId.hashCode());
         return result;
     }
 
@@ -1486,6 +1505,7 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentRefundFee);
         sb.append(", ").append(paymentRefundProviderFee);
         sb.append(", ").append(paymentRefundExternalFee);
+        sb.append(", ").append(paymentCustomerId);
 
         sb.append(")");
         return sb.toString();

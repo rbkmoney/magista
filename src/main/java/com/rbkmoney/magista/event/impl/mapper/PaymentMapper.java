@@ -40,30 +40,37 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
 
         Payer payer = invoicePayment.getPayer();
 
-        invoiceEventStat.setPaymentSessionId(payer.getSessionId());
+        if (payer.isSetPaymentResource()) {
+            PaymentResourcePayer resourcePayer = payer.getPaymentResource();
 
-        ContactInfo contactInfo = payer.getContactInfo();
-        invoiceEventStat.setPaymentEmail(contactInfo.getEmail());
-        invoiceEventStat.setPaymentPhoneNumber(contactInfo.getPhoneNumber());
+            DisposablePaymentResource paymentResource = resourcePayer.getResource();
+            invoiceEventStat.setPaymentSessionId(paymentResource.getPaymentSessionId());
 
-        ClientInfo clientInfo = payer.getClientInfo();
-        invoiceEventStat.setPaymentFingerprint(clientInfo.getFingerprint());
-        invoiceEventStat.setPaymentIp(clientInfo.getIpAddress());
+            ContactInfo contactInfo = resourcePayer.getContactInfo();
+            invoiceEventStat.setPaymentEmail(contactInfo.getEmail());
+            invoiceEventStat.setPaymentPhoneNumber(contactInfo.getPhoneNumber());
 
-        PaymentTool paymentTool = payer.getPaymentTool();
-        invoiceEventStat.setPaymentTool(paymentTool.getSetField().getFieldName());
-        if (paymentTool.isSetPaymentTerminal()) {
-            invoiceEventStat.setPaymentTerminalProvider(
-                    paymentTool.getPaymentTerminal().getTerminalType().toString()
-            );
-        }
+            ClientInfo clientInfo = paymentResource.getClientInfo();
+            invoiceEventStat.setPaymentFingerprint(clientInfo.getFingerprint());
+            invoiceEventStat.setPaymentIp(clientInfo.getIpAddress());
 
-        if (paymentTool.isSetBankCard()) {
-            BankCard bankCard = paymentTool.getBankCard();
-            invoiceEventStat.setPaymentMaskedPan(bankCard.getMaskedPan());
-            invoiceEventStat.setPaymentSystem(bankCard.getPaymentSystem().toString());
-            invoiceEventStat.setPaymentBin(bankCard.getBin());
-            invoiceEventStat.setPaymentToken(bankCard.getToken());
+            PaymentTool paymentTool = paymentResource.getPaymentTool();
+            invoiceEventStat.setPaymentTool(paymentTool.getSetField().getFieldName());
+            if (paymentTool.isSetPaymentTerminal()) {
+                invoiceEventStat.setPaymentTerminalProvider(
+                        paymentTool.getPaymentTerminal().getTerminalType().toString()
+                );
+            }
+
+            if (paymentTool.isSetBankCard()) {
+                BankCard bankCard = paymentTool.getBankCard();
+                invoiceEventStat.setPaymentMaskedPan(bankCard.getMaskedPan());
+                invoiceEventStat.setPaymentSystem(bankCard.getPaymentSystem().toString());
+                invoiceEventStat.setPaymentBin(bankCard.getBin());
+                invoiceEventStat.setPaymentToken(bankCard.getToken());
+            }
+        } else if (payer.isSetCustomer()) {
+            invoiceEventStat.setPaymentCustomerId(payer.getCustomer().getCustomerId());
         }
 
         InvoicePaymentStatus status = invoicePayment.getStatus();

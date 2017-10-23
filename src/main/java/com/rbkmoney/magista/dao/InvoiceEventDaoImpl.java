@@ -123,6 +123,7 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setPaymentPhoneNumber(rs.getString("payment_phone_number"));
             invoiceEventStat.setPaymentEmail(rs.getString("payment_email"));
             invoiceEventStat.setPaymentFingerprint(rs.getString("payment_fingerprint"));
+            invoiceEventStat.setPaymentCustomerId(rs.getString("payment_customer_id"));
             invoiceEventStat.setPaymentCreatedAt(rs.getObject("payment_created_at", LocalDateTime.class));
             invoiceEventStat.setPaymentContext(rs.getBytes("payment_context"));
             invoiceEventStat.setPaymentAdjustmentId(rs.getString("payment_adjustment_id"));
