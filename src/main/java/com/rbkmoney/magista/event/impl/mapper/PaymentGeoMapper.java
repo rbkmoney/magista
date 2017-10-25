@@ -31,9 +31,11 @@ public class PaymentGeoMapper implements Mapper<InvoiceEventContext> {
                 invoiceEventStat.getPaymentId(), invoiceEventStat.getInvoiceId(), invoiceEventStat.getEventId(), invoiceEventStat.getPaymentIp());
 
         try {
-            LocationInfo locationInfo = geoProvider.getLocationInfo(invoiceEventStat.getPaymentIp());
-            invoiceEventStat.setPaymentCityId(locationInfo.getCityGeoId());
-            invoiceEventStat.setPaymentCountryId(locationInfo.getCountryGeoId());
+            if (invoiceEventStat.getPaymentIp() != null) {
+                LocationInfo locationInfo = geoProvider.getLocationInfo(invoiceEventStat.getPaymentIp());
+                invoiceEventStat.setPaymentCityId(locationInfo.getCityGeoId());
+                invoiceEventStat.setPaymentCountryId(locationInfo.getCountryGeoId());
+            }
         } catch (ProviderException ex) {
             log.warn("Failed to find city or country by ip:" + invoiceEventStat.getPaymentIp(), ex);
             invoiceEventStat.setPaymentCityId(geo_ipConstants.GEO_ID_UNKNOWN);
