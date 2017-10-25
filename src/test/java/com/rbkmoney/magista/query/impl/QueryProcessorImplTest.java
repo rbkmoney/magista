@@ -147,14 +147,14 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     public void testPaymentsWithoutMerchantAndShopId() {
         String json = "{'query': {'payments': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(10, statResponse.getTotalCount());
+        assertEquals(16, statResponse.getTotalCount());
     }
 
     @Test
     public void testInvoicesWithoutMerchantAndShopId() {
         String json = "{'query': {'invoices': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(8, statResponse.getTotalCount());
+        assertEquals(14, statResponse.getTotalCount());
     }
 
     @Test
@@ -311,7 +311,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
 
         String json3 = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
         StatResponse statResponse3 = queryProcessor.processQuery(json3);
-        assertEquals(4, statResponse3.getData().getRecords().size());
+        assertEquals(5, statResponse3.getData().getRecords().size());
         Map<String, String> result3 = statResponse3.getData().getRecords().stream().filter(
                 t ->
                         t.get("merchant_id").equals("74480e4f-1a36-4edd-8175-7a9e984313b0")
