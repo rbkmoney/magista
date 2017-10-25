@@ -20,3 +20,49 @@ INSERT INTO mst.invoice_event_stat (event_id, event_category, event_type, event_
 
 INSERT INTO mst.payout_event_stat (id, event_id, event_category, event_type, event_created_at, party_id, party_shop_id, payout_id, payout_created_at, payout_status, payout_amount, payout_fee, payout_currency_code, payout_type, payout_card_token, payout_card_masked_pan, payout_card_bin, payout_card_payment_system, payout_account_bank_id, payout_account_bank_corr_id, payout_account_bank_bik, payout_account_bank_name, payout_account_inn, payout_account_legal_agreement_id, payout_account_legal_agreement_signed_at, payout_account_purpose, payout_cancel_details) VALUES (1, 1000, 'PAYOUT', 'PAYOUT_CREATED', '2017-10-09 13:25:22.881000', '281220eb-a4ef-4d03-b666-bdec4b26c5f7', '1507555501740', '1000', '2017-10-09 13:25:22.845000', 'unpaid', 186500, null, 'RUB', 'bank_account', null, null, null, null, '40703810432060000034', '30101810600000000786', '044030786', 'Сбер', '7840290139', null, null, 'Перевод согласно договора номер 006815/07 от 17.06.2015.  Без НДС', null);
 
+
+-- Acts testing
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at)
+VALUES (2067253, 'INVOICE', 'INVOICE_STATUS_CHANGED', '2017-08-23 12:13:24', 'test_party_1', 'test_shop_1', 'uAykKfsktM', 'paid', 'test_product_1', 1000, 'RUB', '2021-08-23 12:12:52', '2017-08-23 12:12:52');
+
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at, payment_status, payment_amount, payment_currency_code, payment_fee, payment_provider_fee, payment_external_fee, payment_id, payment_created_at)
+VALUES (2226237, 'PAYMENT', 'INVOICE_PAYMENT_STATUS_CHANGED', '2017-08-24 16:13:24', 'test_party_1', 'test_shop_1', 'uAykKfsktM', 'unpaid', 'test_product_1', 1000, 'RUB', '2021-08-23 12:12:52', '2017-08-23 12:12:52', 'refunded', 1000, 'RUB', 25, 18, 20, 1, '2017-08-23 12:12:53');
+
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at)
+VALUES (2475599, 'INVOICE', 'INVOICE_STATUS_CHANGED', '2017-08-23 08:30:56', 'test_party_1', 'test_shop_1', 'uWIbtnV7h2', 'paid', 'test_product_1', 1000, 'RUB', '2021-08-23 08:30:33', '2017-08-23 08:30:33');
+
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at, payment_status, payment_amount, payment_currency_code, payment_fee, payment_provider_fee, payment_external_fee, payment_id, payment_created_at)
+VALUES (2475599, 'PAYMENT', 'INVOICE_PAYMENT_STATUS_CHANGED', '2017-08-23 08:30:56', 'test_party_1', 'test_shop_1', 'uWIbtnV7h2', 'unpaid', 'test_product_1', 1000, 'RUB', '2021-08-23 08:30:33', '2017-08-23 08:30:33', 'captured', 1000, 'RUB', 25, 18, 20, 1, '2017-08-23 08:30:34');
+
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at)
+VALUES (2485599, 'INVOICE', 'INVOICE_STATUS_CHANGED', '2017-08-30 08:30:56', 'test_party_1', 'test_shop_1', 'uWIOyeV7h3', 'paid', 'test_product_1', 1000, 'RUB', '2021-08-30 08:30:33', '2017-08-30 08:30:33');
+
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at, payment_status, payment_amount, payment_currency_code, payment_fee, payment_provider_fee, payment_external_fee, payment_id, payment_created_at)
+VALUES (2485599, 'PAYMENT', 'INVOICE_PAYMENT_STATUS_CHANGED', '2017-08-30 08:30:56', 'test_party_1', 'test_shop_1', 'uWIOyeV7h3', 'unpaid', 'test_product_1', 1000, 'RUB', '2021-08-30 08:30:33', '2017-08-30 08:30:33', 'captured', 1000, 'RUB', 25, 18, 20, 1, '2017-08-30 08:30:34');
+
+INSERT INTO mst.payout_event_stat(id, event_id, event_category, event_type, event_created_at, party_id, party_shop_id, payout_id, payout_created_at, payout_status, payout_amount, payout_currency_code, payout_type)
+VALUES (2, 1013, 'PAYOUT', 'PAYOUT_STATUS_CHANGED', '2017-08-28 13:06:46', 'test_party_1', 'test_shop_1', 1014, '2017-08-28 06:00:01', 'confirmed', 950, 'RUB', 'bank_account');
+
+INSERT INTO mst.payout_event_stat(id, event_id, event_category, event_type, event_created_at, party_id, party_shop_id, payout_id, payout_created_at, payout_status, payout_amount, payout_currency_code, payout_type)
+VALUES (3, 1015, 'PAYOUT', 'PAYOUT_STATUS_CHANGED', '2017-09-04 13:06:46', 'test_party_1', 'test_shop_1', 1016, '2017-09-04 06:00:01', 'confirmed', 975, 'RUB', 'bank_account');
+
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at)
+VALUES (3167253, 'INVOICE', 'INVOICE_STATUS_CHANGED', '2017-09-23 12:13:24', 'test_party_1', 'test_shop_1', 'qAyoGtbktM', 'paid', 'test_product_1', 2000, 'RUB', '2021-09-23 12:12:52', '2017-09-23 12:12:52');
+
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at, payment_status, payment_amount, payment_currency_code, payment_fee, payment_provider_fee, payment_external_fee, payment_id, payment_created_at)
+VALUES (3226237, 'PAYMENT', 'INVOICE_PAYMENT_STATUS_CHANGED', '2017-09-24 16:13:24', 'test_party_1', 'test_shop_1', 'qAyoGtbktM', 'unpaid', 'test_product_1', 2000, 'RUB', '2021-09-23 12:12:52', '2017-09-23 12:12:52', 'refunded', 2000, 'RUB', 50, 36, 20, 1, '2017-09-23 12:12:53');
+
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at)
+VALUES (3475599, 'INVOICE', 'INVOICE_STATUS_CHANGED', '2017-09-23 08:30:56', 'test_party_1', 'test_shop_1', 'qWIbtnV7h2', 'paid', 'test_product_1', 2000, 'RUB', '2021-09-23 08:30:33', '2017-09-23 08:30:33');
+
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at, payment_status, payment_amount, payment_currency_code, payment_fee, payment_provider_fee, payment_external_fee, payment_id, payment_created_at)
+VALUES (3475599, 'PAYMENT', 'INVOICE_PAYMENT_STATUS_CHANGED', '2017-09-23 08:30:56', 'test_party_1', 'test_shop_1', 'qWIbtnV7h2', 'unpaid', 'test_product_1', 2000, 'RUB', '2021-09-23 08:30:33', '2017-09-23 08:30:33', 'captured', 2000, 'RUB', 50, 36, 20, 1, '2017-09-23 08:30:34');
+
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at)
+VALUES (3485599, 'INVOICE', 'INVOICE_STATUS_CHANGED', '2017-09-30 08:30:56', 'test_party_1', 'test_shop_1', 'qWIOyeV7h3', 'paid', 'test_product_1', 2000, 'RUB', '2021-09-30 08:30:33', '2017-09-30 08:30:33');
+
+INSERT INTO mst.invoice_event_stat(event_id, event_category, event_type, event_created_at, party_id, party_shop_id, invoice_id, invoice_status, invoice_product, invoice_amount, invoice_currency_code, invoice_due, invoice_created_at, payment_status, payment_amount, payment_currency_code, payment_fee, payment_provider_fee, payment_external_fee, payment_id, payment_created_at)
+VALUES (3485599, 'PAYMENT', 'INVOICE_PAYMENT_STATUS_CHANGED', '2017-09-30 08:30:56', 'test_party_1', 'test_shop_1', 'qWIOyeV7h3', 'unpaid', 'test_product_1', 2000, 'RUB', '2021-09-30 08:30:33', '2017-09-30 08:30:33', 'captured', 2000, 'RUB', 50, 36, 20, 1, '2017-09-30 08:30:34');
+
+INSERT INTO mst.payout_event_stat(id, event_id, event_category, event_type, event_created_at, party_id, party_shop_id, payout_id, payout_created_at, payout_status, payout_amount, payout_currency_code, payout_type)
+VALUES (4, 1017, 'PAYOUT', 'PAYOUT_STATUS_CHANGED', '2017-09-27 13:06:46', 'test_party_1', 'test_shop_1', 1018, '2017-09-27 06:00:01', 'confirmed', 1900, 'RUB', 'bank_account');
