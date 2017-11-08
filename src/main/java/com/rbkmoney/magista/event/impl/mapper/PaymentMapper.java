@@ -2,6 +2,7 @@ package com.rbkmoney.magista.event.impl.mapper;
 
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
@@ -30,13 +31,20 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
         invoiceEventStat.setEventCategory(InvoiceEventCategory.PAYMENT);
         invoiceEventStat.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
 
-        InvoicePayment invoicePayment = invoiceChange
+        InvoicePaymentStarted invoicePaymentStarted = invoiceChange
                 .getInvoicePaymentChange()
                 .getPayload()
-                .getInvoicePaymentStarted()
-                .getPayment();
+                .getInvoicePaymentStarted();
+
+        InvoicePayment invoicePayment = invoicePaymentStarted.getPayment();
 
         invoiceEventStat.setPaymentId(invoicePayment.getId());
+
+        PaymentRoute paymentRoute = invoicePaymentStarted.getRoute();
+        invoiceEventStat.setPaymentProviderId(paymentRoute.getProvider().getId());
+        invoiceEventStat.setPaymentTerminalId(paymentRoute.getTerminal().getId());
+
+        invoiceEventStat.setPaymentDomainRevision(invoicePayment.getDomainRevision());
 
         Payer payer = invoicePayment.getPayer();
 
