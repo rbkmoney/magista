@@ -110,6 +110,9 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
             invoiceEventStat.setPaymentFee(rs.getLong("payment_fee"));
             invoiceEventStat.setPaymentExternalFee(rs.getLong("payment_external_fee"));
             invoiceEventStat.setPaymentProviderFee(rs.getLong("payment_provider_fee"));
+            invoiceEventStat.setPaymentProviderId(rs.getInt("payment_provider_id"));
+            invoiceEventStat.setPaymentTerminalId(rs.getInt("payment_terminal_id"));
+            invoiceEventStat.setPaymentDomainRevision(rs.getLong("payment_domain_revision"));
             invoiceEventStat.setPaymentTool(rs.getString("payment_tool"));
             invoiceEventStat.setPaymentTerminalProvider(rs.getString("payment_terminal_provider"));
             invoiceEventStat.setPaymentMaskedPan(rs.getString("payment_masked_pan"));
