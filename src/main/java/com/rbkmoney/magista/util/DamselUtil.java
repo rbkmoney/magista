@@ -233,11 +233,13 @@ public class DamselUtil {
 
         statPayment.setFlow(toInvoicePaymentFlow(invoicePaymentStat));
 
-        LocationInfo locationInfo = new LocationInfo(
-                invoicePaymentStat.getPaymentCityId(),
-                invoicePaymentStat.getPaymentCountryId()
-        );
-        statPayment.setLocationInfo(locationInfo);
+        if (invoicePaymentStat.getPaymentCountryId() != null && invoicePaymentStat.getPaymentCityId() != null) {
+            LocationInfo locationInfo = new LocationInfo(
+                    invoicePaymentStat.getPaymentCityId(),
+                    invoicePaymentStat.getPaymentCountryId()
+            );
+            statPayment.setLocationInfo(locationInfo);
+        }
 
         return statPayment;
     }
