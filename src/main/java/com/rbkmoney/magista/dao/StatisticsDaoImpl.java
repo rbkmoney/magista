@@ -1,11 +1,11 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
-import com.rbkmoney.magista.domain.enums.*;
+import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
+import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import org.jooq.Comparator;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -18,7 +18,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
@@ -42,7 +45,22 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset,
             Optional<Integer> limit
     ) throws DaoException {
-        Query query = buildInvoiceSelectConditionStepQuery(invoiceParameterSource, paymentParameterSource)
+        Query query = buildInvoiceSelectConditionStepQuery(invoiceParameterSource, paymentParameterSource,
+                INVOICE_EVENT_STAT.PARTY_ID,
+                INVOICE_EVENT_STAT.PARTY_SHOP_ID,
+                INVOICE_EVENT_STAT.INVOICE_ID,
+                INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                INVOICE_EVENT_STAT.INVOICE_STATUS,
+                INVOICE_EVENT_STAT.INVOICE_STATUS_DETAILS,
+                INVOICE_EVENT_STAT.INVOICE_PRODUCT,
+                INVOICE_EVENT_STAT.INVOICE_DESCRIPTION,
+                INVOICE_EVENT_STAT.INVOICE_DUE,
+                INVOICE_EVENT_STAT.INVOICE_AMOUNT,
+                INVOICE_EVENT_STAT.INVOICE_CURRENCY_CODE,
+                INVOICE_EVENT_STAT.INVOICE_CART,
+                INVOICE_EVENT_STAT.INVOICE_CONTEXT_TYPE,
+                INVOICE_EVENT_STAT.INVOICE_CONTEXT
+        )
                 .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
@@ -64,7 +82,39 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset,
             Optional<Integer> limit
     ) throws DaoException {
-        Query query = buildPaymentSelectConditionStepQuery(parameterSource)
+        Query query = buildPaymentSelectConditionStepQuery(parameterSource,
+                INVOICE_EVENT_STAT.PAYMENT_ID,
+                INVOICE_EVENT_STAT.INVOICE_ID,
+                INVOICE_EVENT_STAT.PARTY_ID,
+                INVOICE_EVENT_STAT.PARTY_SHOP_ID,
+                INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
+                INVOICE_EVENT_STAT.PAYMENT_STATUS,
+                INVOICE_EVENT_STAT.PAYMENT_FAILURE_CLASS,
+                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_CODE,
+                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_DESCRIPTION,
+                INVOICE_EVENT_STAT.PAYMENT_AMOUNT,
+                INVOICE_EVENT_STAT.PAYMENT_FEE,
+                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE,
+                INVOICE_EVENT_STAT.PAYMENT_TOOL,
+                INVOICE_EVENT_STAT.PAYMENT_TOKEN,
+                INVOICE_EVENT_STAT.PAYMENT_SYSTEM,
+                INVOICE_EVENT_STAT.PAYMENT_BIN,
+                INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN,
+                INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER,
+                INVOICE_EVENT_STAT.PAYMENT_IP,
+                INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT,
+                INVOICE_EVENT_STAT.PAYMENT_PHONE_NUMBER,
+                INVOICE_EVENT_STAT.PAYMENT_EMAIL,
+                INVOICE_EVENT_STAT.PAYMENT_SESSION_ID,
+                INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID,
+                INVOICE_EVENT_STAT.PAYMENT_FLOW,
+                INVOICE_EVENT_STAT.PAYMENT_HOLD_ON_EXPIRATION,
+                INVOICE_EVENT_STAT.PAYMENT_HOLD_UNTIL,
+                INVOICE_EVENT_STAT.PAYMENT_COUNTRY_ID,
+                INVOICE_EVENT_STAT.PAYMENT_CITY_ID,
+                INVOICE_EVENT_STAT.PAYMENT_CONTEXT_TYPE,
+                INVOICE_EVENT_STAT.PAYMENT_CONTEXT
+        )
                 .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
