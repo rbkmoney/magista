@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
+import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
@@ -107,7 +108,9 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
         );
 
         if (invoicePayment.isSetContext()) {
-            invoiceEventStat.setPaymentContext(invoicePayment.getContext().getData());
+            Content content = invoicePayment.getContext();
+            invoiceEventStat.setPaymentContextType(content.getType());
+            invoiceEventStat.setPaymentContext(content.getData());
         }
 
         InvoicePaymentFlow paymentFlow = invoicePayment.getFlow();

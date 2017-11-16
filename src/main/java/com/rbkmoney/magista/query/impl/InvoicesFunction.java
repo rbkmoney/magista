@@ -1,12 +1,10 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.damsel.base.Content;
-import com.rbkmoney.damsel.domain.InvoiceCart;
-import com.rbkmoney.damsel.merch_stat.*;
-import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.magista.dao.ConditionParameterSource;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
 import com.rbkmoney.magista.query.builder.QueryBuilderException;
@@ -15,15 +13,18 @@ import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.util.DamselUtil;
-import org.apache.http.entity.ContentType;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
+import static com.rbkmoney.magista.util.TypeUtil.toEnumField;
+import static org.jooq.Comparator.*;
 
 /**
  * Created by vpankrashkin on 03.08.16.
@@ -58,68 +59,16 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         return new BaseQueryResult<>(
                 () -> invoicesResult.getDataStream(),
                 () -> {
-                    StatResponseData statResponseData = StatResponseData.invoices(invoicesResult.getDataStream().map(invoice -> toStatInvoice(invoice)).collect(Collectors.toList()));
+                    StatResponseData statResponseData = StatResponseData.invoices(
+                            invoicesResult.getDataStream()
+                                    .map(invoice -> DamselUtil.toStatInvoice(invoice))
+                                    .collect(Collectors.toList())
+                    );
                     StatResponse statResponse = new StatResponse(statResponseData);
                     statResponse.setTotalCount(countResult.getCollectedStream());
                     return statResponse;
                 });
     }
-
-    private StatInvoice toStatInvoice(InvoiceEventStat invoiceEventStat) {
-        StatInvoice statInvoice = new StatInvoice();
-        statInvoice.setId(invoiceEventStat.getInvoiceId());
-        statInvoice.setOwnerId(invoiceEventStat.getPartyId());
-        statInvoice.setShopId(invoiceEventStat.getPartyShopId());
-        statInvoice.setCreatedAt(TypeUtil.temporalToString(
-                invoiceEventStat.getInvoiceCreatedAt().toInstant(ZoneOffset.UTC)
-        ));
-
-        statInvoice.setStatus(toStatInvoiceStatus(
-                com.rbkmoney.damsel.domain.InvoiceStatus._Fields.findByName(
-                        invoiceEventStat.getInvoiceStatus().getLiteral()
-                ), invoiceEventStat.getInvoiceStatusDetails()));
-
-        statInvoice.setProduct(invoiceEventStat.getInvoiceProduct());
-        statInvoice.setDescription(invoiceEventStat.getInvoiceDescription());
-
-        statInvoice.setDue(
-                TypeUtil.temporalToString(invoiceEventStat.getInvoiceDue())
-        );
-        statInvoice.setAmount(invoiceEventStat.getInvoiceAmount());
-        statInvoice.setCurrencySymbolicCode(invoiceEventStat.getInvoiceCurrencyCode());
-
-        if (Objects.nonNull(invoiceEventStat.getInvoiceCart())) {
-            statInvoice.setCart(DamselUtil.fromJson(invoiceEventStat.getInvoiceCart(), InvoiceCart.class));
-        }
-
-        if (invoiceEventStat.getInvoiceContext() != null) {
-            Content content = new Content();
-            //TODO we know about content type in this, its always json
-            content.setType(ContentType.APPLICATION_JSON.getMimeType());
-            content.setData(invoiceEventStat.getInvoiceContext());
-            statInvoice.setContext(content);
-        }
-
-        return statInvoice;
-    }
-
-    private InvoiceStatus toStatInvoiceStatus(com.rbkmoney.damsel.domain.InvoiceStatus._Fields status, String statusDetails) throws NotFoundException {
-        InvoiceStatus._Fields invoiceStatusField = InvoiceStatus._Fields.
-                findByName(status.getFieldName());
-        switch (invoiceStatusField) {
-            case UNPAID:
-                return InvoiceStatus.unpaid(new InvoiceUnpaid());
-            case PAID:
-                return InvoiceStatus.paid(new InvoicePaid());
-            case CANCELLED:
-                return InvoiceStatus.cancelled(new InvoiceCancelled(statusDetails));
-            case FULFILLED:
-                return InvoiceStatus.fulfilled(new InvoiceFulfilled(statusDetails));
-            default:
-                throw new NotFoundException(String.format("Status '%s' not found", status.getFieldName()));
-        }
-    }
-
 
     @Override
     public InvoicesParameters getQueryParameters() {
@@ -252,27 +201,10 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Collection<InvoiceEventStat> result = functionContext.getDao().getInvoices(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        Optional.ofNullable(parameters.getShopCategoryIds()),
-                        Optional.ofNullable(parameters.getInvoiceId()),
-                        Optional.ofNullable(parameters.getPaymentId()),
-                        Optional.ofNullable(parameters.getInvoiceStatus()),
-                        Optional.ofNullable(parameters.getPaymentStatus()),
-                        Optional.ofNullable(parameters.getInvoiceAmount()),
-                        Optional.ofNullable(parameters.getPaymentAmount()),
-                        Optional.ofNullable(parameters.getPaymentFlow()),
-                        Optional.ofNullable(parameters.getPaymentMethod()),
-                        Optional.ofNullable(parameters.getPaymentTerminalProvider()),
-                        Optional.ofNullable(parameters.getPaymentEmail()),
-                        Optional.ofNullable(parameters.getPaymentIp()),
-                        Optional.ofNullable(parameters.getPaymentFingerprint()),
-                        Optional.ofNullable(parameters.getPanMask()),
-                        Optional.ofNullable(parameters.getPaymentCustomerId()),
-                        Optional.ofNullable(Instant.from(parameters.getFromTime())),
-                        Optional.ofNullable(Instant.from(parameters.getToTime())),
-                        Optional.ofNullable(parameters.getSize()),
-                        Optional.ofNullable(parameters.getFrom())
+                        buildInvoiceConditionParameterSource(parameters),
+                        buildPaymentConditionParameterSource(parameters),
+                        Optional.ofNullable(parameters.getFrom()),
+                        Optional.ofNullable(parameters.getSize())
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);
             } catch (DaoException e) {
@@ -294,32 +226,54 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Integer result = functionContext.getDao().getInvoicesCount(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        Optional.ofNullable(parameters.getShopCategoryIds()),
-                        Optional.ofNullable(parameters.getInvoiceId()),
-                        Optional.ofNullable(parameters.getPaymentId()),
-                        Optional.ofNullable(parameters.getInvoiceStatus()),
-                        Optional.ofNullable(parameters.getPaymentStatus()),
-                        Optional.ofNullable(parameters.getInvoiceAmount()),
-                        Optional.ofNullable(parameters.getPaymentAmount()),
-                        Optional.ofNullable(parameters.getPaymentFlow()),
-                        Optional.ofNullable(parameters.getPaymentMethod()),
-                        Optional.ofNullable(parameters.getPaymentTerminalProvider()),
-                        Optional.ofNullable(parameters.getPaymentEmail()),
-                        Optional.ofNullable(parameters.getPaymentIp()),
-                        Optional.ofNullable(parameters.getPaymentFingerprint()),
-                        Optional.ofNullable(parameters.getPanMask()),
-                        Optional.ofNullable(parameters.getPaymentCustomerId()),
-                        Optional.ofNullable(Instant.from(parameters.getFromTime())),
-                        Optional.ofNullable(Instant.from(parameters.getToTime())),
-                        Optional.ofNullable(parameters.getSize()),
-                        Optional.ofNullable(parameters.getFrom())
+                        buildInvoiceConditionParameterSource(parameters),
+                        buildPaymentConditionParameterSource(parameters)
                 );
                 return new BaseQueryResult<>(() -> Stream.of(result), () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }
         }
+    }
+
+    public static ConditionParameterSource buildInvoiceConditionParameterSource(InvoicesParameters parameters) {
+        return new ConditionParameterSource()
+                .addValue(INVOICE_EVENT_STAT.PARTY_ID, parameters.getMerchantId(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_STATUS,
+                        toEnumField(
+                                parameters.getInvoiceStatus(),
+                                com.rbkmoney.magista.domain.enums.InvoiceStatus.class
+                        ),
+                        EQUALS)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_AMOUNT, parameters.getInvoiceAmount(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                        parameters.getFromTime() != null ? LocalDateTime.ofInstant(Instant.from(parameters.getFromTime()), ZoneOffset.UTC) : null,
+                        GREATER_OR_EQUAL)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                        parameters.getToTime() != null ? LocalDateTime.ofInstant(Instant.from(parameters.getToTime()), ZoneOffset.UTC) : null,
+                        LESS)
+                .addInConditionValue(INVOICE_EVENT_STAT.PARTY_SHOP_CATEGORY_ID, parameters.getShopCategoryIds());
+    }
+
+    public static ConditionParameterSource buildPaymentConditionParameterSource(InvoicesParameters parameters) {
+        return new ConditionParameterSource()
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_STATUS,
+                        toEnumField(
+                                parameters.getPaymentStatus(),
+                                com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class
+                        ),
+                        EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_FLOW, parameters.getPaymentFlow(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_EMAIL, parameters.getPaymentEmail(), LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_IP, parameters.getPaymentIp(), LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, parameters.getPanMask(), LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS);
     }
 }

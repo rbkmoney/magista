@@ -1,13 +1,11 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.damsel.base.Content;
-import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
-import com.rbkmoney.damsel.geo_ip.LocationInfo;
-import com.rbkmoney.damsel.merch_stat.*;
-import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.magista.dao.ConditionParameterSource;
+import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
 import com.rbkmoney.magista.query.builder.QueryBuilderException;
@@ -15,16 +13,20 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import org.apache.http.entity.ContentType;
+import com.rbkmoney.magista.util.DamselUtil;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
+import static com.rbkmoney.magista.util.TypeUtil.toEnumField;
+import static org.jooq.Comparator.*;
 
 /**
  * Created by vpankrashkin on 03.08.16.
@@ -60,147 +62,12 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 () -> paymentsResult.getDataStream(),
                 () -> {
                     StatResponseData statResponseData = StatResponseData.payments(paymentsResult.getDataStream()
-                            .map(payment -> toStatPayment(payment)).collect(Collectors.toList()));
+                            .map(payment -> DamselUtil.toStatPayment(payment)).collect(Collectors.toList()));
                     StatResponse statResponse = new StatResponse(statResponseData);
                     statResponse.setTotalCount(countResult.getCollectedStream());
                     return statResponse;
                 }
         );
-    }
-
-    private StatPayment toStatPayment(InvoiceEventStat invoicePaymentStat) {
-        StatPayment statPayment = new StatPayment();
-
-        statPayment.setId(invoicePaymentStat.getPaymentId());
-        statPayment.setInvoiceId(invoicePaymentStat.getInvoiceId());
-        statPayment.setOwnerId(invoicePaymentStat.getPartyId());
-        statPayment.setShopId(invoicePaymentStat.getPartyShopId());
-        statPayment.setCreatedAt(TypeUtil.temporalToString(invoicePaymentStat.getPaymentCreatedAt()
-                .toInstant(ZoneOffset.UTC)));
-        statPayment.setStatus(toStatPaymentStatus(
-                com.rbkmoney.damsel.domain.InvoicePaymentStatus._Fields.findByName(
-                        invoicePaymentStat.getPaymentStatus().getLiteral()
-                ),
-                invoicePaymentStat.getPaymentFailureClass(),
-                invoicePaymentStat.getPaymentExternalFailureCode(),
-                invoicePaymentStat.getPaymentExternalFailureDescription()
-        ));
-
-        statPayment.setAmount(invoicePaymentStat.getPaymentAmount());
-        statPayment.setFee(invoicePaymentStat.getPaymentFee());
-        statPayment.setCurrencySymbolicCode(invoicePaymentStat.getPaymentCurrencyCode());
-
-        if (invoicePaymentStat.getPaymentTool() != null) {
-            PaymentResourcePayer paymentResourcePayer = new PaymentResourcePayer();
-            PaymentTool paymentTool = toStatPaymentTool(
-                    com.rbkmoney.damsel.domain.PaymentTool._Fields.findByName(
-                            invoicePaymentStat.getPaymentTool()
-                    ),
-                    invoicePaymentStat
-            );
-            paymentResourcePayer.setPaymentTool(paymentTool);
-            paymentResourcePayer.setIpAddress(invoicePaymentStat.getPaymentIp());
-            paymentResourcePayer.setFingerprint(invoicePaymentStat.getPaymentFingerprint());
-            paymentResourcePayer.setPhoneNumber(invoicePaymentStat.getPaymentPhoneNumber());
-            paymentResourcePayer.setEmail(invoicePaymentStat.getPaymentEmail());
-            paymentResourcePayer.setSessionId(invoicePaymentStat.getPaymentSessionId());
-
-            statPayment.setPayer(Payer.payment_resource(paymentResourcePayer));
-        } else if (invoicePaymentStat.getPaymentCustomerId() != null) {
-            statPayment.setPayer(Payer.customer(new CustomerPayer(invoicePaymentStat.getPaymentCustomerId())));
-        }
-
-        if (invoicePaymentStat.getPaymentContext() != null) {
-            Content content = new Content();
-            //TODO we know about content type in this, its always json
-            content.setType(ContentType.APPLICATION_JSON.getMimeType());
-            content.setData(invoicePaymentStat.getPaymentContext());
-            statPayment.setContext(content);
-        }
-
-        statPayment.setFlow(toInvoicePaymentFlow(invoicePaymentStat));
-
-        LocationInfo locationInfo = new LocationInfo(
-                invoicePaymentStat.getPaymentCityId(),
-                invoicePaymentStat.getPaymentCountryId()
-        );
-        statPayment.setLocationInfo(locationInfo);
-
-        return statPayment;
-    }
-
-    private InvoicePaymentFlow toInvoicePaymentFlow(InvoiceEventStat invoiceEventStat) {
-        InvoicePaymentFlow._Fields paymentFlow = InvoicePaymentFlow._Fields.findByName(invoiceEventStat.getPaymentFlow());
-        switch (paymentFlow) {
-            case HOLD:
-                return InvoicePaymentFlow.hold(new InvoicePaymentFlowHold(
-                        OnHoldExpiration.valueOf(invoiceEventStat.getPaymentHoldOnExpiration()),
-                        TypeUtil.temporalToString(invoiceEventStat.getPaymentHoldUntil())
-                ));
-            case INSTANT:
-                return InvoicePaymentFlow.instant(new InvoicePaymentFlowInstant());
-            default:
-                throw new NotFoundException(String.format("Payment flow '%s' not found.", invoiceEventStat.getPaymentFlow()));
-        }
-    }
-
-    private PaymentTool toStatPaymentTool(com.rbkmoney.damsel.domain.PaymentTool._Fields paymentTool, InvoiceEventStat invoicePaymentStat) {
-        switch (paymentTool) {
-            case BANK_CARD:
-                return PaymentTool.bank_card(new BankCard(
-                        invoicePaymentStat.getPaymentToken(),
-                        BankCardPaymentSystem.valueOf(invoicePaymentStat.getPaymentSystem()),
-                        invoicePaymentStat.getPaymentBin(),
-                        invoicePaymentStat.getPaymentMaskedPan()
-                ));
-            case PAYMENT_TERMINAL:
-                return PaymentTool.payment_terminal(new PaymentTerminal(
-                        TerminalPaymentProvider.valueOf(invoicePaymentStat.getPaymentTerminalProvider())
-                ));
-            default:
-                throw new NotFoundException(String.format("Payment tool '%s' not found", paymentTool.getFieldName()));
-        }
-    }
-
-    private InvoicePaymentStatus toStatPaymentStatus(
-            com.rbkmoney.damsel.domain.InvoicePaymentStatus._Fields status,
-            String failureClass,
-            String externalFailureCode,
-            String externalFailureDescription
-    ) {
-        switch (status) {
-            case PENDING:
-                return InvoicePaymentStatus.pending(new InvoicePaymentPending());
-            case PROCESSED:
-                return InvoicePaymentStatus.processed(new InvoicePaymentProcessed());
-            case CAPTURED:
-                return InvoicePaymentStatus.captured(new InvoicePaymentCaptured());
-            case CANCELLED:
-                return InvoicePaymentStatus.cancelled(new InvoicePaymentCancelled());
-            case REFUNDED:
-                return InvoicePaymentStatus.refunded(new InvoicePaymentRefunded());
-            case FAILED:
-                return InvoicePaymentStatus.failed(new InvoicePaymentFailed(
-                        toOperationFailure(failureClass, externalFailureCode, externalFailureDescription)
-                ));
-            default:
-                throw new NotFoundException(String.format("Payment status '%s' not found", status.getFieldName()));
-        }
-    }
-
-    private OperationFailure toOperationFailure(String failureClass, String externalFailureCode, String externalFailureDescription) {
-        OperationFailure._Fields failureType = OperationFailure._Fields.findByName(failureClass);
-        switch (failureType) {
-            case OPERATION_TIMEOUT:
-                return OperationFailure.operation_timeout(new OperationTimeout());
-            case EXTERNAL_FAILURE:
-                ExternalFailure externalFailure = new ExternalFailure();
-                externalFailure.setCode(externalFailureCode);
-                externalFailure.setDescription(externalFailureDescription);
-                return OperationFailure.external_failure(externalFailure);
-            default:
-                throw new NotFoundException(String.format("Failure type '%s' not found", failureClass));
-        }
     }
 
     @Override
@@ -379,25 +246,9 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Collection<InvoiceEventStat> result = functionContext.getDao().getPayments(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        Optional.ofNullable(parameters.getShopCategoryIds()),
-                        Optional.ofNullable(parameters.getInvoiceId()),
-                        Optional.ofNullable(parameters.getPaymentId()),
-                        Optional.ofNullable(parameters.getPaymentStatus()),
-                        Optional.ofNullable(parameters.getPaymentFlow()),
-                        Optional.ofNullable(parameters.getPaymentMethod()),
-                        Optional.ofNullable(parameters.getPaymentTerminalProvider()),
-                        Optional.ofNullable(parameters.getPaymentEmail()),
-                        Optional.ofNullable(parameters.getPaymentIp()),
-                        Optional.ofNullable(parameters.getPaymentFingerprint()),
-                        Optional.ofNullable(parameters.getPanMask()),
-                        Optional.ofNullable(parameters.getPaymentAmount()),
-                        Optional.ofNullable(parameters.getPaymentCustomerId()),
-                        Optional.ofNullable(Instant.from(parameters.getFromTime())),
-                        Optional.ofNullable(Instant.from(parameters.getToTime())),
-                        Optional.ofNullable(parameters.getSize()),
-                        Optional.ofNullable(parameters.getFrom())
+                        buildPaymentConditionParameterSource(parameters),
+                        Optional.ofNullable(parameters.getFrom()),
+                        Optional.ofNullable(parameters.getSize())
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);
             } catch (DaoException e) {
@@ -419,30 +270,39 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Integer result = functionContext.getDao().getPaymentsCount(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        Optional.ofNullable(parameters.getShopCategoryIds()),
-                        Optional.ofNullable(parameters.getInvoiceId()),
-                        Optional.ofNullable(parameters.getPaymentId()),
-                        Optional.ofNullable(parameters.getPaymentStatus()),
-                        Optional.ofNullable(parameters.getPaymentFlow()),
-                        Optional.ofNullable(parameters.getPaymentMethod()),
-                        Optional.ofNullable(parameters.getPaymentTerminalProvider()),
-                        Optional.ofNullable(parameters.getPaymentEmail()),
-                        Optional.ofNullable(parameters.getPaymentIp()),
-                        Optional.ofNullable(parameters.getPaymentFingerprint()),
-                        Optional.ofNullable(parameters.getPanMask()),
-                        Optional.ofNullable(parameters.getPaymentAmount()),
-                        Optional.ofNullable(parameters.getPaymentCustomerId()),
-                        Optional.ofNullable(Instant.from(parameters.getFromTime())),
-                        Optional.ofNullable(Instant.from(parameters.getToTime())),
-                        Optional.ofNullable(parameters.getSize()),
-                        Optional.ofNullable(parameters.getFrom())
+                        buildPaymentConditionParameterSource(parameters)
                 );
                 return new BaseQueryResult<>(() -> Stream.of(result), () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }
         }
+    }
+
+    public static ConditionParameterSource buildPaymentConditionParameterSource(PaymentsParameters parameters) {
+        return new ConditionParameterSource()
+                .addValue(INVOICE_EVENT_STAT.PARTY_ID, parameters.getMerchantId(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_STATUS,
+                        toEnumField(parameters.getPaymentStatus(), InvoicePaymentStatus.class),
+                        EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_FLOW, parameters.getPaymentFlow(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_EMAIL, parameters.getPaymentEmail(), LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_IP, parameters.getPaymentIp(), LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, parameters.getPanMask(), LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
+                        parameters.getFromTime() != null ? LocalDateTime.ofInstant(Instant.from(parameters.getFromTime()), ZoneOffset.UTC) : null,
+                        GREATER_OR_EQUAL)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
+                        parameters.getToTime() != null ? LocalDateTime.ofInstant(Instant.from(parameters.getToTime()), ZoneOffset.UTC) : null,
+                        org.jooq.Comparator.LESS)
+                .addInConditionValue(INVOICE_EVENT_STAT.PARTY_SHOP_CATEGORY_ID, parameters.getShopCategoryIds());
     }
 }

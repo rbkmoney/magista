@@ -1,5 +1,7 @@
 package com.rbkmoney.magista.dao;
 
+import com.rbkmoney.magista.dao.field.CollectionConditionField;
+import com.rbkmoney.magista.dao.field.ConditionField;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.*;
 import org.jooq.conf.ParamType;
@@ -140,16 +142,24 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
     }
 
     protected Condition appendConditions(Condition condition, Operator operator, ConditionParameterSource conditionParameterSource) {
-        for (ConditionParameterSource.ConditionField field : conditionParameterSource.getConditionFields()) {
+        for (ConditionField field : conditionParameterSource.getConditionFields()) {
             if (field.getValue() != null) {
-                condition = DSL.condition(operator, condition,
-                        field.getField().compare(
-                                field.getComparator(),
-                                field.getValue()
-                        ));
+                condition = DSL.condition(operator, condition, buildCondition(field));
             }
         }
         return condition;
+    }
+
+    private Condition buildCondition(ConditionField field) {
+        if (field.getComparator() == Comparator.IN) {
+            if (field instanceof CollectionConditionField) {
+                return field.getField().in(((CollectionConditionField) field).getValue());
+            }
+        }
+        return field.getField().compare(
+                field.getComparator(),
+                field.getValue()
+        );
     }
 
     protected SqlParameterSource toSqlParameterSource(Map<String, Param<?>> params) {
