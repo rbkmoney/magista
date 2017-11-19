@@ -11,7 +11,6 @@ import io.github.benas.randombeans.EnhancedRandomBuilder;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import org.apache.thrift.TException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,7 @@ import java.util.LongSummaryStatistics;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-@Ignore
+//@Ignore
 public class OffsetPerformanceTest extends AbstractIntegrationTest {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -90,15 +89,22 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
     }
 
     private void doOffset(String category, Function<StatRequest, StatResponse> action, LocalDateTime fromTime, LocalDateTime toTime, int offsetStep, int size) throws TException {
-        LongSummaryStatistics statistics = IntStream.rangeClosed(1, (count / 2) / offsetStep)
+        String dsl = String.format("{\"query\":{\"%s\":{\"from_time\":\"%s\",\"to_time\":\"%s\"}}}",
+                category, TypeUtil.temporalToString(fromTime), TypeUtil.temporalToString(toTime));
+        int totalCount = action.apply(new StatRequest(dsl)).getTotalCount();
+
+        log.info("Total count of {} - {}", category, totalCount);
+
+        LongSummaryStatistics statistics = IntStream.rangeClosed(0, totalCount / offsetStep)
                 .parallel()
                 .mapToLong(
                         offset -> {
-                            String dsl = String.format("{\"query\":{\"%s\":{\"from_time\":\"%s\",\"to_time\":\"%s\",\"from\":%d,\"size\":%d}}}",
-                                    category, TypeUtil.temporalToString(fromTime), TypeUtil.temporalToString(toTime), offset * offsetStep, size);
+                            StatRequest statRequest = new StatRequest(
+                                    String.format("{\"query\":{\"%s\":{\"from_time\":\"%s\",\"to_time\":\"%s\",\"from\":%d,\"size\":%d}}}",
+                                            category, TypeUtil.temporalToString(fromTime), TypeUtil.temporalToString(toTime), offset * offsetStep, size));
 
                             long start = System.currentTimeMillis();
-                            action.apply(new StatRequest(dsl));
+                            action.apply(statRequest);
                             return System.currentTimeMillis() - start;
                         }
                 ).summaryStatistics();
