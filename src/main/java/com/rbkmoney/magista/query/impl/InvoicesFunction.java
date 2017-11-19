@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
 import static com.rbkmoney.magista.util.TypeUtil.toEnumField;
+import static com.rbkmoney.magista.util.TypeUtil.toLocalDateTime;
 import static org.jooq.Comparator.*;
 
 /**
@@ -248,12 +249,8 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                         ),
                         EQUALS)
                 .addValue(INVOICE_EVENT_STAT.INVOICE_AMOUNT, parameters.getInvoiceAmount(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
-                        parameters.getFromTime() != null ? LocalDateTime.ofInstant(Instant.from(parameters.getFromTime()), ZoneOffset.UTC) : null,
-                        GREATER_OR_EQUAL)
-                .addValue(INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
-                        parameters.getToTime() != null ? LocalDateTime.ofInstant(Instant.from(parameters.getToTime()), ZoneOffset.UTC) : null,
-                        LESS)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_CREATED_AT, toLocalDateTime(parameters.getFromTime()), GREATER_OR_EQUAL)
+                .addValue(INVOICE_EVENT_STAT.INVOICE_CREATED_AT, toLocalDateTime(parameters.getToTime()), LESS)
                 .addInConditionValue(INVOICE_EVENT_STAT.PARTY_SHOP_CATEGORY_ID, parameters.getShopCategoryIds());
     }
 

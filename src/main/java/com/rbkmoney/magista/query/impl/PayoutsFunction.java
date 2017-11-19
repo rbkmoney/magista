@@ -28,6 +28,7 @@ import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_ST
 import static com.rbkmoney.magista.query.impl.Parameters.*;
 import static com.rbkmoney.magista.util.TypeUtil.toEnumField;
 import static com.rbkmoney.magista.util.TypeUtil.toEnumFields;
+import static com.rbkmoney.magista.util.TypeUtil.toLocalDateTime;
 import static org.jooq.Comparator.*;
 
 public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResponse> implements CompositeQuery<PayoutEventStat, StatResponse> {
@@ -257,12 +258,8 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
                 .addValue(PAYOUT_EVENT_STAT.PAYOUT_TYPE,
                         toEnumField(parameters.getPayoutType(), PayoutType.class),
                         EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT,
-                        parameters.getFromTime() != null ? LocalDateTime.ofInstant(Instant.from(parameters.getFromTime()), ZoneOffset.UTC) : null,
-                        GREATER_OR_EQUAL)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT,
-                        parameters.getToTime() != null ? LocalDateTime.ofInstant(Instant.from(parameters.getToTime()), ZoneOffset.UTC) : null,
-                        LESS);
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT, toLocalDateTime(parameters.getFromTime()), GREATER_OR_EQUAL)
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT, toLocalDateTime(parameters.getToTime()), LESS);
     }
 
 }

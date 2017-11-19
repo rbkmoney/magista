@@ -64,7 +64,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
-        return fetch(query, InvoiceEventDaoImpl.getRowMapper());
+        return fetch(query, InvoiceEventDaoImpl.ROW_MAPPER);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
-        return fetch(query, InvoiceEventDaoImpl.getRowMapper());
+        return fetch(query, InvoiceEventDaoImpl.ROW_MAPPER);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
 
-        return fetch(query, PayoutEventDaoImpl.getRowMapper());
+        return fetch(query, PayoutEventDaoImpl.ROW_MAPPER);
     }
 
     @Override

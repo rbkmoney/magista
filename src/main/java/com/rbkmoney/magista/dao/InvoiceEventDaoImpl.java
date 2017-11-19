@@ -2,16 +2,12 @@ package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
-import com.rbkmoney.magista.domain.tables.records.InvoiceEventStatRecord;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.util.TypeUtil;
 import org.jooq.Condition;
-import org.jooq.Field;
 import org.jooq.Query;
 import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
-import java.sql.ResultSetMetaData;
 
 import static com.rbkmoney.magista.domain.Tables.INVOICE_EVENT_STAT;
 
@@ -19,6 +15,8 @@ import static com.rbkmoney.magista.domain.Tables.INVOICE_EVENT_STAT;
  * Created by tolkonepiu on 26/05/2017.
  */
 public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao {
+
+    public static final RowMapper<InvoiceEventStat> ROW_MAPPER = new RecordRowMapper<>(INVOICE_EVENT_STAT, InvoiceEventStat.class);
 
     public InvoiceEventDaoImpl(DataSource dataSource) {
         super(dataSource);
@@ -36,7 +34,7 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
                 .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
                         .and(INVOICE_EVENT_STAT.PAYMENT_ID.eq(paymentId))
                         .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)));
-        return fetchOne(query, getRowMapper());
+        return fetchOne(query, ROW_MAPPER);
     }
 
     @Override
@@ -44,7 +42,7 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
         Query query = getDslContext().selectFrom(INVOICE_EVENT_STAT)
                 .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
                         .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE)));
-        return fetchOne(query, getRowMapper(), getNamedParameterJdbcTemplate());
+        return fetchOne(query, ROW_MAPPER);
     }
 
     @Override
@@ -72,29 +70,4 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
         executeOne(query);
     }
 
-    public static RowMapper<InvoiceEventStat> getRowMapper() {
-        return (rs, i) -> {
-            ResultSetMetaData rsMetaData = rs.getMetaData();
-            int columnCount = rsMetaData.getColumnCount();
-
-            InvoiceEventStatRecord invoiceEventStatRecord = new InvoiceEventStatRecord();
-            for (int column = 1; column <= columnCount; column++) {
-                String columnName = rsMetaData.getColumnName(column);
-                Field field = invoiceEventStatRecord.field(columnName);
-
-                Object value;
-                if (field.getDataType().isBinary()) {
-                    value = rs.getBytes(field.getName());
-                } else if (field.getType().isEnum()) {
-                    value = TypeUtil.toEnumField(rs.getString(field.getName()), field.getType());
-                } else {
-                    value = rs.getObject(field.getName(), field.getType());
-                }
-                if (value != null) {
-                    invoiceEventStatRecord.set(field, value);
-                }
-            }
-            return invoiceEventStatRecord.into(InvoiceEventStat.class);
-        };
-    }
 }

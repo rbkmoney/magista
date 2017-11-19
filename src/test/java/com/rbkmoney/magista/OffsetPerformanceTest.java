@@ -13,6 +13,8 @@ import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
 
@@ -26,6 +28,8 @@ import java.util.stream.IntStream;
 
 @Ignore
 public class OffsetPerformanceTest extends AbstractIntegrationTest {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private MerchantStatisticsSrv.Iface client;
 
@@ -42,12 +46,13 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
     int count = 80_000;
 
     @Before
-    public void setup() throws URISyntaxException {
+    public void setUp() throws URISyntaxException {
         EnhancedRandom enhancedRandom = EnhancedRandomBuilder
                 .aNewEnhancedRandomBuilder()
                 .dateRange(start, end)
                 .build();
 
+        log.info("Insert {} rows...", count);
         enhancedRandom.objects(InvoiceEventStat.class, count, "invoiceCart")
                 .map(invoiceEventStat -> {
                     invoiceEventStat.setPaymentFailureClass("operation_timeout");
@@ -58,6 +63,7 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
                 })
                 .parallel()
                 .forEach(invoiceEventStat -> invoiceEventDao.insert(invoiceEventStat));
+        log.info("{} rows successfully inserted", count);
 
         client = new THSpawnClientBuilder()
                 .withNetworkTimeout(-1)
@@ -65,7 +71,7 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void offsetTest() throws TException {
+    public void testOffset() throws TException {
         doOffset("invoices", statRequest -> {
             try {
                 return client.getInvoices(statRequest);
@@ -96,8 +102,10 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
                             return System.currentTimeMillis() - start;
                         }
                 ).summaryStatistics();
-
-        System.out.println(String.format("%s: requestCount=%d, averageTime=%f, minTime=%d, maxTime=%d", category, statistics.getCount(), statistics.getAverage(), statistics.getMin(), statistics.getMax()));
+        log.info("Result of processing: {}, {} events, time = {} ms, average = {}, min = {}, max = {}",
+                category,
+                statistics.getCount(), statistics.getSum(), statistics.getAverage(),
+                statistics.getMin(), statistics.getMax());
     }
 
 }
