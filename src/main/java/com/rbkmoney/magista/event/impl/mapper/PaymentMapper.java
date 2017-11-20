@@ -54,31 +54,19 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
             DisposablePaymentResource paymentResource = resourcePayer.getResource();
             invoiceEventStat.setPaymentSessionId(paymentResource.getPaymentSessionId());
 
-            ContactInfo contactInfo = resourcePayer.getContactInfo();
-            invoiceEventStat.setPaymentEmail(contactInfo.getEmail());
-            invoiceEventStat.setPaymentPhoneNumber(contactInfo.getPhoneNumber());
+            mapContactInfo(invoiceEventStat, resourcePayer.getContactInfo());
+            mapPaymentTool(invoiceEventStat, paymentResource.getPaymentTool());
 
             ClientInfo clientInfo = paymentResource.getClientInfo();
             invoiceEventStat.setPaymentFingerprint(clientInfo.getFingerprint());
             invoiceEventStat.setPaymentIp(clientInfo.getIpAddress());
+        }
 
-            PaymentTool paymentTool = paymentResource.getPaymentTool();
-            invoiceEventStat.setPaymentTool(paymentTool.getSetField().getFieldName());
-            if (paymentTool.isSetPaymentTerminal()) {
-                invoiceEventStat.setPaymentTerminalProvider(
-                        paymentTool.getPaymentTerminal().getTerminalType().toString()
-                );
-            }
-
-            if (paymentTool.isSetBankCard()) {
-                BankCard bankCard = paymentTool.getBankCard();
-                invoiceEventStat.setPaymentMaskedPan(bankCard.getMaskedPan());
-                invoiceEventStat.setPaymentSystem(bankCard.getPaymentSystem().toString());
-                invoiceEventStat.setPaymentBin(bankCard.getBin());
-                invoiceEventStat.setPaymentToken(bankCard.getToken());
-            }
-        } else if (payer.isSetCustomer()) {
-            invoiceEventStat.setPaymentCustomerId(payer.getCustomer().getCustomerId());
+        if (payer.isSetCustomer()) {
+            CustomerPayer customerPayer = payer.getCustomer();
+            invoiceEventStat.setPaymentCustomerId(customerPayer.getCustomerId());
+            mapPaymentTool(invoiceEventStat, customerPayer.getPaymentTool());
+            mapContactInfo(invoiceEventStat, customerPayer.getContactInfo());
         }
 
         InvoicePaymentStatus status = invoicePayment.getStatus();
@@ -121,6 +109,28 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
         }
 
         return invoiceEventStat;
+    }
+
+    private void mapPaymentTool(InvoiceEventStat invoiceEventStat, PaymentTool paymentTool) {
+        invoiceEventStat.setPaymentTool(paymentTool.getSetField().getFieldName());
+        if (paymentTool.isSetPaymentTerminal()) {
+            invoiceEventStat.setPaymentTerminalProvider(
+                    paymentTool.getPaymentTerminal().getTerminalType().toString()
+            );
+        }
+
+        if (paymentTool.isSetBankCard()) {
+            BankCard bankCard = paymentTool.getBankCard();
+            invoiceEventStat.setPaymentMaskedPan(bankCard.getMaskedPan());
+            invoiceEventStat.setPaymentSystem(bankCard.getPaymentSystem().toString());
+            invoiceEventStat.setPaymentBin(bankCard.getBin());
+            invoiceEventStat.setPaymentToken(bankCard.getToken());
+        }
+    }
+
+    private void mapContactInfo(InvoiceEventStat invoiceEventStat, ContactInfo contactInfo) {
+        invoiceEventStat.setPaymentEmail(contactInfo.getEmail());
+        invoiceEventStat.setPaymentPhoneNumber(contactInfo.getPhoneNumber());
     }
 
 }
