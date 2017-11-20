@@ -11,6 +11,7 @@ import io.github.benas.randombeans.EnhancedRandomBuilder;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import org.apache.thrift.TException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ import java.util.LongSummaryStatistics;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-//@Ignore
+@Ignore
 public class OffsetPerformanceTest extends AbstractIntegrationTest {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());

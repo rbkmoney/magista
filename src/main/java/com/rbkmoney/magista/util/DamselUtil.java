@@ -46,6 +46,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -140,7 +141,7 @@ public class DamselUtil {
         statPayout.setShopId(payoutEvent.getPartyShopId());
         statPayout.setAmount(payoutEvent.getPayoutAmount());
         statPayout.setStatus(toPayoutStatus(payoutEvent));
-        statPayout.setFee(payoutEvent.getPayoutFee());
+        statPayout.setFee(Optional.ofNullable(payoutEvent.getPayoutFee()).orElse(0L));
         statPayout.setCurrencySymbolicCode(payoutEvent.getPayoutCurrencyCode());
         statPayout.setCreatedAt(
                 TypeUtil.temporalToString(payoutEvent.getPayoutCreatedAt())
