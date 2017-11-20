@@ -45,6 +45,9 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
 
     int count = 80_000;
 
+    String partyId = "test";
+    String shopId = "test";
+
     @Before
     public void setUp() throws URISyntaxException {
         EnhancedRandom enhancedRandom = EnhancedRandomBuilder
@@ -55,6 +58,8 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
         log.info("Insert {} rows...", count);
         enhancedRandom.objects(InvoiceEventStat.class, count, "invoiceCart")
                 .map(invoiceEventStat -> {
+                    invoiceEventStat.setPartyId(partyId);
+                    invoiceEventStat.setPartyShopId(shopId);
                     invoiceEventStat.setPaymentFailureClass("operation_timeout");
                     invoiceEventStat.setPaymentTool("bank_card");
                     invoiceEventStat.setPaymentSystem("mastercard");
@@ -78,7 +83,7 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
             } catch (TException ex) {
                 throw new RuntimeException(ex);
             }
-        }, start.atStartOfDay(), end.atStartOfDay(), 1000, 1000);
+        }, partyId, shopId, start.atStartOfDay(), end.atStartOfDay(), 1000, 1000);
 
         doOffset("payments", statRequest -> {
             try {
@@ -86,10 +91,10 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
             } catch (TException ex) {
                 throw new RuntimeException(ex);
             }
-        }, start.atStartOfDay(), end.atStartOfDay(), 1000, 1000);
+        }, partyId, shopId, start.atStartOfDay(), end.atStartOfDay(),1000, 1000);
     }
 
-    private void doOffset(String category, Function<StatRequest, StatResponse> action, LocalDateTime fromTime, LocalDateTime toTime, int offsetStep, int size) throws TException {
+    private void doOffset(String category, Function<StatRequest, StatResponse> action, String partyId, String shopId, LocalDateTime fromTime, LocalDateTime toTime, int offsetStep, int size) throws TException {
         String dsl = String.format("{\"query\":{\"%s\":{\"from_time\":\"%s\",\"to_time\":\"%s\"}}}",
                 category, TypeUtil.temporalToString(fromTime), TypeUtil.temporalToString(toTime));
         int totalCount = action.apply(new StatRequest(dsl)).getTotalCount();
@@ -101,8 +106,8 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
                 .mapToLong(
                         offset -> {
                             StatRequest statRequest = new StatRequest(
-                                    String.format("{\"query\":{\"%s\":{\"from_time\":\"%s\",\"to_time\":\"%s\",\"from\":%d,\"size\":%d}}}",
-                                            category, TypeUtil.temporalToString(fromTime), TypeUtil.temporalToString(toTime), offset * offsetStep, size));
+                                    String.format("{\"query\":{\"%s\":{\"merchant_id\":\"%s\",\"shop_id\":\"%s\",\"from_time\":\"%s\",\"to_time\":\"%s\",\"from\":%d,\"size\":%d}}}",
+                                            category, partyId, shopId, TypeUtil.temporalToString(fromTime), TypeUtil.temporalToString(toTime), offset * offsetStep, size));
 
                             long start = System.currentTimeMillis();
                             action.apply(statRequest);
