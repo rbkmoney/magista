@@ -23,8 +23,11 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LongSummaryStatistics;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.IntStream;
+
+import static io.github.benas.randombeans.api.EnhancedRandom.randomStreamOf;
 
 @Ignore
 public class OffsetPerformanceTest extends AbstractIntegrationTest {
@@ -50,20 +53,19 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
 
     @Before
     public void setUp() throws URISyntaxException {
-        EnhancedRandom enhancedRandom = EnhancedRandomBuilder
-                .aNewEnhancedRandomBuilder()
-                .dateRange(start, end)
-                .build();
-
         log.info("Insert {} rows...", count);
-        enhancedRandom.objects(InvoiceEventStat.class, count, "invoiceCart")
+        AtomicLong atomicLong = new AtomicLong(1);
+        randomStreamOf(count, InvoiceEventStat.class, "invoiceCart")
                 .map(invoiceEventStat -> {
+                    invoiceEventStat.setId(atomicLong.getAndIncrement());
                     invoiceEventStat.setPartyId(partyId);
                     invoiceEventStat.setPartyShopId(shopId);
                     invoiceEventStat.setPaymentFailureClass("operation_timeout");
                     invoiceEventStat.setPaymentTool("bank_card");
                     invoiceEventStat.setPaymentSystem("mastercard");
                     invoiceEventStat.setPaymentFlow("instant");
+                    invoiceEventStat.setInvoiceCreatedAt(LocalDateTime.now());
+                    invoiceEventStat.setPaymentCreatedAt(LocalDateTime.now());
                     return invoiceEventStat;
                 })
                 .parallel()
