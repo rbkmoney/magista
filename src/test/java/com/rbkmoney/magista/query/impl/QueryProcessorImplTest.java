@@ -21,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Map;
 
+import static com.rbkmoney.damsel.merch_stat.PayoutStatus._Fields.CANCELLED;
+import static com.rbkmoney.damsel.merch_stat.PayoutStatus._Fields.CONFIRMED;
+import static com.rbkmoney.damsel.merch_stat.PayoutStatus._Fields.PAID;
 import static com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider.euroset;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -189,6 +192,31 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertTrue(statResponse.getData().getPayments().stream().anyMatch(
                 payment -> payment.getStatus().isSetFailed()
                         && payment.getStatus().getFailed().getFailure().isSetExternalFailure()
+        ));
+    }
+
+    @Test
+    public void testPayoutStatuses() {
+        String json = "{'query': {'payouts': {'payout_statuses': ['paid', 'cancelled', 'confirmed'] }}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertTrue(statResponse.getData().getPayouts().stream().allMatch(
+                payout -> payout.getStatus().getSetField() == PAID
+                        || payout.getStatus().getSetField() == CANCELLED
+                        || payout.getStatus().getSetField() == CONFIRMED
+        ));
+
+        json = "{'query': {'payouts': {'payout_statuses': ['paid', 'cancelled'] }}}";
+        statResponse = queryProcessor.processQuery(json);
+        assertTrue(statResponse.getData().getPayouts().stream().allMatch(
+                payout -> payout.getStatus().getSetField() == PAID
+                        || payout.getStatus().getSetField() == CANCELLED
+        ));
+
+        json = "{'query': {'payouts': {'payout_statuses': ['paid', 'confirmed'] }}}";
+        statResponse = queryProcessor.processQuery(json);
+        assertTrue(statResponse.getData().getPayouts().stream().allMatch(
+                payout -> payout.getStatus().getSetField() == PAID
+                || payout.getStatus().getSetField() == CONFIRMED
         ));
     }
 
