@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +29,8 @@ public class AccountingReportFunction extends ReportBaseFunction {
         try {
             Collection<Map<String, String>> result = getContext(context).getDao().getAccountingDataByPeriod(
                     Instant.from(getQueryParameters().getFromTime()),
-                    Instant.from(getQueryParameters().getToTime())
+                    Instant.from(getQueryParameters().getToTime()),
+                    Optional.ofNullable(getQueryParameters().getShopCategoryIds())
             );
 
             return new BaseQueryResult<>(() -> result.stream(), () -> new StatResponse(StatResponseData.records(result.stream().collect(Collectors.toList()))));

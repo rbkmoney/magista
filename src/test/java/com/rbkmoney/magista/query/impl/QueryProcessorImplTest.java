@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider.euroset;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -346,6 +347,18 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
 
         assertEquals(0, statResponse3.getTotalCount());
 
+    }
+
+    @Test
+    public void testShopCategoryIdsInAccountingReport() {
+        String json = "{'query': {'shop_accounting_report': {'from_time': '2016-01-01T00:00:00Z','to_time': '2017-10-25T18:10:10Z'}}}";
+        int totalCount = queryProcessor.processQuery(json).getData().getRecords().size();
+
+        json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'shop_category_ids': [1, 2, 3]}}}";
+        int countWithout123 = queryProcessor.processQuery(json).getData().getRecords().size();
+
+        json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'shop_category_ids': [4, 5]}}}";
+        assertEquals(totalCount - countWithout123, queryProcessor.processQuery(json).getData().getRecords().size());
     }
 
 }

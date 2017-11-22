@@ -170,7 +170,8 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getAccountingDataByPeriod(
             Instant fromTime,
-            Instant toTime
+            Instant toTime,
+            Optional<List<Integer>> shopCategoryIds
     ) throws DaoException;
 
 }
