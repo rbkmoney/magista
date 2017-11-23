@@ -58,8 +58,8 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
             return getTimeParameter(TO_TIME_PARAM, false);
         }
 
-        public List<Integer> getGetNotInShopCategoryIds() {
-            return getArrayParameter(NOT_IN_SHOP_CATEGORY_IDS_PARAM, false);
+        public List<Integer> getGetWithoutShopCategoryIds() {
+            return getArrayParameter(WITHOUT_SHOP_CATEGORY_IDS_PARAM, false);
         }
     }
 

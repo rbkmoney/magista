@@ -30,7 +30,7 @@ public class AccountingReportFunction extends ReportBaseFunction {
             Collection<Map<String, String>> result = getContext(context).getDao().getAccountingDataByPeriod(
                     Instant.from(getQueryParameters().getFromTime()),
                     Instant.from(getQueryParameters().getToTime()),
-                    Optional.ofNullable(getQueryParameters().getGetNotInShopCategoryIds())
+                    Optional.ofNullable(getQueryParameters().getGetWithoutShopCategoryIds())
             );
 
             return new BaseQueryResult<>(() -> result.stream(), () -> new StatResponse(StatResponseData.records(result.stream().collect(Collectors.toList()))));
