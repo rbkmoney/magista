@@ -354,10 +354,10 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         String json = "{'query': {'shop_accounting_report': {'from_time': '2016-01-01T00:00:00Z','to_time': '2017-10-25T18:10:10Z'}}}";
         int totalCount = queryProcessor.processQuery(json).getData().getRecords().size();
 
-        json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'shop_category_ids': [1, 2, 3]}}}";
+        json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'not_in_shop_category_ids': [1, 2, 3]}}}";
         int countWithout123 = queryProcessor.processQuery(json).getData().getRecords().size();
 
-        json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'shop_category_ids': [4, 5]}}}";
+        json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'not_in_shop_category_ids': [4, 5]}}}";
         assertEquals(totalCount - countWithout123, queryProcessor.processQuery(json).getData().getRecords().size());
     }
 
