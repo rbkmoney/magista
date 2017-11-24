@@ -6,11 +6,12 @@
 
 ```json
 {
-  "query": { 
-     "<query_type>": {
-     	"<param>": "<val>"
+  "query": {
+    "<query_type>": {
+      "<param>": "<val>"
     },
-    "<query_param>":"<val>" 
+    "<query_param>": "<val>"
+  }
 }
 ```
 
@@ -210,6 +211,7 @@
 Параметры:
 - `from_time` - начало временного интервала выборки(inclusive).
 - `to_time` - конец временного интервала выборки(exclusive).
+- `without_shop_category_ids` - список исключающих категорий
 
 #### Пример:
 

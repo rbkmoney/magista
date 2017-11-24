@@ -6,6 +6,7 @@ import com.rbkmoney.magista.exception.DaoException;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -83,7 +84,8 @@ public interface StatisticsDao {
 
     Collection<Map<String, String>> getAccountingDataByPeriod(
             Instant fromTime,
-            Instant toTime
+            Instant toTime,
+            Optional<List<Integer>> withoutShopCategoryIds
     ) throws DaoException;
 
 }

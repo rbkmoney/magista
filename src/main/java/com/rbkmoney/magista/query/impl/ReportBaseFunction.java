@@ -15,8 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbkmoney.magista.query.impl.Parameters.FROM_TIME_PARAM;
-import static com.rbkmoney.magista.query.impl.Parameters.TO_TIME_PARAM;
+import static com.rbkmoney.magista.query.impl.Parameters.*;
 
 /**
  * Created by tolkonepiu on 21/12/2016.
@@ -57,6 +56,10 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
 
         public TemporalAccessor getToTime() {
             return getTimeParameter(TO_TIME_PARAM, false);
+        }
+
+        public List<Integer> getGetWithoutShopCategoryIds() {
+            return getArrayParameter(WITHOUT_SHOP_CATEGORY_IDS_PARAM, false);
         }
     }
 
