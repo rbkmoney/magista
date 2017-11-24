@@ -35,6 +35,7 @@ public class Parameters {
 
     public static final String PAYOUT_ID_PARAM = "payout_id";
     public static final String PAYOUT_STATUS_PARAM = "payout_status";
+    public static final String PAYOUT_STATUSES_PARAM = "payout_statuses";
     public static final String PAYOUT_TYPE_PARAM = "payout_type";
 
     public static final String SPLIT_INTERVAL_PARAM = "split_interval";

@@ -67,3 +67,9 @@ VALUES (3485599, 'PAYMENT', 'INVOICE_PAYMENT_STATUS_CHANGED', '2017-09-30 08:30:
 
 INSERT INTO mst.payout_event_stat(id, event_id, event_category, event_type, event_created_at, party_id, party_shop_id, payout_id, payout_created_at, payout_status, payout_amount, payout_currency_code, payout_type)
 VALUES (4, 1017, 'PAYOUT', 'PAYOUT_STATUS_CHANGED', '2017-09-27 13:06:46', 'test_party_1', 'test_shop_1', 1018, '2017-09-27 06:00:01', 'confirmed', 1900, 'RUB', 'bank_account');
+
+INSERT INTO mst.payout_event_stat(id, event_id, event_category, event_type, event_created_at, party_id, party_shop_id, payout_id, payout_created_at, payout_status, payout_amount, payout_currency_code, payout_type)
+VALUES (5, 1018, 'PAYOUT', 'PAYOUT_STATUS_CHANGED', '2017-09-27 13:06:46', 'test_party_1', 'test_shop_1', 1019, '2017-09-27 06:00:01', 'paid', 300, 'RUB', 'bank_account');
+
+INSERT INTO mst.payout_event_stat(id, event_id, event_category, event_type, event_created_at, party_id, party_shop_id, payout_id, payout_created_at, payout_status, payout_amount, payout_currency_code, payout_type)
+VALUES (6, 1019, 'PAYOUT', 'PAYOUT_STATUS_CHANGED', '2017-09-27 13:06:46', 'test_party_1', 'test_shop_1', 1020, '2017-09-27 06:00:01', 'cancelled', 300, 'RUB', 'bank_account');

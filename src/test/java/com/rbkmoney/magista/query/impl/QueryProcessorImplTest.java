@@ -21,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Map;
 
+import static com.rbkmoney.damsel.merch_stat.PayoutStatus._Fields.CANCELLED;
+import static com.rbkmoney.damsel.merch_stat.PayoutStatus._Fields.CONFIRMED;
+import static com.rbkmoney.damsel.merch_stat.PayoutStatus._Fields.PAID;
 import static com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider.euroset;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -45,11 +48,12 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testInvoices() {
+    public void testInvoices() throws TException {
         String json = "{'query': {'invoices': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(2, statResponse.getData().getInvoices().size());
         assertEquals(5, statResponse.getTotalCount());
+        new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
     }
 
     @Test
@@ -66,21 +70,23 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testPayouts() {
+    public void testPayouts() throws TException {
         String json = "{'query': {'payouts': {'merchant_id': '281220eb-a4ef-4d03-b666-bdec4b26c5f7', 'shop_id': '1507555501740', 'from_time': '2016-10-25T15:45:20Z','to_time': '2018-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getTotalCount());
         assertEquals(1, statResponse.getData().getPayouts().size());
         assertEquals("281220eb-a4ef-4d03-b666-bdec4b26c5f7", statResponse.getData().getPayouts().get(0).getPartyId());
         assertEquals("1507555501740", statResponse.getData().getPayouts().get(0).getShopId());
+        new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
     }
 
     @Test
-    public void testPayments() {
+    public void testPayments() throws TException {
         String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(2, statResponse.getData().getPayments().size());
         assertEquals(3, statResponse.getTotalCount());
+        new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
     }
 
     @Test
@@ -145,17 +151,19 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testPaymentsWithoutMerchantAndShopId() {
+    public void testPaymentsWithoutMerchantAndShopId() throws TException {
         String json = "{'query': {'payments': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(16, statResponse.getTotalCount());
+        new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
     }
 
     @Test
-    public void testInvoicesWithoutMerchantAndShopId() {
+    public void testInvoicesWithoutMerchantAndShopId() throws TException {
         String json = "{'query': {'invoices': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(14, statResponse.getTotalCount());
+        new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
     }
 
     @Test
@@ -185,6 +193,31 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertTrue(statResponse.getData().getPayments().stream().anyMatch(
                 payment -> payment.getStatus().isSetFailed()
                         && payment.getStatus().getFailed().getFailure().isSetExternalFailure()
+        ));
+    }
+
+    @Test
+    public void testPayoutStatuses() {
+        String json = "{'query': {'payouts': {'payout_statuses': ['paid', 'cancelled', 'confirmed'] }}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertTrue(statResponse.getData().getPayouts().stream().allMatch(
+                payout -> payout.getStatus().getSetField() == PAID
+                        || payout.getStatus().getSetField() == CANCELLED
+                        || payout.getStatus().getSetField() == CONFIRMED
+        ));
+
+        json = "{'query': {'payouts': {'payout_statuses': ['paid', 'cancelled'] }}}";
+        statResponse = queryProcessor.processQuery(json);
+        assertTrue(statResponse.getData().getPayouts().stream().allMatch(
+                payout -> payout.getStatus().getSetField() == PAID
+                        || payout.getStatus().getSetField() == CANCELLED
+        ));
+
+        json = "{'query': {'payouts': {'payout_statuses': ['paid', 'confirmed'] }}}";
+        statResponse = queryProcessor.processQuery(json);
+        assertTrue(statResponse.getData().getPayouts().stream().allMatch(
+                payout -> payout.getStatus().getSetField() == PAID
+                || payout.getStatus().getSetField() == CONFIRMED
         ));
     }
 

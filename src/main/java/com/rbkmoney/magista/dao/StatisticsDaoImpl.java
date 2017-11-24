@@ -1,11 +1,11 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
-import com.rbkmoney.magista.domain.enums.*;
+import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
+import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import org.jooq.Comparator;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -18,7 +18,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
@@ -37,266 +40,109 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Collection<InvoiceEventStat> getInvoices(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<List<Integer>> shopCategoryIds,
-            Optional<String> invoiceId,
-            Optional<String> paymentId,
-            Optional<String> invoiceStatus,
-            Optional<String> paymentStatus,
-            Optional<Long> invoiceAmount,
-            Optional<Long> paymentAmount,
-            Optional<String> paymentFlow,
-            Optional<String> paymentMethod,
-            Optional<String> paymentTerminalProvider,
-            Optional<String> paymentEmail,
-            Optional<String> paymentIp,
-            Optional<String> paymentFingerprint,
-            Optional<String> paymentPanMask,
-            Optional<String> paymentCustomerId,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime,
-            Optional<Integer> limit,
-            Optional<Integer> offset) throws DaoException {
-
-        ConditionParameterSource invoiceSource = buildOptionalInvoiceParameters(
-                merchantId,
-                shopId,
-                invoiceId,
-                invoiceStatus,
-                invoiceAmount,
-                fromTime,
-                toTime
-        );
-
-        ConditionParameterSource paymentSource = buildOptionalPaymentParameters(
-                merchantId,
-                shopId,
-                invoiceId,
-                paymentId,
-                paymentStatus,
-                paymentFlow,
-                paymentMethod,
-                paymentTerminalProvider,
-                paymentEmail,
-                paymentIp,
-                paymentFingerprint,
-                paymentPanMask,
-                paymentAmount,
-                paymentCustomerId,
-                Optional.empty(),
-                Optional.empty()
-        );
-
-        Query query = buildInvoiceSelectConditionStepQuery(invoiceSource, paymentSource, shopCategoryIds)
+            ConditionParameterSource invoiceParameterSource,
+            ConditionParameterSource paymentParameterSource,
+            Optional<Integer> offset,
+            Optional<Integer> limit
+    ) throws DaoException {
+        Query query = buildInvoiceSelectConditionStepQuery(invoiceParameterSource, paymentParameterSource,
+                INVOICE_EVENT_STAT.PARTY_ID,
+                INVOICE_EVENT_STAT.PARTY_SHOP_ID,
+                INVOICE_EVENT_STAT.INVOICE_ID,
+                INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                INVOICE_EVENT_STAT.INVOICE_STATUS,
+                INVOICE_EVENT_STAT.INVOICE_STATUS_DETAILS,
+                INVOICE_EVENT_STAT.INVOICE_PRODUCT,
+                INVOICE_EVENT_STAT.INVOICE_DESCRIPTION,
+                INVOICE_EVENT_STAT.INVOICE_DUE,
+                INVOICE_EVENT_STAT.INVOICE_AMOUNT,
+                INVOICE_EVENT_STAT.INVOICE_CURRENCY_CODE,
+                INVOICE_EVENT_STAT.INVOICE_CART,
+                INVOICE_EVENT_STAT.INVOICE_CONTEXT_TYPE,
+                INVOICE_EVENT_STAT.INVOICE_CONTEXT
+        )
                 .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
-        return fetch(query, InvoiceEventDaoImpl.getRowMapper());
+        return fetch(query, InvoiceEventDaoImpl.ROW_MAPPER);
     }
 
     @Override
     public int getInvoicesCount(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<List<Integer>> shopCategoryIds,
-            Optional<String> invoiceId,
-            Optional<String> paymentId,
-            Optional<String> invoiceStatus,
-            Optional<String> paymentStatus,
-            Optional<Long> invoiceAmount,
-            Optional<Long> paymentAmount,
-            Optional<String> paymentFlow,
-            Optional<String> paymentMethod,
-            Optional<String> paymentTerminalProvider,
-            Optional<String> paymentEmail,
-            Optional<String> paymentIp,
-            Optional<String> paymentFingerprint,
-            Optional<String> paymentPanMask,
-            Optional<String> paymentCustomerId,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime,
-            Optional<Integer> limit,
-            Optional<Integer> offset) throws DaoException {
-
-        ConditionParameterSource invoiceSource = buildOptionalInvoiceParameters(
-                merchantId,
-                shopId,
-                invoiceId,
-                invoiceStatus,
-                invoiceAmount,
-                fromTime,
-                toTime
-        );
-
-        ConditionParameterSource paymentSource = buildOptionalPaymentParameters(
-                merchantId,
-                shopId,
-                invoiceId,
-                paymentId,
-                paymentStatus,
-                paymentFlow,
-                paymentMethod,
-                paymentTerminalProvider,
-                paymentEmail,
-                paymentIp,
-                paymentFingerprint,
-                paymentPanMask,
-                paymentAmount,
-                paymentCustomerId,
-                Optional.empty(),
-                Optional.empty()
-        );
-
-        Query query = buildInvoiceSelectConditionStepQuery(invoiceSource, paymentSource, shopCategoryIds, DSL.count());
+            ConditionParameterSource invoiceParameterSource,
+            ConditionParameterSource paymentParameterSource
+    ) throws DaoException {
+        Query query = buildInvoiceSelectConditionStepQuery(invoiceParameterSource, paymentParameterSource, DSL.count());
         return fetchOne(query, Integer.class);
     }
 
     @Override
     public Collection<InvoiceEventStat> getPayments(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<List<Integer>> shopCategoryIds,
-            Optional<String> invoiceId,
-            Optional<String> paymentId,
-            Optional<String> paymentStatus,
-            Optional<String> paymentFlow,
-            Optional<String> paymentMethod,
-            Optional<String> paymentTerminalProvider,
-            Optional<String> paymentEmail,
-            Optional<String> paymentIp,
-            Optional<String> paymentFingerprint,
-            Optional<String> paymentPanMask,
-            Optional<Long> paymentAmount,
-            Optional<String> paymentCustomerId,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime,
-            Optional<Integer> limit,
-            Optional<Integer> offset) throws DaoException {
-
-        ConditionParameterSource paymentSource = buildOptionalPaymentParameters(
-                merchantId,
-                shopId,
-                invoiceId,
-                paymentId,
-                paymentStatus,
-                paymentFlow,
-                paymentMethod,
-                paymentTerminalProvider,
-                paymentEmail,
-                paymentIp,
-                paymentFingerprint,
-                paymentPanMask,
-                paymentAmount,
-                paymentCustomerId,
-                fromTime,
-                toTime
-        );
-
-        Query query = buildPaymentSelectConditionStepQuery(paymentSource, shopCategoryIds)
+            ConditionParameterSource parameterSource,
+            Optional<Integer> offset,
+            Optional<Integer> limit
+    ) throws DaoException {
+        Query query = buildPaymentSelectConditionStepQuery(parameterSource,
+                INVOICE_EVENT_STAT.PAYMENT_ID,
+                INVOICE_EVENT_STAT.INVOICE_ID,
+                INVOICE_EVENT_STAT.PARTY_ID,
+                INVOICE_EVENT_STAT.PARTY_SHOP_ID,
+                INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
+                INVOICE_EVENT_STAT.PAYMENT_STATUS,
+                INVOICE_EVENT_STAT.PAYMENT_FAILURE_CLASS,
+                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_CODE,
+                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_DESCRIPTION,
+                INVOICE_EVENT_STAT.PAYMENT_AMOUNT,
+                INVOICE_EVENT_STAT.PAYMENT_FEE,
+                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE,
+                INVOICE_EVENT_STAT.PAYMENT_TOOL,
+                INVOICE_EVENT_STAT.PAYMENT_TOKEN,
+                INVOICE_EVENT_STAT.PAYMENT_SYSTEM,
+                INVOICE_EVENT_STAT.PAYMENT_BIN,
+                INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN,
+                INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER,
+                INVOICE_EVENT_STAT.PAYMENT_IP,
+                INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT,
+                INVOICE_EVENT_STAT.PAYMENT_PHONE_NUMBER,
+                INVOICE_EVENT_STAT.PAYMENT_EMAIL,
+                INVOICE_EVENT_STAT.PAYMENT_SESSION_ID,
+                INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID,
+                INVOICE_EVENT_STAT.PAYMENT_FLOW,
+                INVOICE_EVENT_STAT.PAYMENT_HOLD_ON_EXPIRATION,
+                INVOICE_EVENT_STAT.PAYMENT_HOLD_UNTIL,
+                INVOICE_EVENT_STAT.PAYMENT_COUNTRY_ID,
+                INVOICE_EVENT_STAT.PAYMENT_CITY_ID,
+                INVOICE_EVENT_STAT.PAYMENT_CONTEXT_TYPE,
+                INVOICE_EVENT_STAT.PAYMENT_CONTEXT
+        )
                 .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
-        return fetch(query, InvoiceEventDaoImpl.getRowMapper());
+        return fetch(query, InvoiceEventDaoImpl.ROW_MAPPER);
     }
 
     @Override
-    public Integer getPaymentsCount(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<List<Integer>> shopCategoryIds,
-            Optional<String> invoiceId,
-            Optional<String> paymentId,
-            Optional<String> paymentStatus,
-            Optional<String> paymentFlow,
-            Optional<String> paymentMethod,
-            Optional<String> paymentTerminalProvider,
-            Optional<String> paymentEmail,
-            Optional<String> paymentIp,
-            Optional<String> paymentFingerprint,
-            Optional<String> paymentPanMask,
-            Optional<Long> paymentAmount,
-            Optional<String> paymentCustomerId,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime,
-            Optional<Integer> limit,
-            Optional<Integer> offset) throws DaoException {
-
-        ConditionParameterSource parameterSource = buildOptionalPaymentParameters(
-                merchantId,
-                shopId,
-                invoiceId,
-                paymentId,
-                paymentStatus,
-                paymentFlow,
-                paymentMethod,
-                paymentTerminalProvider,
-                paymentEmail,
-                paymentIp,
-                paymentFingerprint,
-                paymentPanMask,
-                paymentAmount,
-                paymentCustomerId,
-                fromTime,
-                toTime
-        );
-
-        Query query = buildPaymentSelectConditionStepQuery(parameterSource, shopCategoryIds, DSL.count());
+    public Integer getPaymentsCount(ConditionParameterSource parameterSource) throws DaoException {
+        Query query = buildPaymentSelectConditionStepQuery(parameterSource, DSL.count());
         return fetchOne(query, Integer.class);
     }
 
     @Override
     public Collection<PayoutEventStat> getPayouts(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> payoutId,
-            Optional<String> payoutStatus,
-            Optional<String> payoutType,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime,
-            Optional<Integer> limit,
-            Optional<Integer> offset) throws DaoException {
-
-        ConditionParameterSource parameterSource = buildOptionalPayoutParameters(
-                merchantId,
-                shopId,
-                payoutId,
-                payoutStatus,
-                payoutType,
-                fromTime,
-                toTime
-        );
-
+            ConditionParameterSource parameterSource,
+            Optional<Integer> offset,
+            Optional<Integer> limit
+    ) throws DaoException {
         Query query = buildPayoutSelectConditionStepQuery(parameterSource)
                 .orderBy(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
 
-        return fetch(query, PayoutEventDaoImpl.getRowMapper());
+        return fetch(query, PayoutEventDaoImpl.ROW_MAPPER);
     }
 
     @Override
-    public Integer getPayoutsCount(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> payoutId,
-            Optional<String> payoutStatus,
-            Optional<String> payoutType,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime,
-            Optional<Integer> limit,
-            Optional<Integer> offset) throws DaoException {
-
-        ConditionParameterSource parameterSource = buildOptionalPayoutParameters(
-                merchantId,
-                shopId,
-                payoutId,
-                payoutStatus,
-                payoutType,
-                fromTime,
-                toTime
-        );
-
+    public Integer getPayoutsCount(ConditionParameterSource parameterSource) throws DaoException {
         Query query = buildPayoutSelectConditionStepQuery(parameterSource, DSL.count());
         return fetchOne(query, Integer.class);
     }
@@ -422,13 +268,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     private SelectConditionStep buildPaymentSelectConditionStepQuery(
             ConditionParameterSource paymentParameterSource,
-            Optional<List<Integer>> shopCategoryIds,
             SelectField<?>... fields) {
         Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT);
-
-        if (shopCategoryIds.isPresent() && !shopCategoryIds.get().isEmpty()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PARTY_SHOP_CATEGORY_ID.in(shopCategoryIds.get()));
-        }
 
         condition = appendConditions(condition, Operator.AND, paymentParameterSource);
 
@@ -436,104 +277,22 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .where(condition);
     }
 
-    private SelectConditionStep buildInvoiceSelectConditionStepQuery(ConditionParameterSource invoiceSource,
-                                                                     ConditionParameterSource paymentSource,
-                                                                     Optional<List<Integer>> shopCategoryIds,
+    private SelectConditionStep buildInvoiceSelectConditionStepQuery(ConditionParameterSource invoiceParameterSource,
+                                                                     ConditionParameterSource paymentParameterSource,
                                                                      SelectField<?>... fields) {
         Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE);
 
-        long paymentParamsCount = paymentSource
-                .getConditionFields()
-                .stream()
-                .filter(
-                        t -> t.getField() != INVOICE_EVENT_STAT.INVOICE_ID
-                                && t.getField() != INVOICE_EVENT_STAT.PARTY_ID
-                                && t.getField() != INVOICE_EVENT_STAT.PARTY_SHOP_ID
-                )
-                .count();
-
-        if (paymentParamsCount > 0) {
+        if (!paymentParameterSource.getConditionFields().isEmpty()) {
             condition = condition.and(INVOICE_EVENT_STAT.INVOICE_ID
                     .in(buildPaymentSelectConditionStepQuery(
-                            paymentSource,
-                            shopCategoryIds,
+                            paymentParameterSource,
                             INVOICE_EVENT_STAT.INVOICE_ID)));
         }
 
-        condition = appendConditions(condition, Operator.AND, invoiceSource);
-
+        condition = appendConditions(condition, Operator.AND, invoiceParameterSource);
 
         return getDslContext().select(fields).from(INVOICE_EVENT_STAT)
                 .where(condition);
-    }
-
-    private ConditionParameterSource buildOptionalInvoiceParameters(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> invoiceId,
-            Optional<String> invoiceStatus,
-            Optional<Long> invoiceAmount,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime
-    ) {
-        return new ConditionParameterSource()
-                .addValue(INVOICE_EVENT_STAT.PARTY_ID, merchantId.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PARTY_SHOP_ID, shopId.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.INVOICE_ID, invoiceId.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.INVOICE_STATUS,
-                        invoiceStatus.isPresent() ? InvoiceStatus.valueOf(invoiceStatus.get()) : null,
-                        Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.INVOICE_AMOUNT, invoiceAmount.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
-                        fromTime.isPresent() ? LocalDateTime.ofInstant(fromTime.get(), ZoneOffset.UTC) : null,
-                        Comparator.GREATER_OR_EQUAL)
-                .addValue(INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
-                        toTime.isPresent() ? LocalDateTime.ofInstant(toTime.get(), ZoneOffset.UTC) : null,
-                        Comparator.LESS);
-    }
-
-    private ConditionParameterSource buildOptionalPaymentParameters(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> invoiceId,
-            Optional<String> paymentId,
-            Optional<String> paymentStatus,
-            Optional<String> paymentFlow,
-            Optional<String> paymentMethod,
-            Optional<String> paymentTerminalProvider,
-            Optional<String> paymentEmail,
-            Optional<String> paymentIp,
-            Optional<String> paymentFingerprint,
-            Optional<String> paymentPanMask,
-            Optional<Long> paymentAmount,
-            Optional<String> paymentCustomerId,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime
-    ) {
-        return new ConditionParameterSource()
-                .addValue(INVOICE_EVENT_STAT.PARTY_ID, merchantId.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PARTY_SHOP_ID, shopId.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.INVOICE_ID, invoiceId.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_ID, paymentId.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_STATUS,
-                        paymentStatus.isPresent() ?
-                                com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.valueOf(paymentStatus.get()) : null,
-                        Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_FLOW, paymentFlow.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_TOOL, paymentMethod.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER, paymentTerminalProvider.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_AMOUNT, paymentAmount.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_EMAIL, paymentEmail.orElse(null), Comparator.LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_IP, paymentIp.orElse(null), Comparator.LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, paymentFingerprint.orElse(null), Comparator.LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, paymentPanMask.orElse(null), Comparator.LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID, paymentCustomerId.orElse(null), Comparator.EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
-                        fromTime.isPresent() ? LocalDateTime.ofInstant(fromTime.get(), ZoneOffset.UTC) : null,
-                        Comparator.GREATER_OR_EQUAL)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
-                        toTime.isPresent() ? LocalDateTime.ofInstant(toTime.get(), ZoneOffset.UTC) : null,
-                        Comparator.LESS);
     }
 
     private SelectConditionStep buildPayoutSelectConditionStepQuery(
@@ -545,34 +304,6 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         return getDslContext().select(fields).from(PAYOUT_EVENT_STAT)
                 .where(condition);
-    }
-
-    private ConditionParameterSource buildOptionalPayoutParameters(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> payoutId,
-            Optional<String> payoutStatus,
-            Optional<String> payoutType,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime
-    ) {
-        return new ConditionParameterSource()
-                .addValue(PAYOUT_EVENT_STAT.PARTY_ID, merchantId.orElse(null), Comparator.EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PARTY_SHOP_ID, shopId.orElse(null), Comparator.EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_ID, payoutId.orElse(null), Comparator.EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_STATUS,
-                        payoutStatus.isPresent() ? PayoutStatus.valueOf(payoutStatus.get()) : null,
-                        Comparator.EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_TYPE,
-                        payoutType.isPresent() ? PayoutType.valueOf(payoutType.get()) : null,
-                        Comparator.EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT,
-                        fromTime.isPresent() ? LocalDateTime.ofInstant(fromTime.get(), ZoneOffset.UTC) : null,
-                        Comparator.GREATER_OR_EQUAL)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT,
-                        toTime.isPresent() ? LocalDateTime.ofInstant(toTime.get(), ZoneOffset.UTC) : null,
-                        Comparator.LESS);
-
     }
 
 }

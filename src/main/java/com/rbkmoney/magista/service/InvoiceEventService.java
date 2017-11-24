@@ -98,6 +98,7 @@ public class InvoiceEventService {
             invoicePaymentEvent.setPaymentAdjustmentStatus(invoiceAdjustmentEvent.getPaymentAdjustmentStatus());
             invoicePaymentEvent.setPaymentAdjustmentStatusCreatedAt(invoiceAdjustmentEvent.getPaymentAdjustmentStatusCreatedAt());
             invoicePaymentEvent.setPaymentAdjustmentCreatedAt(invoiceAdjustmentEvent.getPaymentAdjustmentCreatedAt());
+            invoicePaymentEvent.setPaymentAdjustmentAmount(invoiceAdjustmentEvent.getPaymentAdjustmentAmount());
             invoicePaymentEvent.setPaymentAdjustmentFee(invoiceAdjustmentEvent.getPaymentAdjustmentFee());
             invoicePaymentEvent.setPaymentAdjustmentProviderFee(invoiceAdjustmentEvent.getPaymentAdjustmentProviderFee());
             invoicePaymentEvent.setPaymentAdjustmentExternalFee(invoiceAdjustmentEvent.getPaymentAdjustmentExternalFee());
@@ -150,6 +151,7 @@ public class InvoiceEventService {
             invoicePaymentEvent.setPaymentAdjustmentStatusCreatedAt(invoiceAdjustmentStatusEvent.getPaymentAdjustmentStatusCreatedAt());
 
             if (invoicePaymentEvent.getPaymentAdjustmentStatus() == AdjustmentStatus.captured) {
+                invoicePaymentEvent.setPaymentAmount(invoicePaymentEvent.getPaymentAdjustmentAmount());
                 invoicePaymentEvent.setPaymentFee(invoicePaymentEvent.getPaymentAdjustmentFee());
                 invoicePaymentEvent.setPaymentProviderFee(invoicePaymentEvent.getPaymentAdjustmentProviderFee());
                 invoicePaymentEvent.setPaymentExternalFee(invoicePaymentEvent.getPaymentAdjustmentExternalFee());

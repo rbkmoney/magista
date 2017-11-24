@@ -31,7 +31,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 261358808;
+    private static final long serialVersionUID = 1587862106;
 
     private Long                       id;
     private Long                       eventId;
@@ -108,6 +108,9 @@ public class InvoiceEventStat implements Serializable {
     private Integer                    paymentProviderId;
     private Integer                    paymentTerminalId;
     private Long                       paymentDomainRevision;
+    private String                     invoiceContextType;
+    private String                     paymentContextType;
+    private Long                       paymentAdjustmentAmount;
 
     public InvoiceEventStat() {}
 
@@ -187,6 +190,9 @@ public class InvoiceEventStat implements Serializable {
         this.paymentProviderId = value.paymentProviderId;
         this.paymentTerminalId = value.paymentTerminalId;
         this.paymentDomainRevision = value.paymentDomainRevision;
+        this.invoiceContextType = value.invoiceContextType;
+        this.paymentContextType = value.paymentContextType;
+        this.paymentAdjustmentAmount = value.paymentAdjustmentAmount;
     }
 
     public InvoiceEventStat(
@@ -264,7 +270,10 @@ public class InvoiceEventStat implements Serializable {
         String                     paymentCustomerId,
         Integer                    paymentProviderId,
         Integer                    paymentTerminalId,
-        Long                       paymentDomainRevision
+        Long                       paymentDomainRevision,
+        String                     invoiceContextType,
+        String                     paymentContextType,
+        Long                       paymentAdjustmentAmount
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -341,6 +350,9 @@ public class InvoiceEventStat implements Serializable {
         this.paymentProviderId = paymentProviderId;
         this.paymentTerminalId = paymentTerminalId;
         this.paymentDomainRevision = paymentDomainRevision;
+        this.invoiceContextType = invoiceContextType;
+        this.paymentContextType = paymentContextType;
+        this.paymentAdjustmentAmount = paymentAdjustmentAmount;
     }
 
     public Long getId() {
@@ -943,6 +955,30 @@ public class InvoiceEventStat implements Serializable {
         this.paymentDomainRevision = paymentDomainRevision;
     }
 
+    public String getInvoiceContextType() {
+        return this.invoiceContextType;
+    }
+
+    public void setInvoiceContextType(String invoiceContextType) {
+        this.invoiceContextType = invoiceContextType;
+    }
+
+    public String getPaymentContextType() {
+        return this.paymentContextType;
+    }
+
+    public void setPaymentContextType(String paymentContextType) {
+        this.paymentContextType = paymentContextType;
+    }
+
+    public Long getPaymentAdjustmentAmount() {
+        return this.paymentAdjustmentAmount;
+    }
+
+    public void setPaymentAdjustmentAmount(Long paymentAdjustmentAmount) {
+        this.paymentAdjustmentAmount = paymentAdjustmentAmount;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -1402,6 +1438,24 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentDomainRevision.equals(other.paymentDomainRevision))
             return false;
+        if (invoiceContextType == null) {
+            if (other.invoiceContextType != null)
+                return false;
+        }
+        else if (!invoiceContextType.equals(other.invoiceContextType))
+            return false;
+        if (paymentContextType == null) {
+            if (other.paymentContextType != null)
+                return false;
+        }
+        else if (!paymentContextType.equals(other.paymentContextType))
+            return false;
+        if (paymentAdjustmentAmount == null) {
+            if (other.paymentAdjustmentAmount != null)
+                return false;
+        }
+        else if (!paymentAdjustmentAmount.equals(other.paymentAdjustmentAmount))
+            return false;
         return true;
     }
 
@@ -1484,6 +1538,9 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((this.paymentProviderId == null) ? 0 : this.paymentProviderId.hashCode());
         result = prime * result + ((this.paymentTerminalId == null) ? 0 : this.paymentTerminalId.hashCode());
         result = prime * result + ((this.paymentDomainRevision == null) ? 0 : this.paymentDomainRevision.hashCode());
+        result = prime * result + ((this.invoiceContextType == null) ? 0 : this.invoiceContextType.hashCode());
+        result = prime * result + ((this.paymentContextType == null) ? 0 : this.paymentContextType.hashCode());
+        result = prime * result + ((this.paymentAdjustmentAmount == null) ? 0 : this.paymentAdjustmentAmount.hashCode());
         return result;
     }
 
@@ -1566,6 +1623,9 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentProviderId);
         sb.append(", ").append(paymentTerminalId);
         sb.append(", ").append(paymentDomainRevision);
+        sb.append(", ").append(invoiceContextType);
+        sb.append(", ").append(paymentContextType);
+        sb.append(", ").append(paymentAdjustmentAmount);
 
         sb.append(")");
         return sb.toString();

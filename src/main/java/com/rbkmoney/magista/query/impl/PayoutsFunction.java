@@ -1,11 +1,12 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
-import com.rbkmoney.damsel.merch_stat.*;
-import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.magista.dao.ConditionParameterSource;
+import com.rbkmoney.magista.domain.enums.PayoutStatus;
+import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
 import com.rbkmoney.magista.query.builder.QueryBuilderException;
@@ -13,14 +14,22 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.magista.util.DamselUtil;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
+import static com.rbkmoney.magista.util.TypeUtil.toEnumField;
+import static com.rbkmoney.magista.util.TypeUtil.toEnumFields;
+import static com.rbkmoney.magista.util.TypeUtil.toLocalDateTime;
+import static org.jooq.Comparator.*;
 
 public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResponse> implements CompositeQuery<PayoutEventStat, StatResponse> {
 
@@ -53,75 +62,13 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
                 () -> payoutsResult.getDataStream(),
                 () -> {
                     StatResponseData statResponseData = StatResponseData.payouts(payoutsResult.getDataStream()
-                            .map(payoutEvent -> toStatPayout(payoutEvent))
+                            .map(payoutEvent -> DamselUtil.toStatPayout(payoutEvent))
                             .collect(Collectors.toList()));
 
                     StatResponse statResponse = new StatResponse(statResponseData);
                     statResponse.setTotalCount(countResult.getCollectedStream());
                     return statResponse;
                 });
-    }
-
-    private StatPayout toStatPayout(PayoutEventStat payoutEvent) {
-        StatPayout statPayout = new StatPayout();
-        statPayout.setId(payoutEvent.getPayoutId());
-        statPayout.setPartyId(payoutEvent.getPartyId());
-        statPayout.setShopId(payoutEvent.getPartyShopId());
-        statPayout.setAmount(payoutEvent.getPayoutAmount());
-        statPayout.setStatus(toPayoutStatus(payoutEvent));
-        statPayout.setFee(payoutEvent.getPayoutFee());
-        statPayout.setCurrencySymbolicCode(payoutEvent.getPayoutCurrencyCode());
-        statPayout.setCreatedAt(
-                TypeUtil.temporalToString(payoutEvent.getPayoutCreatedAt())
-        );
-        statPayout.setType(toPayoutType(payoutEvent));
-
-        return statPayout;
-    }
-
-    private PayoutStatus toPayoutStatus(PayoutEventStat payoutEvent) {
-        PayoutStatus._Fields payoutStatus = PayoutStatus._Fields.findByName(payoutEvent.getPayoutStatus().getLiteral());
-        switch (payoutStatus) {
-            case UNPAID:
-                return PayoutStatus.unpaid(new PayoutUnpaid());
-            case PAID:
-                return PayoutStatus.paid(new PayoutPaid());
-            case CANCELLED:
-                return PayoutStatus.cancelled(new PayoutCancelled(payoutEvent.getPayoutCancelDetails()));
-            case CONFIRMED:
-                return PayoutStatus.confirmed(new PayoutConfirmed());
-            default:
-                throw new NotFoundException(String.format("Payout status '%s' not found", payoutStatus.getFieldName()));
-        }
-    }
-
-    private PayoutType toPayoutType(PayoutEventStat payoutEvent) {
-        PayoutType._Fields payoutType = PayoutType._Fields.findByName(payoutEvent.getPayoutType().getLiteral());
-        switch (payoutType) {
-            case BANK_ACCOUNT:
-                PayoutAccount payoutAccount = new PayoutAccount();
-                BankAccount bankAccount = new BankAccount();
-                bankAccount.setAccount(payoutEvent.getPayoutAccountBankId());
-                bankAccount.setBankBik(payoutEvent.getPayoutAccountBankBik());
-                bankAccount.setBankPostAccount(payoutEvent.getPayoutAccountBankCorrId());
-                bankAccount.setBankName(payoutEvent.getPayoutAccountBankName());
-                payoutAccount.setAccount(bankAccount);
-                payoutAccount.setInn(payoutEvent.getPayoutAccountInn());
-                payoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
-
-                return PayoutType.bank_account(payoutAccount);
-            case BANK_CARD:
-                PayoutCard payoutCard = new PayoutCard();
-                BankCard bankCard = new BankCard();
-                bankCard.setToken(payoutEvent.getPayoutCardToken());
-                bankCard.setPaymentSystem(BankCardPaymentSystem.valueOf(payoutEvent.getPayoutCardPaymentSystem()));
-                bankCard.setBin(payoutEvent.getPayoutCardBin());
-                bankCard.setMaskedPan(payoutEvent.getPayoutCardMaskedPan());
-                payoutCard.setCard(bankCard);
-                return PayoutType.bank_card(payoutCard);
-            default:
-                throw new NotFoundException(String.format("Payout type '%s' not found", payoutType.getFieldName()));
-        }
     }
 
     @Override
@@ -160,6 +107,10 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
 
         public String getPayoutStatus() {
             return getStringParameter(PAYOUT_STATUS_PARAM, false);
+        }
+
+        public List<String> getPayoutStatuses() {
+            return getArrayParameter(PAYOUT_STATUSES_PARAM, false);
         }
 
         public String getPayoutType() {
@@ -261,15 +212,9 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
             PayoutsParameters parameters = new PayoutsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Collection<PayoutEventStat> result = functionContext.getDao().getPayouts(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        Optional.ofNullable(parameters.getPayoutId()),
-                        Optional.ofNullable(parameters.getPayoutStatus()),
-                        Optional.ofNullable(parameters.getPayoutType()),
-                        Optional.ofNullable(Instant.from(parameters.getFromTime())),
-                        Optional.ofNullable(Instant.from(parameters.getToTime())),
-                        Optional.ofNullable(parameters.getSize()),
-                        Optional.ofNullable(parameters.getFrom())
+                        buildPayoutConditionParameterSource(parameters),
+                        Optional.ofNullable(parameters.getFrom()),
+                        Optional.ofNullable(parameters.getSize())
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);
             } catch (DaoException e) {
@@ -291,21 +236,30 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
             PayoutsParameters parameters = new PayoutsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Integer result = functionContext.getDao().getPayoutsCount(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        Optional.ofNullable(parameters.getPayoutId()),
-                        Optional.ofNullable(parameters.getPayoutStatus()),
-                        Optional.ofNullable(parameters.getPayoutType()),
-                        Optional.ofNullable(Instant.from(parameters.getFromTime())),
-                        Optional.ofNullable(Instant.from(parameters.getToTime())),
-                        Optional.ofNullable(parameters.getSize()),
-                        Optional.ofNullable(parameters.getFrom())
+                        buildPayoutConditionParameterSource(parameters)
                 );
                 return new BaseQueryResult<>(() -> Stream.of(result), () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }
         }
+    }
+
+    public static ConditionParameterSource buildPayoutConditionParameterSource(PayoutsParameters parameters) {
+        return new ConditionParameterSource()
+                .addValue(PAYOUT_EVENT_STAT.PARTY_ID, parameters.getMerchantId(), EQUALS)
+                .addValue(PAYOUT_EVENT_STAT.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_ID, parameters.getPayoutId(), EQUALS)
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_STATUS,
+                        toEnumField(parameters.getPayoutStatus(), PayoutStatus.class),
+                        EQUALS)
+                .addInConditionValue(PAYOUT_EVENT_STAT.PAYOUT_STATUS,
+                        toEnumFields(parameters.getPayoutStatuses(), PayoutStatus.class))
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_TYPE,
+                        toEnumField(parameters.getPayoutType(), PayoutType.class),
+                        EQUALS)
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT, toLocalDateTime(parameters.getFromTime()), GREATER_OR_EQUAL)
+                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT, toLocalDateTime(parameters.getToTime()), LESS);
     }
 
 }

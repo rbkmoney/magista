@@ -6,7 +6,6 @@ import com.rbkmoney.magista.exception.DaoException;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,118 +14,32 @@ import java.util.Optional;
  */
 public interface StatisticsDao {
     Collection<InvoiceEventStat> getInvoices(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<List<Integer>> shopCategoryIds,
-            Optional<String> invoiceId,
-            Optional<String> paymentId,
-            Optional<String> invoiceStatus,
-            Optional<String> paymentStatus,
-            Optional<Long> invoiceAmount,
-            Optional<Long> paymentAmount,
-            Optional<String> paymentFlow,
-            Optional<String> paymentMethod,
-            Optional<String> paymentTerminalProvider,
-            Optional<String> paymentEmail,
-            Optional<String> paymentIp,
-            Optional<String> paymentFingerprint,
-            Optional<String> paymentPanMask,
-            Optional<String> paymentCustomerId,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime,
-            Optional<Integer> limit,
-            Optional<Integer> offset
+            ConditionParameterSource invoiceParameterSource,
+            ConditionParameterSource paymentParameterSource,
+            Optional<Integer> offset,
+            Optional<Integer> limit
     ) throws DaoException;
 
-    int getInvoicesCount(Optional<String> merchantId,
-                         Optional<String> shopId,
-                         Optional<List<Integer>> shopCategoryIds,
-                         Optional<String> invoiceId,
-                         Optional<String> paymentId,
-                         Optional<String> invoiceStatus,
-                         Optional<String> paymentStatus,
-                         Optional<Long> invoiceAmount,
-                         Optional<Long> paymentAmount,
-                         Optional<String> paymentFlow,
-                         Optional<String> paymentMethod,
-                         Optional<String> paymentTerminalProvider,
-                         Optional<String> paymentEmail,
-                         Optional<String> paymentIp,
-                         Optional<String> paymentFingerprint,
-                         Optional<String> paymentPanMask,
-                         Optional<String> paymentCustomerId,
-                         Optional<Instant> fromTime,
-                         Optional<Instant> toTime,
-                         Optional<Integer> limit,
-                         Optional<Integer> offset) throws DaoException;
+    int getInvoicesCount(
+            ConditionParameterSource invoiceParameterSource,
+            ConditionParameterSource paymentParameterSource
+    ) throws DaoException;
 
     Collection<InvoiceEventStat> getPayments(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<List<Integer>> shopCategoryIds,
-            Optional<String> invoiceId,
-            Optional<String> paymentId,
-            Optional<String> paymentStatus,
-            Optional<String> paymentFlow,
-            Optional<String> paymentMethod,
-            Optional<String> paymentTerminalProvider,
-            Optional<String> paymentEmail,
-            Optional<String> paymentIp,
-            Optional<String> paymentFingerprint,
-            Optional<String> paymentPanMask,
-            Optional<Long> paymentAmount,
-            Optional<String> paymentCustomerId,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime,
-            Optional<Integer> limit,
-            Optional<Integer> offset
+            ConditionParameterSource parameterSource,
+            Optional<Integer> offset,
+            Optional<Integer> limit
     ) throws DaoException;
 
-    Integer getPaymentsCount(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<List<Integer>> shopCategoryIds,
-            Optional<String> invoiceId,
-            Optional<String> paymentId,
-            Optional<String> paymentStatus,
-            Optional<String> paymentFlow,
-            Optional<String> paymentMethod,
-            Optional<String> paymentTerminalProvider,
-            Optional<String> paymentEmail,
-            Optional<String> paymentIp,
-            Optional<String> paymentFingerprint,
-            Optional<String> paymentPanMask,
-            Optional<Long> paymentAmount,
-            Optional<String> paymentCustomerId,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime,
-            Optional<Integer> limit,
-            Optional<Integer> offset
-    ) throws DaoException;
+    Integer getPaymentsCount(ConditionParameterSource parameterSource) throws DaoException;
 
     Collection<PayoutEventStat> getPayouts(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> payoutId,
-            Optional<String> payoutStatus,
-            Optional<String> payoutType,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime,
-            Optional<Integer> limit,
-            Optional<Integer> offset
+            ConditionParameterSource parameterSource,
+            Optional<Integer> offset,
+            Optional<Integer> limit
     ) throws DaoException;
 
-    Integer getPayoutsCount(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> payoutId,
-            Optional<String> payoutStatus,
-            Optional<String> payoutType,
-            Optional<Instant> fromTime,
-            Optional<Instant> toTime,
-            Optional<Integer> limit,
-            Optional<Integer> offset
-    ) throws DaoException;
+    Integer getPayoutsCount(ConditionParameterSource parameterSource) throws DaoException;
 
     Collection<Map<String, String>> getPaymentsTurnoverStat(
             String merchantId,
