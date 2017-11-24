@@ -47,7 +47,7 @@ public class PaymentAdjustmentMapper implements Mapper<InvoiceEventContext> {
                 DamselUtil.getAdjustmentStatusCreatedAt(adjustment.getStatus())
         );
 
-        invoiceEventStat.setPaymentAmount(
+        invoiceEventStat.setPaymentAdjustmentAmount(
                 DamselUtil.getAmount(adjustment.getNewCashFlow(),
                         posting -> posting.getSource().getAccountType().isSetProvider()
                                 && posting.getDestination().getAccountType().isSetMerchant()

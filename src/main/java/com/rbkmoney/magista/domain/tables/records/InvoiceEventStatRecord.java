@@ -33,7 +33,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 527525689;
+    private static final long serialVersionUID = -2115520419;
 
     /**
      * Setter for <code>mst.invoice_event_stat.id</code>.
@@ -1085,6 +1085,48 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
         return (Long) get(74);
     }
 
+    /**
+     * Setter for <code>mst.invoice_event_stat.invoice_context_type</code>.
+     */
+    public void setInvoiceContextType(String value) {
+        set(75, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.invoice_context_type</code>.
+     */
+    public String getInvoiceContextType() {
+        return (String) get(75);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_context_type</code>.
+     */
+    public void setPaymentContextType(String value) {
+        set(76, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_context_type</code>.
+     */
+    public String getPaymentContextType() {
+        return (String) get(76);
+    }
+
+    /**
+     * Setter for <code>mst.invoice_event_stat.payment_adjustment_amount</code>.
+     */
+    public void setPaymentAdjustmentAmount(Long value) {
+        set(77, value);
+    }
+
+    /**
+     * Getter for <code>mst.invoice_event_stat.payment_adjustment_amount</code>.
+     */
+    public Long getPaymentAdjustmentAmount() {
+        return (Long) get(77);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -1111,7 +1153,7 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
     /**
      * Create a detached, initialised InvoiceEventStatRecord
      */
-    public InvoiceEventStatRecord(Long id, Long eventId, InvoiceEventCategory eventCategory, InvoiceEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyEmail, String partyShopId, String partyShopName, String partyShopDescription, String partyShopUrl, Integer partyShopCategoryId, String partyShopPayoutToolId, String partyContractId, String partyContractRegisteredNumber, String partyContractInn, String invoiceId, InvoiceStatus invoiceStatus, String invoiceStatusDetails, String invoiceProduct, String invoiceDescription, Long invoiceAmount, String invoiceCurrencyCode, LocalDateTime invoiceDue, LocalDateTime invoiceCreatedAt, byte[] invoiceContext, String paymentId, InvoicePaymentStatus paymentStatus, String paymentExternalFailureCode, String paymentExternalFailureDescription, Long paymentAmount, String paymentCurrencyCode, Long paymentFee, Long paymentProviderFee, Long paymentExternalFee, String paymentTool, String paymentMaskedPan, String paymentBin, String paymentToken, String paymentSystem, String paymentSessionId, Integer paymentCountryId, Integer paymentCityId, String paymentIp, String paymentPhoneNumber, String paymentEmail, String paymentFingerprint, LocalDateTime paymentCreatedAt, byte[] paymentContext, String paymentAdjustmentId, AdjustmentStatus paymentAdjustmentStatus, LocalDateTime paymentAdjustmentStatusCreatedAt, LocalDateTime paymentAdjustmentCreatedAt, String paymentAdjustmentReason, Long paymentAdjustmentFee, Long paymentAdjustmentProviderFee, Long paymentAdjustmentExternalFee, String paymentFailureClass, String invoiceTemplateId, String invoiceCart, String paymentFlow, String paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentTerminalProvider, String paymentRefundId, InvoicePaymentRefundStatus paymentRefundStatus, LocalDateTime paymentRefundCreatedAt, String paymentRefundReason, Long paymentRefundFee, Long paymentRefundProviderFee, Long paymentRefundExternalFee, String paymentCustomerId, Integer paymentProviderId, Integer paymentTerminalId, Long paymentDomainRevision) {
+    public InvoiceEventStatRecord(Long id, Long eventId, InvoiceEventCategory eventCategory, InvoiceEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyEmail, String partyShopId, String partyShopName, String partyShopDescription, String partyShopUrl, Integer partyShopCategoryId, String partyShopPayoutToolId, String partyContractId, String partyContractRegisteredNumber, String partyContractInn, String invoiceId, InvoiceStatus invoiceStatus, String invoiceStatusDetails, String invoiceProduct, String invoiceDescription, Long invoiceAmount, String invoiceCurrencyCode, LocalDateTime invoiceDue, LocalDateTime invoiceCreatedAt, byte[] invoiceContext, String paymentId, InvoicePaymentStatus paymentStatus, String paymentExternalFailureCode, String paymentExternalFailureDescription, Long paymentAmount, String paymentCurrencyCode, Long paymentFee, Long paymentProviderFee, Long paymentExternalFee, String paymentTool, String paymentMaskedPan, String paymentBin, String paymentToken, String paymentSystem, String paymentSessionId, Integer paymentCountryId, Integer paymentCityId, String paymentIp, String paymentPhoneNumber, String paymentEmail, String paymentFingerprint, LocalDateTime paymentCreatedAt, byte[] paymentContext, String paymentAdjustmentId, AdjustmentStatus paymentAdjustmentStatus, LocalDateTime paymentAdjustmentStatusCreatedAt, LocalDateTime paymentAdjustmentCreatedAt, String paymentAdjustmentReason, Long paymentAdjustmentFee, Long paymentAdjustmentProviderFee, Long paymentAdjustmentExternalFee, String paymentFailureClass, String invoiceTemplateId, String invoiceCart, String paymentFlow, String paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentTerminalProvider, String paymentRefundId, InvoicePaymentRefundStatus paymentRefundStatus, LocalDateTime paymentRefundCreatedAt, String paymentRefundReason, Long paymentRefundFee, Long paymentRefundProviderFee, Long paymentRefundExternalFee, String paymentCustomerId, Integer paymentProviderId, Integer paymentTerminalId, Long paymentDomainRevision, String invoiceContextType, String paymentContextType, Long paymentAdjustmentAmount) {
         super(InvoiceEventStat.INVOICE_EVENT_STAT);
 
         set(0, id);
@@ -1189,5 +1231,8 @@ public class InvoiceEventStatRecord extends UpdatableRecordImpl<InvoiceEventStat
         set(72, paymentProviderId);
         set(73, paymentTerminalId);
         set(74, paymentDomainRevision);
+        set(75, invoiceContextType);
+        set(76, paymentContextType);
+        set(77, paymentAdjustmentAmount);
     }
 }

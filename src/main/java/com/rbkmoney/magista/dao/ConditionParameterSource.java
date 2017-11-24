@@ -1,5 +1,8 @@
 package com.rbkmoney.magista.dao;
 
+import com.rbkmoney.magista.dao.field.CollectionConditionField;
+import com.rbkmoney.magista.dao.field.ConditionField;
+import com.rbkmoney.magista.dao.field.SimpleConditionField;
 import org.jooq.Comparator;
 import org.jooq.Field;
 
@@ -20,7 +23,15 @@ public class ConditionParameterSource {
 
     public <T> ConditionParameterSource addValue(Field<T> field, T value, Comparator comparator) {
         if (value != null) {
-            ConditionField conditionField = new ConditionField(field, value, comparator);
+            ConditionField conditionField = new SimpleConditionField<>(field, value, comparator);
+            conditionFields.add(conditionField);
+        }
+        return this;
+    }
+
+    public <T> ConditionParameterSource addInConditionValue(Field<T> field, Collection<T> value) {
+        if (value != null) {
+            ConditionField conditionField = new CollectionConditionField<>(field, value, Comparator.IN);
             conditionFields.add(conditionField);
         }
         return this;
@@ -35,39 +46,5 @@ public class ConditionParameterSource {
         return "ConditionParameterSource{" +
                 "conditionFields=" + conditionFields +
                 '}';
-    }
-
-    public class ConditionField<T> {
-
-        private final Field<T> field;
-        private final T value;
-        private final Comparator comparator;
-
-        public ConditionField(Field<T> field, T value, Comparator comparator) {
-            this.field = field;
-            this.value = value;
-            this.comparator = comparator;
-        }
-
-        public Field<T> getField() {
-            return field;
-        }
-
-        public T getValue() {
-            return value;
-        }
-
-        public Comparator getComparator() {
-            return comparator;
-        }
-
-        @Override
-        public String toString() {
-            return "ConditionField{" +
-                    "field=" + field +
-                    ", value=" + value +
-                    ", comparator=" + comparator +
-                    '}';
-        }
     }
 }

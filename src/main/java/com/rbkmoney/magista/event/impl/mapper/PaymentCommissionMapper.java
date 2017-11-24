@@ -28,14 +28,6 @@ public class PaymentCommissionMapper implements Mapper<InvoiceEventContext> {
                 .getInvoicePaymentStarted();
 
         List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentStarted.getCashFlow();
-
-        invoiceEventStat.setPaymentAmount(
-                DamselUtil.getAmount(finalCashFlowPostings,
-                        posting -> posting.getSource().getAccountType().isSetProvider()
-                                && posting.getDestination().getAccountType().isSetMerchant()
-                                && posting.getDestination().getAccountType().getMerchant() == MerchantCashFlowAccount.settlement)
-        );
-
         Map<FeeType, Long> fees = DamselUtil.getFees(finalCashFlowPostings);
 
         invoiceEventStat.setPaymentFee(fees.get(FeeType.FEE));
