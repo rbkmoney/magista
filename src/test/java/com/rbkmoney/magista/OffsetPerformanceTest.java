@@ -7,8 +7,6 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.dao.InvoiceEventDao;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
-import io.github.benas.randombeans.EnhancedRandomBuilder;
-import io.github.benas.randombeans.api.EnhancedRandom;
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -93,7 +91,7 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
             } catch (TException ex) {
                 throw new RuntimeException(ex);
             }
-        }, partyId, shopId, start.atStartOfDay(), end.atStartOfDay(),1000, 1000);
+        }, partyId, shopId, start.atStartOfDay(), end.atStartOfDay(), 1000, 1000);
     }
 
     private void doOffset(String category, Function<StatRequest, StatResponse> action, String partyId, String shopId, LocalDateTime fromTime, LocalDateTime toTime, int offsetStep, int size) throws TException {
