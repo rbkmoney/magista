@@ -42,7 +42,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset,
             Optional<Integer> limit
     ) throws DaoException {
-        Query query = buildInvoiceSelectConditionStepQuery(invoiceParameterSource, paymentParameterSource,
+        SelectConditionStep selectConditionStep = buildInvoiceSelectConditionStepQuery(invoiceParameterSource, paymentParameterSource,
                 INVOICE_EVENT_STAT.PARTY_ID,
                 INVOICE_EVENT_STAT.PARTY_SHOP_ID,
                 INVOICE_EVENT_STAT.INVOICE_ID,
@@ -57,10 +57,19 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.INVOICE_CART,
                 INVOICE_EVENT_STAT.INVOICE_CONTEXT_TYPE,
                 INVOICE_EVENT_STAT.INVOICE_CONTEXT
-        )
-                .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
-                .offset(offset.orElse(0));
+        );
+
+
+        if (offset.isPresent() && offset.get() > 0) {
+            selectConditionStep = selectConditionStep.and(INVOICE_EVENT_STAT.ID.lt(
+                    getDslContext().select(DSL.min(DSL.field("id", Long.class))).from(
+                            buildInvoiceSelectConditionStepQuery(invoiceParameterSource, paymentParameterSource, INVOICE_EVENT_STAT.ID)
+                                    .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
+                                    .limit(offset.get()))));
+        }
+
+        Query query = selectConditionStep.orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
+                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT));
         return fetch(query, InvoiceEventDaoImpl.ROW_MAPPER);
     }
 
@@ -79,7 +88,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset,
             Optional<Integer> limit
     ) throws DaoException {
-        Query query = buildPaymentSelectConditionStepQuery(parameterSource,
+        SelectConditionStep selectConditionStep = buildPaymentSelectConditionStepQuery(parameterSource,
                 INVOICE_EVENT_STAT.PAYMENT_ID,
                 INVOICE_EVENT_STAT.INVOICE_ID,
                 INVOICE_EVENT_STAT.PARTY_ID,
@@ -111,10 +120,18 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.PAYMENT_CITY_ID,
                 INVOICE_EVENT_STAT.PAYMENT_CONTEXT_TYPE,
                 INVOICE_EVENT_STAT.PAYMENT_CONTEXT
-        )
-                .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
-                .offset(offset.orElse(0));
+        );
+
+        if (offset.isPresent() && offset.get() > 0) {
+            selectConditionStep = selectConditionStep.and(INVOICE_EVENT_STAT.ID.lt(
+                    getDslContext().select(DSL.min(DSL.field("id", Long.class))).from(
+                            buildPaymentSelectConditionStepQuery(parameterSource, INVOICE_EVENT_STAT.ID)
+                                    .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
+                                    .limit(offset.get()))));
+        }
+
+        Query query = selectConditionStep.orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
+                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT));
         return fetch(query, InvoiceEventDaoImpl.ROW_MAPPER);
     }
 
