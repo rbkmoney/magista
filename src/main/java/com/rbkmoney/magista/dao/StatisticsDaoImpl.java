@@ -1,5 +1,7 @@
 package com.rbkmoney.magista.dao;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
@@ -14,11 +16,9 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 import javax.sql.DataSource;
 import java.sql.Types;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
@@ -31,18 +31,41 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     public static final int MAX_LIMIT = 1000;
 
+    private final Cache<Map.Entry<Condition, String>, List<Map.Entry<LocalDateTime, Integer>>> statCache;
+
     public StatisticsDaoImpl(DataSource ds) {
         super(ds);
+        statCache = Caffeine.newBuilder()
+                .maximumSize(1000)
+                .expireAfterWrite(60, TimeUnit.MINUTES)
+                .build();
     }
 
     @Override
     public Collection<InvoiceEventStat> getInvoices(
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime,
             Optional<Integer> offset,
             Optional<Integer> limit
     ) throws DaoException {
-        Query query = buildInvoiceSelectConditionStepQuery(invoiceParameterSource, paymentParameterSource,
+
+        if (offset.isPresent()) {
+            Map.Entry<LocalDateTime, Integer> dateRange = getDateRangeByOffset(
+                    buildInvoiceCondition(invoiceParameterSource, paymentParameterSource, fromTime, toTime),
+                    fromTime,
+                    toTime,
+                    INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                    offset.get()
+            );
+            if (dateRange != null) {
+                toTime = Optional.ofNullable(dateRange.getKey());
+                offset = Optional.ofNullable(dateRange.getValue());
+            }
+        }
+
+        Query query = getDslContext().select(
                 INVOICE_EVENT_STAT.PARTY_ID,
                 INVOICE_EVENT_STAT.PARTY_SHOP_ID,
                 INVOICE_EVENT_STAT.INVOICE_ID,
@@ -57,7 +80,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.INVOICE_CART,
                 INVOICE_EVENT_STAT.INVOICE_CONTEXT_TYPE,
                 INVOICE_EVENT_STAT.INVOICE_CONTEXT
-        )
+        ).from(INVOICE_EVENT_STAT)
+                .where(buildInvoiceCondition(invoiceParameterSource, paymentParameterSource, fromTime, toTime))
                 .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
@@ -67,19 +91,39 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     @Override
     public int getInvoicesCount(
             ConditionParameterSource invoiceParameterSource,
-            ConditionParameterSource paymentParameterSource
+            ConditionParameterSource paymentParameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime
     ) throws DaoException {
-        Query query = buildInvoiceSelectConditionStepQuery(invoiceParameterSource, paymentParameterSource, DSL.count());
+        Query query = getDslContext().select(DSL.count()).from(INVOICE_EVENT_STAT)
+                .where(buildInvoiceCondition(invoiceParameterSource, paymentParameterSource, fromTime, toTime));
         return fetchOne(query, Integer.class);
     }
 
     @Override
     public Collection<InvoiceEventStat> getPayments(
             ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime,
             Optional<Integer> offset,
             Optional<Integer> limit
     ) throws DaoException {
-        Query query = buildPaymentSelectConditionStepQuery(parameterSource,
+
+        if (offset.isPresent()) {
+            Map.Entry<LocalDateTime, Integer> dateRange = getDateRangeByOffset(
+                    buildPaymentCondition(parameterSource, fromTime, toTime),
+                    fromTime,
+                    toTime,
+                    INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
+                    offset.get()
+            );
+            if (dateRange != null) {
+                toTime = Optional.ofNullable(dateRange.getKey());
+                offset = Optional.ofNullable(dateRange.getValue());
+            }
+        }
+
+        Query query = getDslContext().select(
                 INVOICE_EVENT_STAT.PAYMENT_ID,
                 INVOICE_EVENT_STAT.INVOICE_ID,
                 INVOICE_EVENT_STAT.PARTY_ID,
@@ -111,7 +155,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.PAYMENT_CITY_ID,
                 INVOICE_EVENT_STAT.PAYMENT_CONTEXT_TYPE,
                 INVOICE_EVENT_STAT.PAYMENT_CONTEXT
-        )
+        ).from(INVOICE_EVENT_STAT)
+                .where(buildPaymentCondition(parameterSource, fromTime, toTime))
                 .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
@@ -119,8 +164,13 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Integer getPaymentsCount(ConditionParameterSource parameterSource) throws DaoException {
-        Query query = buildPaymentSelectConditionStepQuery(parameterSource, DSL.count());
+    public Integer getPaymentsCount(
+            ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime
+    ) throws DaoException {
+        Query query = getDslContext().select(DSL.count()).from(INVOICE_EVENT_STAT)
+                .where(buildPaymentCondition(parameterSource, fromTime, toTime));
         return fetchOne(query, Integer.class);
     }
 
@@ -263,33 +313,56 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         return params;
     }
 
-    private SelectConditionStep buildPaymentSelectConditionStepQuery(
+    private Condition buildPaymentCondition(
             ConditionParameterSource paymentParameterSource,
-            SelectField<?>... fields) {
-        Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT);
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime
+    ) {
+        Condition condition = appendDateTimeRange(
+                INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT),
+                INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
+                fromTime,
+                toTime);
 
-        condition = appendConditions(condition, Operator.AND, paymentParameterSource);
-
-        return getDslContext().select(fields).from(INVOICE_EVENT_STAT)
-                .where(condition);
+        return appendConditions(condition, Operator.AND, paymentParameterSource);
     }
 
-    private SelectConditionStep buildInvoiceSelectConditionStepQuery(ConditionParameterSource invoiceParameterSource,
-                                                                     ConditionParameterSource paymentParameterSource,
-                                                                     SelectField<?>... fields) {
-        Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE);
+    private Condition buildInvoiceCondition(
+            ConditionParameterSource invoiceParameterSource,
+            ConditionParameterSource paymentParameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime
+    ) {
+        Condition condition = appendDateTimeRange(
+                INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE),
+                INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                fromTime,
+                toTime);
 
         if (!paymentParameterSource.getConditionFields().isEmpty()) {
-            condition = condition.and(INVOICE_EVENT_STAT.INVOICE_ID
-                    .in(buildPaymentSelectConditionStepQuery(
-                            paymentParameterSource,
-                            INVOICE_EVENT_STAT.INVOICE_ID)));
+            condition = condition.and(
+                    INVOICE_EVENT_STAT.INVOICE_ID.in(
+                            getDslContext().select(INVOICE_EVENT_STAT.INVOICE_ID)
+                                    .from(INVOICE_EVENT_STAT)
+                                    .where(buildPaymentCondition(paymentParameterSource, fromTime, toTime))
+                    )
+            );
+        }
+        return appendConditions(condition, Operator.AND, invoiceParameterSource);
+    }
+
+    private Condition appendDateTimeRange(Condition condition,
+                                          Field<LocalDateTime> field,
+                                          Optional<LocalDateTime> fromTime,
+                                          Optional<LocalDateTime> toTime) {
+        if (fromTime.isPresent()) {
+            condition = condition.and(field.ge(fromTime.get()));
         }
 
-        condition = appendConditions(condition, Operator.AND, invoiceParameterSource);
-
-        return getDslContext().select(fields).from(INVOICE_EVENT_STAT)
-                .where(condition);
+        if (toTime.isPresent()) {
+            condition = condition.and(field.lt(toTime.get()));
+        }
+        return condition;
     }
 
     private SelectConditionStep buildPayoutSelectConditionStepQuery(
@@ -301,6 +374,73 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         return getDslContext().select(fields).from(PAYOUT_EVENT_STAT)
                 .where(condition);
+    }
+
+    private <T extends Record> Map.Entry<LocalDateTime, Integer> getDateRangeByOffset(Condition condition,
+                                                                                      Optional<LocalDateTime> fromTime,
+                                                                                      Optional<LocalDateTime> toTime,
+                                                                                      TableField<T, LocalDateTime> dateTimeField,
+                                                                                      int offset) {
+        List<Map.Entry<LocalDateTime, Integer>> dateRanges = getDateTimeRanges(condition,
+                fromTime,
+                toTime,
+                dateTimeField);
+
+        Map.Entry<LocalDateTime, Integer> currentRange = null;
+        for (Map.Entry<LocalDateTime, Integer> dateRange : dateRanges) {
+            if (offset - dateRange.getValue() < 0) {
+                break;
+            }
+            offset -= dateRange.getValue();
+            currentRange = new AbstractMap.SimpleEntry<>(dateRange.getKey(), offset);
+        }
+        return currentRange;
+    }
+
+    private <T extends Record> List<Map.Entry<LocalDateTime, Integer>> getDateTimeRanges(Condition condition,
+                                                                                         Optional<LocalDateTime> fromTime,
+                                                                                         Optional<LocalDateTime> toTime,
+                                                                                         TableField<T, LocalDateTime> dateTimeField) {
+        final Map.Entry key = new AbstractMap.SimpleEntry<>(condition, dateTimeField.getName());
+
+        List<Map.Entry<LocalDateTime, Integer>> dateRanges = statCache.getIfPresent(key);
+        if (dateRanges == null) {
+            Field<LocalDateTime> spValField = DSL.field(
+                    DSL.sql("date_trunc('" + DatePart.HOUR.toSQL() + "', " + dateTimeField.getName() + ")"),
+                    LocalDateTime.class
+            ).as("sp_val");
+            Field countField = DSL.count().as("count");
+
+            Query query = getDslContext().select(spValField, countField).from(INVOICE_EVENT_STAT)
+                    .where(condition)
+                    .groupBy(spValField)
+                    .orderBy(spValField.desc());
+
+            dateRanges = fetch(query,
+                    (resultSet, i) -> new AbstractMap.SimpleEntry<>(
+                            resultSet.getObject(spValField.getName(), LocalDateTime.class),
+                            resultSet.getInt(countField.getName())
+                    )
+            );
+            if (checkBounds(fromTime, toTime, dateTimeField)) {
+                statCache.put(key, dateRanges);
+            }
+        }
+
+        return dateRanges;
+    }
+
+    private <T extends Record> boolean checkBounds(Optional<LocalDateTime> fromTime,
+                                                   Optional<LocalDateTime> toTime,
+                                                   TableField<T, LocalDateTime> dateTimeField) {
+        return fromTime.isPresent()
+                && toTime.isPresent()
+                && fetchOne(getDslContext().select(
+                DSL.field(
+                        DSL.min(dateTimeField).le(fromTime.get())
+                                .and(DSL.max(dateTimeField).ge(toTime.get())))
+                ).from(dateTimeField.getTable()),
+                Boolean.class);
     }
 
 }

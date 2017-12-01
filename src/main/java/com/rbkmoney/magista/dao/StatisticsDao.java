@@ -5,6 +5,7 @@ import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -17,22 +18,32 @@ public interface StatisticsDao {
     Collection<InvoiceEventStat> getInvoices(
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime,
             Optional<Integer> offset,
             Optional<Integer> limit
     ) throws DaoException;
 
     int getInvoicesCount(
             ConditionParameterSource invoiceParameterSource,
-            ConditionParameterSource paymentParameterSource
+            ConditionParameterSource paymentParameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime
     ) throws DaoException;
 
     Collection<InvoiceEventStat> getPayments(
             ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime,
             Optional<Integer> offset,
             Optional<Integer> limit
     ) throws DaoException;
 
-    Integer getPaymentsCount(ConditionParameterSource parameterSource) throws DaoException;
+    Integer getPaymentsCount(
+            ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime
+    ) throws DaoException;
 
     Collection<PayoutEventStat> getPayouts(
             ConditionParameterSource parameterSource,
