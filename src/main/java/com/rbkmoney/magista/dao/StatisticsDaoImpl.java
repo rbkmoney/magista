@@ -16,7 +16,10 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 import javax.sql.DataSource;
 import java.sql.Types;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -51,17 +54,21 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> limit
     ) throws DaoException {
 
+        int limitValue = Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT);
+
         if (offset.isPresent()) {
-            Map.Entry<LocalDateTime, Integer> dateRange = getDateRangeByOffset(
+            DateTimeRange dateTimeRange = getDateTimeRangeByOffset(
                     buildInvoiceCondition(invoiceParameterSource, paymentParameterSource, fromTime, toTime),
                     fromTime,
                     toTime,
                     INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
-                    offset.get()
+                    offset.get(),
+                    limitValue
             );
-            if (dateRange != null) {
-                toTime = Optional.ofNullable(dateRange.getKey());
-                offset = Optional.ofNullable(dateRange.getValue());
+            if (dateTimeRange != null) {
+                fromTime = Optional.ofNullable(dateTimeRange.getFromTime());
+                toTime = Optional.ofNullable(dateTimeRange.getToTime());
+                offset = Optional.ofNullable(dateTimeRange.getOffset());
             }
         }
 
@@ -83,7 +90,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         ).from(INVOICE_EVENT_STAT)
                 .where(buildInvoiceCondition(invoiceParameterSource, paymentParameterSource, fromTime, toTime))
                 .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
+                .limit(limitValue)
                 .offset(offset.orElse(0));
         return fetch(query, InvoiceEventDaoImpl.ROW_MAPPER);
     }
@@ -109,17 +116,21 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> limit
     ) throws DaoException {
 
+        int limitValue = Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT);
+
         if (offset.isPresent()) {
-            Map.Entry<LocalDateTime, Integer> dateRange = getDateRangeByOffset(
+            DateTimeRange dateTimeRange = getDateTimeRangeByOffset(
                     buildPaymentCondition(parameterSource, fromTime, toTime),
                     fromTime,
                     toTime,
                     INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
-                    offset.get()
+                    offset.get(),
+                    limitValue
             );
-            if (dateRange != null) {
-                toTime = Optional.ofNullable(dateRange.getKey());
-                offset = Optional.ofNullable(dateRange.getValue());
+            if (dateTimeRange != null) {
+                fromTime = Optional.ofNullable(dateTimeRange.getFromTime());
+                toTime = Optional.ofNullable(dateTimeRange.getToTime());
+                offset = Optional.ofNullable(dateTimeRange.getOffset());
             }
         }
 
@@ -158,7 +169,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         ).from(INVOICE_EVENT_STAT)
                 .where(buildPaymentCondition(parameterSource, fromTime, toTime))
                 .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
+                .limit(limitValue)
                 .offset(offset.orElse(0));
         return fetch(query, InvoiceEventDaoImpl.ROW_MAPPER);
     }
@@ -376,23 +387,37 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .where(condition);
     }
 
-    private <T extends Record> Map.Entry<LocalDateTime, Integer> getDateRangeByOffset(Condition condition,
-                                                                                      Optional<LocalDateTime> fromTime,
-                                                                                      Optional<LocalDateTime> toTime,
-                                                                                      TableField<T, LocalDateTime> dateTimeField,
-                                                                                      int offset) {
+    private <T extends Record> DateTimeRange getDateTimeRangeByOffset(Condition condition,
+                                                                      Optional<LocalDateTime> fromTime,
+                                                                      Optional<LocalDateTime> toTime,
+                                                                      TableField<T, LocalDateTime> dateTimeField,
+                                                                      int offset,
+                                                                      int limit) {
         List<Map.Entry<LocalDateTime, Integer>> dateRanges = getDateTimeRanges(condition,
                 fromTime,
                 toTime,
                 dateTimeField);
 
-        Map.Entry<LocalDateTime, Integer> currentRange = null;
+        boolean isOffsetSet = false;
+        DateTimeRange currentRange = null;
         for (Map.Entry<LocalDateTime, Integer> dateRange : dateRanges) {
-            if (offset - dateRange.getValue() < 0) {
-                break;
+            if (!isOffsetSet && offset - dateRange.getValue() >= 0) {
+                offset -= dateRange.getValue();
+
+                currentRange = new DateTimeRange();
+                currentRange.setToTime(dateRange.getKey());
+                currentRange.setOffset(offset);
+            } else {
+                if (!isOffsetSet && !(isOffsetSet = currentRange != null)) break;
+
+                if ((limit + offset) - dateRange.getValue() > 0) {
+                    limit -= dateRange.getValue();
+                } else {
+                    currentRange.setFromTime(dateRange.getKey());
+                    break;
+                }
+
             }
-            offset -= dateRange.getValue();
-            currentRange = new AbstractMap.SimpleEntry<>(dateRange.getKey(), offset);
         }
         return currentRange;
     }
@@ -441,6 +466,48 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                 .and(DSL.max(dateTimeField).ge(toTime.get())))
                 ).from(dateTimeField.getTable()),
                 Boolean.class);
+    }
+
+    public static class DateTimeRange {
+
+        private LocalDateTime fromTime;
+
+        private LocalDateTime toTime;
+
+        private int offset;
+
+        public LocalDateTime getFromTime() {
+            return fromTime;
+        }
+
+        public void setFromTime(LocalDateTime fromTime) {
+            this.fromTime = fromTime;
+        }
+
+        public LocalDateTime getToTime() {
+            return toTime;
+        }
+
+        public void setToTime(LocalDateTime toTime) {
+            this.toTime = toTime;
+        }
+
+        public int getOffset() {
+            return offset;
+        }
+
+        public void setOffset(int offset) {
+            this.offset = offset;
+        }
+
+        @Override
+        public String toString() {
+            return "DateTimeRange{" +
+                    "fromTime=" + fromTime +
+                    ", toTime=" + toTime +
+                    ", offset=" + offset +
+                    '}';
+        }
     }
 
 }
