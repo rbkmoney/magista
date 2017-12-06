@@ -36,11 +36,11 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     private final Cache<Map.Entry<Condition, String>, List<Map.Entry<LocalDateTime, Integer>>> statCache;
 
-    public StatisticsDaoImpl(DataSource ds) {
+    public StatisticsDaoImpl(DataSource ds, long cacheMaxSize, long expireTime) {
         super(ds);
         statCache = Caffeine.newBuilder()
-                .maximumSize(1000)
-                .expireAfterWrite(60, TimeUnit.MINUTES)
+                .maximumSize(cacheMaxSize)
+                .expireAfterWrite(expireTime, TimeUnit.MILLISECONDS)
                 .build();
     }
 
