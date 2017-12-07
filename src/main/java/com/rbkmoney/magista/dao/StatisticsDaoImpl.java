@@ -65,11 +65,10 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                     offset.get(),
                     limitValue
             );
-            if (dateTimeRange != null) {
-                fromTime = Optional.ofNullable(dateTimeRange.getFromTime());
-                toTime = Optional.ofNullable(dateTimeRange.getToTime());
-                offset = Optional.ofNullable(dateTimeRange.getOffset());
-            }
+
+            fromTime = Optional.ofNullable(dateTimeRange.getFromTime());
+            toTime = Optional.ofNullable(dateTimeRange.getToTime());
+            offset = Optional.ofNullable(dateTimeRange.getOffset());
         }
 
         Query query = getDslContext().select(
@@ -127,11 +126,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                     offset.get(),
                     limitValue
             );
-            if (dateTimeRange != null) {
-                fromTime = Optional.ofNullable(dateTimeRange.getFromTime());
-                toTime = Optional.ofNullable(dateTimeRange.getToTime());
-                offset = Optional.ofNullable(dateTimeRange.getOffset());
-            }
+            fromTime = Optional.ofNullable(dateTimeRange.getFromTime());
+            toTime = Optional.ofNullable(dateTimeRange.getToTime());
+            offset = Optional.ofNullable(dateTimeRange.getOffset());
         }
 
         Query query = getDslContext().select(
@@ -398,20 +395,18 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 toTime,
                 dateTimeField);
 
-        boolean isOffsetSet = false;
-        DateTimeRange currentRange = null;
+        boolean offsetFound = false;
+        int fromTimeBound = limit;
+        DateTimeRange currentRange = new DateTimeRange(fromTime.orElse(null), toTime.orElse(null), offset);
         for (Map.Entry<LocalDateTime, Integer> dateRange : dateRanges) {
-            if (!isOffsetSet && offset - dateRange.getValue() >= 0) {
-                offset -= dateRange.getValue();
-
-                currentRange = new DateTimeRange();
+            int newOffset = currentRange.getOffset() - dateRange.getValue();
+            if (!offsetFound && newOffset >= 0) {
                 currentRange.setToTime(dateRange.getKey());
-                currentRange.setOffset(offset);
+                currentRange.setOffset(newOffset);
             } else {
-                if (!isOffsetSet && !(isOffsetSet = currentRange != null)) break;
-
-                if ((limit + offset) - dateRange.getValue() > 0) {
-                    limit -= dateRange.getValue();
+                offsetFound = true;
+                if ((fromTimeBound + currentRange.getOffset()) - dateRange.getValue() > 0) {
+                    fromTimeBound -= dateRange.getValue();
                 } else {
                     currentRange.setFromTime(dateRange.getKey());
                     break;
@@ -475,6 +470,12 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         private LocalDateTime toTime;
 
         private int offset;
+
+        public DateTimeRange(LocalDateTime fromTime, LocalDateTime toTime, int offset) {
+            this.fromTime = fromTime;
+            this.toTime = toTime;
+            this.offset = offset;
+        }
 
         public LocalDateTime getFromTime() {
             return fromTime;
