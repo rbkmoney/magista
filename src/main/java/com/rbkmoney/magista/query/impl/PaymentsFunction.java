@@ -14,6 +14,7 @@ import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.util.DamselUtil;
+import com.rbkmoney.magista.util.TypeUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
@@ -245,6 +246,8 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             try {
                 Collection<InvoiceEventStat> result = functionContext.getDao().getPayments(
                         buildPaymentConditionParameterSource(parameters),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
                         Optional.ofNullable(parameters.getFrom()),
                         Optional.ofNullable(parameters.getSize())
                 );
@@ -268,7 +271,9 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Integer result = functionContext.getDao().getPaymentsCount(
-                        buildPaymentConditionParameterSource(parameters)
+                        buildPaymentConditionParameterSource(parameters),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime()))
                 );
                 return new BaseQueryResult<>(() -> Stream.of(result), () -> result);
             } catch (DaoException e) {
@@ -295,8 +300,6 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), LIKE)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, parameters.getPanMask(), LIKE)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT, toLocalDateTime(parameters.getFromTime()), GREATER_OR_EQUAL)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT, toLocalDateTime(parameters.getToTime()), LESS)
                 .addInConditionValue(INVOICE_EVENT_STAT.PARTY_SHOP_CATEGORY_ID, parameters.getShopCategoryIds());
     }
 }

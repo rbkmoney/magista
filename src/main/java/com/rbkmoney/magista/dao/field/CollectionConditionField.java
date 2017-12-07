@@ -9,9 +9,9 @@ public class CollectionConditionField<T> implements ConditionField<T, Collection
 
     private final Field<T> field;
 
-    private Collection<T> value;
+    private final Collection<T> value;
 
-    private Comparator comparator;
+    private final Comparator comparator;
 
     public CollectionConditionField(Field<T> field, Collection<T> value, Comparator comparator) {
         this.field = field;
@@ -32,6 +32,26 @@ public class CollectionConditionField<T> implements ConditionField<T, Collection
     @Override
     public Comparator getComparator() {
         return comparator;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CollectionConditionField<?> that = (CollectionConditionField<?>) o;
+
+        if (field != null ? !field.equals(that.field) : that.field != null) return false;
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
+        return comparator == that.comparator;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = field != null ? field.hashCode() : 0;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + (comparator != null ? comparator.hashCode() : 0);
+        return result;
     }
 
     @Override
