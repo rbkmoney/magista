@@ -33,7 +33,7 @@ public class GeoProviderImpl implements GeoProvider {
     public LocationInfo getLocationInfo(String ip) throws ProviderException {
         return retryTemplate.execute(context -> {
                     if (context.getLastThrowable() != null) {
-                        log.error("Failed to get location info (ip='{}'), retrying ({})...", ip, context.getRetryCount(), context.getLastThrowable());
+                        log.warn("Failed to get location info (ip='{}'), retrying ({})...", ip, context.getRetryCount(), context.getLastThrowable());
                     }
 
                     try {

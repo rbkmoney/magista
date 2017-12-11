@@ -37,7 +37,7 @@ public class PartyService {
     public Party getParty(String partyId, Instant timestamp) throws NotFoundException, PartyException {
         return retryTemplate.execute(context -> {
                     if (context.getLastThrowable() != null) {
-                        log.error("Failed to get party (partyId='{}', timestamp='{}'), retrying ({})...", partyId, timestamp, context.getRetryCount(), context.getLastThrowable());
+                        log.warn("Failed to get party (partyId='{}', timestamp='{}'), retrying ({})...", partyId, timestamp, context.getRetryCount(), context.getLastThrowable());
                     }
 
                     try {

@@ -1,11 +1,11 @@
 package com.rbkmoney.magista.config;
 
+import com.rbkmoney.magista.retry.SimpleRetryPolicy;
 import com.rbkmoney.woody.api.flow.error.WRuntimeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
 import java.util.Collections;
