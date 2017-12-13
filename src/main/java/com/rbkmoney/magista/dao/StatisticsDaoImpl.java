@@ -423,10 +423,13 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                                                                               TableField<T, LocalDateTime> dateTimeField) {
         final Map.Entry key = new AbstractMap.SimpleEntry<>(condition, dateTimeField.getName());
 
-        if (statCache.getIfPresent(key) == null) {
-            if (checkBounds(condition, fromTime, toTime, dateTimeField)) {
-                return statCache.get(key, keyValue -> getDateTimeRanges(condition, dateTimeField));
-            }
+        List<Map.Entry<LocalDateTime, Integer>> dateRanges = statCache.getIfPresent(key);
+        if (dateRanges != null) {
+            return dateRanges;
+        }
+
+        if (checkBounds(condition, fromTime, toTime, dateTimeField)) {
+            return statCache.get(key, keyValue -> getDateTimeRanges(condition, dateTimeField));
         }
         return getDateTimeRanges(condition, dateTimeField);
     }
