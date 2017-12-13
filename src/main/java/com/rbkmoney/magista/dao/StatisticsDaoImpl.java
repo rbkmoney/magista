@@ -390,7 +390,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                                                       TableField<T, LocalDateTime> dateTimeField,
                                                                       int offset,
                                                                       int limit) {
-        List<Map.Entry<LocalDateTime, Integer>> dateRanges = getDateTimeRanges(condition,
+        List<Map.Entry<LocalDateTime, Integer>> dateRanges = getCacheDateTimeRanges(condition,
                 fromTime,
                 toTime,
                 dateTimeField);
@@ -417,40 +417,43 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         return currentRange;
     }
 
-    private <T extends Record> List<Map.Entry<LocalDateTime, Integer>> getDateTimeRanges(Condition condition,
-                                                                                         Optional<LocalDateTime> fromTime,
-                                                                                         Optional<LocalDateTime> toTime,
-                                                                                         TableField<T, LocalDateTime> dateTimeField) {
+    private <T extends Record> List<Map.Entry<LocalDateTime, Integer>> getCacheDateTimeRanges(Condition condition,
+                                                                                              Optional<LocalDateTime> fromTime,
+                                                                                              Optional<LocalDateTime> toTime,
+                                                                                              TableField<T, LocalDateTime> dateTimeField) {
         final Map.Entry key = new AbstractMap.SimpleEntry<>(condition, dateTimeField.getName());
 
-        List<Map.Entry<LocalDateTime, Integer>> dateRanges = statCache.getIfPresent(key);
-        if (dateRanges == null) {
-            Field<LocalDateTime> spValField = DSL.field(
-                    DSL.sql("date_trunc('" + DatePart.HOUR.toSQL() + "', " + dateTimeField.getName() + ")"),
-                    LocalDateTime.class
-            ).as("sp_val");
-            Field countField = DSL.count().as("count");
-
-            Query query = getDslContext().select(spValField, countField).from(INVOICE_EVENT_STAT)
-                    .where(condition)
-                    .groupBy(spValField)
-                    .orderBy(spValField.desc());
-
-            dateRanges = fetch(query,
-                    (resultSet, i) -> new AbstractMap.SimpleEntry<>(
-                            resultSet.getObject(spValField.getName(), LocalDateTime.class),
-                            resultSet.getInt(countField.getName())
-                    )
-            );
-            if (checkBounds(fromTime, toTime, dateTimeField)) {
-                statCache.put(key, dateRanges);
+        if (statCache.getIfPresent(key) == null) {
+            if (checkBounds(condition, fromTime, toTime, dateTimeField)) {
+                return statCache.get(key, keyValue -> getDateTimeRanges(condition, dateTimeField));
             }
         }
-
-        return dateRanges;
+        return getDateTimeRanges(condition, dateTimeField);
     }
 
-    private <T extends Record> boolean checkBounds(Optional<LocalDateTime> fromTime,
+    private <T extends Record> List<Map.Entry<LocalDateTime, Integer>> getDateTimeRanges(Condition condition,
+                                                                                         TableField<T, LocalDateTime> dateTimeField) {
+        Field<LocalDateTime> spValField = DSL.field(
+                DSL.sql("date_trunc('" + DatePart.HOUR.toSQL() + "', " + dateTimeField.getName() + ")"),
+                LocalDateTime.class
+        ).as("sp_val");
+        Field countField = DSL.count().as("count");
+
+        Query query = getDslContext().select(spValField, countField).from(INVOICE_EVENT_STAT)
+                .where(condition)
+                .groupBy(spValField)
+                .orderBy(spValField.desc());
+
+        return fetch(query,
+                (resultSet, i) -> new AbstractMap.SimpleEntry<>(
+                        resultSet.getObject(spValField.getName(), LocalDateTime.class),
+                        resultSet.getInt(countField.getName())
+                )
+        );
+    }
+
+    private <T extends Record> boolean checkBounds(Condition condition,
+                                                   Optional<LocalDateTime> fromTime,
                                                    Optional<LocalDateTime> toTime,
                                                    TableField<T, LocalDateTime> dateTimeField) {
         return fromTime.isPresent()
@@ -459,7 +462,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 DSL.field(
                         DSL.min(dateTimeField).le(fromTime.get())
                                 .and(DSL.max(dateTimeField).ge(toTime.get())))
-                ).from(dateTimeField.getTable()),
+                ).from(dateTimeField.getTable())
+                        .where(condition),
                 Boolean.class);
     }
 
