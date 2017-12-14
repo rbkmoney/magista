@@ -459,15 +459,19 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                                    Optional<LocalDateTime> fromTime,
                                                    Optional<LocalDateTime> toTime,
                                                    TableField<T, LocalDateTime> dateTimeField) {
-        return fromTime.isPresent()
-                && toTime.isPresent()
-                && fetchOne(getDslContext().select(
+        if (!fromTime.isPresent() || !toTime.isPresent()) {
+            return false;
+        }
+
+        Boolean checkBounds = fetchOne(getDslContext().select(
                 DSL.field(
                         DSL.min(dateTimeField).le(fromTime.get())
                                 .and(DSL.max(dateTimeField).ge(toTime.get())))
                 ).from(dateTimeField.getTable())
                         .where(condition),
                 Boolean.class);
+
+        return checkBounds != null && checkBounds;
     }
 
     public static class DateTimeRange {

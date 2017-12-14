@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class OffsetTest extends AbstractIntegrationTest {
 
@@ -140,6 +141,14 @@ public class OffsetTest extends AbstractIntegrationTest {
             assertEquals(count - currentStep, (long) Long.valueOf(payments.get(0).getId()));
             assertEquals(count - (currentStep += size) + 1, (long) Long.valueOf(payments.get(payments.size() - 1).getId()));
         }
+    }
+
+    @Test
+    public void testWhenDataNotFound() {
+        String dsl = "{\"from\":2,\"query\":{\"invoices\":{\"from_time\":\"2015-08-11T19:42:35Z\",\"invoice_id\":\"testInvoiceID\",\"invoice_status\":\"fulfilled\",\"merchant_id\":\"281220eb-a4ef-4d03-b666-bdec4b26c5f7\",\"payment_amount\":10000,\"payment_email\":\"test@test_rbk.ru\",\"payment_fingerprint\":\"blablablalbalbal\",\"payment_flow\":\"instant\",\"payment_id\":\"testPaymentID\",\"payment_ip\":\"192.168.0.1\",\"payment_method\":\"bank_card\",\"payment_status\":\"processed\",\"shop_id\":\"statistics.1513266467361591\",\"to_time\":\"2020-08-11T19:42:35Z\"}},\"size\":2}";
+        StatResponse statResponse = queryProcessor.processQuery(dsl);
+        assertEquals(0, statResponse.getTotalCount());
+        assertTrue(statResponse.getData().getInvoices().isEmpty());
     }
 
 }
