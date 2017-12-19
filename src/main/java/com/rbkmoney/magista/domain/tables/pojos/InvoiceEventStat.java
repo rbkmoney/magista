@@ -31,7 +31,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 1587862106;
+    private static final long serialVersionUID = 1902585190;
 
     private Long                       id;
     private Long                       eventId;
@@ -111,6 +111,8 @@ public class InvoiceEventStat implements Serializable {
     private String                     invoiceContextType;
     private String                     paymentContextType;
     private Long                       paymentAdjustmentAmount;
+    private String                     paymentDigitalWalletId;
+    private String                     paymentDigitalWalletProvider;
 
     public InvoiceEventStat() {}
 
@@ -193,6 +195,8 @@ public class InvoiceEventStat implements Serializable {
         this.invoiceContextType = value.invoiceContextType;
         this.paymentContextType = value.paymentContextType;
         this.paymentAdjustmentAmount = value.paymentAdjustmentAmount;
+        this.paymentDigitalWalletId = value.paymentDigitalWalletId;
+        this.paymentDigitalWalletProvider = value.paymentDigitalWalletProvider;
     }
 
     public InvoiceEventStat(
@@ -273,7 +277,9 @@ public class InvoiceEventStat implements Serializable {
         Long                       paymentDomainRevision,
         String                     invoiceContextType,
         String                     paymentContextType,
-        Long                       paymentAdjustmentAmount
+        Long                       paymentAdjustmentAmount,
+        String                     paymentDigitalWalletId,
+        String                     paymentDigitalWalletProvider
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -353,6 +359,8 @@ public class InvoiceEventStat implements Serializable {
         this.invoiceContextType = invoiceContextType;
         this.paymentContextType = paymentContextType;
         this.paymentAdjustmentAmount = paymentAdjustmentAmount;
+        this.paymentDigitalWalletId = paymentDigitalWalletId;
+        this.paymentDigitalWalletProvider = paymentDigitalWalletProvider;
     }
 
     public Long getId() {
@@ -979,6 +987,22 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentAmount = paymentAdjustmentAmount;
     }
 
+    public String getPaymentDigitalWalletId() {
+        return this.paymentDigitalWalletId;
+    }
+
+    public void setPaymentDigitalWalletId(String paymentDigitalWalletId) {
+        this.paymentDigitalWalletId = paymentDigitalWalletId;
+    }
+
+    public String getPaymentDigitalWalletProvider() {
+        return this.paymentDigitalWalletProvider;
+    }
+
+    public void setPaymentDigitalWalletProvider(String paymentDigitalWalletProvider) {
+        this.paymentDigitalWalletProvider = paymentDigitalWalletProvider;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -1456,6 +1480,18 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentAdjustmentAmount.equals(other.paymentAdjustmentAmount))
             return false;
+        if (paymentDigitalWalletId == null) {
+            if (other.paymentDigitalWalletId != null)
+                return false;
+        }
+        else if (!paymentDigitalWalletId.equals(other.paymentDigitalWalletId))
+            return false;
+        if (paymentDigitalWalletProvider == null) {
+            if (other.paymentDigitalWalletProvider != null)
+                return false;
+        }
+        else if (!paymentDigitalWalletProvider.equals(other.paymentDigitalWalletProvider))
+            return false;
         return true;
     }
 
@@ -1541,6 +1577,8 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((this.invoiceContextType == null) ? 0 : this.invoiceContextType.hashCode());
         result = prime * result + ((this.paymentContextType == null) ? 0 : this.paymentContextType.hashCode());
         result = prime * result + ((this.paymentAdjustmentAmount == null) ? 0 : this.paymentAdjustmentAmount.hashCode());
+        result = prime * result + ((this.paymentDigitalWalletId == null) ? 0 : this.paymentDigitalWalletId.hashCode());
+        result = prime * result + ((this.paymentDigitalWalletProvider == null) ? 0 : this.paymentDigitalWalletProvider.hashCode());
         return result;
     }
 
@@ -1626,6 +1664,8 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(invoiceContextType);
         sb.append(", ").append(paymentContextType);
         sb.append(", ").append(paymentAdjustmentAmount);
+        sb.append(", ").append(paymentDigitalWalletId);
+        sb.append(", ").append(paymentDigitalWalletProvider);
 
         sb.append(")");
         return sb.toString();

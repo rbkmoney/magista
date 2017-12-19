@@ -6,6 +6,8 @@ import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.merch_stat.BankCard;
 import com.rbkmoney.damsel.merch_stat.CustomerPayer;
+import com.rbkmoney.damsel.merch_stat.DigitalWallet;
+import com.rbkmoney.damsel.merch_stat.DigitalWalletProvider;
 import com.rbkmoney.damsel.merch_stat.ExternalFailure;
 import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
 import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
@@ -273,6 +275,11 @@ public class DamselUtil {
             case PAYMENT_TERMINAL:
                 return PaymentTool.payment_terminal(new PaymentTerminal(
                         TerminalPaymentProvider.valueOf(invoicePaymentStat.getPaymentTerminalProvider())
+                ));
+            case DIGITAL_WALLET:
+                return PaymentTool.digital_wallet(new DigitalWallet(
+                        DigitalWalletProvider.valueOf(invoicePaymentStat.getPaymentDigitalWalletProvider()),
+                        invoicePaymentStat.getPaymentDigitalWalletId()
                 ));
             default:
                 throw new NotFoundException(String.format("Payment tool '%s' not found", paymentTool.getFieldName()));

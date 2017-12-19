@@ -122,6 +122,12 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
             );
         }
 
+        if (paymentTool.isSetDigitalWallet()) {
+            DigitalWallet digitalWallet = paymentTool.getDigitalWallet();
+            invoiceEventStat.setPaymentDigitalWalletId(digitalWallet.getId());
+            invoiceEventStat.setPaymentDigitalWalletProvider(digitalWallet.getProvider().toString());
+        }
+
         if (paymentTool.isSetBankCard()) {
             BankCard bankCard = paymentTool.getBankCard();
             invoiceEventStat.setPaymentMaskedPan(bankCard.getMaskedPan());
