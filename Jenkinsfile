@@ -3,7 +3,7 @@ build('magista', 'java-maven') {
     checkoutRepo()
 
     def serviceName = env.REPO_NAME
-    def baseImageTag = "f26fcc19d1941ab74f1c72dd8a408be17a769333"
+    def baseImageTag = "60ec6caf5c52778c9e89075656cca2ceeee4d0dd"
     def mvnArgs = '-DjvmArgs="-Xmx256m"'
 
     // Run mvn and generate docker file
