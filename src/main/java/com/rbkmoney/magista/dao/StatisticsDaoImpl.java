@@ -4,10 +4,12 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
+import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
+import com.rbkmoney.magista.util.TypeUtil;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -91,7 +93,25 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
                 .limit(limitValue)
                 .offset(offset.orElse(0));
-        return fetch(query, InvoiceEventDaoImpl.ROW_MAPPER);
+        return fetch(query, (rs, i) -> {
+            InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
+            invoiceEventStat.setPartyId(rs.getString(INVOICE_EVENT_STAT.PARTY_ID.getName()));
+            invoiceEventStat.setPartyShopId(rs.getString(INVOICE_EVENT_STAT.PARTY_SHOP_ID.getName()));
+            invoiceEventStat.setInvoiceId(rs.getString(INVOICE_EVENT_STAT.INVOICE_ID.getName()));
+            invoiceEventStat.setInvoiceCreatedAt(rs.getObject(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.getName(), LocalDateTime.class));
+            invoiceEventStat.setInvoiceStatus(TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.INVOICE_STATUS.getName()), InvoiceStatus.class));
+            invoiceEventStat.setInvoiceStatusDetails(rs.getString(INVOICE_EVENT_STAT.INVOICE_STATUS_DETAILS.getName()));
+            invoiceEventStat.setInvoiceProduct(rs.getString(INVOICE_EVENT_STAT.INVOICE_PRODUCT.getName()));
+            invoiceEventStat.setInvoiceDescription(rs.getString(INVOICE_EVENT_STAT.INVOICE_DESCRIPTION.getName()));
+            invoiceEventStat.setInvoiceDue(rs.getObject(INVOICE_EVENT_STAT.INVOICE_DUE.getName(), LocalDateTime.class));
+            invoiceEventStat.setInvoiceAmount(rs.getLong(INVOICE_EVENT_STAT.INVOICE_AMOUNT.getName()));
+            invoiceEventStat.setInvoiceCurrencyCode(rs.getString(INVOICE_EVENT_STAT.INVOICE_CURRENCY_CODE.getName()));
+            invoiceEventStat.setInvoiceCart(rs.getString(INVOICE_EVENT_STAT.INVOICE_CART.getName()));
+            invoiceEventStat.setInvoiceContextType(rs.getString(INVOICE_EVENT_STAT.INVOICE_CONTEXT_TYPE.getName()));
+            invoiceEventStat.setInvoiceContext(rs.getBytes(INVOICE_EVENT_STAT.INVOICE_CONTEXT.getName()));
+
+            return invoiceEventStat;
+        });
     }
 
     @Override
@@ -168,7 +188,46 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
                 .limit(limitValue)
                 .offset(offset.orElse(0));
-        return fetch(query, InvoiceEventDaoImpl.ROW_MAPPER);
+        return fetch(query, (rs, i) -> {
+            InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
+
+            invoiceEventStat.setPartyId(rs.getString(INVOICE_EVENT_STAT.PARTY_ID.getName()));
+            invoiceEventStat.setPartyShopId(rs.getString(INVOICE_EVENT_STAT.PARTY_SHOP_ID.getName()));
+            invoiceEventStat.setInvoiceId(rs.getString(INVOICE_EVENT_STAT.INVOICE_ID.getName()));
+            invoiceEventStat.setPaymentId(rs.getString(INVOICE_EVENT_STAT.PAYMENT_ID.getName()));
+            invoiceEventStat.setPaymentCreatedAt(rs.getObject(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.getName(), LocalDateTime.class));
+            invoiceEventStat.setPaymentStatus(
+                    TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.PAYMENT_STATUS.getName()),
+                            com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class)
+            );
+            invoiceEventStat.setPaymentFailureClass(rs.getString(INVOICE_EVENT_STAT.PAYMENT_FAILURE_CLASS.getName()));
+            invoiceEventStat.setPaymentExternalFailureCode(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_CODE.getName()));
+            invoiceEventStat.setPaymentExternalFailureDescription(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_DESCRIPTION.getName()));
+            invoiceEventStat.setPaymentAmount(rs.getLong(INVOICE_EVENT_STAT.PAYMENT_AMOUNT.getName()));
+            invoiceEventStat.setPaymentFee(rs.getLong(INVOICE_EVENT_STAT.PAYMENT_FEE.getName()));
+            invoiceEventStat.setPaymentCurrencyCode(rs.getString(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.getName()));
+            invoiceEventStat.setPaymentTool(rs.getString(INVOICE_EVENT_STAT.PAYMENT_TOOL.getName()));
+            invoiceEventStat.setPaymentToken(rs.getString(INVOICE_EVENT_STAT.PAYMENT_TOKEN.getName()));
+            invoiceEventStat.setPaymentSystem(rs.getString(INVOICE_EVENT_STAT.PAYMENT_SYSTEM.getName()));
+            invoiceEventStat.setPaymentBin(rs.getString(INVOICE_EVENT_STAT.PAYMENT_BIN.getName()));
+            invoiceEventStat.setPaymentMaskedPan(rs.getString(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN.getName()));
+            invoiceEventStat.setPaymentTerminalProvider(rs.getString(INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER.getName()));
+            invoiceEventStat.setPaymentIp(rs.getString(INVOICE_EVENT_STAT.PAYMENT_IP.getName()));
+            invoiceEventStat.setPaymentFingerprint(rs.getString(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT.getName()));
+            invoiceEventStat.setPaymentPhoneNumber(rs.getString(INVOICE_EVENT_STAT.PAYMENT_PHONE_NUMBER.getName()));
+            invoiceEventStat.setPaymentEmail(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EMAIL.getName()));
+            invoiceEventStat.setPaymentSessionId(rs.getString(INVOICE_EVENT_STAT.PAYMENT_SESSION_ID.getName()));
+            invoiceEventStat.setPaymentCustomerId(rs.getString(INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID.getName()));
+            invoiceEventStat.setPaymentFlow(rs.getString(INVOICE_EVENT_STAT.PAYMENT_FLOW.getName()));
+            invoiceEventStat.setPaymentHoldOnExpiration(rs.getString(INVOICE_EVENT_STAT.PAYMENT_HOLD_ON_EXPIRATION.getName()));
+            invoiceEventStat.setPaymentHoldUntil(rs.getObject(INVOICE_EVENT_STAT.PAYMENT_HOLD_UNTIL.getName(), LocalDateTime.class));
+            invoiceEventStat.setPaymentCountryId(rs.getInt(INVOICE_EVENT_STAT.PAYMENT_COUNTRY_ID.getName()));
+            invoiceEventStat.setPaymentCityId(rs.getInt(INVOICE_EVENT_STAT.PAYMENT_CITY_ID.getName()));
+            invoiceEventStat.setPaymentContextType(rs.getString(INVOICE_EVENT_STAT.PAYMENT_CONTEXT_TYPE.getName()));
+            invoiceEventStat.setPaymentContext(rs.getBytes(INVOICE_EVENT_STAT.PAYMENT_CONTEXT.getName()));
+
+            return invoiceEventStat;
+        });
     }
 
     @Override
@@ -431,7 +490,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         if (checkBounds(condition, fromTime, toTime, dateTimeField)) {
             return statCache.get(key, keyValue -> getDateTimeRanges(condition, dateTimeField));
         }
-        return getDateTimeRanges(condition, dateTimeField);
+        return Collections.emptyList();
     }
 
     private <T extends Record> List<Map.Entry<LocalDateTime, Integer>> getDateTimeRanges(Condition condition,
