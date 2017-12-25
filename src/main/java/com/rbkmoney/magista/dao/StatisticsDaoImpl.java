@@ -449,6 +449,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                                                       TableField<T, LocalDateTime> dateTimeField,
                                                                       int offset,
                                                                       int limit) {
+        log.debug("Trying to get datetime range, fromTime='{}', toTime='{}', offset='{}', limit='{}', condition='{}'",
+                fromTime, toTime, offset, limit, condition);
         List<Map.Entry<LocalDateTime, Integer>> dateRanges = getCacheDateTimeRanges(condition,
                 fromTime,
                 toTime,
@@ -473,6 +475,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
             }
         }
+        log.debug("Datetime range was retrieved, datetimeRange='{}', condition='{}'", currentRange, condition);
         return currentRange;
     }
 
@@ -480,21 +483,26 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                                                                               Optional<LocalDateTime> fromTime,
                                                                                               Optional<LocalDateTime> toTime,
                                                                                               TableField<T, LocalDateTime> dateTimeField) {
+        log.debug("Trying to get datetime ranges from the cache, condition='{}', dateTimeField='{}'", condition, dateTimeField);
         final Map.Entry key = new AbstractMap.SimpleEntry<>(condition, dateTimeField.getName());
 
         List<Map.Entry<LocalDateTime, Integer>> dateRanges = statCache.getIfPresent(key);
+        if (dateRanges == null && checkBounds(condition, fromTime, toTime, dateTimeField)) {
+            dateRanges = statCache.get(key, keyValue -> getDateTimeRanges(condition, dateTimeField));
+        }
+
         if (dateRanges != null) {
+            log.debug("Datetime ranges was retrieved from the cache, rangesCount='{}', condition='{}', dateTimeField='{}'", dateRanges.size(), condition, dateTimeField);
             return dateRanges;
         }
 
-        if (checkBounds(condition, fromTime, toTime, dateTimeField)) {
-            return statCache.get(key, keyValue -> getDateTimeRanges(condition, dateTimeField));
-        }
+        log.debug("Datetime ranges not found in the cache, condition='{}', dateTimeField='{}'", condition, dateTimeField);
         return Collections.emptyList();
     }
 
     private <T extends Record> List<Map.Entry<LocalDateTime, Integer>> getDateTimeRanges(Condition condition,
                                                                                          TableField<T, LocalDateTime> dateTimeField) {
+        log.debug("Trying to get datetime ranges from the storage, condition='{}', dateTimeField='{}'", condition, dateTimeField);
         Field<LocalDateTime> spValField = DSL.field(
                 DSL.sql("date_trunc('" + DatePart.HOUR.toSQL() + "', " + dateTimeField.getName() + ")"),
                 LocalDateTime.class
@@ -506,12 +514,14 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .groupBy(spValField)
                 .orderBy(spValField.desc());
 
-        return fetch(query,
+        List<Map.Entry<LocalDateTime, Integer>> dateRanges = fetch(query,
                 (resultSet, i) -> new AbstractMap.SimpleEntry<>(
                         resultSet.getObject(spValField.getName(), LocalDateTime.class),
                         resultSet.getInt(countField.getName())
                 )
         );
+        log.debug("Datetime ranges was retrieved from the storage, rangesCount='{}', condition='{}', dateTimeField='{}'", dateRanges.size(), condition, dateTimeField);
+        return dateRanges;
     }
 
     private <T extends Record> boolean checkBounds(Condition condition,
