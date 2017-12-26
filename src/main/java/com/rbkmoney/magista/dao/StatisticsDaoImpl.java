@@ -170,6 +170,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.PAYMENT_BIN,
                 INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN,
                 INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER,
+                INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_ID,
+                INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_PROVIDER,
                 INVOICE_EVENT_STAT.PAYMENT_IP,
                 INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT,
                 INVOICE_EVENT_STAT.PAYMENT_PHONE_NUMBER,
@@ -212,6 +214,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             invoiceEventStat.setPaymentBin(rs.getString(INVOICE_EVENT_STAT.PAYMENT_BIN.getName()));
             invoiceEventStat.setPaymentMaskedPan(rs.getString(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN.getName()));
             invoiceEventStat.setPaymentTerminalProvider(rs.getString(INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER.getName()));
+            invoiceEventStat.setPaymentDigitalWalletId(rs.getString(INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_ID.getName()));
+            invoiceEventStat.setPaymentDigitalWalletProvider(rs.getString(INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()));
             invoiceEventStat.setPaymentIp(rs.getString(INVOICE_EVENT_STAT.PAYMENT_IP.getName()));
             invoiceEventStat.setPaymentFingerprint(rs.getString(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT.getName()));
             invoiceEventStat.setPaymentPhoneNumber(rs.getString(INVOICE_EVENT_STAT.PAYMENT_PHONE_NUMBER.getName()));
