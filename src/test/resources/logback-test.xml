@@ -7,6 +7,10 @@
         <appender-ref ref="CONSOLE"/>
     </root>
 
+    <logger name="com.rbkmoney.magista">
+        <level value="debug" />
+    </logger>
+
     <logger name="org.springframework.jdbc.core.JdbcTemplate">
         <level value="info" />
     </logger>
