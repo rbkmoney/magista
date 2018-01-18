@@ -210,9 +210,11 @@ public class DamselUtil {
         statPayment.setFee(invoicePaymentStat.getPaymentFee());
         statPayment.setCurrencySymbolicCode(invoicePaymentStat.getPaymentCurrencyCode());
 
-        if (invoicePaymentStat.getPaymentTool() != null) {
+        PaymentTool paymentTool = toStatPaymentTool(invoicePaymentStat);
+        if (invoicePaymentStat.getPaymentCustomerId() != null) {
+            statPayment.setPayer(Payer.customer(new CustomerPayer(invoicePaymentStat.getPaymentCustomerId())));
+        } else if (invoicePaymentStat.getPaymentSessionId() != null) {
             PaymentResourcePayer paymentResourcePayer = new PaymentResourcePayer();
-            PaymentTool paymentTool = toStatPaymentTool(invoicePaymentStat);
             paymentResourcePayer.setPaymentTool(paymentTool);
             paymentResourcePayer.setIpAddress(invoicePaymentStat.getPaymentIp());
             paymentResourcePayer.setFingerprint(invoicePaymentStat.getPaymentFingerprint());
@@ -221,8 +223,6 @@ public class DamselUtil {
             paymentResourcePayer.setSessionId(invoicePaymentStat.getPaymentSessionId());
 
             statPayment.setPayer(Payer.payment_resource(paymentResourcePayer));
-        } else if (invoicePaymentStat.getPaymentCustomerId() != null) {
-            statPayment.setPayer(Payer.customer(new CustomerPayer(invoicePaymentStat.getPaymentCustomerId())));
         }
 
         if (invoicePaymentStat.getPaymentContext() != null) {
