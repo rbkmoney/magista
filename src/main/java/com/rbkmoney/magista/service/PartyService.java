@@ -9,6 +9,7 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,11 @@ public class PartyService {
     public PartyService(PartyManagementSrv.Iface partyManagementSrv, RetryTemplate retryTemplate) {
         this.partyManagementSrv = partyManagementSrv;
         this.retryTemplate = retryTemplate;
+    }
+
+    @Cacheable("parties")
+    public Party getParty(String partyId, long partyRevision) throws NotFoundException, PartyException {
+        return getParty(partyId, PartyRevisionParam.revision(partyRevision));
     }
 
     public Party getParty(String partyId, Instant timestamp) throws NotFoundException, PartyException {

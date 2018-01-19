@@ -32,10 +32,18 @@ public class InvoicePartyMapper implements Mapper<InvoiceEventContext> {
                 invoiceEventStat.getInvoiceId(), invoiceEventStat.getPartyId(), invoiceEventStat.getEventId());
 
         try {
-            Party party = partyService.getParty(
-                    invoiceEventStat.getPartyId(),
-                    invoiceEventStat.getInvoiceCreatedAt().toInstant(ZoneOffset.UTC)
-            );
+            Party party;
+            if (invoiceEventStat.getInvoicePartyRevision() != null) {
+                party = partyService.getParty(
+                        invoiceEventStat.getPartyId(),
+                        invoiceEventStat.getInvoicePartyRevision()
+                );
+            } else {
+                party = partyService.getParty(
+                        invoiceEventStat.getPartyId(),
+                        invoiceEventStat.getInvoiceCreatedAt().toInstant(ZoneOffset.UTC)
+                );
+            }
             invoiceEventStat.setPartyEmail(party.getContactInfo().getEmail());
 
             Shop shop = party.getShops().get(invoiceEventStat.getPartyShopId());

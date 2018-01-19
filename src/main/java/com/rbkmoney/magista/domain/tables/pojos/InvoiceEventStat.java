@@ -31,7 +31,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 1587862106;
+    private static final long serialVersionUID = 311362829;
 
     private Long                       id;
     private Long                       eventId;
@@ -111,6 +111,8 @@ public class InvoiceEventStat implements Serializable {
     private String                     invoiceContextType;
     private String                     paymentContextType;
     private Long                       paymentAdjustmentAmount;
+    private Long                       invoicePartyRevision;
+    private Long                       paymentPartyRevision;
 
     public InvoiceEventStat() {}
 
@@ -193,6 +195,8 @@ public class InvoiceEventStat implements Serializable {
         this.invoiceContextType = value.invoiceContextType;
         this.paymentContextType = value.paymentContextType;
         this.paymentAdjustmentAmount = value.paymentAdjustmentAmount;
+        this.invoicePartyRevision = value.invoicePartyRevision;
+        this.paymentPartyRevision = value.paymentPartyRevision;
     }
 
     public InvoiceEventStat(
@@ -273,7 +277,9 @@ public class InvoiceEventStat implements Serializable {
         Long                       paymentDomainRevision,
         String                     invoiceContextType,
         String                     paymentContextType,
-        Long                       paymentAdjustmentAmount
+        Long                       paymentAdjustmentAmount,
+        Long                       invoicePartyRevision,
+        Long                       paymentPartyRevision
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -353,6 +359,8 @@ public class InvoiceEventStat implements Serializable {
         this.invoiceContextType = invoiceContextType;
         this.paymentContextType = paymentContextType;
         this.paymentAdjustmentAmount = paymentAdjustmentAmount;
+        this.invoicePartyRevision = invoicePartyRevision;
+        this.paymentPartyRevision = paymentPartyRevision;
     }
 
     public Long getId() {
@@ -979,6 +987,22 @@ public class InvoiceEventStat implements Serializable {
         this.paymentAdjustmentAmount = paymentAdjustmentAmount;
     }
 
+    public Long getInvoicePartyRevision() {
+        return this.invoicePartyRevision;
+    }
+
+    public void setInvoicePartyRevision(Long invoicePartyRevision) {
+        this.invoicePartyRevision = invoicePartyRevision;
+    }
+
+    public Long getPaymentPartyRevision() {
+        return this.paymentPartyRevision;
+    }
+
+    public void setPaymentPartyRevision(Long paymentPartyRevision) {
+        this.paymentPartyRevision = paymentPartyRevision;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -1456,6 +1480,18 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentAdjustmentAmount.equals(other.paymentAdjustmentAmount))
             return false;
+        if (invoicePartyRevision == null) {
+            if (other.invoicePartyRevision != null)
+                return false;
+        }
+        else if (!invoicePartyRevision.equals(other.invoicePartyRevision))
+            return false;
+        if (paymentPartyRevision == null) {
+            if (other.paymentPartyRevision != null)
+                return false;
+        }
+        else if (!paymentPartyRevision.equals(other.paymentPartyRevision))
+            return false;
         return true;
     }
 
@@ -1541,6 +1577,8 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((this.invoiceContextType == null) ? 0 : this.invoiceContextType.hashCode());
         result = prime * result + ((this.paymentContextType == null) ? 0 : this.paymentContextType.hashCode());
         result = prime * result + ((this.paymentAdjustmentAmount == null) ? 0 : this.paymentAdjustmentAmount.hashCode());
+        result = prime * result + ((this.invoicePartyRevision == null) ? 0 : this.invoicePartyRevision.hashCode());
+        result = prime * result + ((this.paymentPartyRevision == null) ? 0 : this.paymentPartyRevision.hashCode());
         return result;
     }
 
@@ -1626,6 +1664,8 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(invoiceContextType);
         sb.append(", ").append(paymentContextType);
         sb.append(", ").append(paymentAdjustmentAmount);
+        sb.append(", ").append(invoicePartyRevision);
+        sb.append(", ").append(paymentPartyRevision);
 
         sb.append(")");
         return sb.toString();
