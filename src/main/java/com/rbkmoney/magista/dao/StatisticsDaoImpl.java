@@ -491,7 +491,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         final Map.Entry key = new AbstractMap.SimpleEntry<>(condition, dateTimeField.getName());
 
         List<Map.Entry<LocalDateTime, Integer>> dateRanges = statCache.getIfPresent(key);
-        if (dateRanges == null && checkBounds(condition, fromTime, toTime, dateTimeField)) {
+        if (dateRanges == null && checkBounds(toTime, dateTimeField)) {
             dateRanges = statCache.get(key, keyValue -> getDateTimeRanges(condition, dateTimeField));
         }
 
@@ -528,20 +528,15 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         return dateRanges;
     }
 
-    private <T extends Record> boolean checkBounds(Condition condition,
-                                                   Optional<LocalDateTime> fromTime,
-                                                   Optional<LocalDateTime> toTime,
+    private <T extends Record> boolean checkBounds(Optional<LocalDateTime> toTime,
                                                    TableField<T, LocalDateTime> dateTimeField) {
-        if (!fromTime.isPresent() || !toTime.isPresent()) {
+        if (!toTime.isPresent()) {
             return false;
         }
 
         Boolean checkBounds = fetchOne(getDslContext().select(
-                DSL.field(
-                        DSL.min(dateTimeField).le(fromTime.get())
-                                .and(DSL.max(dateTimeField).ge(toTime.get())))
-                ).from(dateTimeField.getTable())
-                        .where(condition),
+                DSL.field(DSL.max(dateTimeField).ge(toTime.get())))
+                        .from(dateTimeField.getTable()),
                 Boolean.class);
 
         return checkBounds != null && checkBounds;
