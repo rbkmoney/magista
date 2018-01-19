@@ -9,6 +9,7 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
@@ -34,18 +35,27 @@ public class PartyService {
         this.retryTemplate = retryTemplate;
     }
 
+    @Cacheable("parties")
+    public Party getParty(String partyId, long partyRevision) throws NotFoundException, PartyException {
+        return getParty(partyId, PartyRevisionParam.revision(partyRevision));
+    }
+
     public Party getParty(String partyId, Instant timestamp) throws NotFoundException, PartyException {
+        return getParty(partyId, PartyRevisionParam.timestamp(TypeUtil.temporalToString(timestamp)));
+    }
+
+    public Party getParty(String partyId, PartyRevisionParam partyRevisionParam) throws NotFoundException, PartyException {
         return retryTemplate.execute(context -> {
                     if (context.getLastThrowable() != null) {
-                        log.warn("Failed to get party (partyId='{}', timestamp='{}'), retrying ({})...", partyId, timestamp, context.getRetryCount(), context.getLastThrowable());
+                        log.warn("Failed to get party (partyId='{}', partyRevisionParam='{}'), retrying ({})...", partyId, partyRevisionParam, context.getRetryCount(), context.getLastThrowable());
                     }
 
                     try {
-                        return partyManagementSrv.checkout(userInfo, partyId, TypeUtil.temporalToString(timestamp));
+                        return partyManagementSrv.checkout(userInfo, partyId, partyRevisionParam);
                     } catch (PartyNotFound ex) {
                         throw new NotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
-                    } catch (PartyNotExistsYet ex) {
-                        throw new NotFoundException(String.format("Party not exists at this time, partyId='%s', timestamp='%s'", partyId, timestamp), ex);
+                    } catch (InvalidPartyRevision ex) {
+                        throw new NotFoundException(String.format("Invalid party revision, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex);
                     } catch (TException ex) {
                         throw new PartyException("Exception with get party from hg", ex);
                     }
