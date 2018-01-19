@@ -54,8 +54,8 @@ public class PartyService {
                         return partyManagementSrv.checkout(userInfo, partyId, partyRevisionParam);
                     } catch (PartyNotFound ex) {
                         throw new NotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
-                    } catch (PartyNotExistsYet ex) {
-                        throw new NotFoundException(String.format("Party not exists at this time, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex);
+                    } catch (InvalidPartyRevision ex) {
+                        throw new NotFoundException(String.format("Invalid party revision, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex);
                     } catch (TException ex) {
                         throw new PartyException("Exception with get party from hg", ex);
                     }
