@@ -87,6 +87,10 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
             }
         }
 
+        if (invoicePayment.isSetPartyRevision()) {
+            invoiceEventStat.setPaymentPartyRevision(invoicePayment.getPartyRevision());
+        }
+
         Cash cost = invoicePayment.getCost();
         invoiceEventStat.setPaymentAmount(cost.getAmount());
         invoiceEventStat.setPaymentCurrencyCode(cost.getCurrency().getSymbolicCode());

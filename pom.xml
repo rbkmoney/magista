@@ -13,11 +13,11 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.9.14-SNAPSHOT</version>
+    <version>1.9.16-SNAPSHOT</version>
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
-        <damsel.version>1.209-35a511d-epic</damsel.version>
+        <damsel.version>1.218-689f5fc-epic</damsel.version>
         <shared.resources.version>0.2.1</shared.resources.version>
         <server.port>8022</server.port>
         <dockerfile.base.service.tag>60ec6caf5c52778c9e89075656cca2ceeee4d0dd</dockerfile.base.service.tag>
@@ -46,6 +46,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.retry</groupId>
@@ -136,13 +140,13 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>1.4.3</version>
+            <version>1.5.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.4.3</version>
+            <version>1.5.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

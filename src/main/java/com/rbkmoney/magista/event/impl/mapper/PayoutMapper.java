@@ -1,8 +1,8 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
-import com.rbkmoney.damsel.domain.BankAccount;
 import com.rbkmoney.damsel.domain.BankCard;
 import com.rbkmoney.damsel.domain.LegalAgreement;
+import com.rbkmoney.damsel.domain.RussianBankAccount;
 import com.rbkmoney.damsel.payout_processing.*;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
@@ -43,7 +43,7 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
 
             if (payout.getType().isSetBankAccount()) {
                 PayoutAccount payoutAccount = payout.getType().getBankAccount();
-                BankAccount bankAccount = payoutAccount.getAccount();
+                RussianBankAccount bankAccount = payoutAccount.getAccount();
 
                 payoutEventStat.setPayoutAccountBankId(bankAccount.getAccount());
                 payoutEventStat.setPayoutAccountBankCorrId(bankAccount.getBankPostAccount());
