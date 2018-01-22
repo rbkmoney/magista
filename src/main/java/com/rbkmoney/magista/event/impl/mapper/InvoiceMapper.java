@@ -75,7 +75,9 @@ public class InvoiceMapper implements Mapper<InvoiceEventContext> {
                 DamselUtil.getInvoiceStatusDetails(invoiceStatus)
         );
 
-        invoiceEventStat.setInvoicePartyRevision(invoice.getPartyRevision());
+        if (invoice.isSetPartyRevision()) {
+            invoiceEventStat.setInvoicePartyRevision(invoice.getPartyRevision());
+        }
 
         invoiceEventStat.setInvoiceCreatedAt(
                 TypeUtil.stringToLocalDateTime(invoice.getCreatedAt())
