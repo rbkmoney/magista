@@ -87,7 +87,7 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
             }
         }
 
-        if (invoicePayment.isSetDomainRevision()) {
+        if (invoicePayment.isSetPartyRevision()) {
             invoiceEventStat.setPaymentPartyRevision(invoicePayment.getPartyRevision());
         }
 
