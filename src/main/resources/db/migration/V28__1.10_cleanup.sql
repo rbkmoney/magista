@@ -1,34 +1,34 @@
-drop index invoice_stat_party_id_party_shop_id_invoice_created_at_idx;
+DROP INDEX IF EXISTS invoice_stat_party_id_party_shop_id_invoice_created_at_idx;
 
-drop index invoice_stat_party_id_party_shop_id_payment_created_at_idx;
+DROP INDEX IF EXISTS invoice_stat_party_id_party_shop_id_payment_created_at_idx;
 
-drop index event_invoice_ms_key;
+DROP INDEX IF EXISTS event_invoice_ms_key;
 
-drop index invoice_stat_invoice_created_at_idx;
+DROP INDEX IF EXISTS invoice_stat_invoice_created_at_idx;
 
-drop index invoice_stat_payment_created_at_idx;
+DROP INDEX IF EXISTS invoice_stat_payment_created_at_idx;
 
-drop table invoice_event_stat;
+DROP TABLE IF EXISTS invoice_event_stat;
 
-drop table payout_event_stat;
+DROP TABLE IF EXISTS payout_event_stat;
 
-drop type invoice_event_category;
+DROP TYPE IF EXISTS INVOICE_EVENT_CATEGORY;
 
-drop type invoice_payment_status;
+DROP TYPE IF EXISTS INVOICE_PAYMENT_STATUS;
 
-drop type invoice_status;
+DROP TYPE IF EXISTS INVOICE_STATUS;
 
-drop type adjustment_status;
+DROP TYPE IF EXISTS ADJUSTMENT_STATUS;
 
-drop type invoice_event_type;
+DROP TYPE IF EXISTS INVOICE_EVENT_TYPE;
 
-drop type invoice_payment_refund_status;
+DROP TYPE IF EXISTS INVOICE_PAYMENT_REFUND_STATUS;
 
-drop type payout_event_category;
+DROP TYPE IF EXISTS PAYOUT_EVENT_CATEGORY;
 
-drop type payout_event_type;
+DROP TYPE IF EXISTS PAYOUT_EVENT_TYPE;
 
-drop type payout_status;
+DROP TYPE IF EXISTS PAYOUT_STATUS;
 
-drop type payout_type;
+DROP TYPE IF EXISTS PAYOUT_TYPE;
 
