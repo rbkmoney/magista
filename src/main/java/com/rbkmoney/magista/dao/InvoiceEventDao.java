@@ -10,12 +10,14 @@ public interface InvoiceEventDao {
 
     Long getLastEventId() throws DaoException;
 
-    InvoiceEventStat findPaymentByInvoiceAndPaymentId(String invoiceId, String paymentId) throws DaoException;
+    InvoiceEventStat findAdjustmentByIds(String invoiceId, String paymentId, String adjustmentId) throws DaoException;
+
+    InvoiceEventStat findRefundByIds(String invoiceId, String paymentId, String refundId) throws DaoException;
+
+    InvoiceEventStat findPaymentByIds(String invoiceId, String paymentId) throws DaoException;
 
     InvoiceEventStat findInvoiceById(String invoiceId) throws DaoException;
 
     void insert(InvoiceEventStat invoiceEvent) throws DaoException;
-
-    void update(InvoiceEventStat invoiceEvent) throws DaoException;
 
 }

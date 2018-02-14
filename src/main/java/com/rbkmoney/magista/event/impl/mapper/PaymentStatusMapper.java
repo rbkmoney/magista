@@ -5,6 +5,8 @@ import com.rbkmoney.damsel.domain.OperationFailure;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStatusChanged;
 import com.rbkmoney.geck.common.util.TBaseUtil;
+import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
+import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.event.Mapper;
@@ -17,6 +19,8 @@ public class PaymentStatusMapper implements Mapper<InvoiceEventContext> {
     @Override
     public InvoiceEventContext fill(InvoiceEventContext context) {
         InvoiceEventStat invoiceEventStat = context.getInvoiceEventStat();
+        invoiceEventStat.setEventCategory(InvoiceEventCategory.PAYMENT);
+        invoiceEventStat.setEventType(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED);
 
         InvoicePaymentChange invoicePaymentChange = context
                 .getInvoiceChange()
