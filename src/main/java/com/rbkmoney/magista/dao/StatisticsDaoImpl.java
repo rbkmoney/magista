@@ -63,7 +63,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                     buildInvoiceCondition(invoiceParameterSource, paymentParameterSource, fromTime, toTime),
                     fromTime,
                     toTime,
-                    INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                    INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                     offset.get(),
                     limitValue
             );
@@ -142,7 +142,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                     buildPaymentCondition(parameterSource, fromTime, toTime),
                     fromTime,
                     toTime,
-                    INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
+                    INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                     offset.get(),
                     limitValue
             );
@@ -391,7 +391,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     ) {
         Condition condition = appendDateTimeRange(
                 INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT),
-                INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
+                INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 fromTime,
                 toTime);
 
@@ -411,7 +411,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     ) {
         Condition condition = appendDateTimeRange(
                 INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE),
-                INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 fromTime,
                 toTime);
 
