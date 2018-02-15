@@ -14,7 +14,7 @@ public class PaymentRefundStatusMapper implements Mapper<InvoiceEventContext> {
     @Override
     public InvoiceEventContext fill(InvoiceEventContext context) {
         InvoiceEventStat paymentRefundEventStat = context.getInvoiceEventStat();
-        paymentRefundEventStat.setEventCategory(InvoiceEventCategory.PAYMENT);
+        paymentRefundEventStat.setEventCategory(InvoiceEventCategory.REFUND);
         paymentRefundEventStat.setEventType(InvoiceEventType.INVOICE_PAYMENT_REFUND_STATUS_CHANGED);
 
         InvoicePaymentChange invoicePaymentChange = context

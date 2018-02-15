@@ -123,8 +123,8 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     public void testShopCategoryIds() {
         String json = "{'query': {'payments': {'shop_category_ids': [4, 5], 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(4, statResponse.getData().getPayments().size());
-        assertEquals(4, statResponse.getTotalCount());
+        assertEquals(5, statResponse.getData().getPayments().size());
+        assertEquals(5, statResponse.getTotalCount());
     }
 
     @Test
@@ -170,7 +170,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     public void testFindByPaymentMethodAndTerminalProvider() {
         String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1', 'payment_method': 'payment_terminal', 'payment_terminal_provider':'euroset', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(1, statResponse.getTotalCount());
+        assertEquals(2, statResponse.getTotalCount());
         assertEquals(euroset, statResponse.getData().getPayments().get(0).getPayer().getPaymentResource().getPaymentTool().getPaymentTerminal().getTerminalType());
     }
 
@@ -178,6 +178,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     public void testFindByCustomerId() {
         String json = "{'query': {'invoices': {'payment_customer_id': 'test', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(statResponse.getTotalCount(), statResponse.getData().getInvoices().size());
         assertEquals(1, statResponse.getTotalCount());
 
         json = "{'query': {'payments': {'payment_customer_id': 'test', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-26T18:10:10Z'}}}";
@@ -263,7 +264,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     public void testPaymentsCardTypesStat() {
         String json = "{'query': {'payments_pmt_cards_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(1, statResponse.getData().getRecords().size());
+        assertEquals(3, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
     }
 

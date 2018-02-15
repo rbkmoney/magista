@@ -28,7 +28,11 @@ public enum InvoiceEventCategory implements EnumType {
 
     INVOICE("INVOICE"),
 
-    PAYMENT("PAYMENT");
+    PAYMENT("PAYMENT"),
+
+    REFUND("REFUND"),
+
+    ADJUSTMENT("ADJUSTMENT");
 
     private final String literal;
 
