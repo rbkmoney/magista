@@ -7,8 +7,6 @@ import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
-import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
-import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.event.Mapper;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
@@ -24,8 +22,6 @@ public class PaymentAdjustmentMapper implements Mapper<InvoiceEventContext> {
     @Override
     public InvoiceEventContext fill(InvoiceEventContext context) {
         InvoiceEventStat invoiceEventStat = context.getInvoiceEventStat();
-        invoiceEventStat.setEventCategory(InvoiceEventCategory.ADJUSTMENT);
-        invoiceEventStat.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_CREATED);
 
         InvoicePaymentChange invoicePaymentChange = context
                 .getInvoiceChange()

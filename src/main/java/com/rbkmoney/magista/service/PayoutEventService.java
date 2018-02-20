@@ -60,7 +60,6 @@ public class PayoutEventService {
         try {
             PayoutEventStat payoutEvent = getPayoutEventById(payoutStatusEvent.getPayoutId());
 
-            payoutEvent.setId(payoutStatusEvent.getId());
             payoutEvent.setEventType(payoutStatusEvent.getEventType());
             payoutEvent.setEventId(payoutStatusEvent.getEventId());
             payoutEvent.setEventCreatedAt(payoutStatusEvent.getEventCreatedAt());
@@ -68,7 +67,7 @@ public class PayoutEventService {
             payoutEvent.setPayoutStatus(payoutStatusEvent.getPayoutStatus());
             payoutEvent.setPayoutCancelDetails(payoutStatusEvent.getPayoutCancelDetails());
 
-            payoutEventDao.insert(payoutEvent);
+            payoutEventDao.update(payoutEvent);
             log.info("Payout event status have been changed, payoutId='{}', eventId='{}', payoutStatus='{}'",
                     payoutEvent.getPayoutId(), payoutEvent.getEventId(), payoutEvent.getPayoutStatus());
 

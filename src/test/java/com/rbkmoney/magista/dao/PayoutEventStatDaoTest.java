@@ -23,10 +23,9 @@ public class PayoutEventStatDaoTest extends AbstractIntegrationTest {
     PayoutEventDao payoutEventDao;
 
     @Test
-    public void insertUpdateAndFindPayoutEventTest() throws DaoException {
+    public void insertUpdateAndFindPayoutEventTest() throws IOException {
         PayoutEventStat payoutEventStat = random(PayoutEventStat.class);
 
-        payoutEventStat.setId(10L);
         payoutEventDao.insert(payoutEventStat);
 
         assertEquals(payoutEventStat, payoutEventDao.findPayoutById(payoutEventStat.getPayoutId()));
@@ -34,8 +33,7 @@ public class PayoutEventStatDaoTest extends AbstractIntegrationTest {
         payoutEventStat.setPayoutStatus(PayoutStatus.cancelled);
         payoutEventStat.setPayoutCancelDetails("kek");
 
-        payoutEventStat.setId(20L);
-        payoutEventDao.insert(payoutEventStat);
+        payoutEventDao.update(payoutEventStat);
 
         assertEquals(payoutEventStat, payoutEventDao.findPayoutById(payoutEventStat.getPayoutId()));
     }

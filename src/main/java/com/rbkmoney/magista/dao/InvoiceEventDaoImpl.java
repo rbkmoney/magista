@@ -5,7 +5,6 @@ import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Condition;
 import org.jooq.Query;
-import org.jooq.impl.DSL;
 import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
@@ -30,62 +29,19 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
     }
 
     @Override
-    public InvoiceEventStat findAdjustmentByIds(String invoiceId, String paymentId, String adjustmentId) throws DaoException {
-        Condition condition = INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
-                .and(INVOICE_EVENT_STAT.PAYMENT_ID.eq(paymentId))
-                .and(INVOICE_EVENT_STAT.PAYMENT_ADJUSTMENT_ID.eq(adjustmentId))
-                .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.ADJUSTMENT));
+    public InvoiceEventStat findPaymentByInvoiceAndPaymentId(String invoiceId, String paymentId) throws DaoException {
         Query query = getDslContext().selectFrom(INVOICE_EVENT_STAT)
-                .where(INVOICE_EVENT_STAT.ID.eq(
-                        getDslContext().select(DSL.max(INVOICE_EVENT_STAT.ID))
-                                .from(INVOICE_EVENT_STAT).where(condition)
-                        )
-                );
-        return fetchOne(query, ROW_MAPPER);
-    }
-
-    @Override
-    public InvoiceEventStat findRefundByIds(String invoiceId, String paymentId, String refundId) throws DaoException {
-        Condition condition = INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
-                .and(INVOICE_EVENT_STAT.PAYMENT_ID.eq(paymentId))
-                .and(INVOICE_EVENT_STAT.PAYMENT_REFUND_ID.eq(refundId))
-                .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.REFUND));
-        Query query = getDslContext().selectFrom(INVOICE_EVENT_STAT)
-                .where(INVOICE_EVENT_STAT.ID.eq(
-                        getDslContext().select(DSL.max(INVOICE_EVENT_STAT.ID))
-                                .from(INVOICE_EVENT_STAT).where(condition)
-                        )
-                );
-        return fetchOne(query, ROW_MAPPER);
-    }
-
-    @Override
-    public InvoiceEventStat findPaymentByIds(String invoiceId, String paymentId) throws DaoException {
-        Condition condition = INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
-                .and(INVOICE_EVENT_STAT.PAYMENT_ID.eq(paymentId))
-                .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT));
-
-        Query query = getDslContext().selectFrom(INVOICE_EVENT_STAT)
-                .where(condition
-                        .and(INVOICE_EVENT_STAT.ID.eq(
-                                getDslContext().select(DSL.max(INVOICE_EVENT_STAT.ID))
-                                        .from(INVOICE_EVENT_STAT).where(condition)
-                                )
-                        )
-                );
+                .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
+                        .and(INVOICE_EVENT_STAT.PAYMENT_ID.eq(paymentId))
+                        .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)));
         return fetchOne(query, ROW_MAPPER);
     }
 
     @Override
     public InvoiceEventStat findInvoiceById(String invoiceId) throws DaoException {
-        Condition condition = INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
-                .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE));
         Query query = getDslContext().selectFrom(INVOICE_EVENT_STAT)
-                .where(INVOICE_EVENT_STAT.ID.eq(
-                        getDslContext().select(DSL.max(INVOICE_EVENT_STAT.ID))
-                                .from(INVOICE_EVENT_STAT).where(condition)
-                        )
-                );
+                .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
+                        .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE)));
         return fetchOne(query, ROW_MAPPER);
     }
 
@@ -93,6 +49,23 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
     public void insert(InvoiceEventStat invoiceEventStat) throws DaoException {
         Query query = getDslContext().insertInto(INVOICE_EVENT_STAT)
                 .set(getDslContext().newRecord(INVOICE_EVENT_STAT, invoiceEventStat));
+
+        executeOne(query);
+    }
+
+    @Override
+    public void update(InvoiceEventStat invoiceEventStat) throws DaoException {
+        Condition condition;
+        if (invoiceEventStat.getEventCategory() == InvoiceEventCategory.INVOICE) {
+            condition = INVOICE_EVENT_STAT.PAYMENT_ID.isNull();
+        } else {
+            condition = INVOICE_EVENT_STAT.PAYMENT_ID.eq(invoiceEventStat.getPaymentId());
+        }
+
+        Query query = getDslContext().update(INVOICE_EVENT_STAT)
+                .set(getDslContext().newRecord(INVOICE_EVENT_STAT, invoiceEventStat))
+                .where(INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceEventStat.getInvoiceId()))
+                .and(condition);
 
         executeOne(query);
     }
