@@ -93,13 +93,13 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
 
             payoutEventStat.setPayoutAmount(DamselUtil.getAmount(payout.getPayoutFlow(),
                     posting -> posting.getSource().getAccountType().isSetMerchant()
-                            && posting.getDestination().getAccountType().isSetMerchant()));
+                            && posting.getSource().getAccountType().getMerchant() == MerchantCashFlowAccount.settlement
+                            && posting.getDestination().getAccountType().isSetMerchant()
+                            && posting.getDestination().getAccountType().getMerchant() == MerchantCashFlowAccount.payout));
 
-            //TODO merchant -> provider
             Map<FeeType, Long> commissions = DamselUtil.getFees(payout.getPayoutFlow());
             payoutEventStat.setPayoutFee(commissions.get(FeeType.FEE));
 
-            //TODO Shit
             payoutEventStat.setPayoutCurrencyCode(payout.getPayoutFlow().get(0).getVolume().getCurrency().getSymbolicCode());
             payoutEventStat.setPartyId(payout.getPartyId());
             payoutEventStat.setPartyShopId(payout.getShopId());
