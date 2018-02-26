@@ -66,15 +66,14 @@ public class OffsetTest extends AbstractIntegrationTest {
                              invoiceEventStat.setPartyId(partyId);
                              invoiceEventStat.setPartyShopId(shopId);
                              invoiceEventStat.setEventCategory(InvoiceEventCategory.INVOICE);
-                             invoiceEventStat.setEventCreatedAt(start = start.plusHours(1));
-                             invoiceEventStat.setInvoiceCreatedAt(start);
+                             invoiceEventStat.setInvoiceCreatedAt(start = start.plusHours(1));
                              return invoiceEventStat;
                          }
                      }
                 ).collect(Collectors.toList());
 
         LocalDateTime toTime = invoiceEventStats.stream()
-                .map(invoice -> invoice.getEventCreatedAt())
+                .map(invoice -> invoice.getInvoiceCreatedAt())
                 .max(LocalDateTime::compareTo)
                 .get().plusHours(1);
 
@@ -117,15 +116,14 @@ public class OffsetTest extends AbstractIntegrationTest {
                              invoiceEventStat.setPaymentTool("bank_card");
                              invoiceEventStat.setPaymentSystem("mastercard");
                              invoiceEventStat.setPaymentFlow("instant");
-                             invoiceEventStat.setEventCreatedAt(start = start.plusHours(1));
-                             invoiceEventStat.setPaymentCreatedAt(start);
+                             invoiceEventStat.setPaymentCreatedAt(start = start.plusHours(1));
                              return invoiceEventStat;
                          }
                      }
                 ).collect(Collectors.toList());
 
         LocalDateTime toTime = invoiceEventStats.stream()
-                .map(invoice -> invoice.getEventCreatedAt())
+                .map(invoice -> invoice.getInvoiceCreatedAt())
                 .max(LocalDateTime::compareTo)
                 .get().plusHours(1);
 

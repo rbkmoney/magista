@@ -11,4 +11,6 @@ public interface PayoutEventDao {
 
     void insert(PayoutEventStat payoutEvent) throws DaoException;
 
+    void update(PayoutEventStat payoutEvent) throws DaoException;
+
 }

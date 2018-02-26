@@ -25,32 +25,20 @@ public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
     InvoiceEventDao invoiceEventDao;
 
     @Test
-    public void insertUpdateAndFindInvoiceEventTest() throws DaoException {
+    public void insertUpdateAndFindInvoiceEventTest() throws IOException {
         InvoiceEventStat invoiceEventStat = random(InvoiceEventStat.class);
 
-        invoiceEventStat.setId(10L);
         invoiceEventStat.setEventCategory(InvoiceEventCategory.INVOICE);
+
         invoiceEventDao.insert(invoiceEventStat);
 
         assertEquals(invoiceEventStat, invoiceEventDao.findInvoiceById(invoiceEventStat.getInvoiceId()));
 
-        invoiceEventStat.setId(20L);
         invoiceEventStat.setEventCategory(InvoiceEventCategory.PAYMENT);
-        invoiceEventDao.insert(invoiceEventStat);
 
-        assertEquals(invoiceEventStat, invoiceEventDao.findPaymentByIds(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId()));
+        invoiceEventDao.update(invoiceEventStat);
 
-        invoiceEventStat.setId(30L);
-        invoiceEventStat.setEventCategory(InvoiceEventCategory.REFUND);
-        invoiceEventDao.insert(invoiceEventStat);
-
-        assertEquals(invoiceEventStat, invoiceEventDao.findRefundByIds(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId(), invoiceEventStat.getPaymentRefundId()));
-
-        invoiceEventStat.setId(40L);
-        invoiceEventStat.setEventCategory(InvoiceEventCategory.ADJUSTMENT);
-        invoiceEventDao.insert(invoiceEventStat);
-
-        assertEquals(invoiceEventStat, invoiceEventDao.findAdjustmentByIds(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId(), invoiceEventStat.getPaymentAdjustmentId()));
+        assertEquals(invoiceEventStat, invoiceEventDao.findPaymentByInvoiceAndPaymentId(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId()));
     }
 
     @Test
@@ -76,7 +64,7 @@ public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void insertNullSymbolInString() throws DaoException {
+    public void insertNullSymbolInString() throws IOException {
         InvoiceEventStat invoiceEventStat = random(InvoiceEventStat.class);
 
         invoiceEventStat.setInvoiceDescription("\u0000\u0000\u0014stman description");
