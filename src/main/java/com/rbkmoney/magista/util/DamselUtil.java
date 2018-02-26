@@ -176,7 +176,7 @@ public class DamselUtil {
                 PayoutAccount payoutAccount = new PayoutAccount();
                 com.rbkmoney.damsel.merch_stat.BankAccount bankAccount = new com.rbkmoney.damsel.merch_stat.BankAccount();
                 bankAccount.setAccount(payoutEvent.getPayoutAccountBankId());
-                bankAccount.setBankBik(payoutEvent.getPayoutAccountBankBik());
+                bankAccount.setBankBik(payoutEvent.getPayoutAccountBankLocalCode());
                 bankAccount.setBankPostAccount(payoutEvent.getPayoutAccountBankCorrId());
                 bankAccount.setBankName(payoutEvent.getPayoutAccountBankName());
                 payoutAccount.setAccount(bankAccount);
