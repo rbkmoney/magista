@@ -4,7 +4,6 @@ import com.rbkmoney.magista.dao.InvoiceEventDao;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
-import com.rbkmoney.magista.exception.AdjustmentException;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
@@ -302,6 +301,14 @@ public class InvoiceEventService {
             invoicePaymentEvent.setPaymentRefundReason(refundEventStat.getPaymentRefundReason());
             invoicePaymentEvent.setPaymentRefundStatus(refundEventStat.getPaymentRefundStatus());
             invoicePaymentEvent.setPaymentRefundCreatedAt(refundEventStat.getPaymentRefundCreatedAt());
+            invoicePaymentEvent.setPaymentRefundAmount(
+                    Optional.ofNullable(refundEventStat.getPaymentRefundAmount())
+                            .orElse(invoicePaymentEvent.getPaymentAmount())
+            );
+            invoicePaymentEvent.setPaymentRefundCurrencyCode(
+                    Optional.ofNullable(refundEventStat.getPaymentRefundCurrencyCode())
+                            .orElse(invoicePaymentEvent.getPaymentRefundCurrencyCode())
+            );
             invoicePaymentEvent.setPaymentRefundFee(refundEventStat.getPaymentRefundFee());
             invoicePaymentEvent.setPaymentRefundExternalFee(refundEventStat.getPaymentRefundExternalFee());
             invoicePaymentEvent.setPaymentRefundProviderFee(refundEventStat.getPaymentRefundProviderFee());
