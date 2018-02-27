@@ -307,7 +307,7 @@ public class InvoiceEventService {
             );
             invoicePaymentEvent.setPaymentRefundCurrencyCode(
                     Optional.ofNullable(refundEventStat.getPaymentRefundCurrencyCode())
-                            .orElse(invoicePaymentEvent.getPaymentRefundCurrencyCode())
+                            .orElse(invoicePaymentEvent.getPaymentCurrencyCode())
             );
             invoicePaymentEvent.setPaymentRefundFee(refundEventStat.getPaymentRefundFee());
             invoicePaymentEvent.setPaymentRefundExternalFee(refundEventStat.getPaymentRefundExternalFee());
