@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
-import com.rbkmoney.damsel.domain.ExternalFailure;
+import com.rbkmoney.damsel.domain.Failure;
 import com.rbkmoney.damsel.domain.OperationFailure;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStatusChanged;
@@ -39,10 +39,10 @@ public class PaymentStatusMapper implements Mapper<InvoiceEventContext> {
         if (invoicePaymentStatusChanged.getStatus().isSetFailed()) {
             OperationFailure operationFailure = invoicePaymentStatusChanged.getStatus().getFailed().getFailure();
             invoiceEventStat.setPaymentFailureClass(operationFailure.getSetField().getFieldName());
-            if (operationFailure.isSetExternalFailure()) {
-                ExternalFailure externalFailure = operationFailure.getExternalFailure();
-                invoiceEventStat.setPaymentExternalFailureCode(externalFailure.getCode());
-                invoiceEventStat.setPaymentExternalFailureDescription(externalFailure.getDescription());
+            if (operationFailure.isSetFailure()) {
+                Failure failure = operationFailure.getFailure();
+                invoiceEventStat.setPaymentExternalFailureCode(failure.getCode());
+                invoiceEventStat.setPaymentExternalFailureDescription(failure.getReason());
             }
         }
 

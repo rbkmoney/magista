@@ -31,7 +31,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = -1164476391;
+    private static final long serialVersionUID = -17011528;
 
     /**
      * Setter for <code>mst.payout_event_stat.id</code>.
@@ -314,16 +314,16 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
     }
 
     /**
-     * Setter for <code>mst.payout_event_stat.payout_account_bank_bik</code>.
+     * Setter for <code>mst.payout_event_stat.payout_account_bank_local_code</code>.
      */
-    public void setPayoutAccountBankBik(String value) {
+    public void setPayoutAccountBankLocalCode(String value) {
         set(20, value);
     }
 
     /**
-     * Getter for <code>mst.payout_event_stat.payout_account_bank_bik</code>.
+     * Getter for <code>mst.payout_event_stat.payout_account_bank_local_code</code>.
      */
-    public String getPayoutAccountBankBik() {
+    public String getPayoutAccountBankLocalCode() {
         return (String) get(20);
     }
 
@@ -411,6 +411,118 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
         return (String) get(26);
     }
 
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_account_legal_name</code>.
+     */
+    public void setPayoutAccountLegalName(String value) {
+        set(27, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_legal_name</code>.
+     */
+    public String getPayoutAccountLegalName() {
+        return (String) get(27);
+    }
+
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_account_trading_name</code>.
+     */
+    public void setPayoutAccountTradingName(String value) {
+        set(28, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_trading_name</code>.
+     */
+    public String getPayoutAccountTradingName() {
+        return (String) get(28);
+    }
+
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_account_registered_address</code>.
+     */
+    public void setPayoutAccountRegisteredAddress(String value) {
+        set(29, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_registered_address</code>.
+     */
+    public String getPayoutAccountRegisteredAddress() {
+        return (String) get(29);
+    }
+
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_account_actual_address</code>.
+     */
+    public void setPayoutAccountActualAddress(String value) {
+        set(30, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_actual_address</code>.
+     */
+    public String getPayoutAccountActualAddress() {
+        return (String) get(30);
+    }
+
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_account_registered_number</code>.
+     */
+    public void setPayoutAccountRegisteredNumber(String value) {
+        set(31, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_registered_number</code>.
+     */
+    public String getPayoutAccountRegisteredNumber() {
+        return (String) get(31);
+    }
+
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_account_bank_address</code>.
+     */
+    public void setPayoutAccountBankAddress(String value) {
+        set(32, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_bank_address</code>.
+     */
+    public String getPayoutAccountBankAddress() {
+        return (String) get(32);
+    }
+
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_account_bank_iban</code>.
+     */
+    public void setPayoutAccountBankIban(String value) {
+        set(33, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_bank_iban</code>.
+     */
+    public String getPayoutAccountBankIban() {
+        return (String) get(33);
+    }
+
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_account_bank_bic</code>.
+     */
+    public void setPayoutAccountBankBic(String value) {
+        set(34, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_bank_bic</code>.
+     */
+    public String getPayoutAccountBankBic() {
+        return (String) get(34);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -437,7 +549,7 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
     /**
      * Create a detached, initialised PayoutEventStatRecord
      */
-    public PayoutEventStatRecord(Long id, Long eventId, PayoutEventCategory eventCategory, PayoutEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyShopId, String payoutId, LocalDateTime payoutCreatedAt, PayoutStatus payoutStatus, Long payoutAmount, Long payoutFee, String payoutCurrencyCode, PayoutType payoutType, String payoutCardToken, String payoutCardMaskedPan, String payoutCardBin, String payoutCardPaymentSystem, String payoutAccountBankId, String payoutAccountBankCorrId, String payoutAccountBankBik, String payoutAccountBankName, String payoutAccountInn, String payoutAccountLegalAgreementId, LocalDateTime payoutAccountLegalAgreementSignedAt, String payoutAccountPurpose, String payoutCancelDetails) {
+    public PayoutEventStatRecord(Long id, Long eventId, PayoutEventCategory eventCategory, PayoutEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyShopId, String payoutId, LocalDateTime payoutCreatedAt, PayoutStatus payoutStatus, Long payoutAmount, Long payoutFee, String payoutCurrencyCode, PayoutType payoutType, String payoutCardToken, String payoutCardMaskedPan, String payoutCardBin, String payoutCardPaymentSystem, String payoutAccountBankId, String payoutAccountBankCorrId, String payoutAccountBankLocalCode, String payoutAccountBankName, String payoutAccountInn, String payoutAccountLegalAgreementId, LocalDateTime payoutAccountLegalAgreementSignedAt, String payoutAccountPurpose, String payoutCancelDetails, String payoutAccountLegalName, String payoutAccountTradingName, String payoutAccountRegisteredAddress, String payoutAccountActualAddress, String payoutAccountRegisteredNumber, String payoutAccountBankAddress, String payoutAccountBankIban, String payoutAccountBankBic) {
         super(PayoutEventStat.PAYOUT_EVENT_STAT);
 
         set(0, id);
@@ -460,12 +572,20 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
         set(17, payoutCardPaymentSystem);
         set(18, payoutAccountBankId);
         set(19, payoutAccountBankCorrId);
-        set(20, payoutAccountBankBik);
+        set(20, payoutAccountBankLocalCode);
         set(21, payoutAccountBankName);
         set(22, payoutAccountInn);
         set(23, payoutAccountLegalAgreementId);
         set(24, payoutAccountLegalAgreementSignedAt);
         set(25, payoutAccountPurpose);
         set(26, payoutCancelDetails);
+        set(27, payoutAccountLegalName);
+        set(28, payoutAccountTradingName);
+        set(29, payoutAccountRegisteredAddress);
+        set(30, payoutAccountActualAddress);
+        set(31, payoutAccountRegisteredNumber);
+        set(32, payoutAccountBankAddress);
+        set(33, payoutAccountBankIban);
+        set(34, payoutAccountBankBic);
     }
 }
