@@ -328,6 +328,7 @@ public class InvoiceEventService {
                     refundStatusEvent.getEventType()
             );
 
+            invoicePaymentRefundEvent.setId(refundStatusEvent.getId());
             invoicePaymentRefundEvent.setPaymentRefundStatus(refundStatusEvent.getPaymentRefundStatus());
 
             invoiceEventDao.insert(invoicePaymentRefundEvent);
