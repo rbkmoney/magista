@@ -311,11 +311,11 @@ public class DamselUtil {
     }
 
     public static OperationFailure toOperationFailure(InvoiceEventStat invoicePaymentStat) {
-        OperationFailure._Fields failureType = OperationFailure._Fields.findByName(invoicePaymentStat.getPaymentFailureClass());
+        com.rbkmoney.damsel.domain.OperationFailure._Fields failureType = com.rbkmoney.damsel.domain.OperationFailure._Fields.findByName(invoicePaymentStat.getPaymentFailureClass());
         switch (failureType) {
             case OPERATION_TIMEOUT:
                 return OperationFailure.operation_timeout(new OperationTimeout());
-            case EXTERNAL_FAILURE:
+            case FAILURE:
                 ExternalFailure externalFailure = new ExternalFailure();
                 externalFailure.setCode(invoicePaymentStat.getPaymentExternalFailureCode());
                 externalFailure.setDescription(invoicePaymentStat.getPaymentExternalFailureDescription());
