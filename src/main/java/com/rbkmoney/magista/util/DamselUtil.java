@@ -8,7 +8,8 @@ import com.rbkmoney.damsel.merch_stat.BankCard;
 import com.rbkmoney.damsel.merch_stat.CustomerPayer;
 import com.rbkmoney.damsel.merch_stat.DigitalWallet;
 import com.rbkmoney.damsel.merch_stat.DigitalWalletProvider;
-import com.rbkmoney.damsel.merch_stat.ExternalFailure;
+import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.damsel.merch_stat.InternationalBankAccount;
 import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
 import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
 import com.rbkmoney.damsel.merch_stat.InvoicePaid;
@@ -31,7 +32,7 @@ import com.rbkmoney.damsel.merch_stat.Payer;
 import com.rbkmoney.damsel.merch_stat.PaymentResourcePayer;
 import com.rbkmoney.damsel.merch_stat.PaymentTerminal;
 import com.rbkmoney.damsel.merch_stat.PaymentTool;
-import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.damsel.merch_stat.RussianBankAccount;
 import com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.json.JsonHandler;
@@ -173,17 +174,7 @@ public class DamselUtil {
         PayoutType._Fields payoutType = PayoutType._Fields.findByName(payoutEvent.getPayoutType().getLiteral());
         switch (payoutType) {
             case BANK_ACCOUNT:
-                PayoutAccount payoutAccount = new PayoutAccount();
-                com.rbkmoney.damsel.merch_stat.BankAccount bankAccount = new com.rbkmoney.damsel.merch_stat.BankAccount();
-                bankAccount.setAccount(payoutEvent.getPayoutAccountBankId());
-                bankAccount.setBankBik(payoutEvent.getPayoutAccountBankLocalCode());
-                bankAccount.setBankPostAccount(payoutEvent.getPayoutAccountBankCorrId());
-                bankAccount.setBankName(payoutEvent.getPayoutAccountBankName());
-                payoutAccount.setAccount(bankAccount);
-                payoutAccount.setInn(payoutEvent.getPayoutAccountInn());
-                payoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
-
-                return PayoutType.bank_account(payoutAccount);
+                PayoutType.bank_account(toPayoutAccount(payoutEvent));
             case BANK_CARD:
                 PayoutCard payoutCard = new PayoutCard();
                 com.rbkmoney.damsel.merch_stat.BankCard bankCard = new com.rbkmoney.damsel.merch_stat.BankCard();
@@ -195,6 +186,38 @@ public class DamselUtil {
                 return PayoutType.bank_card(payoutCard);
             default:
                 throw new NotFoundException(String.format("Payout type '%s' not found", payoutType.getFieldName()));
+        }
+    }
+
+    private static PayoutAccount toPayoutAccount(PayoutEventStat payoutEvent) {
+        switch (payoutEvent.getPayoutAccountType()) {
+            case RUSSIAN_PAYOUT_ACCOUNT:
+                RussianBankAccount russianBankAccount = new RussianBankAccount();
+                russianBankAccount.setAccount(payoutEvent.getPayoutAccountBankId());
+                russianBankAccount.setBankBik(payoutEvent.getPayoutAccountBankLocalCode());
+                russianBankAccount.setBankPostAccount(payoutEvent.getPayoutAccountBankCorrId());
+                russianBankAccount.setBankName(payoutEvent.getPayoutAccountBankName());
+
+                RussianPayoutAccount russianPayoutAccount = new RussianPayoutAccount();
+                russianPayoutAccount.setBankAccount(russianBankAccount);
+                russianPayoutAccount.setInn(payoutEvent.getPayoutAccountInn());
+                russianPayoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
+                return PayoutAccount.russian_payout_account(russianPayoutAccount);
+            case INTERNATIONAL_PAYOUT_ACCOUNT:
+                InternationalBankAccount internationalBankAccount = new InternationalBankAccount();
+                internationalBankAccount.setAccountHolder(payoutEvent.getPayoutAccountBankId());
+                internationalBankAccount.setBankName(payoutEvent.getPayoutAccountBankName());
+                internationalBankAccount.setLocalBankCode(payoutEvent.getPayoutAccountBankLocalCode());
+                internationalBankAccount.setIban(payoutEvent.getPayoutAccountBankIban());
+                internationalBankAccount.setBic(payoutEvent.getPayoutAccountBankBic());
+                internationalBankAccount.setBankAddress(payoutEvent.getPayoutAccountBankAddress());
+
+                InternationalPayoutAccount internationalPayoutAccount = new InternationalPayoutAccount();
+                internationalPayoutAccount.setBankAccount(internationalBankAccount);
+                internationalPayoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
+                return PayoutAccount.international_payout_account(internationalPayoutAccount);
+            default:
+                throw new NotFoundException(String.format("Payout account type '%s' not found", payoutEvent.getPayoutAccountType()));
         }
     }
 
