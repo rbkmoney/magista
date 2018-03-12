@@ -162,7 +162,8 @@ public class DamselUtil {
 
     public static String toPayoutCashFlowDescriptionStatString(List<com.rbkmoney.damsel.payout_processing.CashFlowDescription> cashFlowDescriptions) {
         try {
-            return new ObjectMapper().writeValueAsString(cashFlowDescriptions.stream().map(
+            return new ObjectMapper().writeValueAsString(cashFlowDescriptions.stream()
+                    .map(
                     cashFlowDescription -> {
                         try {
                             return new TBaseProcessor().process(cashFlowDescription, new JsonHandler());

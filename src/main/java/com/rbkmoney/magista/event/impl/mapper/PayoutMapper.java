@@ -13,7 +13,9 @@ import com.rbkmoney.magista.event.impl.context.PayoutEventContext;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PayoutMapper implements Mapper<PayoutEventContext> {
     @Override
@@ -106,7 +108,10 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
             payoutEventStat.setPartyShopId(payout.getShopId());
 
             if (payout.isSetCashFlowDescriptions()) {
-                payoutEventStat.setPayoutCashFlowDescriptions(DamselUtil.toPayoutCashFlowDescriptionStatString(payout.getCashFlowDescriptions()));
+                List<CashFlowDescription> cashFlowDescriptions = payout.getCashFlowDescriptions().stream()
+                        .filter(cashFlowDescription -> cashFlowDescription.getCashFlowType() != CashFlowType.adjustment)
+                        .collect(Collectors.toList());
+                payoutEventStat.setPayoutCashFlowDescriptions(DamselUtil.toPayoutCashFlowDescriptionStatString(cashFlowDescriptions));
             }
         }
 
