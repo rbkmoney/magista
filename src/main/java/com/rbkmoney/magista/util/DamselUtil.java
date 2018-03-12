@@ -174,7 +174,7 @@ public class DamselUtil {
         PayoutType._Fields payoutType = PayoutType._Fields.findByName(payoutEvent.getPayoutType().getLiteral());
         switch (payoutType) {
             case BANK_ACCOUNT:
-                PayoutType.bank_account(toPayoutAccount(payoutEvent));
+                return PayoutType.bank_account(toPayoutAccount(payoutEvent));
             case BANK_CARD:
                 PayoutCard payoutCard = new PayoutCard();
                 com.rbkmoney.damsel.merch_stat.BankCard bankCard = new com.rbkmoney.damsel.merch_stat.BankCard();
