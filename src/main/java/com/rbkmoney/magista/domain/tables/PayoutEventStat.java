@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = 128775719;
+    private static final long serialVersionUID = -593780896;
 
     /**
      * The reference instance of <code>mst.payout_event_stat</code>
@@ -235,6 +235,11 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
      * The column <code>mst.payout_event_stat.payout_account_type</code>.
      */
     public final TableField<PayoutEventStatRecord, PayoutAccountType> PAYOUT_ACCOUNT_TYPE = createField("payout_account_type", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.PayoutAccountType.class), this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_cash_flow_descriptions</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_CASH_FLOW_DESCRIPTIONS = createField("payout_cash_flow_descriptions", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * Create a <code>mst.payout_event_stat</code> table reference

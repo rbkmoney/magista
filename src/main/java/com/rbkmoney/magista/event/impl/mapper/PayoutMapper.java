@@ -104,6 +104,10 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
             payoutEventStat.setPayoutCurrencyCode(payout.getPayoutFlow().get(0).getVolume().getCurrency().getSymbolicCode());
             payoutEventStat.setPartyId(payout.getPartyId());
             payoutEventStat.setPartyShopId(payout.getShopId());
+
+            if (payout.isSetCashFlowDescriptions()) {
+                payoutEventStat.setPayoutCashFlowDescriptions(DamselUtil.toPayoutCashFlowDescriptionStatString(payout.getCashFlowDescriptions()));
+            }
         }
 
         return context.setPayoutEventStat(payoutEventStat);

@@ -1,14 +1,16 @@
 package com.rbkmoney.magista.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.merch_stat.BankCard;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.CustomerPayer;
 import com.rbkmoney.damsel.merch_stat.DigitalWallet;
 import com.rbkmoney.damsel.merch_stat.DigitalWalletProvider;
-import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.InternationalBankAccount;
 import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
 import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
@@ -46,10 +48,7 @@ import org.apache.thrift.TBase;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -57,6 +56,10 @@ import java.util.stream.Collectors;
  * Created by tolkonepiu on 23/06/2017.
  */
 public class DamselUtil {
+
+    public final static ObjectMapper objectMapper = new ObjectMapper();
+
+    public final static JsonProcessor jsonProcessor = new JsonProcessor();
 
     public static LocalDateTime getAdjustmentStatusCreatedAt(InvoicePaymentAdjustmentStatus adjustmentStatus) {
         switch (adjustmentStatus.getSetField()) {
@@ -150,8 +153,44 @@ public class DamselUtil {
                 TypeUtil.temporalToString(payoutEvent.getPayoutCreatedAt())
         );
         statPayout.setType(toPayoutType(payoutEvent));
+        if (payoutEvent.getPayoutCashFlowDescriptions() != null) {
+            statPayout.setCashFlowDescriptions(toPayoutCashFlowDescriptions(payoutEvent));
+        }
 
         return statPayout;
+    }
+
+    public static String toPayoutCashFlowDescriptionStatString(List<com.rbkmoney.damsel.payout_processing.CashFlowDescription> cashFlowDescriptions) {
+        try {
+            return new ObjectMapper().writeValueAsString(cashFlowDescriptions.stream().map(
+                    cashFlowDescription -> {
+                        try {
+                            return new TBaseProcessor().process(cashFlowDescription, new JsonHandler());
+                        } catch (IOException ex) {
+                            throw new RuntimeJsonMappingException(ex.getMessage());
+                        }
+                    }).collect(Collectors.toList())
+            );
+        } catch (IOException ex) {
+            throw new RuntimeJsonMappingException(ex.getMessage());
+        }
+    }
+
+    public static List<CashFlowDescription> toPayoutCashFlowDescriptions(PayoutEventStat payoutEvent) {
+        List<CashFlowDescription> cashFlowDescriptions = new ArrayList<>();
+        try {
+            for (JsonNode jsonNode : objectMapper.readTree(payoutEvent.getPayoutCashFlowDescriptions())) {
+                CashFlowDescription cashFlowDescription = jsonToTBase(jsonNode, CashFlowDescription.class);
+                cashFlowDescriptions.add(cashFlowDescription);
+            }
+        } catch (IOException ex) {
+            throw new RuntimeJsonMappingException(ex.getMessage());
+        }
+        return cashFlowDescriptions;
+    }
+
+    public static <T extends TBase> T jsonToTBase(JsonNode jsonNode, Class<T> type) throws IOException {
+        return jsonProcessor.process(jsonNode, new TBaseHandler<>(type));
     }
 
     public static PayoutStatus toPayoutStatus(PayoutEventStat payoutEvent) {
