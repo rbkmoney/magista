@@ -153,20 +153,20 @@ public class DamselUtil {
                 TypeUtil.temporalToString(payoutEvent.getPayoutCreatedAt())
         );
         statPayout.setType(toPayoutType(payoutEvent));
-        if (payoutEvent.getPayoutCashFlowDescriptions() != null) {
-            statPayout.setCashFlowDescriptions(toPayoutCashFlowDescriptions(payoutEvent));
+        if (payoutEvent.getPayoutSummary() != null) {
+            statPayout.setSummary(toPayoutSummary(payoutEvent));
         }
 
         return statPayout;
     }
 
-    public static String toPayoutCashFlowDescriptionStatString(List<com.rbkmoney.damsel.payout_processing.CashFlowDescription> cashFlowDescriptions) {
+    public static String toPayoutSummaryStatString(List<com.rbkmoney.damsel.payout_processing.PayoutSummaryItem> payoutSummaryItems) {
         try {
-            return new ObjectMapper().writeValueAsString(cashFlowDescriptions.stream()
+            return new ObjectMapper().writeValueAsString(payoutSummaryItems.stream()
                     .map(
-                    cashFlowDescription -> {
+                    payoutSummaryItem -> {
                         try {
-                            return new TBaseProcessor().process(cashFlowDescription, new JsonHandler());
+                            return new TBaseProcessor().process(payoutSummaryItem, new JsonHandler());
                         } catch (IOException ex) {
                             throw new RuntimeJsonMappingException(ex.getMessage());
                         }
@@ -177,17 +177,17 @@ public class DamselUtil {
         }
     }
 
-    public static List<CashFlowDescription> toPayoutCashFlowDescriptions(PayoutEventStat payoutEvent) {
-        List<CashFlowDescription> cashFlowDescriptions = new ArrayList<>();
+    public static List<PayoutSummaryItem> toPayoutSummary(PayoutEventStat payoutEvent) {
+        List<PayoutSummaryItem> payoutSummaryItems = new ArrayList<>();
         try {
-            for (JsonNode jsonNode : objectMapper.readTree(payoutEvent.getPayoutCashFlowDescriptions())) {
-                CashFlowDescription cashFlowDescription = jsonToTBase(jsonNode, CashFlowDescription.class);
-                cashFlowDescriptions.add(cashFlowDescription);
+            for (JsonNode jsonNode : objectMapper.readTree(payoutEvent.getPayoutSummary())) {
+                PayoutSummaryItem payoutSummaryItem = jsonToTBase(jsonNode, PayoutSummaryItem.class);
+                payoutSummaryItems.add(payoutSummaryItem);
             }
         } catch (IOException ex) {
             throw new RuntimeJsonMappingException(ex.getMessage());
         }
-        return cashFlowDescriptions;
+        return payoutSummaryItems;
     }
 
     public static <T extends TBase> T jsonToTBase(JsonNode jsonNode, Class<T> type) throws IOException {

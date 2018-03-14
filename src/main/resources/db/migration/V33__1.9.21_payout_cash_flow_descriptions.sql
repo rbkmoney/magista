@@ -1,1 +1,0 @@
-ALTER TABLE mst.payout_event_stat ADD COLUMN payout_cash_flow_descriptions CHARACTER VARYING;

@@ -107,11 +107,11 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
             payoutEventStat.setPartyId(payout.getPartyId());
             payoutEventStat.setPartyShopId(payout.getShopId());
 
-            if (payout.isSetCashFlowDescriptions()) {
-                List<CashFlowDescription> cashFlowDescriptions = payout.getCashFlowDescriptions().stream()
-                        .filter(cashFlowDescription -> cashFlowDescription.getCashFlowType() != CashFlowType.adjustment)
+            if (payout.isSetSummary()) {
+                List<PayoutSummaryItem> payoutSummaryItems = payout.getSummary().stream()
+                        .filter(payoutSummaryItem -> payoutSummaryItem.getOperationType() != OperationType.adjustment)
                         .collect(Collectors.toList());
-                payoutEventStat.setPayoutCashFlowDescriptions(DamselUtil.toPayoutCashFlowDescriptionStatString(cashFlowDescriptions));
+                payoutEventStat.setPayoutSummary(DamselUtil.toPayoutSummaryStatString(payoutSummaryItems));
             }
         }
 
