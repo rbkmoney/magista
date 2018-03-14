@@ -8,7 +8,7 @@ import com.rbkmoney.damsel.merch_stat.BankCard;
 import com.rbkmoney.damsel.merch_stat.CustomerPayer;
 import com.rbkmoney.damsel.merch_stat.DigitalWallet;
 import com.rbkmoney.damsel.merch_stat.DigitalWalletProvider;
-import com.rbkmoney.damsel.merch_stat.ExternalFailure;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
 import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
 import com.rbkmoney.damsel.merch_stat.InvoicePaid;
@@ -31,7 +31,7 @@ import com.rbkmoney.damsel.merch_stat.Payer;
 import com.rbkmoney.damsel.merch_stat.PaymentResourcePayer;
 import com.rbkmoney.damsel.merch_stat.PaymentTerminal;
 import com.rbkmoney.damsel.merch_stat.PaymentTool;
-import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.damsel.merch_stat.RussianBankAccount;
 import com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.json.JsonHandler;
@@ -173,17 +173,17 @@ public class DamselUtil {
         PayoutType._Fields payoutType = PayoutType._Fields.findByName(payoutEvent.getPayoutType().getLiteral());
         switch (payoutType) {
             case BANK_ACCOUNT:
-                PayoutAccount payoutAccount = new PayoutAccount();
-                com.rbkmoney.damsel.merch_stat.BankAccount bankAccount = new com.rbkmoney.damsel.merch_stat.BankAccount();
-                bankAccount.setAccount(payoutEvent.getPayoutAccountBankId());
-                bankAccount.setBankBik(payoutEvent.getPayoutAccountBankLocalCode());
-                bankAccount.setBankPostAccount(payoutEvent.getPayoutAccountBankCorrId());
-                bankAccount.setBankName(payoutEvent.getPayoutAccountBankName());
-                payoutAccount.setAccount(bankAccount);
-                payoutAccount.setInn(payoutEvent.getPayoutAccountInn());
-                payoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
+                RussianBankAccount russianBankAccount = new RussianBankAccount();
+                russianBankAccount.setAccount(payoutEvent.getPayoutAccountBankId());
+                russianBankAccount.setBankBik(payoutEvent.getPayoutAccountBankLocalCode());
+                russianBankAccount.setBankPostAccount(payoutEvent.getPayoutAccountBankCorrId());
+                russianBankAccount.setBankName(payoutEvent.getPayoutAccountBankName());
 
-                return PayoutType.bank_account(payoutAccount);
+                RussianPayoutAccount russianPayoutAccount = new RussianPayoutAccount();
+                russianPayoutAccount.setBankAccount(russianBankAccount);
+                russianPayoutAccount.setInn(payoutEvent.getPayoutAccountInn());
+                russianPayoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
+                return PayoutType.bank_account(PayoutAccount.russian_payout_account(russianPayoutAccount));
             case BANK_CARD:
                 PayoutCard payoutCard = new PayoutCard();
                 com.rbkmoney.damsel.merch_stat.BankCard bankCard = new com.rbkmoney.damsel.merch_stat.BankCard();
