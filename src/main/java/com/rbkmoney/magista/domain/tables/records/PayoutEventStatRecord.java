@@ -4,6 +4,7 @@
 package com.rbkmoney.magista.domain.tables.records;
 
 
+import com.rbkmoney.magista.domain.enums.PayoutAccountType;
 import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
 import com.rbkmoney.magista.domain.enums.PayoutEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
@@ -31,7 +32,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = -17011528;
+    private static final long serialVersionUID = 2058161012;
 
     /**
      * Setter for <code>mst.payout_event_stat.id</code>.
@@ -523,6 +524,34 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
         return (String) get(34);
     }
 
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_account_type</code>.
+     */
+    public void setPayoutAccountType(PayoutAccountType value) {
+        set(35, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_account_type</code>.
+     */
+    public PayoutAccountType getPayoutAccountType() {
+        return (PayoutAccountType) get(35);
+    }
+
+    /**
+     * Setter for <code>mst.payout_event_stat.payout_summary</code>.
+     */
+    public void setPayoutSummary(String value) {
+        set(36, value);
+    }
+
+    /**
+     * Getter for <code>mst.payout_event_stat.payout_summary</code>.
+     */
+    public String getPayoutSummary() {
+        return (String) get(36);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -549,7 +578,7 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
     /**
      * Create a detached, initialised PayoutEventStatRecord
      */
-    public PayoutEventStatRecord(Long id, Long eventId, PayoutEventCategory eventCategory, PayoutEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyShopId, String payoutId, LocalDateTime payoutCreatedAt, PayoutStatus payoutStatus, Long payoutAmount, Long payoutFee, String payoutCurrencyCode, PayoutType payoutType, String payoutCardToken, String payoutCardMaskedPan, String payoutCardBin, String payoutCardPaymentSystem, String payoutAccountBankId, String payoutAccountBankCorrId, String payoutAccountBankLocalCode, String payoutAccountBankName, String payoutAccountInn, String payoutAccountLegalAgreementId, LocalDateTime payoutAccountLegalAgreementSignedAt, String payoutAccountPurpose, String payoutCancelDetails, String payoutAccountLegalName, String payoutAccountTradingName, String payoutAccountRegisteredAddress, String payoutAccountActualAddress, String payoutAccountRegisteredNumber, String payoutAccountBankAddress, String payoutAccountBankIban, String payoutAccountBankBic) {
+    public PayoutEventStatRecord(Long id, Long eventId, PayoutEventCategory eventCategory, PayoutEventType eventType, LocalDateTime eventCreatedAt, String partyId, String partyShopId, String payoutId, LocalDateTime payoutCreatedAt, PayoutStatus payoutStatus, Long payoutAmount, Long payoutFee, String payoutCurrencyCode, PayoutType payoutType, String payoutCardToken, String payoutCardMaskedPan, String payoutCardBin, String payoutCardPaymentSystem, String payoutAccountBankId, String payoutAccountBankCorrId, String payoutAccountBankLocalCode, String payoutAccountBankName, String payoutAccountInn, String payoutAccountLegalAgreementId, LocalDateTime payoutAccountLegalAgreementSignedAt, String payoutAccountPurpose, String payoutCancelDetails, String payoutAccountLegalName, String payoutAccountTradingName, String payoutAccountRegisteredAddress, String payoutAccountActualAddress, String payoutAccountRegisteredNumber, String payoutAccountBankAddress, String payoutAccountBankIban, String payoutAccountBankBic, PayoutAccountType payoutAccountType, String payoutSummary) {
         super(PayoutEventStat.PAYOUT_EVENT_STAT);
 
         set(0, id);
@@ -587,5 +616,7 @@ public class PayoutEventStatRecord extends UpdatableRecordImpl<PayoutEventStatRe
         set(32, payoutAccountBankAddress);
         set(33, payoutAccountBankIban);
         set(34, payoutAccountBankBic);
+        set(35, payoutAccountType);
+        set(36, payoutSummary);
     }
 }

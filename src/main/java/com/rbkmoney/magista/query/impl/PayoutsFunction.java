@@ -16,9 +16,6 @@ import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.util.DamselUtil;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,9 +23,7 @@ import java.util.stream.Stream;
 
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
-import static com.rbkmoney.magista.util.TypeUtil.toEnumField;
-import static com.rbkmoney.magista.util.TypeUtil.toEnumFields;
-import static com.rbkmoney.magista.util.TypeUtil.toLocalDateTime;
+import static com.rbkmoney.magista.util.TypeUtil.*;
 import static org.jooq.Comparator.*;
 
 public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResponse> implements CompositeQuery<PayoutEventStat, StatResponse> {
