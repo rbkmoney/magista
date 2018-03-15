@@ -7,10 +7,10 @@ import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.merch_stat.BankCard;
-import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.CustomerPayer;
 import com.rbkmoney.damsel.merch_stat.DigitalWallet;
 import com.rbkmoney.damsel.merch_stat.DigitalWalletProvider;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.InternationalBankAccount;
 import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
 import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
@@ -164,13 +164,13 @@ public class DamselUtil {
         try {
             return new ObjectMapper().writeValueAsString(payoutSummaryItems.stream()
                     .map(
-                    payoutSummaryItem -> {
-                        try {
-                            return new TBaseProcessor().process(payoutSummaryItem, new JsonHandler());
-                        } catch (IOException ex) {
-                            throw new RuntimeJsonMappingException(ex.getMessage());
-                        }
-                    }).collect(Collectors.toList())
+                            payoutSummaryItem -> {
+                                try {
+                                    return new TBaseProcessor().process(payoutSummaryItem, new JsonHandler());
+                                } catch (IOException ex) {
+                                    throw new RuntimeJsonMappingException(ex.getMessage());
+                                }
+                            }).collect(Collectors.toList())
             );
         } catch (IOException ex) {
             throw new RuntimeJsonMappingException(ex.getMessage());
