@@ -3,7 +3,9 @@ package com.rbkmoney.magista.dao;
 import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
+import org.jooq.Condition;
 import org.jooq.Query;
+import org.jooq.impl.DSL;
 import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
@@ -26,9 +28,15 @@ public class PayoutEventDaoImpl extends AbstractDao implements PayoutEventDao {
 
     @Override
     public PayoutEventStat findPayoutById(String payoutId) throws DaoException {
+        Condition condition = PAYOUT_EVENT_STAT.PAYOUT_ID.eq(payoutId)
+                .and(PAYOUT_EVENT_STAT.EVENT_CATEGORY.eq(PayoutEventCategory.PAYOUT));
+
         Query query = getDslContext().selectFrom(PAYOUT_EVENT_STAT)
-                .where(PAYOUT_EVENT_STAT.PAYOUT_ID.eq(payoutId)
-                        .and(PAYOUT_EVENT_STAT.EVENT_CATEGORY.eq(PayoutEventCategory.PAYOUT)));
+                .where(PAYOUT_EVENT_STAT.ID.eq(
+                        getDslContext().select(DSL.max(PAYOUT_EVENT_STAT.ID))
+                                .from(PAYOUT_EVENT_STAT).where(condition)
+                        )
+                );
         return fetchOne(query, ROW_MAPPER);
     }
 
@@ -36,15 +44,6 @@ public class PayoutEventDaoImpl extends AbstractDao implements PayoutEventDao {
     public void insert(PayoutEventStat payoutEvent) throws DaoException {
         Query query = getDslContext().insertInto(PAYOUT_EVENT_STAT)
                 .set(getDslContext().newRecord(PAYOUT_EVENT_STAT, payoutEvent));
-
-        executeOne(query);
-    }
-
-    @Override
-    public void update(PayoutEventStat payoutEvent) throws DaoException {
-        Query query = getDslContext().update(PAYOUT_EVENT_STAT)
-                .set(getDslContext().newRecord(PAYOUT_EVENT_STAT, payoutEvent))
-                .where(PAYOUT_EVENT_STAT.PAYOUT_ID.eq(payoutEvent.getPayoutId()));
 
         executeOne(query);
     }

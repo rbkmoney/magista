@@ -23,11 +23,8 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LongSummaryStatistics;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-
-import static io.github.benas.randombeans.api.EnhancedRandom.randomStreamOf;
 
 @Ignore
 public class OffsetPerformanceTest extends AbstractIntegrationTest {
@@ -93,7 +90,7 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
             } catch (TException ex) {
                 throw new RuntimeException(ex);
             }
-        }, partyId, shopId, start.atStartOfDay(), end.atStartOfDay(),1000, 1000);
+        }, partyId, shopId, start.atStartOfDay(), end.atStartOfDay(), 1000, 1000);
     }
 
     private void doOffset(String category, Function<StatRequest, StatResponse> action, String partyId, String shopId, LocalDateTime fromTime, LocalDateTime toTime, int offsetStep, int size) throws TException {

@@ -63,7 +63,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                     buildInvoiceCondition(invoiceParameterSource, paymentParameterSource, fromTime, toTime),
                     fromTime,
                     toTime,
-                    INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                    INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                     offset.get(),
                     limitValue
             );
@@ -142,7 +142,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                     buildPaymentCondition(parameterSource, fromTime, toTime),
                     fromTime,
                     toTime,
-                    INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
+                    INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                     offset.get(),
                     limitValue
             );
@@ -267,7 +267,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Collection<Map<String, String>> getPaymentsTurnoverStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT payment_currency_code AS currency_symbolic_code, SUM(payment_amount - payment_fee) AS amount_with_fee, SUM(payment_amount) AS amount_without_fee, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT'::mst.invoice_event_category and party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time AND payment_status = :succeeded_status::mst.invoice_payment_status GROUP BY sp_val, payment_currency_code ORDER BY sp_val";
+        String sql = "SELECT payment_currency_code AS currency_symbolic_code, SUM(payment_amount - payment_fee) AS amount_with_fee, SUM(payment_amount) AS amount_without_fee, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat WHERE id IN (select max(id) from mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time GROUP BY invoice_id, payment_id) AND payment_status = :succeeded_status::mst.invoice_payment_status GROUP BY sp_val, payment_currency_code ORDER BY sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
@@ -283,7 +283,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Collection<Map<String, String>> getPaymentsGeoStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT payment_city_id as city_id, payment_country_id as country_id, payment_currency_code as currency_symbolic_code, SUM(payment_amount - payment_fee) as amount_with_fee, SUM(payment_amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (payment_created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat where event_category = 'PAYMENT'::mst.invoice_event_category and payment_status = :succeeded_status::mst.invoice_payment_status and party_shop_id = :shop_id AND party_id = :merchant_id and payment_city_id notnull and payment_country_id notnull and payment_created_at >= :from_time AND payment_created_at < :to_time  group by sp_val, payment_city_id, payment_country_id, payment_currency_code order by sp_val";
+        String sql = "SELECT payment_city_id as city_id, payment_country_id as country_id, payment_currency_code as currency_symbolic_code, SUM(payment_amount - payment_fee) as amount_with_fee, SUM(payment_amount) as amount_without_fee, trunc(EXTRACT(epoch FROM (payment_created_at - (:from_time::timestamp))) / EXTRACT(epoch FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat where id IN (SELECT max(id) FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time AND payment_city_id NOTNULL AND payment_country_id NOTNULL GROUP BY invoice_id, payment_id) AND payment_status = :succeeded_status :: mst.INVOICE_PAYMENT_STATUS  group by sp_val, payment_city_id, payment_country_id, payment_currency_code order by sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
@@ -301,7 +301,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Collection<Map<String, String>> getPaymentsConversionStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT t.*, t.successful_count::FLOAT / greatest(t.total_count, 1) AS conversion FROM (SELECT SUM(CASE WHEN (payment_status = :succeeded_status::mst.invoice_payment_status OR payment_status = :failed_status::mst.invoice_payment_status) THEN 1 ELSE 0 END) AS total_count, SUM(CASE WHEN event_category = 'PAYMENT'::mst.invoice_event_category and payment_status = :succeeded_status::mst.invoice_payment_status THEN 1 ELSE 0 END) AS successful_count, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat WHERE party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time GROUP BY sp_val ORDER BY sp_val) AS t";
+        String sql = "SELECT t.*, t.successful_count::FLOAT / greatest(t.total_count, 1) AS conversion FROM (SELECT SUM(CASE WHEN (payment_status = :succeeded_status::mst.invoice_payment_status OR payment_status = :failed_status::mst.invoice_payment_status) THEN 1 ELSE 0 END) AS total_count, SUM(CASE WHEN event_category = 'PAYMENT'::mst.invoice_event_category and payment_status = :succeeded_status::mst.invoice_payment_status THEN 1 ELSE 0 END) AS successful_count, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat WHERE id IN (SELECT max(id) from mst.invoice_event_stat WHERE party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time GROUP BY invoice_id , payment_id) GROUP BY sp_val ORDER BY sp_val) AS t";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         params.addValue("failed_status", InvoicePaymentStatus._Fields.FAILED.getFieldName());
@@ -318,7 +318,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Collection<Map<String, String>> getCustomersRateStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT count(payment_fingerprint) AS unic_count, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + " sec')) AS sp_val FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT'::mst.invoice_event_category and party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time GROUP BY sp_val ORDER BY sp_val";
+        String sql = "SELECT count(payment_fingerprint) AS unic_count, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + " sec')) AS sp_val FROM mst.invoice_event_stat WHERE id IN (select max(id) from mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time GROUP BY invoice_id, payment_id) GROUP BY sp_val ORDER BY sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         log.trace("SQL: {}, Params: {}", sql, params);
         return fetch(sql, params, (rs, i) -> {
@@ -331,7 +331,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Collection<Map<String, String>> getPaymentsCardTypesStat(String merchantId, String shopId, Instant fromTime, Instant toTime, int splitInterval) throws DaoException {
-        String sql = "SELECT count(payment_system) AS total_count, payment_system AS payment_system, SUM(payment_amount - payment_fee) AS amount_with_fee, SUM(payment_amount) AS amount_without_fee, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT'::mst.invoice_event_category and payment_status = :succeeded_status::mst.invoice_payment_status AND payment_system NOTNULL AND party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time GROUP BY sp_val, payment_system ORDER BY sp_val";
+        String sql = "SELECT count(payment_system) AS total_count, payment_system AS payment_system, SUM(payment_amount - payment_fee) AS amount_with_fee, SUM(payment_amount) AS amount_without_fee, trunc(EXTRACT(EPOCH FROM (payment_created_at - (:from_time::TIMESTAMP))) / EXTRACT(EPOCH FROM INTERVAL '" + splitInterval + "  sec')) AS sp_val FROM mst.invoice_event_stat WHERE id IN (SELECT max(id) FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND payment_system NOTNULL AND party_shop_id = :shop_id AND party_id = :merchant_id AND payment_created_at >= :from_time AND payment_created_at < :to_time GROUP BY invoice_id, payment_id) GROUP BY sp_val, payment_system ORDER BY sp_val";
         MapSqlParameterSource params = createParamsMap(merchantId, shopId, fromTime, toTime, splitInterval);
         params.addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName());
         log.trace("SQL: {}, Params: {}", sql, params);
@@ -349,7 +349,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     @Override
     public Collection<Map<String, String>> getAccountingDataByPeriod(Instant fromTime, Instant toTime, Optional<List<Integer>> withoutShopCategoryIds) throws DaoException {
         //TODO rewrite this request to jooq
-        String sql = "SELECT part1.party_id as merchant_id, part1.party_shop_id as shop_id, part1.payment_currency_code as currency_code, (coalesce(funds_to_be_paid_prev_periods,0) - coalesce(funds_paid_out_prev_periods,0) - coalesce(funds_refunded_prev_periods,0)) as opening_balance, coalesce(funds_acquired_period,0) as funds_acquired, coalesce(fee_charged_period,0) as fee_charged, coalesce(funds_paid_out_period,0) as funds_paid_out, coalesce(funds_refunded_period,0) as funds_refunded, (coalesce(funds_to_be_paid_prev_periods,0) - coalesce(funds_paid_out_prev_periods,0) - coalesce(funds_refunded_prev_periods,0) + coalesce(funds_acquired_period,0) - coalesce(fee_charged_period,0) - coalesce(funds_paid_out_period,0) - coalesce(funds_refunded_period,0)) as closing_balance FROM (SELECT party_id, party_shop_id, payment_currency_code, sum(payment_amount) as funds_acquired_period, sum(payment_fee) as fee_charged_period FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT'::mst.invoice_event_category AND payment_status IN (:succeeded_status::mst.invoice_payment_status, :refunded_status::mst.invoice_payment_status) AND party_shop_category_id NOT IN (:shop_categories) AND event_created_at >= :from_time AND event_created_at < :to_time GROUP BY party_shop_id, payment_currency_code, party_id) part1 LEFT JOIN (SELECT party_id, party_shop_id, sum(payment_amount) as funds_refunded_period FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT'::mst.invoice_event_category AND payment_status = :refunded_status::mst.invoice_payment_status AND event_created_at >= :from_time AND event_created_at < :to_time GROUP BY party_shop_id, payment_currency_code, party_id) part2 ON part1.party_id = part2.party_id AND part1.party_shop_id = part2.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payment_amount - payment_fee) as funds_to_be_paid_prev_periods FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT'::mst.invoice_event_category AND payment_status IN (:succeeded_status::mst.invoice_payment_status, :refunded_status::mst.invoice_payment_status) AND event_created_at < :from_time GROUP BY party_shop_id, party_id) part3 ON part1.party_id = part3.party_id AND part1.party_shop_id = part3.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payment_amount) as funds_refunded_prev_periods FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT'::mst.invoice_event_category AND payment_status = :refunded_status::mst.invoice_payment_status AND event_created_at < :from_time GROUP BY party_shop_id, party_id) part4 ON part1.party_id = part4.party_id AND part1.party_shop_id = part4.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payout_amount) as funds_paid_out_period FROM mst.payout_event_stat WHERE payout_status = :payout_confirmed_status::mst.payout_status AND payout_created_at >=  :from_time AND payout_created_at < :to_time GROUP BY party_shop_id, party_id) part5 ON part1.party_id = part5.party_id AND part1.party_shop_id = part5.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payout_amount) as funds_paid_out_prev_periods FROM mst.payout_event_stat WHERE payout_status = :payout_confirmed_status::mst.payout_status AND payout_created_at < :from_time GROUP BY party_shop_id, party_id) part6 ON part1.party_id = part6.party_id AND part1.party_shop_id = part6.party_shop_id";
+        String sql = "SELECT part1.party_id AS merchant_id, part1.party_shop_id AS shop_id, part1.payment_currency_code AS currency_code, (coalesce(funds_to_be_paid_prev_periods, 0) - coalesce(funds_paid_out_prev_periods, 0) - coalesce(funds_refunded_prev_periods, 0)) AS opening_balance, coalesce(funds_acquired_period, 0) AS funds_acquired, coalesce(fee_charged_period, 0) AS fee_charged, coalesce(funds_paid_out_period, 0) AS funds_paid_out, coalesce(funds_refunded_period, 0) AS funds_refunded, (coalesce(funds_to_be_paid_prev_periods, 0) - coalesce(funds_paid_out_prev_periods, 0) - coalesce(funds_refunded_prev_periods, 0) + coalesce(funds_acquired_period, 0) - coalesce(fee_charged_period, 0) - coalesce(funds_paid_out_period, 0) - coalesce(funds_refunded_period, 0)) AS closing_balance FROM (SELECT party_id, party_shop_id, payment_currency_code, sum(payment_amount) AS funds_acquired_period, sum(payment_fee) AS fee_charged_period FROM mst.invoice_event_stat WHERE id IN (SELECT max(id) FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND party_shop_category_id NOT IN (:shop_categories) AND event_created_at >= :from_time AND event_created_at < :to_time GROUP BY invoice_id, payment_id) AND payment_status IN (:succeeded_status :: mst.INVOICE_PAYMENT_STATUS, :refunded_status :: mst.INVOICE_PAYMENT_STATUS) GROUP BY party_shop_id, payment_currency_code, party_id) part1 LEFT JOIN (SELECT party_id, party_shop_id, sum( payment_amount) AS funds_refunded_period FROM mst.invoice_event_stat WHERE id IN (SELECT max(id) FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND event_created_at >= :from_time AND event_created_at < :to_time GROUP BY invoice_id, payment_id) AND payment_status = :refunded_status :: mst.INVOICE_PAYMENT_STATUS GROUP BY party_shop_id, payment_currency_code, party_id) part2 ON part1.party_id = part2.party_id AND part1.party_shop_id = part2.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payment_amount - payment_fee) AS funds_to_be_paid_prev_periods FROM mst.invoice_event_stat WHERE id IN (SELECT max(id) FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND event_created_at < :from_time GROUP BY invoice_id, payment_id) AND payment_status IN (:succeeded_status :: mst.INVOICE_PAYMENT_STATUS, :refunded_status :: mst.INVOICE_PAYMENT_STATUS) GROUP BY party_shop_id, party_id) part3 ON part1.party_id = part3.party_id AND part1.party_shop_id = part3.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payment_amount) AS funds_refunded_prev_periods FROM mst.invoice_event_stat WHERE id IN (SELECT max(id) FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND event_created_at < :from_time GROUP BY invoice_id, payment_id) AND payment_status = :refunded_status :: mst.INVOICE_PAYMENT_STATUS GROUP BY party_shop_id, party_id) part4 ON part1.party_id = part4.party_id AND part1.party_shop_id = part4.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payout_amount) AS funds_paid_out_period FROM mst.payout_event_stat WHERE id IN (SELECT max(id) FROM mst.payout_event_stat WHERE payout_created_at >= :from_time AND payout_created_at < :to_time GROUP BY payout_id) AND payout_status = :payout_confirmed_status :: mst.PAYOUT_STATUS GROUP BY party_shop_id, party_id) part5 ON part1.party_id = part5.party_id AND part1.party_shop_id = part5.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payout_amount) AS funds_paid_out_prev_periods FROM mst.payout_event_stat WHERE id IN (SELECT max(id) FROM mst.payout_event_stat WHERE payout_created_at < :from_time GROUP BY payout_id) AND payout_status = :payout_confirmed_status :: mst.PAYOUT_STATUS GROUP BY party_shop_id, party_id) part6 ON part1.party_id = part6.party_id AND part1.party_shop_id = part6.party_shop_id";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("from_time", LocalDateTime.ofInstant(fromTime, ZoneOffset.UTC), Types.OTHER)
                 .addValue("to_time", LocalDateTime.ofInstant(toTime, ZoneOffset.UTC), Types.OTHER)
@@ -391,9 +391,14 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     ) {
         Condition condition = appendDateTimeRange(
                 INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT),
-                INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
+                INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 fromTime,
                 toTime);
+
+        condition = INVOICE_EVENT_STAT.ID.in(
+                getDslContext().select(DSL.max(INVOICE_EVENT_STAT.ID)).from(INVOICE_EVENT_STAT)
+                        .where(condition).groupBy(INVOICE_EVENT_STAT.INVOICE_ID, INVOICE_EVENT_STAT.PAYMENT_ID)
+        );
 
         return appendConditions(condition, Operator.AND, paymentParameterSource);
     }
@@ -406,9 +411,14 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     ) {
         Condition condition = appendDateTimeRange(
                 INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE),
-                INVOICE_EVENT_STAT.INVOICE_CREATED_AT,
+                INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 fromTime,
                 toTime);
+
+        condition = INVOICE_EVENT_STAT.ID.in(
+                getDslContext().select(DSL.max(INVOICE_EVENT_STAT.ID)).from(INVOICE_EVENT_STAT)
+                        .where(condition).groupBy(INVOICE_EVENT_STAT.INVOICE_ID)
+        );
 
         if (!paymentParameterSource.getConditionFields().isEmpty()) {
             condition = condition.and(
