@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 1378008542;
+    private static final long serialVersionUID = -1753340459;
 
     /**
      * The reference instance of <code>mst.invoice_event_stat</code>
@@ -476,6 +476,11 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
      * The column <code>mst.invoice_event_stat.payment_refund_currency_code</code>.
      */
     public final TableField<InvoiceEventStatRecord, String> PAYMENT_REFUND_CURRENCY_CODE = createField("payment_refund_currency_code", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.invoice_event_stat.payment_status_sub_failure</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, String> PAYMENT_STATUS_SUB_FAILURE = createField("payment_status_sub_failure", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * Create a <code>mst.invoice_event_stat</code> table reference

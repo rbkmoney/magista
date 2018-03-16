@@ -193,7 +193,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertTrue(statResponse.getData().getPayments().stream().anyMatch(
                 payment -> payment.getStatus().isSetFailed()
-                        && payment.getStatus().getFailed().getFailure().isSetExternalFailure()
+                        && payment.getStatus().getFailed().getFailure().isSetFailure()
         ));
     }
 

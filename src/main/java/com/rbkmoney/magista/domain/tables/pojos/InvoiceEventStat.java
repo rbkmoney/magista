@@ -31,7 +31,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 1155789297;
+    private static final long serialVersionUID = 1794646891;
 
     private Long                       id;
     private Long                       eventId;
@@ -117,6 +117,7 @@ public class InvoiceEventStat implements Serializable {
     private String                     paymentDigitalWalletProvider;
     private Long                       paymentRefundAmount;
     private String                     paymentRefundCurrencyCode;
+    private String                     paymentStatusSubFailure;
 
     public InvoiceEventStat() {}
 
@@ -205,6 +206,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentDigitalWalletProvider = value.paymentDigitalWalletProvider;
         this.paymentRefundAmount = value.paymentRefundAmount;
         this.paymentRefundCurrencyCode = value.paymentRefundCurrencyCode;
+        this.paymentStatusSubFailure = value.paymentStatusSubFailure;
     }
 
     public InvoiceEventStat(
@@ -291,7 +293,8 @@ public class InvoiceEventStat implements Serializable {
         String                     paymentDigitalWalletId,
         String                     paymentDigitalWalletProvider,
         Long                       paymentRefundAmount,
-        String                     paymentRefundCurrencyCode
+        String                     paymentRefundCurrencyCode,
+        String                     paymentStatusSubFailure
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -377,6 +380,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentDigitalWalletProvider = paymentDigitalWalletProvider;
         this.paymentRefundAmount = paymentRefundAmount;
         this.paymentRefundCurrencyCode = paymentRefundCurrencyCode;
+        this.paymentStatusSubFailure = paymentStatusSubFailure;
     }
 
     public Long getId() {
@@ -1051,6 +1055,14 @@ public class InvoiceEventStat implements Serializable {
         this.paymentRefundCurrencyCode = paymentRefundCurrencyCode;
     }
 
+    public String getPaymentStatusSubFailure() {
+        return this.paymentStatusSubFailure;
+    }
+
+    public void setPaymentStatusSubFailure(String paymentStatusSubFailure) {
+        this.paymentStatusSubFailure = paymentStatusSubFailure;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -1564,6 +1576,12 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentRefundCurrencyCode.equals(other.paymentRefundCurrencyCode))
             return false;
+        if (paymentStatusSubFailure == null) {
+            if (other.paymentStatusSubFailure != null)
+                return false;
+        }
+        else if (!paymentStatusSubFailure.equals(other.paymentStatusSubFailure))
+            return false;
         return true;
     }
 
@@ -1655,6 +1673,7 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((this.paymentDigitalWalletProvider == null) ? 0 : this.paymentDigitalWalletProvider.hashCode());
         result = prime * result + ((this.paymentRefundAmount == null) ? 0 : this.paymentRefundAmount.hashCode());
         result = prime * result + ((this.paymentRefundCurrencyCode == null) ? 0 : this.paymentRefundCurrencyCode.hashCode());
+        result = prime * result + ((this.paymentStatusSubFailure == null) ? 0 : this.paymentStatusSubFailure.hashCode());
         return result;
     }
 
@@ -1746,6 +1765,7 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentDigitalWalletProvider);
         sb.append(", ").append(paymentRefundAmount);
         sb.append(", ").append(paymentRefundCurrencyCode);
+        sb.append(", ").append(paymentStatusSubFailure);
 
         sb.append(")");
         return sb.toString();

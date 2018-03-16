@@ -41,6 +41,7 @@ import com.rbkmoney.geck.serializer.kit.json.JsonHandler;
 import com.rbkmoney.geck.serializer.kit.json.JsonProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseProcessor;
+import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.NotFoundException;
@@ -379,10 +380,14 @@ public class DamselUtil {
             case OPERATION_TIMEOUT:
                 return OperationFailure.operation_timeout(new OperationTimeout());
             case FAILURE:
-                ExternalFailure externalFailure = new ExternalFailure();
+                Failure externalFailure = new Failure();
                 externalFailure.setCode(invoicePaymentStat.getPaymentExternalFailureCode());
-                externalFailure.setDescription(invoicePaymentStat.getPaymentExternalFailureDescription());
-                return OperationFailure.external_failure(externalFailure);
+                externalFailure.setReason(invoicePaymentStat.getPaymentExternalFailureDescription());
+                if (invoicePaymentStat.getPaymentStatusSubFailure() != null) {
+                    Failure failure = TErrorUtil.toGeneral(invoicePaymentStat.getPaymentStatusSubFailure());
+                    externalFailure.setSub(failure.getSub());
+                }
+                return OperationFailure.failure(externalFailure);
             default:
                 throw new NotFoundException(String.format("Failure type '%s' not found", invoicePaymentStat.getPaymentFailureClass()));
         }

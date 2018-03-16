@@ -5,6 +5,7 @@ import com.rbkmoney.damsel.domain.OperationFailure;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStatusChanged;
 import com.rbkmoney.geck.common.util.TBaseUtil;
+import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
@@ -43,6 +44,7 @@ public class PaymentStatusMapper implements Mapper<InvoiceEventContext> {
                 Failure failure = operationFailure.getFailure();
                 invoiceEventStat.setPaymentExternalFailureCode(failure.getCode());
                 invoiceEventStat.setPaymentExternalFailureDescription(failure.getReason());
+                invoiceEventStat.setPaymentStatusSubFailure(TErrorUtil.toStringVal(failure));
             }
         }
 
