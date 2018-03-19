@@ -16,6 +16,8 @@ import java.util.Optional;
  */
 public interface StatisticsDao {
     Collection<InvoiceEventStat> getInvoices(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
@@ -25,6 +27,8 @@ public interface StatisticsDao {
     ) throws DaoException;
 
     int getInvoicesCount(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
@@ -32,6 +36,8 @@ public interface StatisticsDao {
     ) throws DaoException;
 
     Collection<InvoiceEventStat> getPayments(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
@@ -40,18 +46,26 @@ public interface StatisticsDao {
     ) throws DaoException;
 
     Integer getPaymentsCount(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) throws DaoException;
 
     Collection<PayoutEventStat> getPayouts(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource parameterSource,
             Optional<Integer> offset,
             Optional<Integer> limit
     ) throws DaoException;
 
-    Integer getPayoutsCount(ConditionParameterSource parameterSource) throws DaoException;
+    Integer getPayoutsCount(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            ConditionParameterSource parameterSource
+    ) throws DaoException;
 
     Collection<Map<String, String>> getPaymentsTurnoverStat(
             String merchantId,
