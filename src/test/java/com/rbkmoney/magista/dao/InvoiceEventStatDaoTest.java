@@ -10,6 +10,7 @@ import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -20,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by tolkonepiu on 26/05/2017.
  */
+@Transactional
 public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
 
     @Autowired
