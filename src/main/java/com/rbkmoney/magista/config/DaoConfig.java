@@ -37,6 +37,18 @@ public class DaoConfig {
     }
 
     @Bean
+    @DependsOn("dbInitializer")
+    public AdjustmentDao adjustmentDao(DataSource ds) {
+        return new AdjustmentDaoImpl(ds);
+    }
+
+    @Bean
+    @DependsOn("dbInitializer")
+    public RefundDao refundDao(DataSource ds) {
+        return new RefundDaoImpl(ds);
+    }
+
+    @Bean
     public Schema dbSchema() {
         return Mst.MST;
     }

@@ -4,10 +4,14 @@
 package com.rbkmoney.magista.domain;
 
 
+import com.rbkmoney.magista.domain.tables.Adjustment;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.PayoutEventStat;
+import com.rbkmoney.magista.domain.tables.Refund;
+import com.rbkmoney.magista.domain.tables.records.AdjustmentRecord;
 import com.rbkmoney.magista.domain.tables.records.InvoiceEventStatRecord;
 import com.rbkmoney.magista.domain.tables.records.PayoutEventStatRecord;
+import com.rbkmoney.magista.domain.tables.records.RefundRecord;
 
 import javax.annotation.Generated;
 
@@ -34,15 +38,19 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
+    public static final Identity<AdjustmentRecord, Long> IDENTITY_ADJUSTMENT = Identities0.IDENTITY_ADJUSTMENT;
     public static final Identity<InvoiceEventStatRecord, Long> IDENTITY_INVOICE_EVENT_STAT = Identities0.IDENTITY_INVOICE_EVENT_STAT;
     public static final Identity<PayoutEventStatRecord, Long> IDENTITY_PAYOUT_EVENT_STAT = Identities0.IDENTITY_PAYOUT_EVENT_STAT;
+    public static final Identity<RefundRecord, Long> IDENTITY_REFUND = Identities0.IDENTITY_REFUND;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<AdjustmentRecord> ADJUSTMENT_PKEY = UniqueKeys0.ADJUSTMENT_PKEY;
     public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_PKEY = UniqueKeys0.INVOICE_EVENT_PKEY;
     public static final UniqueKey<PayoutEventStatRecord> PAYMENT_EVENT_PKEY = UniqueKeys0.PAYMENT_EVENT_PKEY;
+    public static final UniqueKey<RefundRecord> REFUND_PKEY = UniqueKeys0.REFUND_PKEY;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -54,12 +62,16 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     private static class Identities0 extends AbstractKeys {
+        public static Identity<AdjustmentRecord, Long> IDENTITY_ADJUSTMENT = createIdentity(Adjustment.ADJUSTMENT, Adjustment.ADJUSTMENT.ID);
         public static Identity<InvoiceEventStatRecord, Long> IDENTITY_INVOICE_EVENT_STAT = createIdentity(InvoiceEventStat.INVOICE_EVENT_STAT, InvoiceEventStat.INVOICE_EVENT_STAT.ID);
         public static Identity<PayoutEventStatRecord, Long> IDENTITY_PAYOUT_EVENT_STAT = createIdentity(PayoutEventStat.PAYOUT_EVENT_STAT, PayoutEventStat.PAYOUT_EVENT_STAT.ID);
+        public static Identity<RefundRecord, Long> IDENTITY_REFUND = createIdentity(Refund.REFUND, Refund.REFUND.ID);
     }
 
     private static class UniqueKeys0 extends AbstractKeys {
+        public static final UniqueKey<AdjustmentRecord> ADJUSTMENT_PKEY = createUniqueKey(Adjustment.ADJUSTMENT, "adjustment_pkey", Adjustment.ADJUSTMENT.ID);
         public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_PKEY = createUniqueKey(InvoiceEventStat.INVOICE_EVENT_STAT, "invoice_event_pkey", InvoiceEventStat.INVOICE_EVENT_STAT.ID);
         public static final UniqueKey<PayoutEventStatRecord> PAYMENT_EVENT_PKEY = createUniqueKey(PayoutEventStat.PAYOUT_EVENT_STAT, "payment_event_pkey", PayoutEventStat.PAYOUT_EVENT_STAT.ID);
+        public static final UniqueKey<RefundRecord> REFUND_PKEY = createUniqueKey(Refund.REFUND, "refund_pkey", Refund.REFUND.ID);
     }
 }

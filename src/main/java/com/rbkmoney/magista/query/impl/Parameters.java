@@ -33,6 +33,9 @@ public class Parameters {
     public static final String PAYMENT_FLOW_PARAM = "payment_flow";
     public static final String PAYMENT_CUSTOMER_ID_PARAM = "payment_customer_id";
 
+    public static final String REFUND_ID_PARAM = "refund_id";
+    public static final String REFUND_STATUS_PARAM = "refund_status";
+
     public static final String PAYOUT_ID_PARAM = "payout_id";
     public static final String PAYOUT_STATUS_PARAM = "payout_status";
     public static final String PAYOUT_STATUSES_PARAM = "payout_statuses";

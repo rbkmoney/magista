@@ -169,6 +169,15 @@ public class JsonQueryParserTest {
     }
 
     @Test
+    public void testRefundsFunctionParse() {
+        String json = "{'query': {'refunds': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'refund_id':'C', 'refund_status': 'captured', 'from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T00:00:00Z'}}}";
+        List<QueryPart> queryParts = parser.parseQuery(json);
+        assertEquals("root query", 1, queryParts.size());
+        QueryPart queryPart = queryParts.get(0);
+        System.out.println(queryPart.getParameters().getStringParameter("refund_status", false));
+    }
+
+    @Test
     public void testCustomersRateStatParse() throws Exception {
         String json = "{'query': {'customers_rate_stat': {'merchant_id': '1','shop_id': '2', 'split_interval':'1','from_time': '2016-03-22T00:12:00Z', 'to_time': '2016-03-22T01:00:00Z'}}}";
         List<QueryPart> queryParts = parser.parseQuery(json);

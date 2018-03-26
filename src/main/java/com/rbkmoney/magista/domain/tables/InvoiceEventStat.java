@@ -6,10 +6,8 @@ package com.rbkmoney.magista.domain.tables;
 
 import com.rbkmoney.magista.domain.Keys;
 import com.rbkmoney.magista.domain.Mst;
-import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
-import com.rbkmoney.magista.domain.enums.InvoicePaymentRefundStatus;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.records.InvoiceEventStatRecord;
@@ -42,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 1378008542;
+    private static final long serialVersionUID = 352188111;
 
     /**
      * The reference instance of <code>mst.invoice_event_stat</code>
@@ -303,46 +301,6 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
     public final TableField<InvoiceEventStatRecord, byte[]> PAYMENT_CONTEXT = createField("payment_context", org.jooq.impl.SQLDataType.BLOB, this, "");
 
     /**
-     * The column <code>mst.invoice_event_stat.payment_adjustment_id</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, String> PAYMENT_ADJUSTMENT_ID = createField("payment_adjustment_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_adjustment_status</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, AdjustmentStatus> PAYMENT_ADJUSTMENT_STATUS = createField("payment_adjustment_status", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.AdjustmentStatus.class), this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_adjustment_status_created_at</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, LocalDateTime> PAYMENT_ADJUSTMENT_STATUS_CREATED_AT = createField("payment_adjustment_status_created_at", org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_adjustment_created_at</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, LocalDateTime> PAYMENT_ADJUSTMENT_CREATED_AT = createField("payment_adjustment_created_at", org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_adjustment_reason</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, String> PAYMENT_ADJUSTMENT_REASON = createField("payment_adjustment_reason", org.jooq.impl.SQLDataType.VARCHAR, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_adjustment_fee</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_ADJUSTMENT_FEE = createField("payment_adjustment_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_adjustment_provider_fee</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_ADJUSTMENT_PROVIDER_FEE = createField("payment_adjustment_provider_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_adjustment_external_fee</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_ADJUSTMENT_EXTERNAL_FEE = createField("payment_adjustment_external_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
      * The column <code>mst.invoice_event_stat.payment_failure_class</code>.
      */
     public final TableField<InvoiceEventStatRecord, String> PAYMENT_FAILURE_CLASS = createField("payment_failure_class", org.jooq.impl.SQLDataType.VARCHAR, this, "");
@@ -376,41 +334,6 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
      * The column <code>mst.invoice_event_stat.payment_terminal_provider</code>.
      */
     public final TableField<InvoiceEventStatRecord, String> PAYMENT_TERMINAL_PROVIDER = createField("payment_terminal_provider", org.jooq.impl.SQLDataType.VARCHAR, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_refund_id</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, String> PAYMENT_REFUND_ID = createField("payment_refund_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_refund_status</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, InvoicePaymentRefundStatus> PAYMENT_REFUND_STATUS = createField("payment_refund_status", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.InvoicePaymentRefundStatus.class), this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_refund_created_at</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, LocalDateTime> PAYMENT_REFUND_CREATED_AT = createField("payment_refund_created_at", org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_refund_reason</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, String> PAYMENT_REFUND_REASON = createField("payment_refund_reason", org.jooq.impl.SQLDataType.VARCHAR, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_refund_fee</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_REFUND_FEE = createField("payment_refund_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_refund_provider_fee</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_REFUND_PROVIDER_FEE = createField("payment_refund_provider_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_refund_external_fee</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_REFUND_EXTERNAL_FEE = createField("payment_refund_external_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>mst.invoice_event_stat.payment_customer_id</code>.
@@ -466,16 +389,6 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
      * The column <code>mst.invoice_event_stat.payment_digital_wallet_provider</code>.
      */
     public final TableField<InvoiceEventStatRecord, String> PAYMENT_DIGITAL_WALLET_PROVIDER = createField("payment_digital_wallet_provider", org.jooq.impl.SQLDataType.VARCHAR, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_refund_amount</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, Long> PAYMENT_REFUND_AMOUNT = createField("payment_refund_amount", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
-     * The column <code>mst.invoice_event_stat.payment_refund_currency_code</code>.
-     */
-    public final TableField<InvoiceEventStatRecord, String> PAYMENT_REFUND_CURRENCY_CODE = createField("payment_refund_currency_code", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * Create a <code>mst.invoice_event_stat</code> table reference

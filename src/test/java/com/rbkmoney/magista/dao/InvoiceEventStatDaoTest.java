@@ -9,7 +9,6 @@ import com.rbkmoney.magista.exception.DaoException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -39,18 +38,6 @@ public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
         invoiceEventDao.insert(invoiceEventStat);
 
         assertEquals(invoiceEventStat, invoiceEventDao.findPaymentByIds(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId()));
-
-        invoiceEventStat.setId(30L);
-        invoiceEventStat.setEventCategory(InvoiceEventCategory.REFUND);
-        invoiceEventDao.insert(invoiceEventStat);
-
-        assertEquals(invoiceEventStat, invoiceEventDao.findRefundByIds(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId(), invoiceEventStat.getPaymentRefundId()));
-
-        invoiceEventStat.setId(40L);
-        invoiceEventStat.setEventCategory(InvoiceEventCategory.ADJUSTMENT);
-        invoiceEventDao.insert(invoiceEventStat);
-
-        assertEquals(invoiceEventStat, invoiceEventDao.findAdjustmentByIds(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId(), invoiceEventStat.getPaymentAdjustmentId()));
     }
 
     @Test

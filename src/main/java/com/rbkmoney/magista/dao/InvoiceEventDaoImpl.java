@@ -30,36 +30,6 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
     }
 
     @Override
-    public InvoiceEventStat findAdjustmentByIds(String invoiceId, String paymentId, String adjustmentId) throws DaoException {
-        Condition condition = INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
-                .and(INVOICE_EVENT_STAT.PAYMENT_ID.eq(paymentId))
-                .and(INVOICE_EVENT_STAT.PAYMENT_ADJUSTMENT_ID.eq(adjustmentId))
-                .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.ADJUSTMENT));
-        Query query = getDslContext().selectFrom(INVOICE_EVENT_STAT)
-                .where(INVOICE_EVENT_STAT.ID.eq(
-                        getDslContext().select(DSL.max(INVOICE_EVENT_STAT.ID))
-                                .from(INVOICE_EVENT_STAT).where(condition)
-                        )
-                );
-        return fetchOne(query, ROW_MAPPER);
-    }
-
-    @Override
-    public InvoiceEventStat findRefundByIds(String invoiceId, String paymentId, String refundId) throws DaoException {
-        Condition condition = INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
-                .and(INVOICE_EVENT_STAT.PAYMENT_ID.eq(paymentId))
-                .and(INVOICE_EVENT_STAT.PAYMENT_REFUND_ID.eq(refundId))
-                .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.REFUND));
-        Query query = getDslContext().selectFrom(INVOICE_EVENT_STAT)
-                .where(INVOICE_EVENT_STAT.ID.eq(
-                        getDslContext().select(DSL.max(INVOICE_EVENT_STAT.ID))
-                                .from(INVOICE_EVENT_STAT).where(condition)
-                        )
-                );
-        return fetchOne(query, ROW_MAPPER);
-    }
-
-    @Override
     public InvoiceEventStat findPaymentByIds(String invoiceId, String paymentId) throws DaoException {
         Condition condition = INVOICE_EVENT_STAT.INVOICE_ID.eq(invoiceId)
                 .and(INVOICE_EVENT_STAT.PAYMENT_ID.eq(paymentId))

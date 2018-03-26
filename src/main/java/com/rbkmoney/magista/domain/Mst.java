@@ -4,8 +4,10 @@
 package com.rbkmoney.magista.domain;
 
 
+import com.rbkmoney.magista.domain.tables.Adjustment;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.PayoutEventStat;
+import com.rbkmoney.magista.domain.tables.Refund;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,12 +34,17 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Mst extends SchemaImpl {
 
-    private static final long serialVersionUID = 1938195565;
+    private static final long serialVersionUID = -1374128738;
 
     /**
      * The reference instance of <code>mst</code>
      */
     public static final Mst MST = new Mst();
+
+    /**
+     * The table <code>mst.adjustment</code>.
+     */
+    public final Adjustment ADJUSTMENT = com.rbkmoney.magista.domain.tables.Adjustment.ADJUSTMENT;
 
     /**
      * The table <code>mst.invoice_event_stat</code>.
@@ -48,6 +55,11 @@ public class Mst extends SchemaImpl {
      * The table <code>mst.payout_event_stat</code>.
      */
     public final PayoutEventStat PAYOUT_EVENT_STAT = com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
+
+    /**
+     * The table <code>mst.refund</code>.
+     */
+    public final Refund REFUND = com.rbkmoney.magista.domain.tables.Refund.REFUND;
 
     /**
      * No further instances allowed
@@ -74,8 +86,10 @@ public class Mst extends SchemaImpl {
 
     private final List<Sequence<?>> getSequences0() {
         return Arrays.<Sequence<?>>asList(
+            Sequences.ADJUSTMENT_ID_SEQ,
             Sequences.INVOICE_EVENT_STAT_ID_SEQ,
-            Sequences.PAYOUT_EVENT_STAT_ID_SEQ);
+            Sequences.PAYOUT_EVENT_STAT_ID_SEQ,
+            Sequences.REFUND_ID_SEQ);
     }
 
     @Override
@@ -87,7 +101,9 @@ public class Mst extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
+            Adjustment.ADJUSTMENT,
             InvoiceEventStat.INVOICE_EVENT_STAT,
-            PayoutEventStat.PAYOUT_EVENT_STAT);
+            PayoutEventStat.PAYOUT_EVENT_STAT,
+            Refund.REFUND);
     }
 }

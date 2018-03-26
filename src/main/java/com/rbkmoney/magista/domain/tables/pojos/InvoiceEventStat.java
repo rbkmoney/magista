@@ -4,10 +4,8 @@
 package com.rbkmoney.magista.domain.tables.pojos;
 
 
-import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
-import com.rbkmoney.magista.domain.enums.InvoicePaymentRefundStatus;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 
@@ -31,92 +29,75 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 1155789297;
+    private static final long serialVersionUID = 1154369064;
 
-    private Long                       id;
-    private Long                       eventId;
-    private InvoiceEventCategory       eventCategory;
-    private InvoiceEventType           eventType;
-    private LocalDateTime              eventCreatedAt;
-    private String                     partyId;
-    private String                     partyEmail;
-    private String                     partyShopId;
-    private String                     partyShopName;
-    private String                     partyShopDescription;
-    private String                     partyShopUrl;
-    private Integer                    partyShopCategoryId;
-    private String                     partyShopPayoutToolId;
-    private String                     partyContractId;
-    private String                     partyContractRegisteredNumber;
-    private String                     partyContractInn;
-    private String                     invoiceId;
-    private InvoiceStatus              invoiceStatus;
-    private String                     invoiceStatusDetails;
-    private String                     invoiceProduct;
-    private String                     invoiceDescription;
-    private Long                       invoiceAmount;
-    private String                     invoiceCurrencyCode;
-    private LocalDateTime              invoiceDue;
-    private LocalDateTime              invoiceCreatedAt;
-    private byte[]                     invoiceContext;
-    private String                     paymentId;
-    private InvoicePaymentStatus       paymentStatus;
-    private String                     paymentExternalFailureCode;
-    private String                     paymentExternalFailureDescription;
-    private Long                       paymentAmount;
-    private String                     paymentCurrencyCode;
-    private Long                       paymentFee;
-    private Long                       paymentProviderFee;
-    private Long                       paymentExternalFee;
-    private String                     paymentTool;
-    private String                     paymentMaskedPan;
-    private String                     paymentBin;
-    private String                     paymentToken;
-    private String                     paymentSystem;
-    private String                     paymentSessionId;
-    private Integer                    paymentCountryId;
-    private Integer                    paymentCityId;
-    private String                     paymentIp;
-    private String                     paymentPhoneNumber;
-    private String                     paymentEmail;
-    private String                     paymentFingerprint;
-    private LocalDateTime              paymentCreatedAt;
-    private byte[]                     paymentContext;
-    private String                     paymentAdjustmentId;
-    private AdjustmentStatus           paymentAdjustmentStatus;
-    private LocalDateTime              paymentAdjustmentStatusCreatedAt;
-    private LocalDateTime              paymentAdjustmentCreatedAt;
-    private String                     paymentAdjustmentReason;
-    private Long                       paymentAdjustmentFee;
-    private Long                       paymentAdjustmentProviderFee;
-    private Long                       paymentAdjustmentExternalFee;
-    private String                     paymentFailureClass;
-    private String                     invoiceTemplateId;
-    private String                     invoiceCart;
-    private String                     paymentFlow;
-    private String                     paymentHoldOnExpiration;
-    private LocalDateTime              paymentHoldUntil;
-    private String                     paymentTerminalProvider;
-    private String                     paymentRefundId;
-    private InvoicePaymentRefundStatus paymentRefundStatus;
-    private LocalDateTime              paymentRefundCreatedAt;
-    private String                     paymentRefundReason;
-    private Long                       paymentRefundFee;
-    private Long                       paymentRefundProviderFee;
-    private Long                       paymentRefundExternalFee;
-    private String                     paymentCustomerId;
-    private Integer                    paymentProviderId;
-    private Integer                    paymentTerminalId;
-    private Long                       paymentDomainRevision;
-    private String                     invoiceContextType;
-    private String                     paymentContextType;
-    private Long                       paymentAdjustmentAmount;
-    private Long                       invoicePartyRevision;
-    private Long                       paymentPartyRevision;
-    private String                     paymentDigitalWalletId;
-    private String                     paymentDigitalWalletProvider;
-    private Long                       paymentRefundAmount;
-    private String                     paymentRefundCurrencyCode;
+    private Long                 id;
+    private Long                 eventId;
+    private InvoiceEventCategory eventCategory;
+    private InvoiceEventType     eventType;
+    private LocalDateTime        eventCreatedAt;
+    private String               partyId;
+    private String               partyEmail;
+    private String               partyShopId;
+    private String               partyShopName;
+    private String               partyShopDescription;
+    private String               partyShopUrl;
+    private Integer              partyShopCategoryId;
+    private String               partyShopPayoutToolId;
+    private String               partyContractId;
+    private String               partyContractRegisteredNumber;
+    private String               partyContractInn;
+    private String               invoiceId;
+    private InvoiceStatus        invoiceStatus;
+    private String               invoiceStatusDetails;
+    private String               invoiceProduct;
+    private String               invoiceDescription;
+    private Long                 invoiceAmount;
+    private String               invoiceCurrencyCode;
+    private LocalDateTime        invoiceDue;
+    private LocalDateTime        invoiceCreatedAt;
+    private byte[]               invoiceContext;
+    private String               paymentId;
+    private InvoicePaymentStatus paymentStatus;
+    private String               paymentExternalFailureCode;
+    private String               paymentExternalFailureDescription;
+    private Long                 paymentAmount;
+    private String               paymentCurrencyCode;
+    private Long                 paymentFee;
+    private Long                 paymentProviderFee;
+    private Long                 paymentExternalFee;
+    private String               paymentTool;
+    private String               paymentMaskedPan;
+    private String               paymentBin;
+    private String               paymentToken;
+    private String               paymentSystem;
+    private String               paymentSessionId;
+    private Integer              paymentCountryId;
+    private Integer              paymentCityId;
+    private String               paymentIp;
+    private String               paymentPhoneNumber;
+    private String               paymentEmail;
+    private String               paymentFingerprint;
+    private LocalDateTime        paymentCreatedAt;
+    private byte[]               paymentContext;
+    private String               paymentFailureClass;
+    private String               invoiceTemplateId;
+    private String               invoiceCart;
+    private String               paymentFlow;
+    private String               paymentHoldOnExpiration;
+    private LocalDateTime        paymentHoldUntil;
+    private String               paymentTerminalProvider;
+    private String               paymentCustomerId;
+    private Integer              paymentProviderId;
+    private Integer              paymentTerminalId;
+    private Long                 paymentDomainRevision;
+    private String               invoiceContextType;
+    private String               paymentContextType;
+    private Long                 paymentAdjustmentAmount;
+    private Long                 invoicePartyRevision;
+    private Long                 paymentPartyRevision;
+    private String               paymentDigitalWalletId;
+    private String               paymentDigitalWalletProvider;
 
     public InvoiceEventStat() {}
 
@@ -170,14 +151,6 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFingerprint = value.paymentFingerprint;
         this.paymentCreatedAt = value.paymentCreatedAt;
         this.paymentContext = value.paymentContext;
-        this.paymentAdjustmentId = value.paymentAdjustmentId;
-        this.paymentAdjustmentStatus = value.paymentAdjustmentStatus;
-        this.paymentAdjustmentStatusCreatedAt = value.paymentAdjustmentStatusCreatedAt;
-        this.paymentAdjustmentCreatedAt = value.paymentAdjustmentCreatedAt;
-        this.paymentAdjustmentReason = value.paymentAdjustmentReason;
-        this.paymentAdjustmentFee = value.paymentAdjustmentFee;
-        this.paymentAdjustmentProviderFee = value.paymentAdjustmentProviderFee;
-        this.paymentAdjustmentExternalFee = value.paymentAdjustmentExternalFee;
         this.paymentFailureClass = value.paymentFailureClass;
         this.invoiceTemplateId = value.invoiceTemplateId;
         this.invoiceCart = value.invoiceCart;
@@ -185,13 +158,6 @@ public class InvoiceEventStat implements Serializable {
         this.paymentHoldOnExpiration = value.paymentHoldOnExpiration;
         this.paymentHoldUntil = value.paymentHoldUntil;
         this.paymentTerminalProvider = value.paymentTerminalProvider;
-        this.paymentRefundId = value.paymentRefundId;
-        this.paymentRefundStatus = value.paymentRefundStatus;
-        this.paymentRefundCreatedAt = value.paymentRefundCreatedAt;
-        this.paymentRefundReason = value.paymentRefundReason;
-        this.paymentRefundFee = value.paymentRefundFee;
-        this.paymentRefundProviderFee = value.paymentRefundProviderFee;
-        this.paymentRefundExternalFee = value.paymentRefundExternalFee;
         this.paymentCustomerId = value.paymentCustomerId;
         this.paymentProviderId = value.paymentProviderId;
         this.paymentTerminalId = value.paymentTerminalId;
@@ -203,95 +169,76 @@ public class InvoiceEventStat implements Serializable {
         this.paymentPartyRevision = value.paymentPartyRevision;
         this.paymentDigitalWalletId = value.paymentDigitalWalletId;
         this.paymentDigitalWalletProvider = value.paymentDigitalWalletProvider;
-        this.paymentRefundAmount = value.paymentRefundAmount;
-        this.paymentRefundCurrencyCode = value.paymentRefundCurrencyCode;
     }
 
     public InvoiceEventStat(
-        Long                       id,
-        Long                       eventId,
-        InvoiceEventCategory       eventCategory,
-        InvoiceEventType           eventType,
-        LocalDateTime              eventCreatedAt,
-        String                     partyId,
-        String                     partyEmail,
-        String                     partyShopId,
-        String                     partyShopName,
-        String                     partyShopDescription,
-        String                     partyShopUrl,
-        Integer                    partyShopCategoryId,
-        String                     partyShopPayoutToolId,
-        String                     partyContractId,
-        String                     partyContractRegisteredNumber,
-        String                     partyContractInn,
-        String                     invoiceId,
-        InvoiceStatus              invoiceStatus,
-        String                     invoiceStatusDetails,
-        String                     invoiceProduct,
-        String                     invoiceDescription,
-        Long                       invoiceAmount,
-        String                     invoiceCurrencyCode,
-        LocalDateTime              invoiceDue,
-        LocalDateTime              invoiceCreatedAt,
-        byte[]                     invoiceContext,
-        String                     paymentId,
-        InvoicePaymentStatus       paymentStatus,
-        String                     paymentExternalFailureCode,
-        String                     paymentExternalFailureDescription,
-        Long                       paymentAmount,
-        String                     paymentCurrencyCode,
-        Long                       paymentFee,
-        Long                       paymentProviderFee,
-        Long                       paymentExternalFee,
-        String                     paymentTool,
-        String                     paymentMaskedPan,
-        String                     paymentBin,
-        String                     paymentToken,
-        String                     paymentSystem,
-        String                     paymentSessionId,
-        Integer                    paymentCountryId,
-        Integer                    paymentCityId,
-        String                     paymentIp,
-        String                     paymentPhoneNumber,
-        String                     paymentEmail,
-        String                     paymentFingerprint,
-        LocalDateTime              paymentCreatedAt,
-        byte[]                     paymentContext,
-        String                     paymentAdjustmentId,
-        AdjustmentStatus           paymentAdjustmentStatus,
-        LocalDateTime              paymentAdjustmentStatusCreatedAt,
-        LocalDateTime              paymentAdjustmentCreatedAt,
-        String                     paymentAdjustmentReason,
-        Long                       paymentAdjustmentFee,
-        Long                       paymentAdjustmentProviderFee,
-        Long                       paymentAdjustmentExternalFee,
-        String                     paymentFailureClass,
-        String                     invoiceTemplateId,
-        String                     invoiceCart,
-        String                     paymentFlow,
-        String                     paymentHoldOnExpiration,
-        LocalDateTime              paymentHoldUntil,
-        String                     paymentTerminalProvider,
-        String                     paymentRefundId,
-        InvoicePaymentRefundStatus paymentRefundStatus,
-        LocalDateTime              paymentRefundCreatedAt,
-        String                     paymentRefundReason,
-        Long                       paymentRefundFee,
-        Long                       paymentRefundProviderFee,
-        Long                       paymentRefundExternalFee,
-        String                     paymentCustomerId,
-        Integer                    paymentProviderId,
-        Integer                    paymentTerminalId,
-        Long                       paymentDomainRevision,
-        String                     invoiceContextType,
-        String                     paymentContextType,
-        Long                       paymentAdjustmentAmount,
-        Long                       invoicePartyRevision,
-        Long                       paymentPartyRevision,
-        String                     paymentDigitalWalletId,
-        String                     paymentDigitalWalletProvider,
-        Long                       paymentRefundAmount,
-        String                     paymentRefundCurrencyCode
+        Long                 id,
+        Long                 eventId,
+        InvoiceEventCategory eventCategory,
+        InvoiceEventType     eventType,
+        LocalDateTime        eventCreatedAt,
+        String               partyId,
+        String               partyEmail,
+        String               partyShopId,
+        String               partyShopName,
+        String               partyShopDescription,
+        String               partyShopUrl,
+        Integer              partyShopCategoryId,
+        String               partyShopPayoutToolId,
+        String               partyContractId,
+        String               partyContractRegisteredNumber,
+        String               partyContractInn,
+        String               invoiceId,
+        InvoiceStatus        invoiceStatus,
+        String               invoiceStatusDetails,
+        String               invoiceProduct,
+        String               invoiceDescription,
+        Long                 invoiceAmount,
+        String               invoiceCurrencyCode,
+        LocalDateTime        invoiceDue,
+        LocalDateTime        invoiceCreatedAt,
+        byte[]               invoiceContext,
+        String               paymentId,
+        InvoicePaymentStatus paymentStatus,
+        String               paymentExternalFailureCode,
+        String               paymentExternalFailureDescription,
+        Long                 paymentAmount,
+        String               paymentCurrencyCode,
+        Long                 paymentFee,
+        Long                 paymentProviderFee,
+        Long                 paymentExternalFee,
+        String               paymentTool,
+        String               paymentMaskedPan,
+        String               paymentBin,
+        String               paymentToken,
+        String               paymentSystem,
+        String               paymentSessionId,
+        Integer              paymentCountryId,
+        Integer              paymentCityId,
+        String               paymentIp,
+        String               paymentPhoneNumber,
+        String               paymentEmail,
+        String               paymentFingerprint,
+        LocalDateTime        paymentCreatedAt,
+        byte[]               paymentContext,
+        String               paymentFailureClass,
+        String               invoiceTemplateId,
+        String               invoiceCart,
+        String               paymentFlow,
+        String               paymentHoldOnExpiration,
+        LocalDateTime        paymentHoldUntil,
+        String               paymentTerminalProvider,
+        String               paymentCustomerId,
+        Integer              paymentProviderId,
+        Integer              paymentTerminalId,
+        Long                 paymentDomainRevision,
+        String               invoiceContextType,
+        String               paymentContextType,
+        Long                 paymentAdjustmentAmount,
+        Long                 invoicePartyRevision,
+        Long                 paymentPartyRevision,
+        String               paymentDigitalWalletId,
+        String               paymentDigitalWalletProvider
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -342,14 +289,6 @@ public class InvoiceEventStat implements Serializable {
         this.paymentFingerprint = paymentFingerprint;
         this.paymentCreatedAt = paymentCreatedAt;
         this.paymentContext = paymentContext;
-        this.paymentAdjustmentId = paymentAdjustmentId;
-        this.paymentAdjustmentStatus = paymentAdjustmentStatus;
-        this.paymentAdjustmentStatusCreatedAt = paymentAdjustmentStatusCreatedAt;
-        this.paymentAdjustmentCreatedAt = paymentAdjustmentCreatedAt;
-        this.paymentAdjustmentReason = paymentAdjustmentReason;
-        this.paymentAdjustmentFee = paymentAdjustmentFee;
-        this.paymentAdjustmentProviderFee = paymentAdjustmentProviderFee;
-        this.paymentAdjustmentExternalFee = paymentAdjustmentExternalFee;
         this.paymentFailureClass = paymentFailureClass;
         this.invoiceTemplateId = invoiceTemplateId;
         this.invoiceCart = invoiceCart;
@@ -357,13 +296,6 @@ public class InvoiceEventStat implements Serializable {
         this.paymentHoldOnExpiration = paymentHoldOnExpiration;
         this.paymentHoldUntil = paymentHoldUntil;
         this.paymentTerminalProvider = paymentTerminalProvider;
-        this.paymentRefundId = paymentRefundId;
-        this.paymentRefundStatus = paymentRefundStatus;
-        this.paymentRefundCreatedAt = paymentRefundCreatedAt;
-        this.paymentRefundReason = paymentRefundReason;
-        this.paymentRefundFee = paymentRefundFee;
-        this.paymentRefundProviderFee = paymentRefundProviderFee;
-        this.paymentRefundExternalFee = paymentRefundExternalFee;
         this.paymentCustomerId = paymentCustomerId;
         this.paymentProviderId = paymentProviderId;
         this.paymentTerminalId = paymentTerminalId;
@@ -375,8 +307,6 @@ public class InvoiceEventStat implements Serializable {
         this.paymentPartyRevision = paymentPartyRevision;
         this.paymentDigitalWalletId = paymentDigitalWalletId;
         this.paymentDigitalWalletProvider = paymentDigitalWalletProvider;
-        this.paymentRefundAmount = paymentRefundAmount;
-        this.paymentRefundCurrencyCode = paymentRefundCurrencyCode;
     }
 
     public Long getId() {
@@ -771,70 +701,6 @@ public class InvoiceEventStat implements Serializable {
         this.paymentContext = paymentContext;
     }
 
-    public String getPaymentAdjustmentId() {
-        return this.paymentAdjustmentId;
-    }
-
-    public void setPaymentAdjustmentId(String paymentAdjustmentId) {
-        this.paymentAdjustmentId = paymentAdjustmentId;
-    }
-
-    public AdjustmentStatus getPaymentAdjustmentStatus() {
-        return this.paymentAdjustmentStatus;
-    }
-
-    public void setPaymentAdjustmentStatus(AdjustmentStatus paymentAdjustmentStatus) {
-        this.paymentAdjustmentStatus = paymentAdjustmentStatus;
-    }
-
-    public LocalDateTime getPaymentAdjustmentStatusCreatedAt() {
-        return this.paymentAdjustmentStatusCreatedAt;
-    }
-
-    public void setPaymentAdjustmentStatusCreatedAt(LocalDateTime paymentAdjustmentStatusCreatedAt) {
-        this.paymentAdjustmentStatusCreatedAt = paymentAdjustmentStatusCreatedAt;
-    }
-
-    public LocalDateTime getPaymentAdjustmentCreatedAt() {
-        return this.paymentAdjustmentCreatedAt;
-    }
-
-    public void setPaymentAdjustmentCreatedAt(LocalDateTime paymentAdjustmentCreatedAt) {
-        this.paymentAdjustmentCreatedAt = paymentAdjustmentCreatedAt;
-    }
-
-    public String getPaymentAdjustmentReason() {
-        return this.paymentAdjustmentReason;
-    }
-
-    public void setPaymentAdjustmentReason(String paymentAdjustmentReason) {
-        this.paymentAdjustmentReason = paymentAdjustmentReason;
-    }
-
-    public Long getPaymentAdjustmentFee() {
-        return this.paymentAdjustmentFee;
-    }
-
-    public void setPaymentAdjustmentFee(Long paymentAdjustmentFee) {
-        this.paymentAdjustmentFee = paymentAdjustmentFee;
-    }
-
-    public Long getPaymentAdjustmentProviderFee() {
-        return this.paymentAdjustmentProviderFee;
-    }
-
-    public void setPaymentAdjustmentProviderFee(Long paymentAdjustmentProviderFee) {
-        this.paymentAdjustmentProviderFee = paymentAdjustmentProviderFee;
-    }
-
-    public Long getPaymentAdjustmentExternalFee() {
-        return this.paymentAdjustmentExternalFee;
-    }
-
-    public void setPaymentAdjustmentExternalFee(Long paymentAdjustmentExternalFee) {
-        this.paymentAdjustmentExternalFee = paymentAdjustmentExternalFee;
-    }
-
     public String getPaymentFailureClass() {
         return this.paymentFailureClass;
     }
@@ -889,62 +755,6 @@ public class InvoiceEventStat implements Serializable {
 
     public void setPaymentTerminalProvider(String paymentTerminalProvider) {
         this.paymentTerminalProvider = paymentTerminalProvider;
-    }
-
-    public String getPaymentRefundId() {
-        return this.paymentRefundId;
-    }
-
-    public void setPaymentRefundId(String paymentRefundId) {
-        this.paymentRefundId = paymentRefundId;
-    }
-
-    public InvoicePaymentRefundStatus getPaymentRefundStatus() {
-        return this.paymentRefundStatus;
-    }
-
-    public void setPaymentRefundStatus(InvoicePaymentRefundStatus paymentRefundStatus) {
-        this.paymentRefundStatus = paymentRefundStatus;
-    }
-
-    public LocalDateTime getPaymentRefundCreatedAt() {
-        return this.paymentRefundCreatedAt;
-    }
-
-    public void setPaymentRefundCreatedAt(LocalDateTime paymentRefundCreatedAt) {
-        this.paymentRefundCreatedAt = paymentRefundCreatedAt;
-    }
-
-    public String getPaymentRefundReason() {
-        return this.paymentRefundReason;
-    }
-
-    public void setPaymentRefundReason(String paymentRefundReason) {
-        this.paymentRefundReason = paymentRefundReason;
-    }
-
-    public Long getPaymentRefundFee() {
-        return this.paymentRefundFee;
-    }
-
-    public void setPaymentRefundFee(Long paymentRefundFee) {
-        this.paymentRefundFee = paymentRefundFee;
-    }
-
-    public Long getPaymentRefundProviderFee() {
-        return this.paymentRefundProviderFee;
-    }
-
-    public void setPaymentRefundProviderFee(Long paymentRefundProviderFee) {
-        this.paymentRefundProviderFee = paymentRefundProviderFee;
-    }
-
-    public Long getPaymentRefundExternalFee() {
-        return this.paymentRefundExternalFee;
-    }
-
-    public void setPaymentRefundExternalFee(Long paymentRefundExternalFee) {
-        this.paymentRefundExternalFee = paymentRefundExternalFee;
     }
 
     public String getPaymentCustomerId() {
@@ -1033,22 +843,6 @@ public class InvoiceEventStat implements Serializable {
 
     public void setPaymentDigitalWalletProvider(String paymentDigitalWalletProvider) {
         this.paymentDigitalWalletProvider = paymentDigitalWalletProvider;
-    }
-
-    public Long getPaymentRefundAmount() {
-        return this.paymentRefundAmount;
-    }
-
-    public void setPaymentRefundAmount(Long paymentRefundAmount) {
-        this.paymentRefundAmount = paymentRefundAmount;
-    }
-
-    public String getPaymentRefundCurrencyCode() {
-        return this.paymentRefundCurrencyCode;
-    }
-
-    public void setPaymentRefundCurrencyCode(String paymentRefundCurrencyCode) {
-        this.paymentRefundCurrencyCode = paymentRefundCurrencyCode;
     }
 
     @Override
@@ -1354,54 +1148,6 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!Arrays.equals(paymentContext, other.paymentContext))
             return false;
-        if (paymentAdjustmentId == null) {
-            if (other.paymentAdjustmentId != null)
-                return false;
-        }
-        else if (!paymentAdjustmentId.equals(other.paymentAdjustmentId))
-            return false;
-        if (paymentAdjustmentStatus == null) {
-            if (other.paymentAdjustmentStatus != null)
-                return false;
-        }
-        else if (!paymentAdjustmentStatus.equals(other.paymentAdjustmentStatus))
-            return false;
-        if (paymentAdjustmentStatusCreatedAt == null) {
-            if (other.paymentAdjustmentStatusCreatedAt != null)
-                return false;
-        }
-        else if (!paymentAdjustmentStatusCreatedAt.equals(other.paymentAdjustmentStatusCreatedAt))
-            return false;
-        if (paymentAdjustmentCreatedAt == null) {
-            if (other.paymentAdjustmentCreatedAt != null)
-                return false;
-        }
-        else if (!paymentAdjustmentCreatedAt.equals(other.paymentAdjustmentCreatedAt))
-            return false;
-        if (paymentAdjustmentReason == null) {
-            if (other.paymentAdjustmentReason != null)
-                return false;
-        }
-        else if (!paymentAdjustmentReason.equals(other.paymentAdjustmentReason))
-            return false;
-        if (paymentAdjustmentFee == null) {
-            if (other.paymentAdjustmentFee != null)
-                return false;
-        }
-        else if (!paymentAdjustmentFee.equals(other.paymentAdjustmentFee))
-            return false;
-        if (paymentAdjustmentProviderFee == null) {
-            if (other.paymentAdjustmentProviderFee != null)
-                return false;
-        }
-        else if (!paymentAdjustmentProviderFee.equals(other.paymentAdjustmentProviderFee))
-            return false;
-        if (paymentAdjustmentExternalFee == null) {
-            if (other.paymentAdjustmentExternalFee != null)
-                return false;
-        }
-        else if (!paymentAdjustmentExternalFee.equals(other.paymentAdjustmentExternalFee))
-            return false;
         if (paymentFailureClass == null) {
             if (other.paymentFailureClass != null)
                 return false;
@@ -1443,48 +1189,6 @@ public class InvoiceEventStat implements Serializable {
                 return false;
         }
         else if (!paymentTerminalProvider.equals(other.paymentTerminalProvider))
-            return false;
-        if (paymentRefundId == null) {
-            if (other.paymentRefundId != null)
-                return false;
-        }
-        else if (!paymentRefundId.equals(other.paymentRefundId))
-            return false;
-        if (paymentRefundStatus == null) {
-            if (other.paymentRefundStatus != null)
-                return false;
-        }
-        else if (!paymentRefundStatus.equals(other.paymentRefundStatus))
-            return false;
-        if (paymentRefundCreatedAt == null) {
-            if (other.paymentRefundCreatedAt != null)
-                return false;
-        }
-        else if (!paymentRefundCreatedAt.equals(other.paymentRefundCreatedAt))
-            return false;
-        if (paymentRefundReason == null) {
-            if (other.paymentRefundReason != null)
-                return false;
-        }
-        else if (!paymentRefundReason.equals(other.paymentRefundReason))
-            return false;
-        if (paymentRefundFee == null) {
-            if (other.paymentRefundFee != null)
-                return false;
-        }
-        else if (!paymentRefundFee.equals(other.paymentRefundFee))
-            return false;
-        if (paymentRefundProviderFee == null) {
-            if (other.paymentRefundProviderFee != null)
-                return false;
-        }
-        else if (!paymentRefundProviderFee.equals(other.paymentRefundProviderFee))
-            return false;
-        if (paymentRefundExternalFee == null) {
-            if (other.paymentRefundExternalFee != null)
-                return false;
-        }
-        else if (!paymentRefundExternalFee.equals(other.paymentRefundExternalFee))
             return false;
         if (paymentCustomerId == null) {
             if (other.paymentCustomerId != null)
@@ -1552,18 +1256,6 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentDigitalWalletProvider.equals(other.paymentDigitalWalletProvider))
             return false;
-        if (paymentRefundAmount == null) {
-            if (other.paymentRefundAmount != null)
-                return false;
-        }
-        else if (!paymentRefundAmount.equals(other.paymentRefundAmount))
-            return false;
-        if (paymentRefundCurrencyCode == null) {
-            if (other.paymentRefundCurrencyCode != null)
-                return false;
-        }
-        else if (!paymentRefundCurrencyCode.equals(other.paymentRefundCurrencyCode))
-            return false;
         return true;
     }
 
@@ -1620,14 +1312,6 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((this.paymentFingerprint == null) ? 0 : this.paymentFingerprint.hashCode());
         result = prime * result + ((this.paymentCreatedAt == null) ? 0 : this.paymentCreatedAt.hashCode());
         result = prime * result + ((this.paymentContext == null) ? 0 : Arrays.hashCode(this.paymentContext));
-        result = prime * result + ((this.paymentAdjustmentId == null) ? 0 : this.paymentAdjustmentId.hashCode());
-        result = prime * result + ((this.paymentAdjustmentStatus == null) ? 0 : this.paymentAdjustmentStatus.hashCode());
-        result = prime * result + ((this.paymentAdjustmentStatusCreatedAt == null) ? 0 : this.paymentAdjustmentStatusCreatedAt.hashCode());
-        result = prime * result + ((this.paymentAdjustmentCreatedAt == null) ? 0 : this.paymentAdjustmentCreatedAt.hashCode());
-        result = prime * result + ((this.paymentAdjustmentReason == null) ? 0 : this.paymentAdjustmentReason.hashCode());
-        result = prime * result + ((this.paymentAdjustmentFee == null) ? 0 : this.paymentAdjustmentFee.hashCode());
-        result = prime * result + ((this.paymentAdjustmentProviderFee == null) ? 0 : this.paymentAdjustmentProviderFee.hashCode());
-        result = prime * result + ((this.paymentAdjustmentExternalFee == null) ? 0 : this.paymentAdjustmentExternalFee.hashCode());
         result = prime * result + ((this.paymentFailureClass == null) ? 0 : this.paymentFailureClass.hashCode());
         result = prime * result + ((this.invoiceTemplateId == null) ? 0 : this.invoiceTemplateId.hashCode());
         result = prime * result + ((this.invoiceCart == null) ? 0 : this.invoiceCart.hashCode());
@@ -1635,13 +1319,6 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((this.paymentHoldOnExpiration == null) ? 0 : this.paymentHoldOnExpiration.hashCode());
         result = prime * result + ((this.paymentHoldUntil == null) ? 0 : this.paymentHoldUntil.hashCode());
         result = prime * result + ((this.paymentTerminalProvider == null) ? 0 : this.paymentTerminalProvider.hashCode());
-        result = prime * result + ((this.paymentRefundId == null) ? 0 : this.paymentRefundId.hashCode());
-        result = prime * result + ((this.paymentRefundStatus == null) ? 0 : this.paymentRefundStatus.hashCode());
-        result = prime * result + ((this.paymentRefundCreatedAt == null) ? 0 : this.paymentRefundCreatedAt.hashCode());
-        result = prime * result + ((this.paymentRefundReason == null) ? 0 : this.paymentRefundReason.hashCode());
-        result = prime * result + ((this.paymentRefundFee == null) ? 0 : this.paymentRefundFee.hashCode());
-        result = prime * result + ((this.paymentRefundProviderFee == null) ? 0 : this.paymentRefundProviderFee.hashCode());
-        result = prime * result + ((this.paymentRefundExternalFee == null) ? 0 : this.paymentRefundExternalFee.hashCode());
         result = prime * result + ((this.paymentCustomerId == null) ? 0 : this.paymentCustomerId.hashCode());
         result = prime * result + ((this.paymentProviderId == null) ? 0 : this.paymentProviderId.hashCode());
         result = prime * result + ((this.paymentTerminalId == null) ? 0 : this.paymentTerminalId.hashCode());
@@ -1653,8 +1330,6 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((this.paymentPartyRevision == null) ? 0 : this.paymentPartyRevision.hashCode());
         result = prime * result + ((this.paymentDigitalWalletId == null) ? 0 : this.paymentDigitalWalletId.hashCode());
         result = prime * result + ((this.paymentDigitalWalletProvider == null) ? 0 : this.paymentDigitalWalletProvider.hashCode());
-        result = prime * result + ((this.paymentRefundAmount == null) ? 0 : this.paymentRefundAmount.hashCode());
-        result = prime * result + ((this.paymentRefundCurrencyCode == null) ? 0 : this.paymentRefundCurrencyCode.hashCode());
         return result;
     }
 
@@ -1711,14 +1386,6 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentFingerprint);
         sb.append(", ").append(paymentCreatedAt);
         sb.append(", ").append("[binary...]");
-        sb.append(", ").append(paymentAdjustmentId);
-        sb.append(", ").append(paymentAdjustmentStatus);
-        sb.append(", ").append(paymentAdjustmentStatusCreatedAt);
-        sb.append(", ").append(paymentAdjustmentCreatedAt);
-        sb.append(", ").append(paymentAdjustmentReason);
-        sb.append(", ").append(paymentAdjustmentFee);
-        sb.append(", ").append(paymentAdjustmentProviderFee);
-        sb.append(", ").append(paymentAdjustmentExternalFee);
         sb.append(", ").append(paymentFailureClass);
         sb.append(", ").append(invoiceTemplateId);
         sb.append(", ").append(invoiceCart);
@@ -1726,13 +1393,6 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentHoldOnExpiration);
         sb.append(", ").append(paymentHoldUntil);
         sb.append(", ").append(paymentTerminalProvider);
-        sb.append(", ").append(paymentRefundId);
-        sb.append(", ").append(paymentRefundStatus);
-        sb.append(", ").append(paymentRefundCreatedAt);
-        sb.append(", ").append(paymentRefundReason);
-        sb.append(", ").append(paymentRefundFee);
-        sb.append(", ").append(paymentRefundProviderFee);
-        sb.append(", ").append(paymentRefundExternalFee);
         sb.append(", ").append(paymentCustomerId);
         sb.append(", ").append(paymentProviderId);
         sb.append(", ").append(paymentTerminalId);
@@ -1744,8 +1404,6 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentPartyRevision);
         sb.append(", ").append(paymentDigitalWalletId);
         sb.append(", ").append(paymentDigitalWalletProvider);
-        sb.append(", ").append(paymentRefundAmount);
-        sb.append(", ").append(paymentRefundCurrencyCode);
 
         sb.append(")");
         return sb.toString();
