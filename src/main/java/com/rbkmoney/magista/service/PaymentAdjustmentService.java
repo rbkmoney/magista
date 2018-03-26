@@ -34,17 +34,17 @@ public class PaymentAdjustmentService {
         try {
             Adjustment adjustment = adjustmentDao.get(invoiceId, paymentId, adjustmentId);
             if (adjustment == null) {
-                throw new NotFoundException(String.format("Adjustment not found, invoiceId='%s', paymentId='%s', refundId='%s'", invoiceId, paymentId, adjustmentId));
+                throw new NotFoundException(String.format("Adjustment not found, invoiceId='%s', paymentId='%s', adjustmentId='%s'", invoiceId, paymentId, adjustmentId));
             }
             return adjustment;
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to get adjustment, invoiceId='%s', paymentId='%s', refundId='%s'", invoiceId, paymentId, adjustmentId), ex);
+            throw new StorageException(String.format("Failed to get adjustment, invoiceId='%s', paymentId='%s', adjustmentId='%s'", invoiceId, paymentId, adjustmentId), ex);
         }
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void savePaymentAdjustment(Adjustment adjustment) throws NotFoundException, StorageException {
-        log.info("Trying to save adjustment event, eventType='{}', invoiceId='{}', adjustmentId='{}'",
+        log.info("Trying to save adjustment event, eventType='{}', invoiceId='{}', paymentId='{}', adjustmentId='{}'",
                 adjustment.getEventType(), adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId());
         switch (adjustment.getEventType()) {
             case INVOICE_PAYMENT_ADJUSTMENT_CREATED:

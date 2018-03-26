@@ -37,7 +37,7 @@ public class PaymentRefundService {
     }
 
     public void savePaymentRefund(Refund refund) throws NotFoundException, StorageException {
-        log.info("Trying to save refund event, eventType='{}', invoiceId='{}', refundId='{}'",
+        log.info("Trying to save refund event, eventType='{}', invoiceId='{}', paymentId='{}', refundId='{}'",
                 refund.getEventType(), refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId());
         switch (refund.getEventType()) {
             case INVOICE_PAYMENT_REFUND_CREATED:
