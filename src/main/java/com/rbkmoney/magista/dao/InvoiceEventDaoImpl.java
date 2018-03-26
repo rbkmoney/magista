@@ -28,9 +28,9 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
     @Override
     public Long getLastEventId() throws DaoException {
         Query query = getDslContext().select(DSL.max(DSL.field("event_id"))).from(
-                getDslContext().select(INVOICE_EVENT_STAT.EVENT_ID).from(INVOICE_EVENT_STAT)
-                        .unionAll(getDslContext().select(REFUND.EVENT_ID).from(REFUND))
-                        .unionAll(getDslContext().select(ADJUSTMENT.EVENT_ID).from(ADJUSTMENT))
+                getDslContext().select(INVOICE_EVENT_STAT.EVENT_ID.max().as("event_id")).from(INVOICE_EVENT_STAT)
+                        .unionAll(getDslContext().select(REFUND.EVENT_ID.max().as("event_id")).from(REFUND))
+                        .unionAll(getDslContext().select(ADJUSTMENT.EVENT_ID.max().as("event_id")).from(ADJUSTMENT))
         );
         return fetchOne(query, Long.class);
     }

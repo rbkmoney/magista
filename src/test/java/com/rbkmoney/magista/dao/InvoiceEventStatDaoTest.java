@@ -4,7 +4,9 @@ import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
+import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
+import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,12 @@ public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
 
     @Autowired
     InvoiceEventDao invoiceEventDao;
+
+    @Autowired
+    AdjustmentDao adjustmentDao;
+
+    @Autowired
+    RefundDao refundDao;
 
     @Test
     public void insertUpdateAndFindInvoiceEventTest() throws DaoException {
@@ -71,6 +79,20 @@ public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
         invoiceEventStat.setPaymentToken("\u0000kek\u0000eke\u0000");
 
         invoiceEventDao.insert(invoiceEventStat);
+    }
+
+    @Test
+    public void testLastEventId() {
+        InvoiceEventStat invoiceEventStat = random(InvoiceEventStat.class);
+        invoiceEventDao.insert(invoiceEventStat);
+
+        Adjustment adjustment = random(Adjustment.class);
+        adjustmentDao.save(adjustment);
+
+        Refund refund = random(Refund.class);
+        refundDao.save(refund);
+
+        assertEquals((Long) Long.max(invoiceEventStat.getEventId(), Long.max(refund.getEventId(), adjustment.getEventId())), invoiceEventDao.getLastEventId());
     }
 
 }
