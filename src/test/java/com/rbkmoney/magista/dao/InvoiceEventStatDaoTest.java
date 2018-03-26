@@ -38,6 +38,7 @@ public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
         invoiceEventDao.insert(invoiceEventStat);
 
         assertEquals(invoiceEventStat, invoiceEventDao.findPaymentByIds(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId()));
+        assertEquals(invoiceEventStat.getEventId(), invoiceEventDao.getLastEventId());
     }
 
     @Test

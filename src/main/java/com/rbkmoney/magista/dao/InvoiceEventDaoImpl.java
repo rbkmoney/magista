@@ -10,7 +10,9 @@ import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
 
+import static com.rbkmoney.magista.domain.Tables.ADJUSTMENT;
 import static com.rbkmoney.magista.domain.Tables.INVOICE_EVENT_STAT;
+import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
 
 /**
  * Created by tolkonepiu on 26/05/2017.
@@ -25,7 +27,11 @@ public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao 
 
     @Override
     public Long getLastEventId() throws DaoException {
-        Query query = getDslContext().select(INVOICE_EVENT_STAT.EVENT_ID.max()).from(INVOICE_EVENT_STAT);
+        Query query = getDslContext().select(DSL.max(DSL.field("event_id"))).from(
+                getDslContext().select(INVOICE_EVENT_STAT.EVENT_ID).from(INVOICE_EVENT_STAT)
+                        .unionAll(getDslContext().select(REFUND.EVENT_ID).from(REFUND))
+                        .unionAll(getDslContext().select(ADJUSTMENT.EVENT_ID).from(ADJUSTMENT))
+        );
         return fetchOne(query, Long.class);
     }
 
