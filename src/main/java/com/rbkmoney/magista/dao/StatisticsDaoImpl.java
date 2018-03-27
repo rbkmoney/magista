@@ -273,6 +273,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .offset(offset.orElse(0));
         return fetch(query, (rs, i) -> {
             Refund refund = new Refund();
+            refund.setEventCreatedAt(rs.getObject(REFUND.EVENT_CREATED_AT.getName(), LocalDateTime.class));
             refund.setPartyId(rs.getString(REFUND.PARTY_ID.getName()));
             refund.setPartyShopId(rs.getString(REFUND.PARTY_SHOP_ID.getName()));
             refund.setInvoiceId(rs.getString(REFUND.INVOICE_ID.getName()));

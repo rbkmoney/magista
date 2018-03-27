@@ -472,14 +472,17 @@ public class DamselUtil {
             case pending:
                 return InvoicePaymentRefundStatus.pending(new InvoicePaymentRefundPending());
             case succeeded:
-                return InvoicePaymentRefundStatus.succeeded(new InvoicePaymentRefundSucceeded());
+                return InvoicePaymentRefundStatus.succeeded(new InvoicePaymentRefundSucceeded(
+                        TypeUtil.temporalToString(refundEvent.getEventCreatedAt())
+                ));
             case failed:
                 return InvoicePaymentRefundStatus.failed(new InvoicePaymentRefundFailed(
                         toOperationFailure(
                                 refundEvent.getRefundOperationFailureClass(),
                                 refundEvent.getRefundExternalFailure(),
                                 refundEvent.getRefundExternalFailureReason()
-                        )
+                        ),
+                        TypeUtil.temporalToString(refundEvent.getEventCreatedAt())
                 ));
             default:
                 throw new NotFoundException(String.format("Refund status '%s' not found", refundEvent.getRefundStatus()));
