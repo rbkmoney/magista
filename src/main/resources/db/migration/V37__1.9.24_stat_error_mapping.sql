@@ -11,3 +11,5 @@ ALTER TABLE mst.refund
 UPDATE mst.invoice_event_stat SET payment_external_failure_code = replace(payment_external_failure_code, ':', '');
 ALTER TABLE mst.invoice_event_stat
   RENAME payment_external_failure_code TO payment_external_failure;
+ALTER TABLE mst.invoice_event_stat
+  RENAME payment_external_failure_description TO payment_external_failure_reason;

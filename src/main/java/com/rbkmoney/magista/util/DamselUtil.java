@@ -376,7 +376,7 @@ public class DamselUtil {
                         toOperationFailure(
                                 invoicePaymentStat.getPaymentOperationFailureClass(),
                                 invoicePaymentStat.getPaymentExternalFailure(),
-                                invoicePaymentStat.getPaymentExternalFailureDescription()
+                                invoicePaymentStat.getPaymentExternalFailureReason()
                         )
                 ));
             default:

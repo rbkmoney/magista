@@ -101,7 +101,7 @@ public class InvoiceEventService {
 
             invoicePaymentEvent.setPaymentOperationFailureClass(invoicePaymentStatusEvent.getPaymentOperationFailureClass());
             invoicePaymentEvent.setPaymentExternalFailure(invoicePaymentStatusEvent.getPaymentExternalFailure());
-            invoicePaymentEvent.setPaymentExternalFailureDescription(invoicePaymentStatusEvent.getPaymentExternalFailureDescription());
+            invoicePaymentEvent.setPaymentExternalFailureReason(invoicePaymentStatusEvent.getPaymentExternalFailureReason());
 
             invoiceEventDao.insert(invoicePaymentEvent);
             log.info("Invoice payment event status have been changed, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'",

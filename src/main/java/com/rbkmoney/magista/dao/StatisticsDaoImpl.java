@@ -166,7 +166,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.PAYMENT_STATUS,
                 INVOICE_EVENT_STAT.PAYMENT_OPERATION_FAILURE_CLASS,
                 INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE,
-                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_DESCRIPTION,
+                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_REASON,
                 INVOICE_EVENT_STAT.PAYMENT_AMOUNT,
                 INVOICE_EVENT_STAT.PAYMENT_FEE,
                 INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE,
@@ -212,7 +212,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                     TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.PAYMENT_OPERATION_FAILURE_CLASS.getName()), FailureClass.class)
             );
             invoiceEventStat.setPaymentExternalFailure(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE.getName()));
-            invoiceEventStat.setPaymentExternalFailureDescription(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_DESCRIPTION.getName()));
+            invoiceEventStat.setPaymentExternalFailureReason(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_REASON.getName()));
             invoiceEventStat.setPaymentAmount(rs.getLong(INVOICE_EVENT_STAT.PAYMENT_AMOUNT.getName()));
             invoiceEventStat.setPaymentFee(rs.getLong(INVOICE_EVENT_STAT.PAYMENT_FEE.getName()));
             invoiceEventStat.setPaymentCurrencyCode(rs.getString(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.getName()));
