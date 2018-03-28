@@ -2,6 +2,7 @@ package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
+import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 
 import java.time.Instant;
@@ -46,6 +47,24 @@ public interface StatisticsDao {
     ) throws DaoException;
 
     Integer getPaymentsCount(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime
+    ) throws DaoException;
+
+    Collection<Refund> getRefunds(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime,
+            Optional<Integer> offset,
+            Optional<Integer> limit
+    ) throws DaoException;
+
+    Integer getRefundsCount(
             Optional<String> merchantId,
             Optional<String> shopId,
             ConditionParameterSource parameterSource,

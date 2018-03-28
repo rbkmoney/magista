@@ -4,12 +4,14 @@ import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
+import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
+import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -19,10 +21,17 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by tolkonepiu on 26/05/2017.
  */
+@Transactional
 public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
 
     @Autowired
     InvoiceEventDao invoiceEventDao;
+
+    @Autowired
+    AdjustmentDao adjustmentDao;
+
+    @Autowired
+    RefundDao refundDao;
 
     @Test
     public void insertUpdateAndFindInvoiceEventTest() throws DaoException {
@@ -39,18 +48,7 @@ public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
         invoiceEventDao.insert(invoiceEventStat);
 
         assertEquals(invoiceEventStat, invoiceEventDao.findPaymentByIds(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId()));
-
-        invoiceEventStat.setId(30L);
-        invoiceEventStat.setEventCategory(InvoiceEventCategory.REFUND);
-        invoiceEventDao.insert(invoiceEventStat);
-
-        assertEquals(invoiceEventStat, invoiceEventDao.findRefundByIds(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId(), invoiceEventStat.getPaymentRefundId()));
-
-        invoiceEventStat.setId(40L);
-        invoiceEventStat.setEventCategory(InvoiceEventCategory.ADJUSTMENT);
-        invoiceEventDao.insert(invoiceEventStat);
-
-        assertEquals(invoiceEventStat, invoiceEventDao.findAdjustmentByIds(invoiceEventStat.getInvoiceId(), invoiceEventStat.getPaymentId(), invoiceEventStat.getPaymentAdjustmentId()));
+        assertEquals(invoiceEventStat.getEventId(), invoiceEventDao.getLastEventId());
     }
 
     @Test
@@ -83,6 +81,20 @@ public class InvoiceEventStatDaoTest extends AbstractIntegrationTest {
         invoiceEventStat.setPaymentToken("\u0000kek\u0000eke\u0000");
 
         invoiceEventDao.insert(invoiceEventStat);
+    }
+
+    @Test
+    public void testLastEventId() {
+        InvoiceEventStat invoiceEventStat = random(InvoiceEventStat.class);
+        invoiceEventDao.insert(invoiceEventStat);
+
+        Adjustment adjustment = random(Adjustment.class);
+        adjustmentDao.save(adjustment);
+
+        Refund refund = random(Refund.class);
+        refundDao.save(refund);
+
+        assertEquals((Long) Long.max(invoiceEventStat.getEventId(), Long.max(refund.getEventId(), adjustment.getEventId())), invoiceEventDao.getLastEventId());
     }
 
 }

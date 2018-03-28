@@ -6,8 +6,10 @@ import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
+import com.rbkmoney.magista.domain.enums.RefundStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
+import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.util.TypeUtil;
 import org.jooq.*;
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
+import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
 
 /**
  * Created by vpankrashkin on 10.08.16.
@@ -254,6 +257,57 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
+    public Collection<Refund> getRefunds(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime,
+            Optional<Integer> offset,
+            Optional<Integer> limit
+    ) throws DaoException {
+        Query query = getDslContext().selectFrom(REFUND)
+                .where(buildRefundCondition(merchantId, shopId, parameterSource, fromTime, toTime))
+                .orderBy(REFUND.REFUND_CREATED_AT.desc())
+                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
+                .offset(offset.orElse(0));
+        return fetch(query, (rs, i) -> {
+            Refund refund = new Refund();
+            refund.setEventCreatedAt(rs.getObject(REFUND.EVENT_CREATED_AT.getName(), LocalDateTime.class));
+            refund.setPartyId(rs.getString(REFUND.PARTY_ID.getName()));
+            refund.setPartyShopId(rs.getString(REFUND.PARTY_SHOP_ID.getName()));
+            refund.setInvoiceId(rs.getString(REFUND.INVOICE_ID.getName()));
+            refund.setPaymentId(rs.getString(REFUND.PAYMENT_ID.getName()));
+            refund.setRefundId(rs.getString(REFUND.REFUND_ID.getName()));
+            refund.setRefundCurrencyCode(rs.getString(REFUND.REFUND_CURRENCY_CODE.getName()));
+            refund.setRefundAmount(rs.getLong(REFUND.REFUND_AMOUNT.getName()));
+            refund.setRefundFee(rs.getLong(REFUND.REFUND_FEE.getName()));
+            refund.setRefundProviderFee(rs.getLong(REFUND.REFUND_PROVIDER_FEE.getName()));
+            refund.setRefundExternalFee(rs.getLong(REFUND.REFUND_EXTERNAL_FEE.getName()));
+            refund.setRefundReason(rs.getString(REFUND.REFUND_REASON.getName()));
+            refund.setRefundStatus(TypeUtil.toEnumField(rs.getString(REFUND.REFUND_STATUS.getName()), RefundStatus.class));
+            refund.setRefundOperationFailureClass(rs.getString(REFUND.REFUND_OPERATION_FAILURE_CLASS.getName()));
+            refund.setRefundExternalFailure(rs.getString(REFUND.REFUND_EXTERNAL_FAILURE.getName()));
+            refund.setRefundExternalFailureReason(rs.getString(REFUND.REFUND_EXTERNAL_FAILURE_REASON.getName()));
+            refund.setRefundCreatedAt(rs.getObject(REFUND.REFUND_CREATED_AT.getName(), LocalDateTime.class));
+            return refund;
+        });
+    }
+
+    @Override
+    public Integer getRefundsCount(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime
+    ) throws DaoException {
+        Query query = getDslContext().select(DSL.count()).from(REFUND)
+                .where(buildRefundCondition(merchantId, shopId, parameterSource, fromTime, toTime));
+        return fetchOne(query, Integer.class);
+    }
+
+    @Override
     public Collection<PayoutEventStat> getPayouts(
             Optional<String> merchantId,
             Optional<String> shopId,
@@ -452,6 +506,29 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             );
         }
         return appendConditions(condition, Operator.AND, invoiceParameterSource);
+    }
+
+    private Condition buildRefundCondition(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime
+    ) {
+        Condition condition = REFUND.ID.in(
+                getDslContext().select(DSL.max(REFUND.ID)).from(REFUND)
+                        .where(
+                                appendPartyAndDateTimeRangeConditions(
+                                        DSL.trueCondition(),
+                                        merchantId,
+                                        shopId,
+                                        REFUND.EVENT_CREATED_AT,
+                                        fromTime,
+                                        toTime
+                                )
+                        ).groupBy(REFUND.INVOICE_ID, REFUND.PAYMENT_ID, REFUND.REFUND_ID)
+        );
+        return appendConditions(condition, Operator.AND, parameterSource);
     }
 
     private Condition appendPartyAndDateTimeRangeConditions(Condition condition,
