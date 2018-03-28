@@ -51,6 +51,7 @@ public class PaymentAdjustmentService {
                 InvoiceEventStat paymentEventStat = invoiceEventService.getInvoicePaymentEventByIds(adjustment.getInvoiceId(), adjustment.getPaymentId());
                 adjustment.setPartyId(paymentEventStat.getPartyId());
                 adjustment.setPartyShopId(paymentEventStat.getPartyShopId());
+                adjustment.setPartyContractId(paymentEventStat.getPartyContractId());
                 break;
             case INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED:
                 Adjustment previousAdjustmentEvent = getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId());

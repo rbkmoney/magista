@@ -8,6 +8,7 @@ CREATE TABLE mst.refund (
   refund_id                      CHARACTER VARYING                 NOT NULL,
   party_id                       CHARACTER VARYING                 NOT NULL,
   party_shop_id                  CHARACTER VARYING                 NOT NULL,
+  party_contract_id              CHARACTER VARYING                 NOT NULL,
   refund_status                  mst.INVOICE_PAYMENT_REFUND_STATUS NOT NULL,
   refund_operation_failure_class CHARACTER VARYING,
   refund_external_failure        CHARACTER VARYING,
@@ -23,7 +24,7 @@ CREATE TABLE mst.refund (
 );
 
 INSERT INTO mst.refund
-(event_id, event_created_at, event_type, invoice_id, payment_id, refund_id, party_id, party_shop_id, refund_status, refund_created_at, refund_reason, refund_currency_code, refund_amount, refund_fee, refund_provider_fee, refund_external_fee)
+(event_id, event_created_at, event_type, invoice_id, payment_id, refund_id, party_id, party_shop_id, party_contract_id, refund_status, refund_created_at, refund_reason, refund_currency_code, refund_amount, refund_fee, refund_provider_fee, refund_external_fee)
   SELECT
     event_id,
     event_created_at,
@@ -33,6 +34,7 @@ INSERT INTO mst.refund
     payment_refund_id,
     party_id,
     party_shop_id,
+    party_contract_id,
     payment_refund_status,
     payment_refund_created_at,
     payment_refund_reason,
@@ -76,5 +78,6 @@ ALTER TABLE mst.invoice_event_stat
 ALTER TABLE mst.invoice_event_stat
   DROP COLUMN payment_refund_external_fee;
 
-ALTER TYPE mst.invoice_payment_refund_status RENAME TO refund_status;
+ALTER TYPE mst.INVOICE_PAYMENT_REFUND_STATUS
+  RENAME TO refund_status;
 

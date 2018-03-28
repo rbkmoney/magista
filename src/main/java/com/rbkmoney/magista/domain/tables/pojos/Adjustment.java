@@ -26,7 +26,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Adjustment implements Serializable {
 
-    private static final long serialVersionUID = 33039661;
+    private static final long serialVersionUID = 292010400;
 
     private Long             id;
     private Long             eventId;
@@ -37,6 +37,7 @@ public class Adjustment implements Serializable {
     private String           adjustmentId;
     private String           partyId;
     private String           partyShopId;
+    private String           partyContractId;
     private AdjustmentStatus adjustmentStatus;
     private LocalDateTime    adjustmentStatusCreatedAt;
     private LocalDateTime    adjustmentCreatedAt;
@@ -57,6 +58,7 @@ public class Adjustment implements Serializable {
         this.adjustmentId = value.adjustmentId;
         this.partyId = value.partyId;
         this.partyShopId = value.partyShopId;
+        this.partyContractId = value.partyContractId;
         this.adjustmentStatus = value.adjustmentStatus;
         this.adjustmentStatusCreatedAt = value.adjustmentStatusCreatedAt;
         this.adjustmentCreatedAt = value.adjustmentCreatedAt;
@@ -76,6 +78,7 @@ public class Adjustment implements Serializable {
         String           adjustmentId,
         String           partyId,
         String           partyShopId,
+        String           partyContractId,
         AdjustmentStatus adjustmentStatus,
         LocalDateTime    adjustmentStatusCreatedAt,
         LocalDateTime    adjustmentCreatedAt,
@@ -93,6 +96,7 @@ public class Adjustment implements Serializable {
         this.adjustmentId = adjustmentId;
         this.partyId = partyId;
         this.partyShopId = partyShopId;
+        this.partyContractId = partyContractId;
         this.adjustmentStatus = adjustmentStatus;
         this.adjustmentStatusCreatedAt = adjustmentStatusCreatedAt;
         this.adjustmentCreatedAt = adjustmentCreatedAt;
@@ -172,6 +176,14 @@ public class Adjustment implements Serializable {
 
     public void setPartyShopId(String partyShopId) {
         this.partyShopId = partyShopId;
+    }
+
+    public String getPartyContractId() {
+        return this.partyContractId;
+    }
+
+    public void setPartyContractId(String partyContractId) {
+        this.partyContractId = partyContractId;
     }
 
     public AdjustmentStatus getAdjustmentStatus() {
@@ -293,6 +305,12 @@ public class Adjustment implements Serializable {
         }
         else if (!partyShopId.equals(other.partyShopId))
             return false;
+        if (partyContractId == null) {
+            if (other.partyContractId != null)
+                return false;
+        }
+        else if (!partyContractId.equals(other.partyContractId))
+            return false;
         if (adjustmentStatus == null) {
             if (other.adjustmentStatus != null)
                 return false;
@@ -351,6 +369,7 @@ public class Adjustment implements Serializable {
         result = prime * result + ((this.adjustmentId == null) ? 0 : this.adjustmentId.hashCode());
         result = prime * result + ((this.partyId == null) ? 0 : this.partyId.hashCode());
         result = prime * result + ((this.partyShopId == null) ? 0 : this.partyShopId.hashCode());
+        result = prime * result + ((this.partyContractId == null) ? 0 : this.partyContractId.hashCode());
         result = prime * result + ((this.adjustmentStatus == null) ? 0 : this.adjustmentStatus.hashCode());
         result = prime * result + ((this.adjustmentStatusCreatedAt == null) ? 0 : this.adjustmentStatusCreatedAt.hashCode());
         result = prime * result + ((this.adjustmentCreatedAt == null) ? 0 : this.adjustmentCreatedAt.hashCode());
@@ -374,6 +393,7 @@ public class Adjustment implements Serializable {
         sb.append(", ").append(adjustmentId);
         sb.append(", ").append(partyId);
         sb.append(", ").append(partyShopId);
+        sb.append(", ").append(partyContractId);
         sb.append(", ").append(adjustmentStatus);
         sb.append(", ").append(adjustmentStatusCreatedAt);
         sb.append(", ").append(adjustmentCreatedAt);

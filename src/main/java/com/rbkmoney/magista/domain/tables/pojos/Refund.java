@@ -26,7 +26,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Refund implements Serializable {
 
-    private static final long serialVersionUID = -1427623782;
+    private static final long serialVersionUID = -1934491191;
 
     private Long             id;
     private Long             eventId;
@@ -37,6 +37,7 @@ public class Refund implements Serializable {
     private String           refundId;
     private String           partyId;
     private String           partyShopId;
+    private String           partyContractId;
     private RefundStatus     refundStatus;
     private String           refundOperationFailureClass;
     private String           refundExternalFailure;
@@ -61,6 +62,7 @@ public class Refund implements Serializable {
         this.refundId = value.refundId;
         this.partyId = value.partyId;
         this.partyShopId = value.partyShopId;
+        this.partyContractId = value.partyContractId;
         this.refundStatus = value.refundStatus;
         this.refundOperationFailureClass = value.refundOperationFailureClass;
         this.refundExternalFailure = value.refundExternalFailure;
@@ -84,6 +86,7 @@ public class Refund implements Serializable {
         String           refundId,
         String           partyId,
         String           partyShopId,
+        String           partyContractId,
         RefundStatus     refundStatus,
         String           refundOperationFailureClass,
         String           refundExternalFailure,
@@ -105,6 +108,7 @@ public class Refund implements Serializable {
         this.refundId = refundId;
         this.partyId = partyId;
         this.partyShopId = partyShopId;
+        this.partyContractId = partyContractId;
         this.refundStatus = refundStatus;
         this.refundOperationFailureClass = refundOperationFailureClass;
         this.refundExternalFailure = refundExternalFailure;
@@ -188,6 +192,14 @@ public class Refund implements Serializable {
 
     public void setPartyShopId(String partyShopId) {
         this.partyShopId = partyShopId;
+    }
+
+    public String getPartyContractId() {
+        return this.partyContractId;
+    }
+
+    public void setPartyContractId(String partyContractId) {
+        this.partyContractId = partyContractId;
     }
 
     public RefundStatus getRefundStatus() {
@@ -341,6 +353,12 @@ public class Refund implements Serializable {
         }
         else if (!partyShopId.equals(other.partyShopId))
             return false;
+        if (partyContractId == null) {
+            if (other.partyContractId != null)
+                return false;
+        }
+        else if (!partyContractId.equals(other.partyContractId))
+            return false;
         if (refundStatus == null) {
             if (other.refundStatus != null)
                 return false;
@@ -423,6 +441,7 @@ public class Refund implements Serializable {
         result = prime * result + ((this.refundId == null) ? 0 : this.refundId.hashCode());
         result = prime * result + ((this.partyId == null) ? 0 : this.partyId.hashCode());
         result = prime * result + ((this.partyShopId == null) ? 0 : this.partyShopId.hashCode());
+        result = prime * result + ((this.partyContractId == null) ? 0 : this.partyContractId.hashCode());
         result = prime * result + ((this.refundStatus == null) ? 0 : this.refundStatus.hashCode());
         result = prime * result + ((this.refundOperationFailureClass == null) ? 0 : this.refundOperationFailureClass.hashCode());
         result = prime * result + ((this.refundExternalFailure == null) ? 0 : this.refundExternalFailure.hashCode());
@@ -450,6 +469,7 @@ public class Refund implements Serializable {
         sb.append(", ").append(refundId);
         sb.append(", ").append(partyId);
         sb.append(", ").append(partyShopId);
+        sb.append(", ").append(partyContractId);
         sb.append(", ").append(refundStatus);
         sb.append(", ").append(refundOperationFailureClass);
         sb.append(", ").append(refundExternalFailure);
