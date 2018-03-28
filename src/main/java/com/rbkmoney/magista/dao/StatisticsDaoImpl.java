@@ -561,6 +561,11 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         condition = appendConditions(condition, Operator.AND, paymentParameterSource);
 
+        condition = PAYOUT_EVENT_STAT.ID.in(
+                getDslContext().select(DSL.max(PAYOUT_EVENT_STAT.ID)).from(PAYOUT_EVENT_STAT)
+                        .where(condition).groupBy(PAYOUT_EVENT_STAT.PAYOUT_ID)
+        );
+
         return getDslContext().select(fields).from(PAYOUT_EVENT_STAT)
                 .where(condition);
     }
