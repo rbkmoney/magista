@@ -23,6 +23,10 @@ import com.rbkmoney.damsel.merch_stat.InvoicePaymentFlowHold;
 import com.rbkmoney.damsel.merch_stat.InvoicePaymentFlowInstant;
 import com.rbkmoney.damsel.merch_stat.InvoicePaymentPending;
 import com.rbkmoney.damsel.merch_stat.InvoicePaymentProcessed;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundFailed;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundPending;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundStatus;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundSucceeded;
 import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefunded;
 import com.rbkmoney.damsel.merch_stat.InvoicePaymentStatus;
 import com.rbkmoney.damsel.merch_stat.InvoiceStatus;
@@ -42,8 +46,10 @@ import com.rbkmoney.geck.serializer.kit.json.JsonProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
+import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
+import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.NotFoundException;
 import org.apache.thrift.TBase;
 
@@ -367,29 +373,27 @@ public class DamselUtil {
                 return InvoicePaymentStatus.refunded(new InvoicePaymentRefunded());
             case FAILED:
                 return InvoicePaymentStatus.failed(new InvoicePaymentFailed(
-                        toOperationFailure(invoicePaymentStat)
+                        toOperationFailure(
+                                invoicePaymentStat.getPaymentOperationFailureClass(),
+                                invoicePaymentStat.getPaymentExternalFailure(),
+                                invoicePaymentStat.getPaymentExternalFailureDescription()
+                        )
                 ));
             default:
                 throw new NotFoundException(String.format("Payment status '%s' not found", status.getFieldName()));
         }
     }
 
-    public static OperationFailure toOperationFailure(InvoiceEventStat invoicePaymentStat) {
-        com.rbkmoney.damsel.domain.OperationFailure._Fields failureType = com.rbkmoney.damsel.domain.OperationFailure._Fields.findByName(invoicePaymentStat.getPaymentFailureClass());
-        switch (failureType) {
-            case OPERATION_TIMEOUT:
+    public static OperationFailure toOperationFailure(FailureClass failureClass, String failure, String failureDescription) {
+        switch (failureClass) {
+            case operation_timeout:
                 return OperationFailure.operation_timeout(new OperationTimeout());
-            case FAILURE:
-                Failure externalFailure = new Failure();
-                externalFailure.setCode(invoicePaymentStat.getPaymentExternalFailureCode());
-                externalFailure.setReason(invoicePaymentStat.getPaymentExternalFailureDescription());
-                if (invoicePaymentStat.getPaymentStatusSubFailure() != null) {
-                    Failure failure = TErrorUtil.toGeneral(invoicePaymentStat.getPaymentStatusSubFailure());
-                    externalFailure.setSub(failure.getSub());
-                }
+            case failure:
+                Failure externalFailure = TErrorUtil.toGeneral(failure);
+                externalFailure.setReason(failureDescription);
                 return OperationFailure.failure(externalFailure);
             default:
-                throw new NotFoundException(String.format("Failure type '%s' not found", invoicePaymentStat.getPaymentFailureClass()));
+                throw new NotFoundException(String.format("Failure type '%s' not found", failureClass));
         }
     }
 
@@ -444,6 +448,44 @@ public class DamselUtil {
                 );
             default:
                 throw new NotFoundException(String.format("Status '%s' not found", invoiceEventStat.getInvoiceStatus()));
+        }
+    }
+
+    public static StatRefund toStatRefund(Refund refundEvent) {
+        StatRefund statRefund = new StatRefund();
+        statRefund.setId(refundEvent.getRefundId());
+        statRefund.setInvoiceId(refundEvent.getInvoiceId());
+        statRefund.setPaymentId(refundEvent.getPaymentId());
+        statRefund.setOwnerId(refundEvent.getPartyId());
+        statRefund.setShopId(refundEvent.getPartyShopId());
+        statRefund.setCurrencySymbolicCode(refundEvent.getRefundCurrencyCode());
+        statRefund.setStatus(toRefundStatus(refundEvent));
+        statRefund.setAmount(refundEvent.getRefundAmount());
+        statRefund.setFee(refundEvent.getRefundFee());
+        statRefund.setReason(refundEvent.getRefundReason());
+        statRefund.setCreatedAt(TypeUtil.temporalToString(refundEvent.getRefundCreatedAt()));
+        return statRefund;
+    }
+
+    public static InvoicePaymentRefundStatus toRefundStatus(Refund refundEvent) {
+        switch (refundEvent.getRefundStatus()) {
+            case pending:
+                return InvoicePaymentRefundStatus.pending(new InvoicePaymentRefundPending());
+            case succeeded:
+                return InvoicePaymentRefundStatus.succeeded(new InvoicePaymentRefundSucceeded(
+                        TypeUtil.temporalToString(refundEvent.getEventCreatedAt())
+                ));
+            case failed:
+                return InvoicePaymentRefundStatus.failed(new InvoicePaymentRefundFailed(
+                        toOperationFailure(
+                                refundEvent.getRefundOperationFailureClass(),
+                                refundEvent.getRefundExternalFailure(),
+                                refundEvent.getRefundExternalFailureReason()
+                        ),
+                        TypeUtil.temporalToString(refundEvent.getEventCreatedAt())
+                ));
+            default:
+                throw new NotFoundException(String.format("Refund status '%s' not found", refundEvent.getRefundStatus()));
         }
     }
 

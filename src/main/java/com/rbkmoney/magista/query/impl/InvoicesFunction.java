@@ -203,6 +203,8 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Collection<InvoiceEventStat> result = functionContext.getDao().getInvoices(
+                        Optional.ofNullable(parameters.getMerchantId()),
+                        Optional.ofNullable(parameters.getShopId()),
                         buildInvoiceConditionParameterSource(parameters),
                         buildPaymentConditionParameterSource(parameters),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
@@ -230,6 +232,8 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Integer result = functionContext.getDao().getInvoicesCount(
+                        Optional.ofNullable(parameters.getMerchantId()),
+                        Optional.ofNullable(parameters.getShopId()),
                         buildInvoiceConditionParameterSource(parameters),
                         buildPaymentConditionParameterSource(parameters),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),

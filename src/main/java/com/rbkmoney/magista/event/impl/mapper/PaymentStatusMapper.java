@@ -6,6 +6,7 @@ import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStatusChanged;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
+import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
@@ -39,12 +40,13 @@ public class PaymentStatusMapper implements Mapper<InvoiceEventContext> {
 
         if (invoicePaymentStatusChanged.getStatus().isSetFailed()) {
             OperationFailure operationFailure = invoicePaymentStatusChanged.getStatus().getFailed().getFailure();
-            invoiceEventStat.setPaymentFailureClass(operationFailure.getSetField().getFieldName());
+            invoiceEventStat.setPaymentOperationFailureClass(
+                    TBaseUtil.unionFieldToEnum(operationFailure, FailureClass.class)
+            );
             if (operationFailure.isSetFailure()) {
                 Failure failure = operationFailure.getFailure();
-                invoiceEventStat.setPaymentExternalFailureCode(failure.getCode());
+                invoiceEventStat.setPaymentExternalFailure(TErrorUtil.toStringVal(failure));
                 invoiceEventStat.setPaymentExternalFailureDescription(failure.getReason());
-                invoiceEventStat.setPaymentStatusSubFailure(TErrorUtil.toStringVal(failure));
             }
         }
 

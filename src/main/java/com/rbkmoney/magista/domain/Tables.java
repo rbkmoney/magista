@@ -4,8 +4,10 @@
 package com.rbkmoney.magista.domain;
 
 
+import com.rbkmoney.magista.domain.tables.Adjustment;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.PayoutEventStat;
+import com.rbkmoney.magista.domain.tables.Refund;
 
 import javax.annotation.Generated;
 
@@ -24,6 +26,11 @@ import javax.annotation.Generated;
 public class Tables {
 
     /**
+     * The table <code>mst.adjustment</code>.
+     */
+    public static final Adjustment ADJUSTMENT = com.rbkmoney.magista.domain.tables.Adjustment.ADJUSTMENT;
+
+    /**
      * The table <code>mst.invoice_event_stat</code>.
      */
     public static final InvoiceEventStat INVOICE_EVENT_STAT = com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
@@ -32,4 +39,9 @@ public class Tables {
      * The table <code>mst.payout_event_stat</code>.
      */
     public static final PayoutEventStat PAYOUT_EVENT_STAT = com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
+
+    /**
+     * The table <code>mst.refund</code>.
+     */
+    public static final Refund REFUND = com.rbkmoney.magista.domain.tables.Refund.REFUND;
 }

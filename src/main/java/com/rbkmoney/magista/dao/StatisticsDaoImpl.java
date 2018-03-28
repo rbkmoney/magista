@@ -3,11 +3,10 @@ package com.rbkmoney.magista.dao;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
-import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
-import com.rbkmoney.magista.domain.enums.InvoiceStatus;
-import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
+import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.util.TypeUtil;
 import org.jooq.*;
@@ -27,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
+import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
 
 /**
  * Created by vpankrashkin on 10.08.16.
@@ -48,6 +48,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Collection<InvoiceEventStat> getInvoices(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
@@ -60,7 +62,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         if (offset.isPresent()) {
             DateTimeRange dateTimeRange = getDateTimeRangeByOffset(
-                    buildInvoiceCondition(invoiceParameterSource, paymentParameterSource, fromTime, toTime),
+                    buildInvoiceCondition(merchantId, shopId, invoiceParameterSource, paymentParameterSource, fromTime, toTime),
                     fromTime,
                     toTime,
                     INVOICE_EVENT_STAT.EVENT_CREATED_AT,
@@ -89,7 +91,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.INVOICE_CONTEXT_TYPE,
                 INVOICE_EVENT_STAT.INVOICE_CONTEXT
         ).from(INVOICE_EVENT_STAT)
-                .where(buildInvoiceCondition(invoiceParameterSource, paymentParameterSource, fromTime, toTime))
+                .where(buildInvoiceCondition(merchantId, shopId, invoiceParameterSource, paymentParameterSource, fromTime, toTime))
                 .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
                 .limit(limitValue)
                 .offset(offset.orElse(0));
@@ -116,18 +118,22 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public int getInvoicesCount(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) throws DaoException {
         Query query = getDslContext().select(DSL.count()).from(INVOICE_EVENT_STAT)
-                .where(buildInvoiceCondition(invoiceParameterSource, paymentParameterSource, fromTime, toTime));
+                .where(buildInvoiceCondition(merchantId, shopId, invoiceParameterSource, paymentParameterSource, fromTime, toTime));
         return fetchOne(query, Integer.class);
     }
 
     @Override
     public Collection<InvoiceEventStat> getPayments(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
@@ -139,7 +145,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         if (offset.isPresent()) {
             DateTimeRange dateTimeRange = getDateTimeRangeByOffset(
-                    buildPaymentCondition(parameterSource, fromTime, toTime),
+                    buildPaymentCondition(merchantId, shopId, parameterSource, fromTime, toTime),
                     fromTime,
                     toTime,
                     INVOICE_EVENT_STAT.EVENT_CREATED_AT,
@@ -158,8 +164,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.PARTY_SHOP_ID,
                 INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
                 INVOICE_EVENT_STAT.PAYMENT_STATUS,
-                INVOICE_EVENT_STAT.PAYMENT_FAILURE_CLASS,
-                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_CODE,
+                INVOICE_EVENT_STAT.PAYMENT_OPERATION_FAILURE_CLASS,
+                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE,
                 INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_DESCRIPTION,
                 INVOICE_EVENT_STAT.PAYMENT_AMOUNT,
                 INVOICE_EVENT_STAT.PAYMENT_FEE,
@@ -186,7 +192,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.PAYMENT_CONTEXT_TYPE,
                 INVOICE_EVENT_STAT.PAYMENT_CONTEXT
         ).from(INVOICE_EVENT_STAT)
-                .where(buildPaymentCondition(parameterSource, fromTime, toTime))
+                .where(buildPaymentCondition(merchantId, shopId, parameterSource, fromTime, toTime))
                 .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
                 .limit(limitValue)
                 .offset(offset.orElse(0));
@@ -202,8 +208,10 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                     TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.PAYMENT_STATUS.getName()),
                             com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class)
             );
-            invoiceEventStat.setPaymentFailureClass(rs.getString(INVOICE_EVENT_STAT.PAYMENT_FAILURE_CLASS.getName()));
-            invoiceEventStat.setPaymentExternalFailureCode(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_CODE.getName()));
+            invoiceEventStat.setPaymentOperationFailureClass(
+                    TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.PAYMENT_OPERATION_FAILURE_CLASS.getName()), FailureClass.class)
+            );
+            invoiceEventStat.setPaymentExternalFailure(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE.getName()));
             invoiceEventStat.setPaymentExternalFailureDescription(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_DESCRIPTION.getName()));
             invoiceEventStat.setPaymentAmount(rs.getLong(INVOICE_EVENT_STAT.PAYMENT_AMOUNT.getName()));
             invoiceEventStat.setPaymentFee(rs.getLong(INVOICE_EVENT_STAT.PAYMENT_FEE.getName()));
@@ -236,17 +244,74 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Integer getPaymentsCount(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) throws DaoException {
         Query query = getDslContext().select(DSL.count()).from(INVOICE_EVENT_STAT)
-                .where(buildPaymentCondition(parameterSource, fromTime, toTime));
+                .where(buildPaymentCondition(merchantId, shopId, parameterSource, fromTime, toTime));
+        return fetchOne(query, Integer.class);
+    }
+
+    @Override
+    public Collection<Refund> getRefunds(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime,
+            Optional<Integer> offset,
+            Optional<Integer> limit
+    ) throws DaoException {
+        Query query = getDslContext().selectFrom(REFUND)
+                .where(buildRefundCondition(merchantId, shopId, parameterSource, fromTime, toTime))
+                .orderBy(REFUND.REFUND_CREATED_AT.desc())
+                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
+                .offset(offset.orElse(0));
+        return fetch(query, (rs, i) -> {
+            Refund refund = new Refund();
+            refund.setEventCreatedAt(rs.getObject(REFUND.EVENT_CREATED_AT.getName(), LocalDateTime.class));
+            refund.setPartyId(rs.getString(REFUND.PARTY_ID.getName()));
+            refund.setPartyShopId(rs.getString(REFUND.PARTY_SHOP_ID.getName()));
+            refund.setInvoiceId(rs.getString(REFUND.INVOICE_ID.getName()));
+            refund.setPaymentId(rs.getString(REFUND.PAYMENT_ID.getName()));
+            refund.setRefundId(rs.getString(REFUND.REFUND_ID.getName()));
+            refund.setRefundCurrencyCode(rs.getString(REFUND.REFUND_CURRENCY_CODE.getName()));
+            refund.setRefundAmount(rs.getLong(REFUND.REFUND_AMOUNT.getName()));
+            refund.setRefundFee(rs.getLong(REFUND.REFUND_FEE.getName()));
+            refund.setRefundProviderFee(rs.getLong(REFUND.REFUND_PROVIDER_FEE.getName()));
+            refund.setRefundExternalFee(rs.getLong(REFUND.REFUND_EXTERNAL_FEE.getName()));
+            refund.setRefundReason(rs.getString(REFUND.REFUND_REASON.getName()));
+            refund.setRefundStatus(TypeUtil.toEnumField(rs.getString(REFUND.REFUND_STATUS.getName()), RefundStatus.class));
+            refund.setRefundOperationFailureClass(
+                    TypeUtil.toEnumField(rs.getString(REFUND.REFUND_OPERATION_FAILURE_CLASS.getName()), FailureClass.class)
+            );
+            refund.setRefundExternalFailure(rs.getString(REFUND.REFUND_EXTERNAL_FAILURE.getName()));
+            refund.setRefundExternalFailureReason(rs.getString(REFUND.REFUND_EXTERNAL_FAILURE_REASON.getName()));
+            refund.setRefundCreatedAt(rs.getObject(REFUND.REFUND_CREATED_AT.getName(), LocalDateTime.class));
+            return refund;
+        });
+    }
+
+    @Override
+    public Integer getRefundsCount(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime
+    ) throws DaoException {
+        Query query = getDslContext().select(DSL.count()).from(REFUND)
+                .where(buildRefundCondition(merchantId, shopId, parameterSource, fromTime, toTime));
         return fetchOne(query, Integer.class);
     }
 
     @Override
     public Collection<PayoutEventStat> getPayouts(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource parameterSource,
             Optional<Integer> offset,
             Optional<Integer> limit
@@ -260,7 +325,11 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Integer getPayoutsCount(ConditionParameterSource parameterSource) throws DaoException {
+    public Integer getPayoutsCount(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            ConditionParameterSource parameterSource
+    ) throws DaoException {
         Query query = buildPayoutSelectConditionStepQuery(parameterSource, DSL.count());
         return fetchOne(query, Integer.class);
     }
@@ -385,12 +454,16 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     private Condition buildPaymentCondition(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) {
-        Condition condition = appendDateTimeRange(
+        Condition condition = appendPartyAndDateTimeRangeConditions(
                 INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT),
+                merchantId,
+                shopId,
                 INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 fromTime,
                 toTime);
@@ -404,13 +477,17 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     private Condition buildInvoiceCondition(
+            Optional<String> merchantId,
+            Optional<String> shopId,
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) {
-        Condition condition = appendDateTimeRange(
+        Condition condition = appendPartyAndDateTimeRangeConditions(
                 INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE),
+                merchantId,
+                shopId,
                 INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 fromTime,
                 toTime);
@@ -425,17 +502,49 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                     INVOICE_EVENT_STAT.INVOICE_ID.in(
                             getDslContext().select(INVOICE_EVENT_STAT.INVOICE_ID)
                                     .from(INVOICE_EVENT_STAT)
-                                    .where(buildPaymentCondition(paymentParameterSource, fromTime, toTime))
+                                    .where(buildPaymentCondition(merchantId, shopId, paymentParameterSource, fromTime, toTime))
                     )
             );
         }
         return appendConditions(condition, Operator.AND, invoiceParameterSource);
     }
 
-    private Condition appendDateTimeRange(Condition condition,
-                                          Field<LocalDateTime> field,
-                                          Optional<LocalDateTime> fromTime,
-                                          Optional<LocalDateTime> toTime) {
+    private Condition buildRefundCondition(
+            Optional<String> merchantId,
+            Optional<String> shopId,
+            ConditionParameterSource parameterSource,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime
+    ) {
+        Condition condition = REFUND.ID.in(
+                getDslContext().select(DSL.max(REFUND.ID)).from(REFUND)
+                        .where(
+                                appendPartyAndDateTimeRangeConditions(
+                                        DSL.trueCondition(),
+                                        merchantId,
+                                        shopId,
+                                        REFUND.EVENT_CREATED_AT,
+                                        fromTime,
+                                        toTime
+                                )
+                        ).groupBy(REFUND.INVOICE_ID, REFUND.PAYMENT_ID, REFUND.REFUND_ID)
+        );
+        return appendConditions(condition, Operator.AND, parameterSource);
+    }
+
+    private Condition appendPartyAndDateTimeRangeConditions(Condition condition,
+                                                            Optional<String> merchantId,
+                                                            Optional<String> shopId,
+                                                            Field<LocalDateTime> field,
+                                                            Optional<LocalDateTime> fromTime,
+                                                            Optional<LocalDateTime> toTime) {
+        if (merchantId.isPresent()) {
+            condition = condition.and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId.get()));
+        }
+        if (shopId.isPresent()) {
+            condition = condition.and(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(shopId.get()));
+        }
+
         if (fromTime.isPresent()) {
             condition = condition.and(field.ge(fromTime.get()));
         }

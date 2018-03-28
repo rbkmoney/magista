@@ -3,9 +3,8 @@ package com.rbkmoney.magista.query.impl;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.magista.dao.ConditionParameterSource;
-import com.rbkmoney.magista.domain.enums.PayoutStatus;
-import com.rbkmoney.magista.domain.enums.PayoutType;
-import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
+import com.rbkmoney.magista.domain.enums.RefundStatus;
+import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
@@ -15,49 +14,50 @@ import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.util.DamselUtil;
+import com.rbkmoney.magista.util.TypeUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
+import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
-import static com.rbkmoney.magista.util.TypeUtil.*;
-import static org.jooq.Comparator.*;
+import static com.rbkmoney.magista.util.TypeUtil.toEnumField;
+import static org.jooq.Comparator.EQUALS;
 
-public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResponse> implements CompositeQuery<PayoutEventStat, StatResponse> {
+public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> implements CompositeQuery<Refund, StatResponse> {
 
-    public static final String FUNC_NAME = "payouts";
+    public static final String FUNC_NAME = "refunds";
 
     private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
-    private PayoutsFunction(Object descriptor, QueryParameters params, CompositeQuery subquery) {
+    private RefundsFunction(Object descriptor, QueryParameters params, CompositeQuery subquery) {
         super(descriptor, params, FUNC_NAME);
         this.subquery = subquery;
     }
 
     @Override
-    public QueryResult<PayoutEventStat, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+    public QueryResult<Refund, StatResponse> execute(QueryContext context) throws QueryExecutionException {
         QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
 
         return execute(context, collectedResults.getCollectedStream());
     }
 
     @Override
-    public QueryResult<PayoutEventStat, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
+    public QueryResult<Refund, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
         if (collectedResults.size() != 2) {
             throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
         }
 
-        QueryResult<PayoutEventStat, List<PayoutEventStat>> payoutsResult = (QueryResult<PayoutEventStat, List<PayoutEventStat>>) collectedResults.get(0);
+        QueryResult<Refund, List<Refund>> refundsResult = (QueryResult<Refund, List<Refund>>) collectedResults.get(0);
         QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
-                () -> payoutsResult.getDataStream(),
+                () -> refundsResult.getDataStream(),
                 () -> {
-                    StatResponseData statResponseData = StatResponseData.payouts(payoutsResult.getDataStream()
-                            .map(payoutEvent -> DamselUtil.toStatPayout(payoutEvent))
+                    StatResponseData statResponseData = StatResponseData.refunds(refundsResult.getDataStream()
+                            .map(refundEvent -> DamselUtil.toStatRefund(refundEvent))
                             .collect(Collectors.toList()));
 
                     StatResponse statResponse = new StatResponse(statResponseData);
@@ -67,13 +67,13 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
     }
 
     @Override
-    public PayoutsParameters getQueryParameters() {
-        return (PayoutsParameters) super.getQueryParameters();
+    public RefundsFunction.RefundsParameters getQueryParameters() {
+        return (RefundsFunction.RefundsParameters) super.getQueryParameters();
     }
 
     @Override
     protected QueryParameters createQueryParameters(QueryParameters parameters, QueryParameters derivedParameters) {
-        return new PayoutsParameters(parameters, derivedParameters);
+        return new RefundsFunction.RefundsParameters(parameters, derivedParameters);
     }
 
     @Override
@@ -86,30 +86,30 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
         return subquery.isParallel();
     }
 
-    public static class PayoutsParameters extends PagedBaseParameters {
+    public static class RefundsParameters extends PagedBaseParameters {
 
-        public PayoutsParameters(Map<String, Object> parameters, QueryParameters derivedParameters) {
+        public RefundsParameters(Map<String, Object> parameters, QueryParameters derivedParameters) {
             super(parameters, derivedParameters);
         }
 
-        public PayoutsParameters(QueryParameters parameters, QueryParameters derivedParameters) {
+        public RefundsParameters(QueryParameters parameters, QueryParameters derivedParameters) {
             super(parameters, derivedParameters);
         }
 
-        public String getPayoutId() {
-            return getStringParameter(PAYOUT_ID_PARAM, false);
+        public String getInvoiceId() {
+            return getStringParameter(INVOICE_ID_PARAM, false);
         }
 
-        public String getPayoutStatus() {
-            return getStringParameter(PAYOUT_STATUS_PARAM, false);
+        public String getPaymentId() {
+            return getStringParameter(PAYMENT_ID_PARAM, false);
         }
 
-        public List<String> getPayoutStatuses() {
-            return getArrayParameter(PAYOUT_STATUSES_PARAM, false);
+        public String getRefundId() {
+            return getStringParameter(REFUND_ID_PARAM, false);
         }
 
-        public String getPayoutType() {
-            return getStringParameter(PAYOUT_TYPE_PARAM, false);
+        public String getRefundStatus() {
+            return getStringParameter(REFUND_STATUS_PARAM, false);
         }
 
         public TemporalAccessor getFromTime() {
@@ -122,24 +122,24 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
 
     }
 
-    public static class PayoutsValidator extends PagedBaseValidator {
+    public static class RefundsValidator extends PagedBaseValidator {
 
         @Override
         public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
             super.validateParameters(parameters);
-            PayoutsParameters payoutsParameters = super.checkParamsType(parameters, PayoutsParameters.class);
+            RefundsFunction.RefundsParameters refundsParameters = super.checkParamsType(parameters, RefundsFunction.RefundsParameters.class);
 
-            validateTimePeriod(payoutsParameters.getFromTime(), payoutsParameters.getToTime());
+            validateTimePeriod(refundsParameters.getFromTime(), refundsParameters.getToTime());
         }
     }
 
-    public static class PayoutsParser extends AbstractQueryParser {
-        private PayoutsValidator validator = new PayoutsValidator();
+    public static class RefundsParser extends AbstractQueryParser {
+        private RefundsValidator validator = new RefundsValidator();
 
         @Override
         public List<QueryPart> parseQuery(Map<String, Object> source, QueryPart parent) throws QueryParserException {
             Map<String, Object> funcSource = (Map) source.get(FUNC_NAME);
-            PayoutsParameters parameters = getValidatedParameters(funcSource, parent, PayoutsParameters::new, validator);
+            RefundsParameters parameters = getValidatedParameters(funcSource, parent, RefundsParameters::new, validator);
 
             return Stream.of(
                     new QueryPart(FUNC_NAME, parameters, parent)
@@ -159,12 +159,12 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
         }
     }
 
-    public static class PayoutsBuilder extends AbstractQueryBuilder {
-        private PayoutsValidator validator = new PayoutsValidator();
+    public static class RefundsBuilder extends AbstractQueryBuilder {
+        private RefundsValidator validator = new RefundsValidator();
 
         @Override
         public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(PayoutsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart));
+            Query resultQuery = buildSingleQuery(RefundsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart));
             validator.validateQuery(resultQuery);
             return resultQuery;
         }
@@ -179,37 +179,39 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
                     getParameters(queryPart.getParent()),
                     queries
             );
-            return createPayoutsFunction(queryPart.getDescriptor(), queryPart.getParameters(), compositeQuery);
+            return createRefundsFunction(queryPart.getDescriptor(), queryPart.getParameters(), compositeQuery);
         }
 
         @Override
         public boolean apply(List<QueryPart> queryParts, QueryPart parent) {
-            return getMatchedPartsStream(PayoutsParser.getMainDescriptor(), queryParts).findFirst().isPresent();
+            return getMatchedPartsStream(RefundsParser.getMainDescriptor(), queryParts).findFirst().isPresent();
         }
     }
 
-    private static PayoutsFunction createPayoutsFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
-        PayoutsFunction payoutsFunction = new PayoutsFunction(descriptor, queryParameters, subquery);
-        subquery.setParentQuery(payoutsFunction);
-        return payoutsFunction;
+    private static RefundsFunction createRefundsFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
+        RefundsFunction refundsFunction = new RefundsFunction(descriptor, queryParameters, subquery);
+        subquery.setParentQuery(refundsFunction);
+        return refundsFunction;
     }
 
-    private static class GetDataFunction extends PagedBaseFunction<PayoutEventStat, Collection<PayoutEventStat>> {
-        private static final String FUNC_NAME = PayoutsFunction.FUNC_NAME + "_data";
+    private static class GetDataFunction extends PagedBaseFunction<Refund, Collection<Refund>> {
+        private static final String FUNC_NAME = RefundsFunction.FUNC_NAME + "_data";
 
         public GetDataFunction(Object descriptor, QueryParameters params) {
             super(descriptor, params, FUNC_NAME);
         }
 
         @Override
-        public QueryResult<PayoutEventStat, Collection<PayoutEventStat>> execute(QueryContext context) throws QueryExecutionException {
+        public QueryResult<Refund, Collection<Refund>> execute(QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
-            PayoutsParameters parameters = new PayoutsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
+            RefundsParameters parameters = new RefundsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Collection<PayoutEventStat> result = functionContext.getDao().getPayouts(
+                Collection<Refund> result = functionContext.getDao().getRefunds(
                         Optional.ofNullable(parameters.getMerchantId()),
                         Optional.ofNullable(parameters.getShopId()),
-                        buildPayoutConditionParameterSource(parameters),
+                        buildRefundConditionParameterSource(parameters),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
                         Optional.ofNullable(parameters.getFrom()),
                         Optional.ofNullable(parameters.getSize())
                 );
@@ -221,7 +223,7 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
     }
 
     private static class GetCountFunction extends ScopedBaseFunction<Integer, Integer> {
-        private static final String FUNC_NAME = PayoutsFunction.FUNC_NAME + "_count";
+        private static final String FUNC_NAME = RefundsFunction.FUNC_NAME + "_count";
 
         public GetCountFunction(Object descriptor, QueryParameters params) {
             super(descriptor, params, FUNC_NAME);
@@ -230,12 +232,14 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
         @Override
         public QueryResult<Integer, Integer> execute(QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
-            PayoutsParameters parameters = new PayoutsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
+            RefundsParameters parameters = new RefundsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Integer result = functionContext.getDao().getPayoutsCount(
+                Integer result = functionContext.getDao().getRefundsCount(
                         Optional.ofNullable(parameters.getMerchantId()),
                         Optional.ofNullable(parameters.getShopId()),
-                        buildPayoutConditionParameterSource(parameters)
+                        buildRefundConditionParameterSource(parameters),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime()))
                 );
                 return new BaseQueryResult<>(() -> Stream.of(result), () -> result);
             } catch (DaoException e) {
@@ -244,21 +248,16 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
         }
     }
 
-    public static ConditionParameterSource buildPayoutConditionParameterSource(PayoutsParameters parameters) {
+    public static ConditionParameterSource buildRefundConditionParameterSource(RefundsParameters parameters) {
         return new ConditionParameterSource()
-                .addValue(PAYOUT_EVENT_STAT.PARTY_ID, parameters.getMerchantId(), EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_ID, parameters.getPayoutId(), EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_STATUS,
-                        toEnumField(parameters.getPayoutStatus(), PayoutStatus.class),
-                        EQUALS)
-                .addInConditionValue(PAYOUT_EVENT_STAT.PAYOUT_STATUS,
-                        toEnumFields(parameters.getPayoutStatuses(), PayoutStatus.class))
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_TYPE,
-                        toEnumField(parameters.getPayoutType(), PayoutType.class),
-                        EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT, toLocalDateTime(parameters.getFromTime()), GREATER_OR_EQUAL)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT, toLocalDateTime(parameters.getToTime()), LESS);
+                .addValue(REFUND.PARTY_ID, parameters.getMerchantId(), EQUALS)
+                .addValue(REFUND.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                .addValue(REFUND.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                .addValue(REFUND.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
+                .addValue(REFUND.REFUND_ID, parameters.getRefundId(), EQUALS)
+                .addValue(REFUND.REFUND_STATUS,
+                        toEnumField(parameters.getRefundStatus(), RefundStatus.class),
+                        EQUALS);
     }
 
 }

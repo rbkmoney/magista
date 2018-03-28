@@ -1,9 +1,6 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.damsel.merch_stat.OnHoldExpiration;
-import com.rbkmoney.damsel.merch_stat.StatInvoice;
-import com.rbkmoney.damsel.merch_stat.StatPayment;
-import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.dao.StatisticsDao;
@@ -283,6 +280,23 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(3, statResponse.getData().getRecords().size());
         assertEquals(0, statResponse.getTotalCount());
+    }
+
+    @Test
+    public void testRefunds() throws TException {
+        String json = "{'query': {'refunds': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(2, statResponse.getTotalCount());
+        assertEquals(2, statResponse.getData().getRefunds().size());
+        new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
+
+        json = "{'query': {'refunds': {'refund_id':'test_refund_2', 'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
+        statResponse = queryProcessor.processQuery(json);
+        assertEquals(1, statResponse.getTotalCount());
+        assertEquals(1, statResponse.getData().getRefunds().size());
+        StatRefund statRefund = statResponse.getData().getRefunds().get(0);
+        assertEquals("test_refund_2", statRefund.getId());
+        new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
     }
 
     @Test

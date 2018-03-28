@@ -1,1 +1,0 @@
-ALTER TABLE mst.invoice_event_stat ADD COLUMN payment_status_sub_failure CHARACTER VARYING;
