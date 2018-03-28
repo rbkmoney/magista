@@ -8,5 +8,6 @@ ALTER TABLE mst.invoice_event_stat
 ALTER TABLE mst.refund
   ALTER COLUMN refund_operation_failure_class TYPE mst.FAILURE_CLASS USING refund_operation_failure_class :: TEXT :: mst.FAILURE_CLASS;
 
+UPDATE mst.invoice_event_stat SET payment_external_failure_code = replace(payment_external_failure_code, ':', '');
 ALTER TABLE mst.invoice_event_stat
   RENAME payment_external_failure_code TO payment_external_failure;
