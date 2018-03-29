@@ -129,7 +129,7 @@
         <dependency>
             <groupId>com.rbkmoney.geck</groupId>
             <artifactId>serializer</artifactId>
-            <version>0.6.7</version>
+            <version>0.6.8</version>
         </dependency>
         <!--Test libs-->
         <dependency>
