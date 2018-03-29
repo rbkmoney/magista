@@ -51,6 +51,7 @@ public class PaymentRefundService {
 
                 refund.setPartyId(previousRefundEvent.getPartyId());
                 refund.setPartyShopId(previousRefundEvent.getPartyShopId());
+                refund.setPartyContractId(previousRefundEvent.getPartyContractId());
                 refund.setRefundCreatedAt(previousRefundEvent.getRefundCreatedAt());
                 refund.setRefundCurrencyCode(previousRefundEvent.getRefundCurrencyCode());
                 refund.setRefundAmount(previousRefundEvent.getRefundAmount());
