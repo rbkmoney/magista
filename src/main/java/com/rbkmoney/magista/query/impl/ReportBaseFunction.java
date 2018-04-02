@@ -50,6 +50,14 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
             super(parameters, derivedParameters);
         }
 
+        public String getMerchantId() {
+            return getStringParameter(MERCHANT_ID_PARAM, false);
+        }
+
+        public String getContractId() {
+            return getStringParameter(CONTRACT_ID_PARAM, false);
+        }
+
         public TemporalAccessor getFromTime() {
             return getTimeParameter(FROM_TIME_PARAM, false);
         }
@@ -58,9 +66,6 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
             return getTimeParameter(TO_TIME_PARAM, false);
         }
 
-        public List<Integer> getGetWithoutShopCategoryIds() {
-            return getArrayParameter(WITHOUT_SHOP_CATEGORY_IDS_PARAM, false);
-        }
     }
 
     public static class ReportBaseValidator extends BaseQueryValidator {
@@ -68,6 +73,16 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
         public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
             super.validateParameters(parameters);
             ReportBaseParameters reportBaseParameters = super.checkParamsType(parameters, ReportBaseParameters.class);
+
+            String merchantId = reportBaseParameters.getMerchantId();
+            if (merchantId == null) {
+                checkParamsResult(true, MERCHANT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            }
+
+            String contractId = reportBaseParameters.getContractId();
+            if (contractId == null) {
+                checkParamsResult(true, CONTRACT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            }
 
             TemporalAccessor from = reportBaseParameters.getFromTime();
             if (from == null) {

@@ -28,9 +28,10 @@ public class AccountingReportFunction extends ReportBaseFunction {
     public QueryResult<Map<String, String>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
         try {
             Collection<Map<String, String>> result = getContext(context).getDao().getAccountingDataByPeriod(
+                    getQueryParameters().getMerchantId(),
+                    getQueryParameters().getContractId(),
                     Instant.from(getQueryParameters().getFromTime()),
-                    Instant.from(getQueryParameters().getToTime()),
-                    Optional.ofNullable(getQueryParameters().getGetWithoutShopCategoryIds())
+                    Instant.from(getQueryParameters().getToTime())
             );
 
             return new BaseQueryResult<>(() -> result.stream(), () -> new StatResponse(StatResponseData.records(result.stream().collect(Collectors.toList()))));

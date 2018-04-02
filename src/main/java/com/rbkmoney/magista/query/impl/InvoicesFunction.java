@@ -205,6 +205,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 Collection<InvoiceEventStat> result = functionContext.getDao().getInvoices(
                         Optional.ofNullable(parameters.getMerchantId()),
                         Optional.ofNullable(parameters.getShopId()),
+                        Optional.ofNullable(parameters.getContractId()),
                         buildInvoiceConditionParameterSource(parameters),
                         buildPaymentConditionParameterSource(parameters),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
@@ -234,6 +235,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 Integer result = functionContext.getDao().getInvoicesCount(
                         Optional.ofNullable(parameters.getMerchantId()),
                         Optional.ofNullable(parameters.getShopId()),
+                        Optional.ofNullable(parameters.getContractId()),
                         buildInvoiceConditionParameterSource(parameters),
                         buildPaymentConditionParameterSource(parameters),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
@@ -250,6 +252,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         return new ConditionParameterSource()
                 .addValue(INVOICE_EVENT_STAT.PARTY_ID, parameters.getMerchantId(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID, parameters.getContractId(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.INVOICE_STATUS,
                         toEnumField(
