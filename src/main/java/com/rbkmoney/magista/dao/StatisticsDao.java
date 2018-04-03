@@ -135,8 +135,8 @@ public interface StatisticsDao {
     Collection<Map<String, String>> getAccountingDataByPeriod(
             String merchantId,
             String contractId,
-            Instant fromTime,
-            Instant toTime
+            Optional<LocalDateTime> fromTime,
+            LocalDateTime toTime
     ) throws DaoException;
 
 }

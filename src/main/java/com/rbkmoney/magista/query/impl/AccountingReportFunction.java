@@ -5,6 +5,7 @@ import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.magista.util.TypeUtil;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -30,8 +31,8 @@ public class AccountingReportFunction extends ReportBaseFunction {
             Collection<Map<String, String>> result = getContext(context).getDao().getAccountingDataByPeriod(
                     getQueryParameters().getMerchantId(),
                     getQueryParameters().getContractId(),
-                    Instant.from(getQueryParameters().getFromTime()),
-                    Instant.from(getQueryParameters().getToTime())
+                    Optional.ofNullable(TypeUtil.toLocalDateTime(getQueryParameters().getFromTime())),
+                    TypeUtil.toLocalDateTime(getQueryParameters().getToTime())
             );
 
             return new BaseQueryResult<>(() -> result.stream(), () -> new StatResponse(StatResponseData.records(result.stream().collect(Collectors.toList()))));

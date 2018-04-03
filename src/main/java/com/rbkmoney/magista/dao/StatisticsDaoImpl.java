@@ -419,183 +419,103 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Collection<Map<String, String>> getAccountingDataByPeriod(String merchantId, String contractId, Instant fromTime, Instant toTime) throws DaoException {
+    public Collection<Map<String, String>> getAccountingDataByPeriod(String merchantId, String contractId, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
         Field<String> partyId = DSL.field("merchant_id", String.class);
         Field<String> partyContractId = DSL.field("contract_id", String.class);
         Field<String> currencyCode = DSL.field("currency_code", String.class);
 
         Field<BigDecimal> fundsAcquiredPeriod = DSL.field("funds_acquired_period", BigDecimal.class);
         Field<BigDecimal> feeChargedPeriod = DSL.field("fee_charged_period", BigDecimal.class);
-        Table part1 = getDslContext().select(
+        Table payments = getDslContext().select(
                 INVOICE_EVENT_STAT.PARTY_ID.as(partyId),
                 INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.as(partyContractId),
                 INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.as(currencyCode),
                 DSL.sum(INVOICE_EVENT_STAT.PAYMENT_AMOUNT).as(fundsAcquiredPeriod),
                 DSL.sum(INVOICE_EVENT_STAT.PAYMENT_FEE).as(feeChargedPeriod)
         ).from(INVOICE_EVENT_STAT).where(
-                INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)
-                        .and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId))
-                        .and(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
-                        .and(INVOICE_EVENT_STAT.EVENT_CREATED_AT.ge(TypeUtil.toLocalDateTime(fromTime)))
-                        .and(INVOICE_EVENT_STAT.EVENT_CREATED_AT.lt(TypeUtil.toLocalDateTime(toTime)))
-                        .and(
-                                INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)
-                        )
+                appendDateTimeRangeConditions(
+                        INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)
+                                .and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId))
+                                .and(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
+                                .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
+                        INVOICE_EVENT_STAT.EVENT_CREATED_AT,
+                        fromTime,
+                        Optional.of(toTime)
+                )
         ).groupBy(
                 INVOICE_EVENT_STAT.PARTY_ID,
                 INVOICE_EVENT_STAT.PARTY_CONTRACT_ID,
                 INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE
-        ).asTable("part1");
+        ).asTable("payments");
 
         Field<BigDecimal> fundsRefundedPeriod = DSL.field("funds_refunded_period", BigDecimal.class);
-        Table part2 = getDslContext().select(
+        Table refunds = getDslContext().select(
                 REFUND.PARTY_ID.as(partyId),
                 REFUND.PARTY_CONTRACT_ID.as(partyContractId),
                 REFUND.REFUND_CURRENCY_CODE.as(currencyCode),
                 DSL.sum(REFUND.REFUND_AMOUNT.minus(REFUND.REFUND_FEE)).as(fundsRefundedPeriod)
         ).from(REFUND).where(
-                REFUND.PARTY_ID.eq(merchantId)
-                        .and(REFUND.PARTY_CONTRACT_ID.eq(contractId))
-                        .and(REFUND.REFUND_STATUS.eq(RefundStatus.succeeded))
-                        .and(REFUND.EVENT_CREATED_AT.ge(TypeUtil.toLocalDateTime(fromTime)))
-                        .and(REFUND.EVENT_CREATED_AT.lt(TypeUtil.toLocalDateTime(toTime)))
+                appendDateTimeRangeConditions(
+                        REFUND.PARTY_ID.eq(merchantId)
+                                .and(REFUND.PARTY_CONTRACT_ID.eq(contractId))
+                                .and(REFUND.REFUND_STATUS.eq(RefundStatus.succeeded)),
+                        REFUND.EVENT_CREATED_AT,
+                        fromTime,
+                        Optional.of(toTime)
+                )
         ).groupBy(
                 REFUND.PARTY_ID,
                 REFUND.PARTY_CONTRACT_ID,
                 REFUND.REFUND_CURRENCY_CODE
-        ).asTable("part2");
-
-        Field<BigDecimal> fundsToBePaidPrevPeriods = DSL.field("funds_to_be_paid_prev_periods", BigDecimal.class);
-        Table part3 = getDslContext().select(
-                INVOICE_EVENT_STAT.PARTY_ID.as(partyId),
-                INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.as(partyContractId),
-                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.as(currencyCode),
-                DSL.sum(INVOICE_EVENT_STAT.PAYMENT_AMOUNT.minus(INVOICE_EVENT_STAT.PAYMENT_FEE)).as(fundsToBePaidPrevPeriods)
-        ).from(INVOICE_EVENT_STAT).where(
-                INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)
-                        .and(INVOICE_EVENT_STAT.EVENT_CREATED_AT.lt(TypeUtil.toLocalDateTime(fromTime)))
-                        .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured))
-        ).groupBy(
-                INVOICE_EVENT_STAT.PARTY_ID,
-                INVOICE_EVENT_STAT.PARTY_CONTRACT_ID,
-                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE
-        ).asTable("part3");
-
-        Field<BigDecimal> fundsRefundedPrevPeriods = DSL.field("funds_refunded_prev_periods", BigDecimal.class);
-        Table part4 = getDslContext().select(
-                REFUND.PARTY_ID.as(partyId),
-                REFUND.PARTY_CONTRACT_ID.as(partyContractId),
-                REFUND.REFUND_CURRENCY_CODE.as(currencyCode),
-                DSL.sum(REFUND.REFUND_AMOUNT.minus(REFUND.REFUND_FEE)).as(fundsRefundedPrevPeriods)
-        ).from(REFUND).where(
-                REFUND.EVENT_CREATED_AT.lt(TypeUtil.toLocalDateTime(fromTime))
-                        .and(REFUND.REFUND_STATUS.eq(RefundStatus.succeeded))
-        ).groupBy(
-                REFUND.PARTY_ID,
-                REFUND.PARTY_CONTRACT_ID,
-                REFUND.REFUND_CURRENCY_CODE
-        ).asTable("part4");
+        ).asTable("refunds");
 
         Field<String> partyShopId = DSL.field("party_shop_id", String.class);
         Field<BigDecimal> fundsPaidOutPeriod = DSL.field("funds_paid_out_period", BigDecimal.class);
-        Table part5 = getDslContext().select(
+        Table payouts = getDslContext().select(
                 PAYOUT_EVENT_STAT.PARTY_ID.as(partyId),
                 PAYOUT_EVENT_STAT.PARTY_SHOP_ID.as(partyShopId),
                 PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.as(currencyCode),
-                DSL.sum(PAYOUT_EVENT_STAT.PAYOUT_AMOUNT.minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))).as(fundsPaidOutPeriod)
+                DSL.sum(
+                        PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
+                                .minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))
+                ).as(fundsPaidOutPeriod)
         ).from(PAYOUT_EVENT_STAT).where(
-                PAYOUT_EVENT_STAT.ID.in(
-                        getDslContext().select(DSL.max(PAYOUT_EVENT_STAT.ID))
-                                .from(PAYOUT_EVENT_STAT)
-                                .where(
-                                        PAYOUT_EVENT_STAT.EVENT_CREATED_AT.ge(TypeUtil.toLocalDateTime(fromTime))
-                                                .and(PAYOUT_EVENT_STAT.EVENT_CREATED_AT.lt(TypeUtil.toLocalDateTime(toTime)))
-                                )
-                                .groupBy(PAYOUT_EVENT_STAT.PAYOUT_ID)
-                ).and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid))
+                appendDateTimeRangeConditions(
+                        PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid),
+                        PAYOUT_EVENT_STAT.EVENT_CREATED_AT,
+                        fromTime,
+                        Optional.of(toTime)
+                )
         ).groupBy(
                 PAYOUT_EVENT_STAT.PARTY_ID,
                 PAYOUT_EVENT_STAT.PARTY_SHOP_ID,
                 PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
-        ).asTable("part5");
-
-        Field<BigDecimal> fundsPaidOutPrevPeriods = DSL.field("funds_paid_out_prev_periods", BigDecimal.class);
-        Table part6 = getDslContext().select(
-                PAYOUT_EVENT_STAT.PARTY_ID.as(partyId),
-                PAYOUT_EVENT_STAT.PARTY_SHOP_ID.as(partyShopId),
-                PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.as(currencyCode),
-                DSL.sum(PAYOUT_EVENT_STAT.PAYOUT_AMOUNT.minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))).as(fundsPaidOutPrevPeriods)
-        ).from(PAYOUT_EVENT_STAT).where(
-                PAYOUT_EVENT_STAT.ID.in(
-                        getDslContext().select(DSL.max(PAYOUT_EVENT_STAT.ID))
-                                .from(PAYOUT_EVENT_STAT)
-                                .where(
-                                        PAYOUT_EVENT_STAT.EVENT_CREATED_AT.lt(TypeUtil.toLocalDateTime(fromTime))
-                                )
-                                .groupBy(PAYOUT_EVENT_STAT.PAYOUT_ID)
-                ).and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid))
-        ).groupBy(
-                PAYOUT_EVENT_STAT.PARTY_ID,
-                PAYOUT_EVENT_STAT.PARTY_SHOP_ID,
-                PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
-        ).asTable("part6");
+        ).asTable("payouts");
 
         Query query = getDslContext().select(
-                part1.field(partyId),
-                part1.field(partyContractId),
-                part1.field(currencyCode),
-                DSL.coalesce(fundsToBePaidPrevPeriods, 0)
-                        .minus(DSL.coalesce(fundsPaidOutPrevPeriods, 0))
-                        .minus(DSL.coalesce(fundsRefundedPrevPeriods, 0))
-                        .as("opening_balance"),
+                payments.field(partyId),
+                payments.field(partyContractId),
+                payments.field(currencyCode),
                 DSL.coalesce(fundsAcquiredPeriod, 0).as("funds_acquired"),
                 DSL.coalesce(feeChargedPeriod, 0).as("fee_charged"),
                 DSL.coalesce(fundsPaidOutPeriod, 0).as("funds_paid_out"),
-                DSL.coalesce(fundsRefundedPeriod, 0).as("funds_refunded"),
-                DSL.coalesce(fundsToBePaidPrevPeriods, 0)
-                        .plus(DSL.coalesce(fundsAcquiredPeriod, 0))
-                        .minus(DSL.coalesce(feeChargedPeriod, 0))
-                        .minus(DSL.coalesce(fundsPaidOutPrevPeriods, 0))
-                        .minus(DSL.coalesce(fundsRefundedPrevPeriods, 0))
-                        .minus(DSL.coalesce(fundsPaidOutPeriod, 0))
-                        .minus(DSL.coalesce(fundsRefundedPeriod, 0))
-                        .as("closing_balance")
-        ).from(part1)
-                .leftJoin(part2).on(
-                        part1.field(partyId).eq(part2.field(partyId))
-                                .and(part1.field(partyContractId).eq(part2.field(partyContractId)))
-                                .and(part1.field(currencyCode).eq(part2.field(currencyCode)))
+                DSL.coalesce(fundsRefundedPeriod, 0).as("funds_refunded")
+        ).from(payments)
+                .leftJoin(refunds).on(
+                        payments.field(partyId).eq(refunds.field(partyId))
+                                .and(payments.field(partyContractId).eq(refunds.field(partyContractId)))
+                                .and(payments.field(currencyCode).eq(refunds.field(currencyCode)))
                 )
-                .leftJoin(part3).on(
-                        part1.field(partyId).eq(part3.field(partyId))
-                                .and(part1.field(partyContractId).eq(part3.field(partyContractId)))
-                                .and(part1.field(currencyCode).eq(part3.field(currencyCode)))
-                )
-                .leftJoin(part4).on(
-                        part1.field(partyId).eq(part4.field(partyId))
-                                .and(part1.field(partyContractId).eq(part4.field(partyContractId)))
-                                .and(part1.field(currencyCode).eq(part4.field(currencyCode)))
-                )
-                .leftJoin(part5).on(
-                        part1.field(partyId).eq(part5.field(partyId))
-                                .and(part1.field(partyContractId).in(
+                .leftJoin(payouts).on(
+                        payments.field(partyId).eq(payouts.field(partyId))
+                                .and(payments.field(partyContractId).in(
                                         getDslContext().select(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID)
                                                 .from(INVOICE_EVENT_STAT)
-                                                .where(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(part5.field(partyShopId)))
+                                                .where(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(payouts.field(partyShopId)))
                                                 .groupBy(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID)
                                         )
                                 )
-                                .and(part1.field(currencyCode).eq(part5.field(currencyCode)))
-                ).leftJoin(part6).on(
-                        part1.field(partyId).eq(part6.field(partyId))
-                                .and(part1.field(partyContractId).in(
-                                        getDslContext().select(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID)
-                                                .from(INVOICE_EVENT_STAT)
-                                                .where(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(part6.field(partyShopId)))
-                                                .groupBy(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID)
-                                        )
-                                )
-                                .and(part1.field(currencyCode).eq(part6.field(currencyCode)))
+                                .and(payments.field(currencyCode).eq(payouts.field(currencyCode)))
                 );
 
         return fetch(query, (rs, i) -> {
@@ -603,12 +523,10 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             map.put("merchant_id", rs.getString("merchant_id"));
             map.put("contract_id", rs.getString("contract_id"));
             map.put("currency_code", rs.getString("currency_code"));
-            map.put("opening_balance", rs.getString("opening_balance"));
             map.put("funds_acquired", rs.getString("funds_acquired"));
             map.put("fee_charged", rs.getString("fee_charged"));
             map.put("funds_paid_out", rs.getString("funds_paid_out"));
             map.put("funds_refunded", rs.getString("funds_refunded"));
-            map.put("closing_balance", rs.getString("closing_balance"));
             return map;
         });
     }

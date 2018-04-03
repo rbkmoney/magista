@@ -85,9 +85,6 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
             }
 
             TemporalAccessor from = reportBaseParameters.getFromTime();
-            if (from == null) {
-                checkParamsResult(true, FROM_TIME_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
-            }
             TemporalAccessor to = reportBaseParameters.getToTime();
             if (to == null) {
                 checkParamsResult(true, TO_TIME_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
