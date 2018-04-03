@@ -74,7 +74,7 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
             }
 
             if (!StringUtils.hasLength(scopedParameters.getMerchantId()) && StringUtils.hasLength(scopedParameters.getContractId())) {
-                checkParamsResult(true, CONTRACT_ID_PARAM, "when searching by shop_id, contract_id must be set");
+                checkParamsResult(true, CONTRACT_ID_PARAM, "when searching by contract_id, merchant_id must be set");
             }
         }
 
