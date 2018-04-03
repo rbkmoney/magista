@@ -31,6 +31,7 @@ public class AccountingReportFunction extends ReportBaseFunction {
             Collection<Map<String, String>> result = getContext(context).getDao().getAccountingDataByPeriod(
                     getQueryParameters().getMerchantId(),
                     getQueryParameters().getContractId(),
+                    getQueryParameters().getCurrencyCode(),
                     Optional.ofNullable(TypeUtil.toLocalDateTime(getQueryParameters().getFromTime())),
                     TypeUtil.toLocalDateTime(getQueryParameters().getToTime())
             );

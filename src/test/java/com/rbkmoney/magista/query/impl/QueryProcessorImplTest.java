@@ -315,7 +315,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
 
     @Test
     public void testAccountingReport() {
-        String json = "{'query': {'shop_accounting_report': {'merchant_id': 'test_party_1', 'contract_id': 'test_contract_1', 'to_time': '2017-08-31T21:00:00Z'}}}";
+        String json = "{'query': {'shop_accounting_report': {'merchant_id': 'test_party_1', 'contract_id': 'test_contract_1', 'currency_code': 'RUB', 'to_time': '2017-08-31T21:00:00Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getData().getRecords().size());
         Map<String, String> result1 = statResponse.getData().getRecords().get(0);
@@ -329,7 +329,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertEquals("1000", result1.get("funds_refunded"));
         assertEquals(0, statResponse.getTotalCount());
 
-        String json2 = "{'query': {'shop_accounting_report': {'merchant_id': 'test_party_1', 'contract_id': 'test_contract_1', 'from_time': '2017-08-31T21:00:00Z','to_time': '2017-09-30T21:00:00Z'}}}";
+        String json2 = "{'query': {'shop_accounting_report': {'merchant_id': 'test_party_1', 'contract_id': 'test_contract_1', 'currency_code': 'RUB', 'from_time': '2017-08-31T21:00:00Z','to_time': '2017-09-30T21:00:00Z'}}}";
         StatResponse statResponse2 = queryProcessor.processQuery(json2);
         assertEquals(1, statResponse2.getData().getRecords().size());
         Map<String, String> result2 = statResponse2.getData().getRecords().get(0);
@@ -343,7 +343,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertEquals("2000", result2.get("funds_refunded"));
         assertEquals(0, statResponse2.getTotalCount());
 
-        String json3 = "{'query': {'shop_accounting_report': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0', 'contract_id': '1', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
+        String json3 = "{'query': {'shop_accounting_report': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0', 'contract_id': '1', 'currency_code': 'RUB', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
         StatResponse statResponse3 = queryProcessor.processQuery(json3);
         assertEquals(1, statResponse3.getData().getRecords().size());
         Map<String, String> result3 = statResponse3.getData().getRecords().get(0);
@@ -356,7 +356,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertEquals("0", result3.get("funds_paid_out"));
         assertEquals("0", result3.get("funds_refunded"));
 
-        String json4 = "{'query': {'shop_accounting_report': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0', 'contract_id': '2', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
+        String json4 = "{'query': {'shop_accounting_report': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0', 'contract_id': '2', 'currency_code': 'RUB', 'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
         StatResponse statResponse4 = queryProcessor.processQuery(json4);
         assertEquals(1, statResponse4.getData().getRecords().size());
         Map<String, String> result4 = statResponse4.getData().getRecords().get(0);

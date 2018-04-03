@@ -419,17 +419,17 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Collection<Map<String, String>> getAccountingDataByPeriod(String merchantId, String contractId, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
-        Field<String> partyId = DSL.field("merchant_id", String.class);
-        Field<String> partyContractId = DSL.field("contract_id", String.class);
-        Field<String> currencyCode = DSL.field("currency_code", String.class);
+    public Collection<Map<String, String>> getAccountingDataByPeriod(String merchantId, String contractId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
+        Field<String> partyIdField = DSL.field("merchant_id", String.class);
+        Field<String> partyContractIdField = DSL.field("contract_id", String.class);
+        Field<String> currencyCodeField = DSL.field("currency_code", String.class);
 
         Field<BigDecimal> fundsAcquiredPeriod = DSL.field("funds_acquired_period", BigDecimal.class);
         Field<BigDecimal> feeChargedPeriod = DSL.field("fee_charged_period", BigDecimal.class);
         Table payments = getDslContext().select(
-                INVOICE_EVENT_STAT.PARTY_ID.as(partyId),
-                INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.as(partyContractId),
-                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.as(currencyCode),
+                INVOICE_EVENT_STAT.PARTY_ID.as(partyIdField),
+                INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.as(partyContractIdField),
+                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.as(currencyCodeField),
                 DSL.sum(INVOICE_EVENT_STAT.PAYMENT_AMOUNT).as(fundsAcquiredPeriod),
                 DSL.sum(INVOICE_EVENT_STAT.PAYMENT_FEE).as(feeChargedPeriod)
         ).from(INVOICE_EVENT_STAT).where(
@@ -437,6 +437,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)
                                 .and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId))
                                 .and(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
+                                .and(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.eq(currencyCode))
                                 .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
                         INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                         fromTime,
@@ -450,9 +451,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         Field<BigDecimal> fundsRefundedPeriod = DSL.field("funds_refunded_period", BigDecimal.class);
         Table refunds = getDslContext().select(
-                REFUND.PARTY_ID.as(partyId),
-                REFUND.PARTY_CONTRACT_ID.as(partyContractId),
-                REFUND.REFUND_CURRENCY_CODE.as(currencyCode),
+                REFUND.PARTY_ID.as(partyIdField),
+                REFUND.PARTY_CONTRACT_ID.as(partyContractIdField),
+                REFUND.REFUND_CURRENCY_CODE.as(currencyCodeField),
                 DSL.sum(REFUND.REFUND_AMOUNT.minus(REFUND.REFUND_FEE)).as(fundsRefundedPeriod)
         ).from(REFUND).where(
                 appendDateTimeRangeConditions(
@@ -469,12 +470,12 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 REFUND.REFUND_CURRENCY_CODE
         ).asTable("refunds");
 
-        Field<String> partyShopId = DSL.field("party_shop_id", String.class);
+        Field<String> partyShopIdField = DSL.field("party_shop_id", String.class);
         Field<BigDecimal> fundsPaidOutPeriod = DSL.field("funds_paid_out_period", BigDecimal.class);
         Table payouts = getDslContext().select(
-                PAYOUT_EVENT_STAT.PARTY_ID.as(partyId),
-                PAYOUT_EVENT_STAT.PARTY_SHOP_ID.as(partyShopId),
-                PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.as(currencyCode),
+                PAYOUT_EVENT_STAT.PARTY_ID.as(partyIdField),
+                PAYOUT_EVENT_STAT.PARTY_SHOP_ID.as(partyShopIdField),
+                PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.as(currencyCodeField),
                 DSL.sum(
                         PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
                                 .minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))
@@ -493,29 +494,29 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         ).asTable("payouts");
 
         Query query = getDslContext().select(
-                payments.field(partyId),
-                payments.field(partyContractId),
-                payments.field(currencyCode),
+                payments.field(partyIdField),
+                payments.field(partyContractIdField),
+                payments.field(currencyCodeField),
                 DSL.coalesce(fundsAcquiredPeriod, 0).as("funds_acquired"),
                 DSL.coalesce(feeChargedPeriod, 0).as("fee_charged"),
                 DSL.coalesce(fundsPaidOutPeriod, 0).as("funds_paid_out"),
                 DSL.coalesce(fundsRefundedPeriod, 0).as("funds_refunded")
         ).from(payments)
                 .leftJoin(refunds).on(
-                        payments.field(partyId).eq(refunds.field(partyId))
-                                .and(payments.field(partyContractId).eq(refunds.field(partyContractId)))
-                                .and(payments.field(currencyCode).eq(refunds.field(currencyCode)))
+                        payments.field(partyIdField).eq(refunds.field(partyIdField))
+                                .and(payments.field(partyContractIdField).eq(refunds.field(partyContractIdField)))
+                                .and(payments.field(currencyCodeField).eq(refunds.field(currencyCodeField)))
                 )
                 .leftJoin(payouts).on(
-                        payments.field(partyId).eq(payouts.field(partyId))
-                                .and(payments.field(partyContractId).in(
+                        payments.field(partyIdField).eq(payouts.field(partyIdField))
+                                .and(payments.field(partyContractIdField).in(
                                         getDslContext().select(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID)
                                                 .from(INVOICE_EVENT_STAT)
-                                                .where(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(payouts.field(partyShopId)))
+                                                .where(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(payouts.field(partyShopIdField)))
                                                 .groupBy(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID)
                                         )
                                 )
-                                .and(payments.field(currencyCode).eq(payouts.field(currencyCode)))
+                                .and(payments.field(currencyCodeField).eq(payouts.field(currencyCodeField)))
                 );
 
         return fetch(query, (rs, i) -> {
