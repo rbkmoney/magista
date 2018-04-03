@@ -287,8 +287,8 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     public void testRefunds() throws TException {
         String json = "{'query': {'refunds': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(2, statResponse.getTotalCount());
-        assertEquals(2, statResponse.getData().getRefunds().size());
+        assertEquals(4, statResponse.getTotalCount());
+        assertEquals(4, statResponse.getData().getRefunds().size());
         new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
 
         json = "{'query': {'refunds': {'refund_id':'test_refund_2', 'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
@@ -383,18 +383,6 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
 
         assertEquals(0, statResponse3.getTotalCount());
 
-    }
-
-    @Test
-    public void testShopCategoryIdsInAccountingReport() {
-        String json = "{'query': {'shop_accounting_report': {'from_time': '2016-01-01T00:00:00Z','to_time': '2017-10-25T18:10:10Z'}}}";
-        int totalCount = queryProcessor.processQuery(json).getData().getRecords().size();
-
-        json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'without_shop_category_ids': [1, 2, 3]}}}";
-        int countWithout123 = queryProcessor.processQuery(json).getData().getRecords().size();
-
-        json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'without_shop_category_ids': [4, 5]}}}";
-        assertEquals(totalCount - countWithout123, queryProcessor.processQuery(json).getData().getRecords().size());
     }
 
 }

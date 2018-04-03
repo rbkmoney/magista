@@ -631,7 +631,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) {
-        Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE);
+        Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT);
         if (merchantId.isPresent()) {
             condition = condition.and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId.get()));
         }
