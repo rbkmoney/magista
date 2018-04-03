@@ -4,6 +4,7 @@
 package com.rbkmoney.magista.domain.tables.pojos;
 
 
+import com.rbkmoney.magista.domain.enums.PayoutAccountType;
 import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
 import com.rbkmoney.magista.domain.enums.PayoutEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
@@ -28,7 +29,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat implements Serializable {
 
-    private static final long serialVersionUID = 472967171;
+    private static final long serialVersionUID = 1311609043;
 
     private Long                id;
     private Long                eventId;
@@ -65,6 +66,8 @@ public class PayoutEventStat implements Serializable {
     private String              payoutAccountBankAddress;
     private String              payoutAccountBankIban;
     private String              payoutAccountBankBic;
+    private PayoutAccountType   payoutAccountType;
+    private String              payoutSummary;
 
     public PayoutEventStat() {}
 
@@ -104,6 +107,8 @@ public class PayoutEventStat implements Serializable {
         this.payoutAccountBankAddress = value.payoutAccountBankAddress;
         this.payoutAccountBankIban = value.payoutAccountBankIban;
         this.payoutAccountBankBic = value.payoutAccountBankBic;
+        this.payoutAccountType = value.payoutAccountType;
+        this.payoutSummary = value.payoutSummary;
     }
 
     public PayoutEventStat(
@@ -141,7 +146,9 @@ public class PayoutEventStat implements Serializable {
         String              payoutAccountRegisteredNumber,
         String              payoutAccountBankAddress,
         String              payoutAccountBankIban,
-        String              payoutAccountBankBic
+        String              payoutAccountBankBic,
+        PayoutAccountType   payoutAccountType,
+        String              payoutSummary
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -178,6 +185,8 @@ public class PayoutEventStat implements Serializable {
         this.payoutAccountBankAddress = payoutAccountBankAddress;
         this.payoutAccountBankIban = payoutAccountBankIban;
         this.payoutAccountBankBic = payoutAccountBankBic;
+        this.payoutAccountType = payoutAccountType;
+        this.payoutSummary = payoutSummary;
     }
 
     public Long getId() {
@@ -460,6 +469,22 @@ public class PayoutEventStat implements Serializable {
         this.payoutAccountBankBic = payoutAccountBankBic;
     }
 
+    public PayoutAccountType getPayoutAccountType() {
+        return this.payoutAccountType;
+    }
+
+    public void setPayoutAccountType(PayoutAccountType payoutAccountType) {
+        this.payoutAccountType = payoutAccountType;
+    }
+
+    public String getPayoutSummary() {
+        return this.payoutSummary;
+    }
+
+    public void setPayoutSummary(String payoutSummary) {
+        this.payoutSummary = payoutSummary;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -679,6 +704,18 @@ public class PayoutEventStat implements Serializable {
         }
         else if (!payoutAccountBankBic.equals(other.payoutAccountBankBic))
             return false;
+        if (payoutAccountType == null) {
+            if (other.payoutAccountType != null)
+                return false;
+        }
+        else if (!payoutAccountType.equals(other.payoutAccountType))
+            return false;
+        if (payoutSummary == null) {
+            if (other.payoutSummary != null)
+                return false;
+        }
+        else if (!payoutSummary.equals(other.payoutSummary))
+            return false;
         return true;
     }
 
@@ -721,6 +758,8 @@ public class PayoutEventStat implements Serializable {
         result = prime * result + ((this.payoutAccountBankAddress == null) ? 0 : this.payoutAccountBankAddress.hashCode());
         result = prime * result + ((this.payoutAccountBankIban == null) ? 0 : this.payoutAccountBankIban.hashCode());
         result = prime * result + ((this.payoutAccountBankBic == null) ? 0 : this.payoutAccountBankBic.hashCode());
+        result = prime * result + ((this.payoutAccountType == null) ? 0 : this.payoutAccountType.hashCode());
+        result = prime * result + ((this.payoutSummary == null) ? 0 : this.payoutSummary.hashCode());
         return result;
     }
 
@@ -763,6 +802,8 @@ public class PayoutEventStat implements Serializable {
         sb.append(", ").append(payoutAccountBankAddress);
         sb.append(", ").append(payoutAccountBankIban);
         sb.append(", ").append(payoutAccountBankBic);
+        sb.append(", ").append(payoutAccountType);
+        sb.append(", ").append(payoutSummary);
 
         sb.append(")");
         return sb.toString();

@@ -4,8 +4,7 @@ import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payout_processing.*;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
-import com.rbkmoney.magista.domain.enums.PayoutEventType;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
@@ -14,7 +13,9 @@ import com.rbkmoney.magista.event.impl.context.PayoutEventContext;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PayoutMapper implements Mapper<PayoutEventContext> {
     @Override
@@ -43,6 +44,7 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
                 PayoutAccount payoutAccount = payout.getType().getBankAccount();
 
                 if (payoutAccount.isSetRussianPayoutAccount()) {
+                    payoutEventStat.setPayoutAccountType(PayoutAccountType.RUSSIAN_PAYOUT_ACCOUNT);
                     RussianPayoutAccount account = payoutAccount.getRussianPayoutAccount();
                     RussianBankAccount bankAccount = account.getBankAccount();
                     payoutEventStat.setPayoutAccountBankId(bankAccount.getAccount());
@@ -55,6 +57,7 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
                     payoutEventStat.setPayoutAccountLegalAgreementId(legalAgreement.getLegalAgreementId());
                     payoutEventStat.setPayoutAccountLegalAgreementSignedAt(TypeUtil.stringToLocalDateTime(legalAgreement.getSignedAt()));
                 } else if (payoutAccount.isSetInternationalPayoutAccount()) {
+                    payoutEventStat.setPayoutAccountType(PayoutAccountType.INTERNATIONAL_PAYOUT_ACCOUNT);
                     InternationalPayoutAccount account = payoutAccount.getInternationalPayoutAccount();
                     InternationalLegalEntity legalEntity = account.getLegalEntity();
                     payoutEventStat.setPayoutAccountTradingName(legalEntity.getTradingName());
@@ -103,6 +106,13 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
             payoutEventStat.setPayoutCurrencyCode(payout.getPayoutFlow().get(0).getVolume().getCurrency().getSymbolicCode());
             payoutEventStat.setPartyId(payout.getPartyId());
             payoutEventStat.setPartyShopId(payout.getShopId());
+
+            if (payout.isSetSummary()) {
+                List<PayoutSummaryItem> payoutSummaryItems = payout.getSummary().stream()
+                        .filter(payoutSummaryItem -> payoutSummaryItem.getOperationType() != OperationType.adjustment)
+                        .collect(Collectors.toList());
+                payoutEventStat.setPayoutSummary(DamselUtil.toPayoutSummaryStatString(payoutSummaryItems));
+            }
         }
 
         return context.setPayoutEventStat(payoutEventStat);

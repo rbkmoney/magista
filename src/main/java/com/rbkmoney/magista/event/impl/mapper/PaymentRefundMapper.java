@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
+import com.rbkmoney.damsel.domain.Cash;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentRefundCreated;
@@ -48,6 +49,11 @@ public class PaymentRefundMapper implements Mapper<InvoiceEventContext> {
         paymentRefundEventStat.setPaymentRefundCreatedAt(
                 TypeUtil.stringToLocalDateTime(refund.getCreatedAt())
         );
+        if (refund.isSetCash()) {
+            Cash cash = refund.getCash();
+            paymentRefundEventStat.setPaymentRefundAmount(cash.getAmount());
+            paymentRefundEventStat.setPaymentRefundCurrencyCode(cash.getCurrency().getSymbolicCode());
+        }
 
         Map<FeeType, Long> fees = DamselUtil.getFees(invoicePaymentRefundCreated.getCashFlow());
 
