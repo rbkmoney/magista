@@ -1,6 +1,8 @@
 package com.rbkmoney.magista.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
@@ -9,6 +11,7 @@ import com.rbkmoney.damsel.merch_stat.CustomerPayer;
 import com.rbkmoney.damsel.merch_stat.DigitalWallet;
 import com.rbkmoney.damsel.merch_stat.DigitalWalletProvider;
 import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.damsel.merch_stat.InternationalBankAccount;
 import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
 import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
 import com.rbkmoney.damsel.merch_stat.InvoicePaid;
@@ -45,10 +48,7 @@ import org.apache.thrift.TBase;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -56,6 +56,10 @@ import java.util.stream.Collectors;
  * Created by tolkonepiu on 23/06/2017.
  */
 public class DamselUtil {
+
+    public final static ObjectMapper objectMapper = new ObjectMapper();
+
+    public final static JsonProcessor jsonProcessor = new JsonProcessor();
 
     public static LocalDateTime getAdjustmentStatusCreatedAt(InvoicePaymentAdjustmentStatus adjustmentStatus) {
         switch (adjustmentStatus.getSetField()) {
@@ -149,9 +153,47 @@ public class DamselUtil {
                 TypeUtil.temporalToString(payoutEvent.getPayoutCreatedAt())
         );
         statPayout.setType(toPayoutType(payoutEvent));
+        if (payoutEvent.getPayoutSummary() != null) {
+            statPayout.setSummary(toPayoutSummary(payoutEvent));
+        }
 
         return statPayout;
     }
+
+    public static String toPayoutSummaryStatString(List<com.rbkmoney.damsel.payout_processing.PayoutSummaryItem> payoutSummaryItems) {
+        try {
+            return new ObjectMapper().writeValueAsString(payoutSummaryItems.stream()
+                    .map(
+                            payoutSummaryItem -> {
+                                try {
+                                    return new TBaseProcessor().process(payoutSummaryItem, new JsonHandler());
+                                } catch (IOException ex) {
+                                    throw new RuntimeJsonMappingException(ex.getMessage());
+                                }
+                            }).collect(Collectors.toList())
+            );
+        } catch (IOException ex) {
+            throw new RuntimeJsonMappingException(ex.getMessage());
+        }
+    }
+
+    public static List<PayoutSummaryItem> toPayoutSummary(PayoutEventStat payoutEvent) {
+        List<PayoutSummaryItem> payoutSummaryItems = new ArrayList<>();
+        try {
+            for (JsonNode jsonNode : objectMapper.readTree(payoutEvent.getPayoutSummary())) {
+                PayoutSummaryItem payoutSummaryItem = jsonToTBase(jsonNode, PayoutSummaryItem.class);
+                payoutSummaryItems.add(payoutSummaryItem);
+            }
+        } catch (IOException ex) {
+            throw new RuntimeJsonMappingException(ex.getMessage());
+        }
+        return payoutSummaryItems;
+    }
+
+    public static <T extends TBase> T jsonToTBase(JsonNode jsonNode, Class<T> type) throws IOException {
+        return jsonProcessor.process(jsonNode, new TBaseHandler<>(type));
+    }
+
 
     public static PayoutStatus toPayoutStatus(PayoutEventStat payoutEvent) {
         PayoutStatus._Fields payoutStatus = PayoutStatus._Fields.findByName(payoutEvent.getPayoutStatus().getLiteral());
@@ -173,17 +215,7 @@ public class DamselUtil {
         PayoutType._Fields payoutType = PayoutType._Fields.findByName(payoutEvent.getPayoutType().getLiteral());
         switch (payoutType) {
             case BANK_ACCOUNT:
-                RussianBankAccount russianBankAccount = new RussianBankAccount();
-                russianBankAccount.setAccount(payoutEvent.getPayoutAccountBankId());
-                russianBankAccount.setBankBik(payoutEvent.getPayoutAccountBankLocalCode());
-                russianBankAccount.setBankPostAccount(payoutEvent.getPayoutAccountBankCorrId());
-                russianBankAccount.setBankName(payoutEvent.getPayoutAccountBankName());
-
-                RussianPayoutAccount russianPayoutAccount = new RussianPayoutAccount();
-                russianPayoutAccount.setBankAccount(russianBankAccount);
-                russianPayoutAccount.setInn(payoutEvent.getPayoutAccountInn());
-                russianPayoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
-                return PayoutType.bank_account(PayoutAccount.russian_payout_account(russianPayoutAccount));
+                return PayoutType.bank_account(toPayoutAccount(payoutEvent));
             case BANK_CARD:
                 PayoutCard payoutCard = new PayoutCard();
                 com.rbkmoney.damsel.merch_stat.BankCard bankCard = new com.rbkmoney.damsel.merch_stat.BankCard();
@@ -195,6 +227,38 @@ public class DamselUtil {
                 return PayoutType.bank_card(payoutCard);
             default:
                 throw new NotFoundException(String.format("Payout type '%s' not found", payoutType.getFieldName()));
+        }
+    }
+
+    public static PayoutAccount toPayoutAccount(PayoutEventStat payoutEvent) {
+        switch (payoutEvent.getPayoutAccountType()) {
+            case RUSSIAN_PAYOUT_ACCOUNT:
+                RussianBankAccount russianBankAccount = new RussianBankAccount();
+                russianBankAccount.setAccount(payoutEvent.getPayoutAccountBankId());
+                russianBankAccount.setBankBik(payoutEvent.getPayoutAccountBankLocalCode());
+                russianBankAccount.setBankPostAccount(payoutEvent.getPayoutAccountBankCorrId());
+                russianBankAccount.setBankName(payoutEvent.getPayoutAccountBankName());
+
+                RussianPayoutAccount russianPayoutAccount = new RussianPayoutAccount();
+                russianPayoutAccount.setBankAccount(russianBankAccount);
+                russianPayoutAccount.setInn(payoutEvent.getPayoutAccountInn());
+                russianPayoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
+                return PayoutAccount.russian_payout_account(russianPayoutAccount);
+            case INTERNATIONAL_PAYOUT_ACCOUNT:
+                InternationalBankAccount internationalBankAccount = new InternationalBankAccount();
+                internationalBankAccount.setAccountHolder(payoutEvent.getPayoutAccountBankId());
+                internationalBankAccount.setBankName(payoutEvent.getPayoutAccountBankName());
+                internationalBankAccount.setLocalBankCode(payoutEvent.getPayoutAccountBankLocalCode());
+                internationalBankAccount.setIban(payoutEvent.getPayoutAccountBankIban());
+                internationalBankAccount.setBic(payoutEvent.getPayoutAccountBankBic());
+                internationalBankAccount.setBankAddress(payoutEvent.getPayoutAccountBankAddress());
+
+                InternationalPayoutAccount internationalPayoutAccount = new InternationalPayoutAccount();
+                internationalPayoutAccount.setBankAccount(internationalBankAccount);
+                internationalPayoutAccount.setPurpose(payoutEvent.getPayoutAccountPurpose());
+                return PayoutAccount.international_payout_account(internationalPayoutAccount);
+            default:
+                throw new NotFoundException(String.format("Payout account type '%s' not found", payoutEvent.getPayoutAccountType()));
         }
     }
 
