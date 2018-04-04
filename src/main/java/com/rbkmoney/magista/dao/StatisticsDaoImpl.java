@@ -2,6 +2,7 @@ package com.rbkmoney.magista.dao;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.common.collect.ImmutableMap;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
@@ -10,18 +11,20 @@ import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.util.TypeUtil;
 import org.jooq.*;
+import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 import javax.sql.DataSource;
-import java.math.BigDecimal;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
@@ -420,116 +423,151 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Collection<Map<String, String>> getAccountingDataByPeriod(String merchantId, String contractId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
-        Field<String> partyIdField = DSL.field("merchant_id", String.class);
-        Field<String> partyContractIdField = DSL.field("contract_id", String.class);
-        Field<String> currencyCodeField = DSL.field("currency_code", String.class);
-
-        Field<BigDecimal> fundsAcquiredPeriod = DSL.field("funds_acquired_period", BigDecimal.class);
-        Field<BigDecimal> feeChargedPeriod = DSL.field("fee_charged_period", BigDecimal.class);
-        Table payments = getDslContext().select(
-                INVOICE_EVENT_STAT.PARTY_ID.as(partyIdField),
-                INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.as(partyContractIdField),
-                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.as(currencyCodeField),
-                DSL.sum(INVOICE_EVENT_STAT.PAYMENT_AMOUNT).as(fundsAcquiredPeriod),
-                DSL.sum(INVOICE_EVENT_STAT.PAYMENT_FEE).as(feeChargedPeriod)
-        ).from(INVOICE_EVENT_STAT).where(
-                appendDateTimeRangeConditions(
-                        INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)
-                                .and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId))
-                                .and(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
-                                .and(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.eq(currencyCode))
-                                .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
-                        INVOICE_EVENT_STAT.EVENT_CREATED_AT,
-                        fromTime,
-                        Optional.of(toTime)
-                )
-        ).groupBy(
-                INVOICE_EVENT_STAT.PARTY_ID,
-                INVOICE_EVENT_STAT.PARTY_CONTRACT_ID,
-                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE
-        ).asTable("payments");
-
-        Field<BigDecimal> fundsRefundedPeriod = DSL.field("funds_refunded_period", BigDecimal.class);
-        Table refunds = getDslContext().select(
-                REFUND.PARTY_ID.as(partyIdField),
-                REFUND.PARTY_CONTRACT_ID.as(partyContractIdField),
-                REFUND.REFUND_CURRENCY_CODE.as(currencyCodeField),
-                DSL.sum(REFUND.REFUND_AMOUNT.minus(REFUND.REFUND_FEE)).as(fundsRefundedPeriod)
-        ).from(REFUND).where(
-                appendDateTimeRangeConditions(
-                        REFUND.PARTY_ID.eq(merchantId)
-                                .and(REFUND.PARTY_CONTRACT_ID.eq(contractId))
-                                .and(REFUND.REFUND_STATUS.eq(RefundStatus.succeeded)),
-                        REFUND.EVENT_CREATED_AT,
-                        fromTime,
-                        Optional.of(toTime)
-                )
-        ).groupBy(
-                REFUND.PARTY_ID,
-                REFUND.PARTY_CONTRACT_ID,
-                REFUND.REFUND_CURRENCY_CODE
-        ).asTable("refunds");
-
-        Field<String> partyShopIdField = DSL.field("party_shop_id", String.class);
-        Field<BigDecimal> fundsPaidOutPeriod = DSL.field("funds_paid_out_period", BigDecimal.class);
-        Table payouts = getDslContext().select(
-                PAYOUT_EVENT_STAT.PARTY_ID.as(partyIdField),
-                PAYOUT_EVENT_STAT.PARTY_SHOP_ID.as(partyShopIdField),
-                PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.as(currencyCodeField),
-                DSL.sum(
-                        PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
-                                .minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))
-                ).as(fundsPaidOutPeriod)
-        ).from(PAYOUT_EVENT_STAT).where(
-                appendDateTimeRangeConditions(
-                        PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid),
-                        PAYOUT_EVENT_STAT.EVENT_CREATED_AT,
-                        fromTime,
-                        Optional.of(toTime)
-                )
-        ).groupBy(
-                PAYOUT_EVENT_STAT.PARTY_ID,
-                PAYOUT_EVENT_STAT.PARTY_SHOP_ID,
-                PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
-        ).asTable("payouts");
-
-        Query query = getDslContext().select(
-                payments.field(partyIdField),
-                payments.field(partyContractIdField),
-                payments.field(currencyCodeField),
-                DSL.coalesce(fundsAcquiredPeriod, 0).as("funds_acquired"),
-                DSL.coalesce(feeChargedPeriod, 0).as("fee_charged"),
-                DSL.coalesce(fundsPaidOutPeriod, 0).as("funds_paid_out"),
-                DSL.coalesce(fundsRefundedPeriod, 0).as("funds_refunded")
-        ).from(payments)
-                .leftJoin(refunds).on(
-                        payments.field(partyIdField).eq(refunds.field(partyIdField))
-                                .and(payments.field(partyContractIdField).eq(refunds.field(partyContractIdField)))
-                                .and(payments.field(currencyCodeField).eq(refunds.field(currencyCodeField)))
-                )
-                .leftJoin(payouts).on(
-                        payments.field(partyIdField).eq(payouts.field(partyIdField))
-                                .and(payments.field(partyContractIdField).in(
-                                        getDslContext().select(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID)
-                                                .from(INVOICE_EVENT_STAT)
-                                                .where(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(payouts.field(partyShopIdField)))
-                                                .groupBy(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID)
-                                        )
-                                )
-                                .and(payments.field(currencyCodeField).eq(payouts.field(currencyCodeField)))
+        CompletableFuture<Map<String, String>> paymentCompletableFuture = CompletableFuture.supplyAsync(() -> {
+            Query query = getDslContext().select(
+                    DSL.sum(INVOICE_EVENT_STAT.PAYMENT_AMOUNT).as("funds_acquired"),
+                    DSL.sum(INVOICE_EVENT_STAT.PAYMENT_FEE).as("fee_charged")
+            ).from(INVOICE_EVENT_STAT).where(
+                    appendDateTimeRangeConditions(
+                            INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)
+                                    .and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId))
+                                    .and(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
+                                    .and(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.eq(currencyCode))
+                                    .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
+                            INVOICE_EVENT_STAT.EVENT_CREATED_AT,
+                            fromTime,
+                            Optional.of(toTime)
+                    )
+            ).groupBy(
+                    INVOICE_EVENT_STAT.PARTY_ID,
+                    INVOICE_EVENT_STAT.PARTY_CONTRACT_ID,
+                    INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE
+            );
+            try {
+                log.debug("Start payment accounting query, merchantId='{}', contractId='{}', currencyCode='{}', fromTime='{}', toTime='{}'",
+                        merchantId, contractId, currencyCode, fromTime, toTime);
+                return Optional.ofNullable(
+                        fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
+                                .put("funds_acquired", rs.getString("funds_acquired"))
+                                .put("fee_charged", rs.getString("fee_charged"))
+                                .build()
+                        )
+                ).orElse(
+                        ImmutableMap.<String, String>builder()
+                                .put("funds_acquired", "0")
+                                .put("fee_charged", "0")
+                                .build()
                 );
-
-        return fetch(query, (rs, i) -> {
-            Map<String, String> map = new HashMap<>();
-            map.put("merchant_id", rs.getString("merchant_id"));
-            map.put("contract_id", rs.getString("contract_id"));
-            map.put("currency_code", rs.getString("currency_code"));
-            map.put("funds_acquired", rs.getString("funds_acquired"));
-            map.put("fee_charged", rs.getString("fee_charged"));
-            map.put("funds_paid_out", rs.getString("funds_paid_out"));
-            map.put("funds_refunded", rs.getString("funds_refunded"));
-            return map;
+            } finally {
+                log.debug("End payment accounting query, merchantId='{}', contractId='{}', currencyCode='{}', fromTime='{}', toTime='{}'",
+                        merchantId, contractId, currencyCode, fromTime, toTime);
+            }
         });
+
+        CompletableFuture<Map<String, String>> refundCompletableFuture = CompletableFuture.supplyAsync(() -> {
+            Query query = getDslContext().select(
+                    DSL.sum(REFUND.REFUND_AMOUNT.minus(REFUND.REFUND_FEE)).as("funds_refunded")
+            ).from(REFUND).where(
+                    appendDateTimeRangeConditions(
+                            REFUND.PARTY_ID.eq(merchantId)
+                                    .and(REFUND.PARTY_CONTRACT_ID.eq(contractId))
+                                    .and(REFUND.REFUND_STATUS.eq(RefundStatus.succeeded))
+                                    .and(REFUND.REFUND_CURRENCY_CODE.eq(currencyCode)),
+                            REFUND.EVENT_CREATED_AT,
+                            fromTime,
+                            Optional.of(toTime)
+                    )
+            ).groupBy(
+                    REFUND.PARTY_ID,
+                    REFUND.PARTY_CONTRACT_ID,
+                    REFUND.REFUND_CURRENCY_CODE
+            );
+            try {
+                log.debug("Start refund accounting query, merchantId='{}', contractId='{}', currencyCode='{}', fromTime='{}', toTime='{}'",
+                        merchantId, contractId, currencyCode, fromTime, toTime);
+                return Optional.ofNullable(
+                        fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
+                                .put("funds_refunded", rs.getString("funds_refunded"))
+                                .build()
+                        )
+                ).orElse(ImmutableMap.<String, String>builder().put("funds_refunded", "0").build());
+            } finally {
+                log.debug("End refund accounting query, merchantId='{}', contractId='{}', currencyCode='{}', fromTime='{}', toTime='{}'",
+                        merchantId, contractId, currencyCode, fromTime, toTime);
+            }
+        });
+
+        CompletableFuture<Map<String, String>> payoutCompletableFuture = CompletableFuture.supplyAsync(() -> {
+            Query query = getDslContext().select(
+                    DSL.sum(
+                            PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
+                                    .minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))
+                    ).as("funds_paid_out")
+            ).from(PAYOUT_EVENT_STAT).where(
+                    appendDateTimeRangeConditions(
+                            PAYOUT_EVENT_STAT.PARTY_SHOP_ID.in(
+                                    getDslContext().select(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
+                                            .from(INVOICE_EVENT_STAT)
+                                            .where(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
+                                            .groupBy(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
+                            )
+                                    .and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid))
+                                    .and(PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.eq(currencyCode)),
+                            PAYOUT_EVENT_STAT.EVENT_CREATED_AT,
+                            fromTime,
+                            Optional.of(toTime)
+                    )
+            ).groupBy(
+                    PAYOUT_EVENT_STAT.PARTY_ID,
+                    PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
+            );
+
+            try {
+                log.debug("Start payout accounting query, merchantId='{}', contractId='{}', currencyCode='{}', fromTime='{}', toTime='{}'",
+                        merchantId, contractId, currencyCode, fromTime, toTime);
+                return Optional.ofNullable(
+                        fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
+                                .put("funds_paid_out", rs.getString("funds_paid_out"))
+                                .build())
+                ).orElse(ImmutableMap.<String, String>builder().put("funds_paid_out", "0").build());
+            } finally {
+                log.debug("End payout accounting query, merchantId='{}', contractId='{}', currencyCode='{}', fromTime='{}', toTime='{}'",
+                        merchantId, contractId, currencyCode, fromTime, toTime);
+            }
+        });
+
+        CompletableFuture<Map<String, String>> combinedFuture = paymentCompletableFuture.thenCombineAsync(
+                refundCompletableFuture, (payments, refunds) -> ImmutableMap.<String, String>builder()
+                        .putAll(payments)
+                        .putAll(refunds)
+                        .build()
+        ).thenCombineAsync(
+                payoutCompletableFuture, (paymentsWithRefunds, payouts) ->
+                        ImmutableMap.<String, String>builder()
+                                .putAll(paymentsWithRefunds)
+                                .putAll(payouts)
+                                .build()
+        );
+
+        try {
+            return Arrays.asList(
+                    ImmutableMap.<String, String>builder()
+                            .put("merchant_id", merchantId)
+                            .put("contract_id", contractId)
+                            .put("currency_code", currencyCode)
+                            .putAll(combinedFuture.get())
+                            .build()
+            );
+        } catch (ExecutionException ex) {
+            Throwable throwable = ex.getCause();
+            if (throwable instanceof DaoException) {
+                throw (DaoException) throwable;
+            }
+            throw new RuntimeException(ex.getMessage(), ex);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(ex);
+        }
     }
 
     private MapSqlParameterSource createParamsMap(String merchantId, String shopId, Instant fromTime, Instant toTime, Integer splitInterval) {
