@@ -6,6 +6,7 @@ package com.rbkmoney.magista.domain.tables;
 
 import com.rbkmoney.magista.domain.Keys;
 import com.rbkmoney.magista.domain.Mst;
+import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
 import com.rbkmoney.magista.domain.tables.records.RefundRecord;
@@ -38,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Refund extends TableImpl<RefundRecord> {
 
-    private static final long serialVersionUID = -809160528;
+    private static final long serialVersionUID = 765421569;
 
     /**
      * The reference instance of <code>mst.refund</code>
@@ -111,7 +112,7 @@ public class Refund extends TableImpl<RefundRecord> {
     /**
      * The column <code>mst.refund.refund_operation_failure_class</code>.
      */
-    public final TableField<RefundRecord, String> REFUND_OPERATION_FAILURE_CLASS = createField("refund_operation_failure_class", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+    public final TableField<RefundRecord, FailureClass> REFUND_OPERATION_FAILURE_CLASS = createField("refund_operation_failure_class", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.FailureClass.class), this, "");
 
     /**
      * The column <code>mst.refund.refund_external_failure</code>.

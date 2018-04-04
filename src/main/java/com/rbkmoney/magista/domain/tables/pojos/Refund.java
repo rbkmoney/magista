@@ -4,6 +4,7 @@
 package com.rbkmoney.magista.domain.tables.pojos;
 
 
+import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
 
@@ -26,7 +27,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Refund implements Serializable {
 
-    private static final long serialVersionUID = -1934491191;
+    private static final long serialVersionUID = 213241229;
 
     private Long             id;
     private Long             eventId;
@@ -39,7 +40,7 @@ public class Refund implements Serializable {
     private String           partyShopId;
     private String           partyContractId;
     private RefundStatus     refundStatus;
-    private String           refundOperationFailureClass;
+    private FailureClass     refundOperationFailureClass;
     private String           refundExternalFailure;
     private String           refundExternalFailureReason;
     private LocalDateTime    refundCreatedAt;
@@ -88,7 +89,7 @@ public class Refund implements Serializable {
         String           partyShopId,
         String           partyContractId,
         RefundStatus     refundStatus,
-        String           refundOperationFailureClass,
+        FailureClass     refundOperationFailureClass,
         String           refundExternalFailure,
         String           refundExternalFailureReason,
         LocalDateTime    refundCreatedAt,
@@ -210,11 +211,11 @@ public class Refund implements Serializable {
         this.refundStatus = refundStatus;
     }
 
-    public String getRefundOperationFailureClass() {
+    public FailureClass getRefundOperationFailureClass() {
         return this.refundOperationFailureClass;
     }
 
-    public void setRefundOperationFailureClass(String refundOperationFailureClass) {
+    public void setRefundOperationFailureClass(FailureClass refundOperationFailureClass) {
         this.refundOperationFailureClass = refundOperationFailureClass;
     }
 

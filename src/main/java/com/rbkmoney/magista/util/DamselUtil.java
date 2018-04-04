@@ -45,6 +45,8 @@ import com.rbkmoney.geck.serializer.kit.json.JsonHandler;
 import com.rbkmoney.geck.serializer.kit.json.JsonProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseProcessor;
+import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
+import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.Refund;
@@ -372,9 +374,9 @@ public class DamselUtil {
             case FAILED:
                 return InvoicePaymentStatus.failed(new InvoicePaymentFailed(
                         toOperationFailure(
-                                invoicePaymentStat.getPaymentFailureClass(),
-                                invoicePaymentStat.getPaymentExternalFailureCode(),
-                                invoicePaymentStat.getPaymentExternalFailureDescription()
+                                invoicePaymentStat.getPaymentOperationFailureClass(),
+                                invoicePaymentStat.getPaymentExternalFailure(),
+                                invoicePaymentStat.getPaymentExternalFailureReason()
                         )
                 ));
             default:
@@ -382,16 +384,14 @@ public class DamselUtil {
         }
     }
 
-    public static OperationFailure toOperationFailure(String failureClass, String failure, String failureDescription) {
-        com.rbkmoney.damsel.domain.OperationFailure._Fields failureType = com.rbkmoney.damsel.domain.OperationFailure._Fields.findByName(failureClass);
-        switch (failureType) {
-            case OPERATION_TIMEOUT:
+    public static OperationFailure toOperationFailure(FailureClass failureClass, String failure, String failureDescription) {
+        switch (failureClass) {
+            case operation_timeout:
                 return OperationFailure.operation_timeout(new OperationTimeout());
-            case FAILURE:
-                ExternalFailure externalFailure = new ExternalFailure();
-                externalFailure.setCode(failure);
-                externalFailure.setDescription(failureDescription);
-                return OperationFailure.external_failure(externalFailure);
+            case failure:
+                Failure externalFailure = TErrorUtil.toGeneral(failure);
+                externalFailure.setReason(failureDescription);
+                return OperationFailure.failure(externalFailure);
             default:
                 throw new NotFoundException(String.format("Failure type '%s' not found", failureClass));
         }

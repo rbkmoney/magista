@@ -5,6 +5,7 @@ import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.dao.InvoiceEventDao;
+import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import io.github.benas.randombeans.EnhancedRandomBuilder;
@@ -59,7 +60,7 @@ public class OffsetPerformanceTest extends AbstractIntegrationTest {
                 .map(invoiceEventStat -> {
                     invoiceEventStat.setPartyId(partyId);
                     invoiceEventStat.setPartyShopId(shopId);
-                    invoiceEventStat.setPaymentFailureClass("operation_timeout");
+                    invoiceEventStat.setPaymentOperationFailureClass(FailureClass.operation_timeout);
                     invoiceEventStat.setPaymentTool("bank_card");
                     invoiceEventStat.setPaymentSystem("mastercard");
                     invoiceEventStat.setPaymentFlow("instant");
