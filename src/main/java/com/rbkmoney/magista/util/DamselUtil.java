@@ -10,8 +10,8 @@ import com.rbkmoney.damsel.merch_stat.BankCard;
 import com.rbkmoney.damsel.merch_stat.CustomerPayer;
 import com.rbkmoney.damsel.merch_stat.DigitalWallet;
 import com.rbkmoney.damsel.merch_stat.DigitalWalletProvider;
-import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.InternationalBankAccount;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
 import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
 import com.rbkmoney.damsel.merch_stat.InvoicePaid;
@@ -364,21 +364,31 @@ public class DamselUtil {
             case PENDING:
                 return InvoicePaymentStatus.pending(new InvoicePaymentPending());
             case PROCESSED:
-                return InvoicePaymentStatus.processed(new InvoicePaymentProcessed());
+                return InvoicePaymentStatus.processed(new InvoicePaymentProcessed(
+                        TypeUtil.temporalToString(invoicePaymentStat.getEventCreatedAt())
+                ));
             case CAPTURED:
-                return InvoicePaymentStatus.captured(new InvoicePaymentCaptured());
+                return InvoicePaymentStatus.captured(new InvoicePaymentCaptured(
+                        TypeUtil.temporalToString(invoicePaymentStat.getEventCreatedAt())
+                ));
             case CANCELLED:
-                return InvoicePaymentStatus.cancelled(new InvoicePaymentCancelled());
+                return InvoicePaymentStatus.cancelled(new InvoicePaymentCancelled(
+                        TypeUtil.temporalToString(invoicePaymentStat.getEventCreatedAt())
+                ));
             case REFUNDED:
-                return InvoicePaymentStatus.refunded(new InvoicePaymentRefunded());
+                return InvoicePaymentStatus.refunded(new InvoicePaymentRefunded(
+                        TypeUtil.temporalToString(invoicePaymentStat.getEventCreatedAt())
+                ));
             case FAILED:
                 return InvoicePaymentStatus.failed(new InvoicePaymentFailed(
-                        toOperationFailure(
-                                invoicePaymentStat.getPaymentOperationFailureClass(),
-                                invoicePaymentStat.getPaymentExternalFailure(),
-                                invoicePaymentStat.getPaymentExternalFailureReason()
+                                toOperationFailure(
+                                        invoicePaymentStat.getPaymentOperationFailureClass(),
+                                        invoicePaymentStat.getPaymentExternalFailure(),
+                                        invoicePaymentStat.getPaymentExternalFailureReason()
+                                ),
+                                TypeUtil.temporalToString(invoicePaymentStat.getEventCreatedAt())
                         )
-                ));
+                );
             default:
                 throw new NotFoundException(String.format("Payment status '%s' not found", status.getFieldName()));
         }
@@ -437,14 +447,22 @@ public class DamselUtil {
             case UNPAID:
                 return com.rbkmoney.damsel.merch_stat.InvoiceStatus.unpaid(new InvoiceUnpaid());
             case PAID:
-                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.paid(new InvoicePaid());
+                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.paid(new InvoicePaid(
+                        TypeUtil.temporalToString(invoiceEventStat.getEventCreatedAt()
+                        )));
             case CANCELLED:
                 return com.rbkmoney.damsel.merch_stat.InvoiceStatus.cancelled(
-                        new InvoiceCancelled(invoiceEventStat.getInvoiceStatusDetails())
+                        new InvoiceCancelled(
+                                invoiceEventStat.getInvoiceStatusDetails(),
+                                TypeUtil.temporalToString(invoiceEventStat.getEventCreatedAt())
+                        )
                 );
             case FULFILLED:
                 return com.rbkmoney.damsel.merch_stat.InvoiceStatus.fulfilled(
-                        new InvoiceFulfilled(invoiceEventStat.getInvoiceStatusDetails())
+                        new InvoiceFulfilled(
+                                invoiceEventStat.getInvoiceStatusDetails(),
+                                TypeUtil.temporalToString(invoiceEventStat.getEventCreatedAt())
+                        )
                 );
             default:
                 throw new NotFoundException(String.format("Status '%s' not found", invoiceEventStat.getInvoiceStatus()));
