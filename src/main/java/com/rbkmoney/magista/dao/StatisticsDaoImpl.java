@@ -78,6 +78,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         }
 
         Query query = getDslContext().select(
+                INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 INVOICE_EVENT_STAT.PARTY_ID,
                 INVOICE_EVENT_STAT.PARTY_SHOP_ID,
                 INVOICE_EVENT_STAT.INVOICE_ID,
@@ -99,6 +100,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .offset(offset.orElse(0));
         return fetch(query, (rs, i) -> {
             InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
+            invoiceEventStat.setEventCreatedAt(rs.getObject(INVOICE_EVENT_STAT.EVENT_CREATED_AT.getName(), LocalDateTime.class));
             invoiceEventStat.setPartyId(rs.getString(INVOICE_EVENT_STAT.PARTY_ID.getName()));
             invoiceEventStat.setPartyShopId(rs.getString(INVOICE_EVENT_STAT.PARTY_SHOP_ID.getName()));
             invoiceEventStat.setInvoiceId(rs.getString(INVOICE_EVENT_STAT.INVOICE_ID.getName()));
@@ -162,6 +164,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         }
 
         Query query = getDslContext().select(
+                INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 INVOICE_EVENT_STAT.PAYMENT_ID,
                 INVOICE_EVENT_STAT.INVOICE_ID,
                 INVOICE_EVENT_STAT.PARTY_ID,
@@ -202,6 +205,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .offset(offset.orElse(0));
         return fetch(query, (rs, i) -> {
             InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
+            invoiceEventStat.setEventCreatedAt(rs.getObject(INVOICE_EVENT_STAT.EVENT_CREATED_AT.getName(), LocalDateTime.class));
 
             invoiceEventStat.setPartyId(rs.getString(INVOICE_EVENT_STAT.PARTY_ID.getName()));
             invoiceEventStat.setPartyShopId(rs.getString(INVOICE_EVENT_STAT.PARTY_SHOP_ID.getName()));
