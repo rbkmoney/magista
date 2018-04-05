@@ -1,10 +1,12 @@
 package com.rbkmoney.magista.dao;
 
+import com.rbkmoney.damsel.merch_stat.OperationFailure;
 import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.AbstractIntegrationTest;
+import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.query.impl.QueryContextFactoryImpl;
@@ -113,7 +115,7 @@ public class OffsetTest extends AbstractIntegrationTest {
                              invoiceEventStat.setPartyId(partyId);
                              invoiceEventStat.setPartyShopId(shopId);
                              invoiceEventStat.setEventCategory(InvoiceEventCategory.PAYMENT);
-                             invoiceEventStat.setPaymentFailureClass("operation_timeout");
+                             invoiceEventStat.setPaymentOperationFailureClass(FailureClass.operation_timeout);
                              invoiceEventStat.setPaymentTool("bank_card");
                              invoiceEventStat.setPaymentSystem("mastercard");
                              invoiceEventStat.setPaymentFlow("instant");

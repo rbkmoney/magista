@@ -168,9 +168,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.PARTY_SHOP_ID,
                 INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
                 INVOICE_EVENT_STAT.PAYMENT_STATUS,
-                INVOICE_EVENT_STAT.PAYMENT_FAILURE_CLASS,
-                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_CODE,
-                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_DESCRIPTION,
+                INVOICE_EVENT_STAT.PAYMENT_OPERATION_FAILURE_CLASS,
+                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE,
+                INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_REASON,
                 INVOICE_EVENT_STAT.PAYMENT_AMOUNT,
                 INVOICE_EVENT_STAT.PAYMENT_FEE,
                 INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE,
@@ -212,9 +212,11 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                     TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.PAYMENT_STATUS.getName()),
                             com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class)
             );
-            invoiceEventStat.setPaymentFailureClass(rs.getString(INVOICE_EVENT_STAT.PAYMENT_FAILURE_CLASS.getName()));
-            invoiceEventStat.setPaymentExternalFailureCode(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_CODE.getName()));
-            invoiceEventStat.setPaymentExternalFailureDescription(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_DESCRIPTION.getName()));
+            invoiceEventStat.setPaymentOperationFailureClass(
+                    TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.PAYMENT_OPERATION_FAILURE_CLASS.getName()), FailureClass.class)
+            );
+            invoiceEventStat.setPaymentExternalFailure(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE.getName()));
+            invoiceEventStat.setPaymentExternalFailureReason(rs.getString(INVOICE_EVENT_STAT.PAYMENT_EXTERNAL_FAILURE_REASON.getName()));
             invoiceEventStat.setPaymentAmount(rs.getLong(INVOICE_EVENT_STAT.PAYMENT_AMOUNT.getName()));
             invoiceEventStat.setPaymentFee(rs.getLong(INVOICE_EVENT_STAT.PAYMENT_FEE.getName()));
             invoiceEventStat.setPaymentCurrencyCode(rs.getString(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.getName()));
@@ -289,7 +291,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             refund.setRefundExternalFee(rs.getLong(REFUND.REFUND_EXTERNAL_FEE.getName()));
             refund.setRefundReason(rs.getString(REFUND.REFUND_REASON.getName()));
             refund.setRefundStatus(TypeUtil.toEnumField(rs.getString(REFUND.REFUND_STATUS.getName()), RefundStatus.class));
-            refund.setRefundOperationFailureClass(rs.getString(REFUND.REFUND_OPERATION_FAILURE_CLASS.getName()));
+            refund.setRefundOperationFailureClass(
+                    TypeUtil.toEnumField(rs.getString(REFUND.REFUND_OPERATION_FAILURE_CLASS.getName()), FailureClass.class)
+            );
             refund.setRefundExternalFailure(rs.getString(REFUND.REFUND_EXTERNAL_FAILURE.getName()));
             refund.setRefundExternalFailureReason(rs.getString(REFUND.REFUND_EXTERNAL_FAILURE_REASON.getName()));
             refund.setRefundCreatedAt(rs.getObject(REFUND.REFUND_CREATED_AT.getName(), LocalDateTime.class));
@@ -684,6 +688,11 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             ConditionParameterSource paymentParameterSource,
             SelectField<?>... fields) {
         Condition condition = PAYOUT_EVENT_STAT.EVENT_CATEGORY.eq(PayoutEventCategory.PAYOUT);
+
+        condition = PAYOUT_EVENT_STAT.ID.in(
+                getDslContext().select(DSL.max(PAYOUT_EVENT_STAT.ID)).from(PAYOUT_EVENT_STAT)
+                        .where(condition).groupBy(PAYOUT_EVENT_STAT.PAYOUT_ID)
+        );
 
         condition = appendConditions(condition, Operator.AND, paymentParameterSource);
 

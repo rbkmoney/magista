@@ -10,6 +10,8 @@ import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentRefundChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
+import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
 import com.rbkmoney.magista.domain.tables.pojos.Refund;
@@ -61,9 +63,12 @@ public class RefundStatusChangedHandler implements Handler<InvoiceChange, StockE
         ));
         if (status.isSetFailed()) {
             OperationFailure operationFailure = status.getFailed().getFailure();
-            refund.setRefundOperationFailureClass(operationFailure.getSetField().getFieldName());
+            refund.setRefundOperationFailureClass(
+                    TBaseUtil.unionFieldToEnum(operationFailure, FailureClass.class)
+            );
             if (operationFailure.isSetFailure()) {
                 Failure failure = operationFailure.getFailure();
+                refund.setRefundExternalFailure(TErrorUtil.toStringVal(failure));
                 refund.setRefundExternalFailureReason(failure.getReason());
             }
         }

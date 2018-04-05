@@ -75,6 +75,13 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testDuplicatePayouts() {
+        String json = "{'query': {'payouts': {'merchant_id': 'test_party_1', 'shop_id': 'test_shop_1', 'from_time': '2016-10-25T15:45:20Z','to_time': '2019-10-25T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(5, statResponse.getTotalCount());
+    }
+
+    @Test
     public void testPayments() throws TException {
         String json = "{'query': {'payments': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'from':'1', 'size':'2'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
@@ -187,7 +194,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertTrue(statResponse.getData().getPayments().stream().anyMatch(
                 payment -> payment.getStatus().isSetFailed()
-                        && payment.getStatus().getFailed().getFailure().isSetExternalFailure()
+                        && payment.getStatus().getFailed().getFailure().isSetFailure()
         ));
     }
 

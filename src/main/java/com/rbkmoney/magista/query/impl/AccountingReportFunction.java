@@ -1,9 +1,7 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.google.common.collect.ImmutableMap;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
-import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.util.TypeUtil;
