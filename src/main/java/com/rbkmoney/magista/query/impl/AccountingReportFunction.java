@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.google.common.collect.ImmutableMap;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.magista.exception.DaoException;
@@ -7,11 +8,9 @@ import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.util.TypeUtil;
 
-import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
@@ -27,18 +26,57 @@ public class AccountingReportFunction extends ReportBaseFunction {
 
     @Override
     public QueryResult<Map<String, String>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
-        try {
-            Collection<Map<String, String>> result = getContext(context).getDao().getAccountingDataByPeriod(
-                    getQueryParameters().getMerchantId(),
-                    getQueryParameters().getContractId(),
-                    getQueryParameters().getCurrencyCode(),
-                    Optional.ofNullable(TypeUtil.toLocalDateTime(getQueryParameters().getFromTime())),
-                    TypeUtil.toLocalDateTime(getQueryParameters().getToTime())
-            );
+        CompletableFuture<Map<String, String>> paymentCompletableFuture = CompletableFuture.supplyAsync(
+                () -> getContext(context).getDao().getPaymentAccountingData(
+                        getQueryParameters().getMerchantId(),
+                        getQueryParameters().getContractId(),
+                        getQueryParameters().getCurrencyCode(),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(getQueryParameters().getFromTime())),
+                        TypeUtil.toLocalDateTime(getQueryParameters().getToTime())
+                )
+        );
 
+        CompletableFuture<Map<String, String>> refundCompletableFuture = CompletableFuture.supplyAsync(
+                () -> getContext(context).getDao().getRefundAccountingData(
+                        getQueryParameters().getMerchantId(),
+                        getQueryParameters().getContractId(),
+                        getQueryParameters().getCurrencyCode(),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(getQueryParameters().getFromTime())),
+                        TypeUtil.toLocalDateTime(getQueryParameters().getToTime())
+                )
+        );
+
+        CompletableFuture<Map<String, String>> payoutCompletableFuture = CompletableFuture.supplyAsync(
+                () -> getContext(context).getDao().getPayoutAccountingData(
+                        getQueryParameters().getMerchantId(),
+                        getQueryParameters().getContractId(),
+                        getQueryParameters().getCurrencyCode(),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(getQueryParameters().getFromTime())),
+                        TypeUtil.toLocalDateTime(getQueryParameters().getToTime())
+                )
+        );
+
+        CompletableFuture<Map<String, String>> combinedFuture = paymentCompletableFuture.thenCombineAsync(
+                refundCompletableFuture, (payments, refunds) -> {
+                    Map map = new HashMap(payments);
+                    map.putAll(refunds);
+                    return map;
+                }
+        ).thenCombineAsync(
+                payoutCompletableFuture, (paymentsWithRefunds, payouts) -> {
+                    Map map = new HashMap(paymentsWithRefunds);
+                    map.putAll(payouts);
+                    return map;
+                }
+        );
+        try {
+            List<Map<String, String>> result = Arrays.asList(combinedFuture.get());
             return new BaseQueryResult<>(() -> result.stream(), () -> new StatResponse(StatResponseData.records(result.stream().collect(Collectors.toList()))));
-        } catch (DaoException e) {
-            throw new QueryExecutionException(e);
+        } catch (ExecutionException ex) {
+            throw new QueryExecutionException(ex.getCause());
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(ex);
         }
     }
 

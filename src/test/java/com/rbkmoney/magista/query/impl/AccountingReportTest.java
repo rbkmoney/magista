@@ -87,4 +87,20 @@ public class AccountingReportTest extends AbstractIntegrationTest {
         assertEquals(0, statResponse3.getTotalCount());
     }
 
+    @Test
+    public void testWhenNotFound() {
+        String json = "{'query': {'shop_accounting_report': {'merchant_id': 'not_found', 'contract_id': '404', 'currency_code': 'RUB', 'to_time': '2017-08-31T21:00:00Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(json);
+        assertEquals(1, statResponse.getData().getRecords().size());
+        Map<String, String> result4 = statResponse.getData().getRecords().get(0);
+        assertEquals(7, result4.size());
+        assertEquals("not_found", result4.get("merchant_id"));
+        assertEquals("404", result4.get("contract_id"));
+        assertEquals("RUB", result4.get("currency_code"));
+        assertEquals("0", result4.get("funds_acquired"));
+        assertEquals("0", result4.get("fee_charged"));
+        assertEquals("0", result4.get("funds_paid_out"));
+        assertEquals("0", result4.get("funds_refunded"));
+    }
+
 }

@@ -8,7 +8,6 @@ import com.rbkmoney.magista.exception.DaoException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -132,7 +131,23 @@ public interface StatisticsDao {
             int splitInterval
     ) throws DaoException;
 
-    Collection<Map<String, String>> getAccountingDataByPeriod(
+    Map<String, String> getPaymentAccountingData(
+            String merchantId,
+            String contractId,
+            String currencyCode,
+            Optional<LocalDateTime> fromTime,
+            LocalDateTime toTime
+    ) throws DaoException;
+
+    Map<String, String> getRefundAccountingData(
+            String merchantId,
+            String contractId,
+            String currencyCode,
+            Optional<LocalDateTime> fromTime,
+            LocalDateTime toTime
+    ) throws DaoException;
+
+    Map<String, String> getPayoutAccountingData(
             String merchantId,
             String contractId,
             String currencyCode,
