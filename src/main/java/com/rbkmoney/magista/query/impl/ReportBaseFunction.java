@@ -50,6 +50,18 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
             super(parameters, derivedParameters);
         }
 
+        public String getMerchantId() {
+            return getStringParameter(MERCHANT_ID_PARAM, false);
+        }
+
+        public String getContractId() {
+            return getStringParameter(CONTRACT_ID_PARAM, false);
+        }
+
+        public String getCurrencyCode() {
+            return getStringParameter(CURRENCY_CODE, false);
+        }
+
         public TemporalAccessor getFromTime() {
             return getTimeParameter(FROM_TIME_PARAM, false);
         }
@@ -58,9 +70,6 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
             return getTimeParameter(TO_TIME_PARAM, false);
         }
 
-        public List<Integer> getGetWithoutShopCategoryIds() {
-            return getArrayParameter(WITHOUT_SHOP_CATEGORY_IDS_PARAM, false);
-        }
     }
 
     public static class ReportBaseValidator extends BaseQueryValidator {
@@ -69,10 +78,22 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
             super.validateParameters(parameters);
             ReportBaseParameters reportBaseParameters = super.checkParamsType(parameters, ReportBaseParameters.class);
 
-            TemporalAccessor from = reportBaseParameters.getFromTime();
-            if (from == null) {
-                checkParamsResult(true, FROM_TIME_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            String merchantId = reportBaseParameters.getMerchantId();
+            if (merchantId == null) {
+                checkParamsResult(true, MERCHANT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
+
+            String contractId = reportBaseParameters.getContractId();
+            if (contractId == null) {
+                checkParamsResult(true, CONTRACT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            }
+
+            String currencyCode = reportBaseParameters.getCurrencyCode();
+            if (currencyCode == null) {
+                checkParamsResult(true, CURRENCY_CODE, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            }
+
+            TemporalAccessor from = reportBaseParameters.getFromTime();
             TemporalAccessor to = reportBaseParameters.getToTime();
             if (to == null) {
                 checkParamsResult(true, TO_TIME_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);

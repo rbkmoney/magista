@@ -10,8 +10,8 @@ import com.rbkmoney.damsel.merch_stat.BankCard;
 import com.rbkmoney.damsel.merch_stat.CustomerPayer;
 import com.rbkmoney.damsel.merch_stat.DigitalWallet;
 import com.rbkmoney.damsel.merch_stat.DigitalWalletProvider;
-import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.InternationalBankAccount;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
 import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
 import com.rbkmoney.damsel.merch_stat.InvoicePaid;
@@ -364,21 +364,31 @@ public class DamselUtil {
             case PENDING:
                 return InvoicePaymentStatus.pending(new InvoicePaymentPending());
             case PROCESSED:
-                return InvoicePaymentStatus.processed(new InvoicePaymentProcessed());
+                InvoicePaymentProcessed invoicePaymentProcessed = new InvoicePaymentProcessed();
+                invoicePaymentProcessed.setAt(TypeUtil.temporalToString(invoicePaymentStat.getEventCreatedAt()));
+                return InvoicePaymentStatus.processed(invoicePaymentProcessed);
             case CAPTURED:
-                return InvoicePaymentStatus.captured(new InvoicePaymentCaptured());
+                InvoicePaymentCaptured invoicePaymentCaptured = new InvoicePaymentCaptured();
+                invoicePaymentCaptured.setAt(TypeUtil.temporalToString(invoicePaymentStat.getEventCreatedAt()));
+                return InvoicePaymentStatus.captured(invoicePaymentCaptured);
             case CANCELLED:
-                return InvoicePaymentStatus.cancelled(new InvoicePaymentCancelled());
+                InvoicePaymentCancelled invoicePaymentCancelled = new InvoicePaymentCancelled();
+                invoicePaymentCancelled.setAt(TypeUtil.temporalToString(invoicePaymentStat.getEventCreatedAt()));
+                return InvoicePaymentStatus.cancelled(invoicePaymentCancelled);
             case REFUNDED:
-                return InvoicePaymentStatus.refunded(new InvoicePaymentRefunded());
+                InvoicePaymentRefunded invoicePaymentRefunded = new InvoicePaymentRefunded();
+                invoicePaymentRefunded.setAt(TypeUtil.temporalToString(invoicePaymentStat.getEventCreatedAt()));
+                return InvoicePaymentStatus.refunded(invoicePaymentRefunded);
             case FAILED:
-                return InvoicePaymentStatus.failed(new InvoicePaymentFailed(
+                InvoicePaymentFailed invoicePaymentFailed = new InvoicePaymentFailed(
                         toOperationFailure(
                                 invoicePaymentStat.getPaymentOperationFailureClass(),
                                 invoicePaymentStat.getPaymentExternalFailure(),
                                 invoicePaymentStat.getPaymentExternalFailureReason()
                         )
-                ));
+                );
+                invoicePaymentFailed.setAt(TypeUtil.temporalToString(invoicePaymentStat.getEventCreatedAt()));
+                return InvoicePaymentStatus.failed(invoicePaymentFailed);
             default:
                 throw new NotFoundException(String.format("Payment status '%s' not found", status.getFieldName()));
         }
@@ -437,15 +447,17 @@ public class DamselUtil {
             case UNPAID:
                 return com.rbkmoney.damsel.merch_stat.InvoiceStatus.unpaid(new InvoiceUnpaid());
             case PAID:
-                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.paid(new InvoicePaid());
+                InvoicePaid invoicePaid = new InvoicePaid();
+                invoicePaid.setAt(TypeUtil.temporalToString(invoiceEventStat.getEventCreatedAt()));
+                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.paid(invoicePaid);
             case CANCELLED:
-                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.cancelled(
-                        new InvoiceCancelled(invoiceEventStat.getInvoiceStatusDetails())
-                );
+                InvoiceCancelled invoiceCancelled = new InvoiceCancelled(invoiceEventStat.getInvoiceStatusDetails());
+                invoiceCancelled.setAt(TypeUtil.temporalToString(invoiceEventStat.getEventCreatedAt()));
+                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.cancelled(invoiceCancelled);
             case FULFILLED:
-                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.fulfilled(
-                        new InvoiceFulfilled(invoiceEventStat.getInvoiceStatusDetails())
-                );
+                InvoiceFulfilled invoiceFulfilled = new InvoiceFulfilled(invoiceEventStat.getInvoiceStatusDetails());
+                invoiceFulfilled.setAt(TypeUtil.temporalToString(invoiceEventStat.getEventCreatedAt()));
+                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.fulfilled(invoiceFulfilled);
             default:
                 throw new NotFoundException(String.format("Status '%s' not found", invoiceEventStat.getInvoiceStatus()));
         }

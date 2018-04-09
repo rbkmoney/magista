@@ -2,6 +2,7 @@ package com.rbkmoney.magista.dao;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.common.collect.ImmutableMap;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
@@ -10,6 +11,7 @@ import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.util.TypeUtil;
 import org.jooq.*;
+import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +22,6 @@ import java.sql.Types;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -50,6 +51,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     public Collection<InvoiceEventStat> getInvoices(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
@@ -62,7 +64,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         if (offset.isPresent()) {
             DateTimeRange dateTimeRange = getDateTimeRangeByOffset(
-                    buildInvoiceCondition(merchantId, shopId, invoiceParameterSource, paymentParameterSource, fromTime, toTime),
+                    buildInvoiceCondition(
+                            merchantId, shopId, contractId, invoiceParameterSource, paymentParameterSource, fromTime, toTime),
                     fromTime,
                     toTime,
                     INVOICE_EVENT_STAT.EVENT_CREATED_AT,
@@ -76,6 +79,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         }
 
         Query query = getDslContext().select(
+                INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 INVOICE_EVENT_STAT.PARTY_ID,
                 INVOICE_EVENT_STAT.PARTY_SHOP_ID,
                 INVOICE_EVENT_STAT.INVOICE_ID,
@@ -91,12 +95,13 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.INVOICE_CONTEXT_TYPE,
                 INVOICE_EVENT_STAT.INVOICE_CONTEXT
         ).from(INVOICE_EVENT_STAT)
-                .where(buildInvoiceCondition(merchantId, shopId, invoiceParameterSource, paymentParameterSource, fromTime, toTime))
+                .where(buildInvoiceCondition(merchantId, shopId, contractId, invoiceParameterSource, paymentParameterSource, fromTime, toTime))
                 .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
                 .limit(limitValue)
                 .offset(offset.orElse(0));
         return fetch(query, (rs, i) -> {
             InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
+            invoiceEventStat.setEventCreatedAt(rs.getObject(INVOICE_EVENT_STAT.EVENT_CREATED_AT.getName(), LocalDateTime.class));
             invoiceEventStat.setPartyId(rs.getString(INVOICE_EVENT_STAT.PARTY_ID.getName()));
             invoiceEventStat.setPartyShopId(rs.getString(INVOICE_EVENT_STAT.PARTY_SHOP_ID.getName()));
             invoiceEventStat.setInvoiceId(rs.getString(INVOICE_EVENT_STAT.INVOICE_ID.getName()));
@@ -120,13 +125,14 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     public int getInvoicesCount(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) throws DaoException {
         Query query = getDslContext().select(DSL.count()).from(INVOICE_EVENT_STAT)
-                .where(buildInvoiceCondition(merchantId, shopId, invoiceParameterSource, paymentParameterSource, fromTime, toTime));
+                .where(buildInvoiceCondition(merchantId, shopId, contractId, invoiceParameterSource, paymentParameterSource, fromTime, toTime));
         return fetchOne(query, Integer.class);
     }
 
@@ -134,6 +140,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     public Collection<InvoiceEventStat> getPayments(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
@@ -145,7 +152,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         if (offset.isPresent()) {
             DateTimeRange dateTimeRange = getDateTimeRangeByOffset(
-                    buildPaymentCondition(merchantId, shopId, parameterSource, fromTime, toTime),
+                    buildPaymentCondition(merchantId, shopId, contractId, parameterSource, fromTime, toTime),
                     fromTime,
                     toTime,
                     INVOICE_EVENT_STAT.EVENT_CREATED_AT,
@@ -158,6 +165,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         }
 
         Query query = getDslContext().select(
+                INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 INVOICE_EVENT_STAT.PAYMENT_ID,
                 INVOICE_EVENT_STAT.INVOICE_ID,
                 INVOICE_EVENT_STAT.PARTY_ID,
@@ -192,12 +200,13 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.PAYMENT_CONTEXT_TYPE,
                 INVOICE_EVENT_STAT.PAYMENT_CONTEXT
         ).from(INVOICE_EVENT_STAT)
-                .where(buildPaymentCondition(merchantId, shopId, parameterSource, fromTime, toTime))
+                .where(buildPaymentCondition(merchantId, shopId, contractId, parameterSource, fromTime, toTime))
                 .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
                 .limit(limitValue)
                 .offset(offset.orElse(0));
         return fetch(query, (rs, i) -> {
             InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
+            invoiceEventStat.setEventCreatedAt(rs.getObject(INVOICE_EVENT_STAT.EVENT_CREATED_AT.getName(), LocalDateTime.class));
 
             invoiceEventStat.setPartyId(rs.getString(INVOICE_EVENT_STAT.PARTY_ID.getName()));
             invoiceEventStat.setPartyShopId(rs.getString(INVOICE_EVENT_STAT.PARTY_SHOP_ID.getName()));
@@ -246,12 +255,13 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     public Integer getPaymentsCount(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) throws DaoException {
         Query query = getDslContext().select(DSL.count()).from(INVOICE_EVENT_STAT)
-                .where(buildPaymentCondition(merchantId, shopId, parameterSource, fromTime, toTime));
+                .where(buildPaymentCondition(merchantId, shopId, contractId, parameterSource, fromTime, toTime));
         return fetchOne(query, Integer.class);
     }
 
@@ -259,6 +269,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     public Collection<Refund> getRefunds(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
@@ -266,7 +277,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> limit
     ) throws DaoException {
         Query query = getDslContext().selectFrom(REFUND)
-                .where(buildRefundCondition(merchantId, shopId, parameterSource, fromTime, toTime))
+                .where(buildRefundCondition(merchantId, shopId, contractId, parameterSource, fromTime, toTime))
                 .orderBy(REFUND.REFUND_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
@@ -299,12 +310,13 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     public Integer getRefundsCount(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) throws DaoException {
         Query query = getDslContext().select(DSL.count()).from(REFUND)
-                .where(buildRefundCondition(merchantId, shopId, parameterSource, fromTime, toTime));
+                .where(buildRefundCondition(merchantId, shopId, contractId, parameterSource, fromTime, toTime));
         return fetchOne(query, Integer.class);
     }
 
@@ -416,31 +428,182 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Collection<Map<String, String>> getAccountingDataByPeriod(Instant fromTime, Instant toTime, Optional<List<Integer>> withoutShopCategoryIds) throws DaoException {
-        //TODO rewrite this request to jooq
-        String sql = "SELECT part1.party_id AS merchant_id, part1.party_shop_id AS shop_id, part1.payment_currency_code AS currency_code, (coalesce(funds_to_be_paid_prev_periods, 0) - coalesce(funds_paid_out_prev_periods, 0) - coalesce(funds_refunded_prev_periods, 0)) AS opening_balance, coalesce(funds_acquired_period, 0) AS funds_acquired, coalesce(fee_charged_period, 0) AS fee_charged, coalesce(funds_paid_out_period, 0) AS funds_paid_out, coalesce(funds_refunded_period, 0) AS funds_refunded, (coalesce(funds_to_be_paid_prev_periods, 0) - coalesce(funds_paid_out_prev_periods, 0) - coalesce(funds_refunded_prev_periods, 0) + coalesce(funds_acquired_period, 0) - coalesce(fee_charged_period, 0) - coalesce(funds_paid_out_period, 0) - coalesce(funds_refunded_period, 0)) AS closing_balance FROM (SELECT party_id, party_shop_id, payment_currency_code, sum(payment_amount) AS funds_acquired_period, sum(payment_fee) AS fee_charged_period FROM mst.invoice_event_stat WHERE id IN (SELECT max(id) FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND party_shop_category_id NOT IN (:shop_categories) AND event_created_at >= :from_time AND event_created_at < :to_time GROUP BY invoice_id, payment_id) AND payment_status IN (:succeeded_status :: mst.INVOICE_PAYMENT_STATUS, :refunded_status :: mst.INVOICE_PAYMENT_STATUS) GROUP BY party_shop_id, payment_currency_code, party_id) part1 LEFT JOIN (SELECT party_id, party_shop_id, sum( payment_amount) AS funds_refunded_period FROM mst.invoice_event_stat WHERE id IN (SELECT max(id) FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND event_created_at >= :from_time AND event_created_at < :to_time GROUP BY invoice_id, payment_id) AND payment_status = :refunded_status :: mst.INVOICE_PAYMENT_STATUS GROUP BY party_shop_id, payment_currency_code, party_id) part2 ON part1.party_id = part2.party_id AND part1.party_shop_id = part2.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payment_amount - payment_fee) AS funds_to_be_paid_prev_periods FROM mst.invoice_event_stat WHERE id IN (SELECT max(id) FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND event_created_at < :from_time GROUP BY invoice_id, payment_id) AND payment_status IN (:succeeded_status :: mst.INVOICE_PAYMENT_STATUS, :refunded_status :: mst.INVOICE_PAYMENT_STATUS) GROUP BY party_shop_id, party_id) part3 ON part1.party_id = part3.party_id AND part1.party_shop_id = part3.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payment_amount) AS funds_refunded_prev_periods FROM mst.invoice_event_stat WHERE id IN (SELECT max(id) FROM mst.invoice_event_stat WHERE event_category = 'PAYMENT' :: mst.INVOICE_EVENT_CATEGORY AND event_created_at < :from_time GROUP BY invoice_id, payment_id) AND payment_status = :refunded_status :: mst.INVOICE_PAYMENT_STATUS GROUP BY party_shop_id, party_id) part4 ON part1.party_id = part4.party_id AND part1.party_shop_id = part4.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payout_amount) AS funds_paid_out_period FROM mst.payout_event_stat WHERE id IN (SELECT max(id) FROM mst.payout_event_stat WHERE payout_created_at >= :from_time AND payout_created_at < :to_time GROUP BY payout_id) AND payout_status = :payout_confirmed_status :: mst.PAYOUT_STATUS GROUP BY party_shop_id, party_id) part5 ON part1.party_id = part5.party_id AND part1.party_shop_id = part5.party_shop_id LEFT JOIN (SELECT party_id, party_shop_id, sum(payout_amount) AS funds_paid_out_prev_periods FROM mst.payout_event_stat WHERE id IN (SELECT max(id) FROM mst.payout_event_stat WHERE payout_created_at < :from_time GROUP BY payout_id) AND payout_status = :payout_confirmed_status :: mst.PAYOUT_STATUS GROUP BY party_shop_id, party_id) part6 ON part1.party_id = part6.party_id AND part1.party_shop_id = part6.party_shop_id";
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("from_time", LocalDateTime.ofInstant(fromTime, ZoneOffset.UTC), Types.OTHER)
-                .addValue("to_time", LocalDateTime.ofInstant(toTime, ZoneOffset.UTC), Types.OTHER)
-                .addValue("succeeded_status", InvoicePaymentStatus._Fields.CAPTURED.getFieldName())
-                .addValue("refunded_status", InvoicePaymentStatus._Fields.REFUNDED.getFieldName())
-                .addValue("payout_confirmed_status", com.rbkmoney.damsel.payout_processing.PayoutStatus._Fields.CONFIRMED.getFieldName())
-                .addValue("shop_categories", withoutShopCategoryIds.orElse(Arrays.asList(-1)));
-        log.trace("SQL: {}, Params: {}", sql, params.getValues());
+    public Map<String, String> getPaymentAccountingData(String merchantId, String contractId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
+        Query query = getDslContext().select(
+                INVOICE_EVENT_STAT.PARTY_ID.as("merchant_id"),
+                INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.as("contract_id"),
+                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.as("currency_code"),
+                DSL.sum(INVOICE_EVENT_STAT.PAYMENT_AMOUNT).as("funds_acquired"),
+                DSL.sum(INVOICE_EVENT_STAT.PAYMENT_FEE).as("fee_charged")
+        ).from(INVOICE_EVENT_STAT).where(
+                appendDateTimeRangeConditions(
+                        INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)
+                                .and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId))
+                                .and(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
+                                .and(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.eq(currencyCode))
+                                .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
+                        INVOICE_EVENT_STAT.EVENT_CREATED_AT,
+                        fromTime,
+                        Optional.of(toTime)
+                )
+        ).groupBy(
+                INVOICE_EVENT_STAT.PARTY_ID,
+                INVOICE_EVENT_STAT.PARTY_CONTRACT_ID,
+                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE
+        );
 
-        return fetch(sql, params, (rs, i) -> {
-            Map<String, String> map = new HashMap<>();
-            map.put("merchant_id", rs.getString("merchant_id"));
-            map.put("shop_id", rs.getString("shop_id"));
-            map.put("currency_code", rs.getString("currency_code"));
-            map.put("opening_balance", rs.getString("opening_balance"));
-            map.put("funds_acquired", rs.getString("funds_acquired"));
-            map.put("fee_charged", rs.getString("fee_charged"));
-            map.put("funds_paid_out", rs.getString("funds_paid_out"));
-            map.put("funds_refunded", rs.getString("funds_refunded"));
-            map.put("closing_balance", rs.getString("closing_balance"));
-            return map;
-        });
+        return Optional.ofNullable(
+                fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
+                        .put("merchant_id", rs.getString("merchant_id"))
+                        .put("contract_id", rs.getString("contract_id"))
+                        .put("currency_code", rs.getString("currency_code"))
+                        .put("funds_acquired", rs.getString("funds_acquired"))
+                        .put("fee_charged", rs.getString("fee_charged"))
+                        .build()
+                )
+        ).orElse(
+                ImmutableMap.<String, String>builder()
+                        .put("merchant_id", merchantId)
+                        .put("contract_id", contractId)
+                        .put("currency_code", currencyCode)
+                        .put("funds_acquired", "0")
+                        .put("fee_charged", "0")
+                        .build()
+        );
+    }
+
+    @Override
+    public Map<String, String> getRefundAccountingData(String merchantId, String contractId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
+        Query query = getDslContext().select(
+                REFUND.PARTY_ID.as("merchant_id"),
+                REFUND.PARTY_CONTRACT_ID.as("contract_id"),
+                REFUND.REFUND_CURRENCY_CODE.as("currency_code"),
+                DSL.sum(REFUND.REFUND_AMOUNT.minus(REFUND.REFUND_FEE)).as("funds_refunded")
+        ).from(REFUND).where(
+                appendDateTimeRangeConditions(
+                        REFUND.PARTY_ID.eq(merchantId)
+                                .and(REFUND.PARTY_CONTRACT_ID.eq(contractId))
+                                .and(REFUND.REFUND_CURRENCY_CODE.eq(currencyCode))
+                                .and(REFUND.REFUND_STATUS.eq(RefundStatus.succeeded)),
+                        REFUND.EVENT_CREATED_AT,
+                        fromTime,
+                        Optional.of(toTime)
+                )
+        ).groupBy(
+                REFUND.PARTY_ID,
+                REFUND.PARTY_CONTRACT_ID,
+                REFUND.REFUND_CURRENCY_CODE
+        );
+
+        return Optional.ofNullable(
+                fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
+                        .put("merchant_id", rs.getString("merchant_id"))
+                        .put("contract_id", rs.getString("contract_id"))
+                        .put("currency_code", rs.getString("currency_code"))
+                        .put("funds_refunded", rs.getString("funds_refunded"))
+                        .build())
+        ).orElse(
+                ImmutableMap.<String, String>builder()
+                        .put("merchant_id", merchantId)
+                        .put("contract_id", contractId)
+                        .put("currency_code", currencyCode)
+                        .put("funds_refunded", "0")
+                        .build()
+        );
+    }
+
+    @Override
+    public Map<String, String> getPayoutAccountingData(String merchantId, String contractId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
+        Field<String> merchantIdField = DSL.field("merchant_id", String.class);
+        Field<String> contractIdField = DSL.field("contract_id", String.class);
+        Field<String> currencyCodeField = DSL.field("currency_code", String.class);
+        Field<Long> fundsPaidOutField = DSL.field("funds_paid_out", Long.class);
+        Field<Long> paidFundsField = DSL.field("paid_funds", Long.class);
+        Field<Long> cancelledFundsField = DSL.field("cancelled_funds", Long.class);
+
+        Query query = getDslContext().select(
+                merchantIdField,
+                contractIdField,
+                currencyCodeField,
+                paidFundsField.minus(DSL.coalesce(cancelledFundsField, 0)).as(fundsPaidOutField)
+        ).from(
+                getDslContext().select(
+                        PAYOUT_EVENT_STAT.PARTY_ID.as(merchantIdField),
+                        DSL.value(contractId).as(contractIdField),
+                        PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.as(currencyCodeField),
+                        DSL.sum(
+                                PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
+                                        .minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))
+                        ).as(paidFundsField)
+                ).from(PAYOUT_EVENT_STAT).where(
+                        appendDateTimeRangeConditions(
+                                PAYOUT_EVENT_STAT.PARTY_ID.eq(merchantId)
+                                        .and(PAYOUT_EVENT_STAT.PARTY_SHOP_ID.in(
+                                                getDslContext().select(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
+                                                        .from(INVOICE_EVENT_STAT)
+                                                        .where(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
+                                                        .groupBy(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
+                                        ))
+                                        .and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid))
+                                        .and(PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.eq(currencyCode)),
+                                PAYOUT_EVENT_STAT.EVENT_CREATED_AT,
+                                fromTime,
+                                Optional.of(toTime)
+                        )
+                ).groupBy(
+                        PAYOUT_EVENT_STAT.PARTY_ID,
+                        PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
+                ).asTable().leftJoin(
+                        getDslContext().select(
+                                DSL.sum(
+                                        PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
+                                                .minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))
+                                ).as(cancelledFundsField)
+                        ).from(PAYOUT_EVENT_STAT).where(
+                                appendDateTimeRangeConditions(
+                                        PAYOUT_EVENT_STAT.PARTY_SHOP_ID.in(
+                                                getDslContext().select(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
+                                                        .from(INVOICE_EVENT_STAT)
+                                                        .where(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
+                                                        .groupBy(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
+                                        )
+                                                .and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.cancelled))
+                                                .and(PAYOUT_EVENT_STAT.PAYOUT_ID.in(
+                                                        getDslContext().select(PAYOUT_EVENT_STAT.PAYOUT_ID)
+                                                                .from(PAYOUT_EVENT_STAT)
+                                                                .where(
+                                                                        PAYOUT_EVENT_STAT.PARTY_ID.eq(merchantId)
+                                                                                .and(PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.eq(currencyCode))
+                                                                                .and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid))
+                                                                )
+                                                ))
+                                                .and(PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.eq(currencyCode)),
+                                        PAYOUT_EVENT_STAT.EVENT_CREATED_AT,
+                                        fromTime,
+                                        Optional.of(toTime)
+                                )
+                        ).groupBy(
+                                PAYOUT_EVENT_STAT.PARTY_ID,
+                                PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
+                        ).asTable()
+                ).on()
+        );
+
+        return Optional.ofNullable(
+                fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
+                        .put("merchant_id", rs.getString("merchant_id"))
+                        .put("contract_id", rs.getString("contract_id"))
+                        .put("currency_code", rs.getString("currency_code"))
+                        .put("funds_paid_out", rs.getString("funds_paid_out"))
+                        .build())
+        ).orElse(
+                ImmutableMap.<String, String>builder()
+                        .put("merchant_id", merchantId)
+                        .put("contract_id", contractId)
+                        .put("currency_code", currencyCode)
+                        .put("funds_paid_out", "0")
+                        .build()
+        );
     }
 
     private MapSqlParameterSource createParamsMap(String merchantId, String shopId, Instant fromTime, Instant toTime, Integer splitInterval) {
@@ -456,14 +619,23 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     private Condition buildPaymentCondition(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) {
-        Condition condition = appendPartyAndDateTimeRangeConditions(
-                INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT),
-                merchantId,
-                shopId,
+        Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT);
+        if (merchantId.isPresent()) {
+            condition = condition.and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId.get()));
+        }
+        if (shopId.isPresent()) {
+            condition = condition.and(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(shopId.get()));
+        }
+        if (contractId.isPresent()) {
+            condition = condition.and(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId.get()));
+        }
+        condition = appendDateTimeRangeConditions(
+                condition,
                 INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 fromTime,
                 toTime);
@@ -479,15 +651,24 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     private Condition buildInvoiceCondition(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) {
-        Condition condition = appendPartyAndDateTimeRangeConditions(
-                INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE),
-                merchantId,
-                shopId,
+        Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.INVOICE);
+        if (merchantId.isPresent()) {
+            condition = condition.and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId.get()));
+        }
+        if (shopId.isPresent()) {
+            condition = condition.and(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(shopId.get()));
+        }
+        if (contractId.isPresent()) {
+            condition = condition.and(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId.get()));
+        }
+        condition = appendDateTimeRangeConditions(
+                condition,
                 INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 fromTime,
                 toTime);
@@ -502,7 +683,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                     INVOICE_EVENT_STAT.INVOICE_ID.in(
                             getDslContext().select(INVOICE_EVENT_STAT.INVOICE_ID)
                                     .from(INVOICE_EVENT_STAT)
-                                    .where(buildPaymentCondition(merchantId, shopId, paymentParameterSource, fromTime, toTime))
+                                    .where(buildPaymentCondition(merchantId, shopId, contractId, paymentParameterSource, fromTime, toTime))
                     )
             );
         }
@@ -512,17 +693,27 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     private Condition buildRefundCondition(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) {
-        Condition condition = REFUND.ID.in(
+        Condition condition = DSL.trueCondition();
+        if (merchantId.isPresent()) {
+            condition = condition.and(REFUND.PARTY_ID.eq(merchantId.get()));
+        }
+        if (shopId.isPresent()) {
+            condition = condition.and(REFUND.PARTY_SHOP_ID.eq(shopId.get()));
+        }
+
+        if (contractId.isPresent()) {
+            condition = condition.and(REFUND.PARTY_CONTRACT_ID.eq(contractId.get()));
+        }
+        condition = REFUND.ID.in(
                 getDslContext().select(DSL.max(REFUND.ID)).from(REFUND)
                         .where(
-                                appendPartyAndDateTimeRangeConditions(
-                                        DSL.trueCondition(),
-                                        merchantId,
-                                        shopId,
+                                appendDateTimeRangeConditions(
+                                        condition,
                                         REFUND.EVENT_CREATED_AT,
                                         fromTime,
                                         toTime
@@ -532,19 +723,10 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         return appendConditions(condition, Operator.AND, parameterSource);
     }
 
-    private Condition appendPartyAndDateTimeRangeConditions(Condition condition,
-                                                            Optional<String> merchantId,
-                                                            Optional<String> shopId,
-                                                            Field<LocalDateTime> field,
-                                                            Optional<LocalDateTime> fromTime,
-                                                            Optional<LocalDateTime> toTime) {
-        if (merchantId.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId.get()));
-        }
-        if (shopId.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(shopId.get()));
-        }
-
+    private Condition appendDateTimeRangeConditions(Condition condition,
+                                                    Field<LocalDateTime> field,
+                                                    Optional<LocalDateTime> fromTime,
+                                                    Optional<LocalDateTime> toTime) {
         if (fromTime.isPresent()) {
             condition = condition.and(field.ge(fromTime.get()));
         }
@@ -579,10 +761,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                                                       int limit) {
         log.debug("Trying to get datetime range, fromTime='{}', toTime='{}', offset='{}', limit='{}', condition='{}'",
                 fromTime, toTime, offset, limit, condition);
-        List<Map.Entry<LocalDateTime, Integer>> dateRanges = getCacheDateTimeRanges(condition,
-                fromTime,
-                toTime,
-                dateTimeField);
+        List<Map.Entry<LocalDateTime, Integer>> dateRanges = getCacheDateTimeRanges(condition, toTime, dateTimeField);
 
         boolean offsetFound = false;
         int fromTimeBound = limit;
@@ -608,7 +787,6 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     private <T extends Record> List<Map.Entry<LocalDateTime, Integer>> getCacheDateTimeRanges(Condition condition,
-                                                                                              Optional<LocalDateTime> fromTime,
                                                                                               Optional<LocalDateTime> toTime,
                                                                                               TableField<T, LocalDateTime> dateTimeField) {
         log.debug("Trying to get datetime ranges from the cache, condition='{}', dateTimeField='{}'", condition, dateTimeField);

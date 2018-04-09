@@ -12,8 +12,9 @@ public class Parameters {
 
     public static final String MERCHANT_ID_PARAM = "merchant_id";
     public static final String SHOP_ID_PARAM = "shop_id";
+    public static final String CONTRACT_ID_PARAM = "contract_id";
     public static final String SHOP_CATEGORY_IDS_PARAM = "shop_category_ids";
-    public static final String WITHOUT_SHOP_CATEGORY_IDS_PARAM = "without_shop_category_ids";
+    public static final String CURRENCY_CODE = "currency_code";
     public static final String FROM_TIME_PARAM = "from_time";
     public static final String TO_TIME_PARAM = "to_time";
 

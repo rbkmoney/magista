@@ -18,12 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Map;
 
-import static com.rbkmoney.damsel.merch_stat.PayoutStatus._Fields.CANCELLED;
-import static com.rbkmoney.damsel.merch_stat.PayoutStatus._Fields.CONFIRMED;
-import static com.rbkmoney.damsel.merch_stat.PayoutStatus._Fields.PAID;
+import static com.rbkmoney.damsel.merch_stat.PayoutStatus._Fields.*;
 import static com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider.euroset;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -222,7 +219,7 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         statResponse = queryProcessor.processQuery(json);
         assertTrue(statResponse.getData().getPayouts().stream().allMatch(
                 payout -> payout.getStatus().getSetField() == PAID
-                || payout.getStatus().getSetField() == CONFIRMED
+                        || payout.getStatus().getSetField() == CONFIRMED
         ));
     }
 
@@ -293,8 +290,8 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     public void testRefunds() throws TException {
         String json = "{'query': {'refunds': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(2, statResponse.getTotalCount());
-        assertEquals(2, statResponse.getData().getRefunds().size());
+        assertEquals(4, statResponse.getTotalCount());
+        assertEquals(4, statResponse.getData().getRefunds().size());
         new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
 
         json = "{'query': {'refunds': {'refund_id':'test_refund_2', 'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
@@ -323,98 +320,4 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         assertEquals("{\"data\":{\"records\":[{\"unic_count\":\"0\",\"offset\":\"180\"}]}}", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse));
     }
 
-    @Test
-    public void testAccountingReport() {
-        String json = "{'query': {'shop_accounting_report': {'from_time': '2017-07-31T21:00:00Z','to_time': '2017-08-31T21:00:00Z'}}}";
-        StatResponse statResponse = queryProcessor.processQuery(json);
-        assertEquals(1, statResponse.getData().getRecords().size());
-        Map<String, String> result1 = statResponse.getData().getRecords().stream().filter(
-                t ->
-                        t.get("merchant_id").equals("test_party_1")
-                                && t.get("shop_id").equals("test_shop_1")
-        ).findFirst().get();
-        assertEquals(9, result1.size());
-        assertEquals("test_party_1", result1.get("merchant_id"));
-        assertEquals("test_shop_1", result1.get("shop_id"));
-        assertEquals("RUB", result1.get("currency_code"));
-        assertEquals("0", result1.get("opening_balance"));
-        assertEquals("3000", result1.get("funds_acquired"));
-        assertEquals("75", result1.get("fee_charged"));
-        assertEquals("950", result1.get("funds_paid_out"));
-        assertEquals("1000", result1.get("funds_refunded"));
-        assertEquals("975", result1.get("closing_balance"));
-        assertEquals(0, statResponse.getTotalCount());
-
-        String json2 = "{'query': {'shop_accounting_report': {'from_time': '2017-08-31T21:00:00Z','to_time': '2017-09-30T21:00:00Z'}}}";
-        StatResponse statResponse2 = queryProcessor.processQuery(json2);
-        assertEquals(1, statResponse2.getData().getRecords().size());
-        Map<String, String> result2 = statResponse2.getData().getRecords().stream().filter(
-                t ->
-                        t.get("merchant_id").equals("test_party_1")
-                                && t.get("shop_id").equals("test_shop_1")
-        ).findFirst().get();
-        assertEquals(9, result2.size());
-        assertEquals("test_party_1", result2.get("merchant_id"));
-        assertEquals("test_shop_1", result2.get("shop_id"));
-        assertEquals("RUB", result2.get("currency_code"));
-        assertEquals("975", result2.get("opening_balance"));
-        assertEquals("6000", result2.get("funds_acquired"));
-        assertEquals("150", result2.get("fee_charged"));
-        assertEquals("2875", result2.get("funds_paid_out"));
-        assertEquals("2000", result2.get("funds_refunded"));
-        assertEquals("1950", result2.get("closing_balance"));
-        assertEquals(0, statResponse2.getTotalCount());
-
-        String json3 = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z'}}}";
-        StatResponse statResponse3 = queryProcessor.processQuery(json3);
-        assertEquals(5, statResponse3.getData().getRecords().size());
-        Map<String, String> result3 = statResponse3.getData().getRecords().stream().filter(
-                t ->
-                        t.get("merchant_id").equals("74480e4f-1a36-4edd-8175-7a9e984313b0")
-                                && t.get("shop_id").equals("1")
-        ).findFirst().get();
-        assertEquals(9, result3.size());
-        assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result3.get("merchant_id"));
-        assertEquals("1", result3.get("shop_id"));
-        assertEquals("RUB", result3.get("currency_code"));
-        assertEquals("444000", result3.get("funds_acquired"));
-        assertEquals("19980", result3.get("fee_charged"));
-        assertEquals("2259530", result3.get("opening_balance"));
-        assertEquals("0", result3.get("funds_paid_out"));
-        assertEquals("0", result3.get("funds_refunded"));
-        assertEquals("2683550", result3.get("closing_balance"));
-
-        Map<String, String> result4 = statResponse3.getData().getRecords().stream().filter(
-                t ->
-                        t.get("merchant_id").equals("74480e4f-1a36-4edd-8175-7a9e984313b0")
-                                && t.get("shop_id").equals("2")
-        ).findFirst().get();
-        assertEquals(9, result4.size());
-        assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result4.get("merchant_id"));
-        assertEquals("2", result4.get("shop_id"));
-        assertEquals("RUB", result4.get("currency_code"));
-        assertEquals("3631200", result4.get("funds_acquired"));
-        assertEquals("163403", result4.get("fee_charged"));
-        assertEquals("0", result4.get("opening_balance"));
-        assertEquals("0", result4.get("funds_paid_out"));
-        assertEquals("0", result4.get("funds_refunded"));
-        assertEquals("3467797", result4.get("closing_balance"));
-
-        assertEquals(0, statResponse3.getTotalCount());
-
-    }
-
-    @Test
-    public void testShopCategoryIdsInAccountingReport() {
-        String json = "{'query': {'shop_accounting_report': {'from_time': '2016-01-01T00:00:00Z','to_time': '2017-10-25T18:10:10Z'}}}";
-        int totalCount = queryProcessor.processQuery(json).getData().getRecords().size();
-
-        json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'without_shop_category_ids': [1, 2, 3]}}}";
-        int countWithout123 = queryProcessor.processQuery(json).getData().getRecords().size();
-
-        json = "{'query': {'shop_accounting_report': {'from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'without_shop_category_ids': [4, 5]}}}";
-        assertEquals(totalCount - countWithout123, queryProcessor.processQuery(json).getData().getRecords().size());
-    }
-
 }
-

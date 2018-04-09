@@ -209,6 +209,7 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
                 Collection<Refund> result = functionContext.getDao().getRefunds(
                         Optional.ofNullable(parameters.getMerchantId()),
                         Optional.ofNullable(parameters.getShopId()),
+                        Optional.ofNullable(parameters.getContractId()),
                         buildRefundConditionParameterSource(parameters),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
@@ -237,6 +238,7 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
                 Integer result = functionContext.getDao().getRefundsCount(
                         Optional.ofNullable(parameters.getMerchantId()),
                         Optional.ofNullable(parameters.getShopId()),
+                        Optional.ofNullable(parameters.getContractId()),
                         buildRefundConditionParameterSource(parameters),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime()))
@@ -252,6 +254,7 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
         return new ConditionParameterSource()
                 .addValue(REFUND.PARTY_ID, parameters.getMerchantId(), EQUALS)
                 .addValue(REFUND.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                .addValue(REFUND.PARTY_CONTRACT_ID, parameters.getContractId(), EQUALS)
                 .addValue(REFUND.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                 .addValue(REFUND.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
                 .addValue(REFUND.REFUND_ID, parameters.getRefundId(), EQUALS)

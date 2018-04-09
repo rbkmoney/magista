@@ -247,6 +247,7 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 Collection<InvoiceEventStat> result = functionContext.getDao().getPayments(
                         Optional.ofNullable(parameters.getMerchantId()),
                         Optional.ofNullable(parameters.getShopId()),
+                        Optional.ofNullable(parameters.getContractId()),
                         buildPaymentConditionParameterSource(parameters),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
@@ -275,6 +276,7 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 Integer result = functionContext.getDao().getPaymentsCount(
                         Optional.ofNullable(parameters.getMerchantId()),
                         Optional.ofNullable(parameters.getShopId()),
+                        Optional.ofNullable(parameters.getContractId()),
                         buildPaymentConditionParameterSource(parameters),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime()))
@@ -290,6 +292,7 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         return new ConditionParameterSource()
                 .addValue(INVOICE_EVENT_STAT.PARTY_ID, parameters.getMerchantId(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID, parameters.getContractId(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_STATUS,

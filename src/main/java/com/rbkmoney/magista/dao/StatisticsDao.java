@@ -8,7 +8,6 @@ import com.rbkmoney.magista.exception.DaoException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -19,6 +18,7 @@ public interface StatisticsDao {
     Collection<InvoiceEventStat> getInvoices(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
@@ -30,6 +30,7 @@ public interface StatisticsDao {
     int getInvoicesCount(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource invoiceParameterSource,
             ConditionParameterSource paymentParameterSource,
             Optional<LocalDateTime> fromTime,
@@ -39,6 +40,7 @@ public interface StatisticsDao {
     Collection<InvoiceEventStat> getPayments(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
@@ -49,6 +51,7 @@ public interface StatisticsDao {
     Integer getPaymentsCount(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
@@ -57,6 +60,7 @@ public interface StatisticsDao {
     Collection<Refund> getRefunds(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
@@ -67,6 +71,7 @@ public interface StatisticsDao {
     Integer getRefundsCount(
             Optional<String> merchantId,
             Optional<String> shopId,
+            Optional<String> contractId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
@@ -126,10 +131,28 @@ public interface StatisticsDao {
             int splitInterval
     ) throws DaoException;
 
-    Collection<Map<String, String>> getAccountingDataByPeriod(
-            Instant fromTime,
-            Instant toTime,
-            Optional<List<Integer>> withoutShopCategoryIds
+    Map<String, String> getPaymentAccountingData(
+            String merchantId,
+            String contractId,
+            String currencyCode,
+            Optional<LocalDateTime> fromTime,
+            LocalDateTime toTime
+    ) throws DaoException;
+
+    Map<String, String> getRefundAccountingData(
+            String merchantId,
+            String contractId,
+            String currencyCode,
+            Optional<LocalDateTime> fromTime,
+            LocalDateTime toTime
+    ) throws DaoException;
+
+    Map<String, String> getPayoutAccountingData(
+            String merchantId,
+            String contractId,
+            String currencyCode,
+            Optional<LocalDateTime> fromTime,
+            LocalDateTime toTime
     ) throws DaoException;
 
 }
