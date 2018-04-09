@@ -11,6 +11,7 @@ import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.util.TypeUtil;
 import org.jooq.*;
+import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -513,31 +514,79 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     @Override
     public Map<String, String> getPayoutAccountingData(String merchantId, String contractId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
+        Field<String> merchantIdField = DSL.field("merchant_id", String.class);
+        Field<String> contractIdField = DSL.field("contract_id", String.class);
+        Field<String> currencyCodeField = DSL.field("currency_code", String.class);
+        Field<Long> fundsPaidOutField = DSL.field("funds_paid_out", Long.class);
+        Field<Long> paidFundsField = DSL.field("paid_funds", Long.class);
+        Field<Long> cancelledFundsField = DSL.field("cancelled_funds", Long.class);
+
         Query query = getDslContext().select(
-                PAYOUT_EVENT_STAT.PARTY_ID.as("merchant_id"),
-                DSL.value(contractId).as("contract_id"),
-                PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.as("currency_code"),
-                DSL.sum(
-                        PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
-                                .minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))
-                ).as("funds_paid_out")
-        ).from(PAYOUT_EVENT_STAT).where(
-                appendDateTimeRangeConditions(
-                        PAYOUT_EVENT_STAT.PARTY_SHOP_ID.in(
-                                getDslContext().select(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
-                                        .from(INVOICE_EVENT_STAT)
-                                        .where(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
-                                        .groupBy(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
+                merchantIdField,
+                contractIdField,
+                currencyCodeField,
+                paidFundsField.minus(DSL.coalesce(cancelledFundsField, 0)).as(fundsPaidOutField)
+        ).from(
+                getDslContext().select(
+                        PAYOUT_EVENT_STAT.PARTY_ID.as(merchantIdField),
+                        DSL.value(contractId).as(contractIdField),
+                        PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.as(currencyCodeField),
+                        DSL.sum(
+                                PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
+                                        .minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))
+                        ).as(paidFundsField)
+                ).from(PAYOUT_EVENT_STAT).where(
+                        appendDateTimeRangeConditions(
+                                PAYOUT_EVENT_STAT.PARTY_ID.eq(merchantId)
+                                        .and(PAYOUT_EVENT_STAT.PARTY_SHOP_ID.in(
+                                                getDslContext().select(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
+                                                        .from(INVOICE_EVENT_STAT)
+                                                        .where(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
+                                                        .groupBy(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
+                                        ))
+                                        .and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid))
+                                        .and(PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.eq(currencyCode)),
+                                PAYOUT_EVENT_STAT.EVENT_CREATED_AT,
+                                fromTime,
+                                Optional.of(toTime)
                         )
-                                .and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid))
-                                .and(PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.eq(currencyCode)),
-                        PAYOUT_EVENT_STAT.EVENT_CREATED_AT,
-                        fromTime,
-                        Optional.of(toTime)
-                )
-        ).groupBy(
-                PAYOUT_EVENT_STAT.PARTY_ID,
-                PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
+                ).groupBy(
+                        PAYOUT_EVENT_STAT.PARTY_ID,
+                        PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
+                ).asTable().leftJoin(
+                        getDslContext().select(
+                                DSL.sum(
+                                        PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
+                                                .minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))
+                                ).as(cancelledFundsField)
+                        ).from(PAYOUT_EVENT_STAT).where(
+                                appendDateTimeRangeConditions(
+                                        PAYOUT_EVENT_STAT.PARTY_SHOP_ID.in(
+                                                getDslContext().select(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
+                                                        .from(INVOICE_EVENT_STAT)
+                                                        .where(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
+                                                        .groupBy(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
+                                        )
+                                                .and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.cancelled))
+                                                .and(PAYOUT_EVENT_STAT.PAYOUT_ID.in(
+                                                        getDslContext().select(PAYOUT_EVENT_STAT.PAYOUT_ID)
+                                                                .from(PAYOUT_EVENT_STAT)
+                                                                .where(
+                                                                        PAYOUT_EVENT_STAT.PARTY_ID.eq(merchantId)
+                                                                                .and(PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.eq(currencyCode))
+                                                                                .and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid))
+                                                                )
+                                                ))
+                                                .and(PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.eq(currencyCode)),
+                                        PAYOUT_EVENT_STAT.EVENT_CREATED_AT,
+                                        fromTime,
+                                        Optional.of(toTime)
+                                )
+                        ).groupBy(
+                                PAYOUT_EVENT_STAT.PARTY_ID,
+                                PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
+                        ).asTable()
+                ).on()
         );
 
         return Optional.ofNullable(
@@ -712,10 +761,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                                                       int limit) {
         log.debug("Trying to get datetime range, fromTime='{}', toTime='{}', offset='{}', limit='{}', condition='{}'",
                 fromTime, toTime, offset, limit, condition);
-        List<Map.Entry<LocalDateTime, Integer>> dateRanges = getCacheDateTimeRanges(condition,
-                fromTime,
-                toTime,
-                dateTimeField);
+        List<Map.Entry<LocalDateTime, Integer>> dateRanges = getCacheDateTimeRanges(condition, toTime, dateTimeField);
 
         boolean offsetFound = false;
         int fromTimeBound = limit;
@@ -741,7 +787,6 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     private <T extends Record> List<Map.Entry<LocalDateTime, Integer>> getCacheDateTimeRanges(Condition condition,
-                                                                                              Optional<LocalDateTime> fromTime,
                                                                                               Optional<LocalDateTime> toTime,
                                                                                               TableField<T, LocalDateTime> dateTimeField) {
         log.debug("Trying to get datetime ranges from the cache, condition='{}', dateTimeField='{}'", condition, dateTimeField);
