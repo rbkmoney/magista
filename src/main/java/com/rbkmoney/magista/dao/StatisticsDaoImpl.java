@@ -59,25 +59,6 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset,
             Optional<Integer> limit
     ) throws DaoException {
-
-        int limitValue = Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT);
-
-        if (offset.isPresent()) {
-            DateTimeRange dateTimeRange = getDateTimeRangeByOffset(
-                    buildInvoiceCondition(
-                            merchantId, shopId, contractId, invoiceParameterSource, paymentParameterSource, fromTime, toTime),
-                    fromTime,
-                    toTime,
-                    INVOICE_EVENT_STAT.EVENT_CREATED_AT,
-                    offset.get(),
-                    limitValue
-            );
-
-            fromTime = Optional.ofNullable(dateTimeRange.getFromTime());
-            toTime = Optional.ofNullable(dateTimeRange.getToTime());
-            offset = Optional.ofNullable(dateTimeRange.getOffset());
-        }
-
         Query query = getDslContext().select(
                 INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 INVOICE_EVENT_STAT.PARTY_ID,
@@ -97,7 +78,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         ).from(INVOICE_EVENT_STAT)
                 .where(buildInvoiceCondition(merchantId, shopId, contractId, invoiceParameterSource, paymentParameterSource, fromTime, toTime))
                 .orderBy(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.desc())
-                .limit(limitValue)
+                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
         return fetch(query, (rs, i) -> {
             InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
@@ -147,23 +128,6 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<Integer> offset,
             Optional<Integer> limit
     ) throws DaoException {
-
-        int limitValue = Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT);
-
-        if (offset.isPresent()) {
-            DateTimeRange dateTimeRange = getDateTimeRangeByOffset(
-                    buildPaymentCondition(merchantId, shopId, contractId, parameterSource, fromTime, toTime),
-                    fromTime,
-                    toTime,
-                    INVOICE_EVENT_STAT.EVENT_CREATED_AT,
-                    offset.get(),
-                    limitValue
-            );
-            fromTime = Optional.ofNullable(dateTimeRange.getFromTime());
-            toTime = Optional.ofNullable(dateTimeRange.getToTime());
-            offset = Optional.ofNullable(dateTimeRange.getOffset());
-        }
-
         Query query = getDslContext().select(
                 INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                 INVOICE_EVENT_STAT.PAYMENT_ID,
@@ -202,7 +166,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         ).from(INVOICE_EVENT_STAT)
                 .where(buildPaymentCondition(merchantId, shopId, contractId, parameterSource, fromTime, toTime))
                 .orderBy(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.desc())
-                .limit(limitValue)
+                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
         return fetch(query, (rs, i) -> {
             InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
