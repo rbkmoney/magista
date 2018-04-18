@@ -3,6 +3,7 @@ package com.rbkmoney.magista.service;
 import com.rbkmoney.magista.dao.AdjustmentDao;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
+import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
@@ -24,10 +25,13 @@ public class PaymentAdjustmentService {
 
     private final InvoiceEventService invoiceEventService;
 
+    private final PaymentService paymentService;
+
     @Autowired
-    public PaymentAdjustmentService(AdjustmentDao adjustmentDao, InvoiceEventService invoiceEventService) {
+    public PaymentAdjustmentService(AdjustmentDao adjustmentDao, InvoiceEventService invoiceEventService, PaymentService paymentService) {
         this.adjustmentDao = adjustmentDao;
         this.invoiceEventService = invoiceEventService;
+        this.paymentService = paymentService;
     }
 
     public Adjustment getAdjustment(String invoiceId, String paymentId, String adjustmentId) throws StorageException {
@@ -74,6 +78,21 @@ public class PaymentAdjustmentService {
             paymentEventStat.setPaymentExternalFee(adjustment.getAdjustmentExternalFee());
             paymentEventStat.setPaymentProviderFee(adjustment.getAdjustmentProviderFee());
             invoiceEventService.saveInvoicePaymentEvent(paymentEventStat);
+
+            PaymentEvent paymentEvent = new PaymentEvent();
+            paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
+            paymentEvent.setEventId(adjustment.getEventId());
+            paymentEvent.setEventCreatedAt(adjustment.getEventCreatedAt());
+            paymentEvent.setInvoiceId(adjustment.getInvoiceId());
+            paymentEvent.setPaymentId(adjustment.getPaymentId());
+            paymentEvent.setPaymentStatus(paymentEventStat.getPaymentStatus());
+            paymentEvent.setPaymentOperationFailureClass(paymentEventStat.getPaymentOperationFailureClass());
+            paymentEvent.setPaymentExternalFailure(paymentEventStat.getPaymentExternalFailure());
+            paymentEvent.setPaymentExternalFailureReason(paymentEventStat.getPaymentExternalFailureReason());
+            paymentEvent.setPaymentFee(adjustment.getAdjustmentFee());
+            paymentEvent.setPaymentProviderFee(adjustment.getAdjustmentProviderFee());
+            paymentEvent.setPaymentExternalFee(adjustment.getAdjustmentExternalFee());
+            paymentService.savePaymentChange(paymentEvent);
         }
 
         try {

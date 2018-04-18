@@ -60,7 +60,7 @@ public class InvoiceMapper implements Mapper<InvoiceEventContext> {
         invoiceEventStat.setInvoiceDescription(details.getDescription());
 
         if (details.isSetCart()) {
-            invoiceEventStat.setInvoiceCart(DamselUtil.toJson(details.getCart()));
+            invoiceEventStat.setInvoiceCart(DamselUtil.toJsonString(details.getCart()));
         }
 
         InvoiceStatus invoiceStatus = invoice.getStatus();

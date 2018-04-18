@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = -1046046094;
+    private static final long serialVersionUID = 1127574;
 
     /**
      * The reference instance of <code>mst.invoice_event_stat</code>
@@ -434,7 +434,7 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
      */
     @Override
     public UniqueKey<InvoiceEventStatRecord> getPrimaryKey() {
-        return Keys.INVOICE_EVENT_PKEY;
+        return Keys.INVOICE_EVENT_STAT_PKEY;
     }
 
     /**
@@ -442,7 +442,7 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
      */
     @Override
     public List<UniqueKey<InvoiceEventStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<InvoiceEventStatRecord>>asList(Keys.INVOICE_EVENT_PKEY);
+        return Arrays.<UniqueKey<InvoiceEventStatRecord>>asList(Keys.INVOICE_EVENT_STAT_PKEY);
     }
 
     /**

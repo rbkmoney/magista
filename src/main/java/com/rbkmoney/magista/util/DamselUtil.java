@@ -90,9 +90,13 @@ public class DamselUtil {
         }
     }
 
-    public static String toJson(TBase tBase) {
+    public static String toJsonString(TBase tBase) {
+        return toJson(tBase).toString();
+    }
+
+    public static JsonNode toJson(TBase tBase) {
         try {
-            return new TBaseProcessor().process(tBase, new JsonHandler()).toString();
+            return new TBaseProcessor().process(tBase, new JsonHandler());
         } catch (IOException ex) {
             throw new IllegalArgumentException(ex);
         }
