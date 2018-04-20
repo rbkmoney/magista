@@ -27,8 +27,9 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceData implements Serializable {
 
-    private static final long serialVersionUID = -675748529;
+    private static final long serialVersionUID = 1752520194;
 
+    private Long          id;
     private UUID          partyId;
     private String        partyShopId;
     private String        partyContractId;
@@ -48,6 +49,7 @@ public class InvoiceData implements Serializable {
     public InvoiceData() {}
 
     public InvoiceData(InvoiceData value) {
+        this.id = value.id;
         this.partyId = value.partyId;
         this.partyShopId = value.partyShopId;
         this.partyContractId = value.partyContractId;
@@ -66,6 +68,7 @@ public class InvoiceData implements Serializable {
     }
 
     public InvoiceData(
+        Long          id,
         UUID          partyId,
         String        partyShopId,
         String        partyContractId,
@@ -82,6 +85,7 @@ public class InvoiceData implements Serializable {
         String        invoiceContextType,
         byte[]        invoiceContext
     ) {
+        this.id = id;
         this.partyId = partyId;
         this.partyShopId = partyShopId;
         this.partyContractId = partyContractId;
@@ -97,6 +101,14 @@ public class InvoiceData implements Serializable {
         this.invoiceCartJson = invoiceCartJson;
         this.invoiceContextType = invoiceContextType;
         this.invoiceContext = invoiceContext;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public UUID getPartyId() {
@@ -228,6 +240,12 @@ public class InvoiceData implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         final InvoiceData other = (InvoiceData) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        }
+        else if (!id.equals(other.id))
+            return false;
         if (partyId == null) {
             if (other.partyId != null)
                 return false;
@@ -325,6 +343,7 @@ public class InvoiceData implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
         result = prime * result + ((this.partyId == null) ? 0 : this.partyId.hashCode());
         result = prime * result + ((this.partyShopId == null) ? 0 : this.partyShopId.hashCode());
         result = prime * result + ((this.partyContractId == null) ? 0 : this.partyContractId.hashCode());
@@ -347,7 +366,8 @@ public class InvoiceData implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder("InvoiceData (");
 
-        sb.append(partyId);
+        sb.append(id);
+        sb.append(", ").append(partyId);
         sb.append(", ").append(partyShopId);
         sb.append(", ").append(partyContractId);
         sb.append(", ").append(invoiceId);

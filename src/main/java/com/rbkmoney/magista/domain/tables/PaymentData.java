@@ -20,6 +20,7 @@ import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -40,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData extends TableImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = 458478456;
+    private static final long serialVersionUID = 2002227536;
 
     /**
      * The reference instance of <code>mst.payment_data</code>
@@ -54,6 +55,11 @@ public class PaymentData extends TableImpl<PaymentDataRecord> {
     public Class<PaymentDataRecord> getRecordType() {
         return PaymentDataRecord.class;
     }
+
+    /**
+     * The column <code>mst.payment_data.id</code>.
+     */
+    public final TableField<PaymentDataRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('mst.payment_data_id_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
      * The column <code>mst.payment_data.invoice_id</code>.
@@ -238,6 +244,14 @@ public class PaymentData extends TableImpl<PaymentDataRecord> {
     @Override
     public Schema getSchema() {
         return Mst.MST;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Identity<PaymentDataRecord, Long> getIdentity() {
+        return Keys.IDENTITY_PAYMENT_DATA;
     }
 
     /**

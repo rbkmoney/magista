@@ -18,6 +18,7 @@ import java.util.UUID;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.Identity;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -38,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceData extends TableImpl<InvoiceDataRecord> {
 
-    private static final long serialVersionUID = 1268480155;
+    private static final long serialVersionUID = -1110016388;
 
     /**
      * The reference instance of <code>mst.invoice_data</code>
@@ -52,6 +53,11 @@ public class InvoiceData extends TableImpl<InvoiceDataRecord> {
     public Class<InvoiceDataRecord> getRecordType() {
         return InvoiceDataRecord.class;
     }
+
+    /**
+     * The column <code>mst.invoice_data.id</code>.
+     */
+    public final TableField<InvoiceDataRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('mst.invoice_data_id_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
      * The column <code>mst.invoice_data.party_id</code>.
@@ -156,6 +162,14 @@ public class InvoiceData extends TableImpl<InvoiceDataRecord> {
     @Override
     public Schema getSchema() {
         return Mst.MST;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Identity<InvoiceDataRecord, Long> getIdentity() {
+        return Keys.IDENTITY_INVOICE_DATA;
     }
 
     /**

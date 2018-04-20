@@ -1,7 +1,5 @@
 package com.rbkmoney.magista.query.impl.builder;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.magista.query.Query;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
 import com.rbkmoney.magista.query.builder.QueryBuilderException;
@@ -39,7 +37,7 @@ public class QueryBuilderImplTest {
     }
 
     Query buildQuery(String json) {
-        List<QueryPart> queryParts =  parser.parseQuery(json);
+        List<QueryPart> queryParts = parser.parseQuery(json);
         return builder.buildQuery(queryParts, null, null);
     }
 }

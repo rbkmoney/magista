@@ -29,8 +29,9 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData implements Serializable {
 
-    private static final long serialVersionUID = -1698835816;
+    private static final long serialVersionUID = -1151789833;
 
+    private Long             id;
     private String           invoiceId;
     private String           paymentId;
     private UUID             partyId;
@@ -66,6 +67,7 @@ public class PaymentData implements Serializable {
     public PaymentData() {}
 
     public PaymentData(PaymentData value) {
+        this.id = value.id;
         this.invoiceId = value.invoiceId;
         this.paymentId = value.paymentId;
         this.partyId = value.partyId;
@@ -100,6 +102,7 @@ public class PaymentData implements Serializable {
     }
 
     public PaymentData(
+        Long             id,
         String           invoiceId,
         String           paymentId,
         UUID             partyId,
@@ -132,6 +135,7 @@ public class PaymentData implements Serializable {
         String           paymentContextType,
         byte[]           paymentContext
     ) {
+        this.id = id;
         this.invoiceId = invoiceId;
         this.paymentId = paymentId;
         this.partyId = partyId;
@@ -163,6 +167,14 @@ public class PaymentData implements Serializable {
         this.paymentPartyRevision = paymentPartyRevision;
         this.paymentContextType = paymentContextType;
         this.paymentContext = paymentContext;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getInvoiceId() {
@@ -422,6 +434,12 @@ public class PaymentData implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         final PaymentData other = (PaymentData) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        }
+        else if (!id.equals(other.id))
+            return false;
         if (invoiceId == null) {
             if (other.invoiceId != null)
                 return false;
@@ -615,6 +633,7 @@ public class PaymentData implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
         result = prime * result + ((this.invoiceId == null) ? 0 : this.invoiceId.hashCode());
         result = prime * result + ((this.paymentId == null) ? 0 : this.paymentId.hashCode());
         result = prime * result + ((this.partyId == null) ? 0 : this.partyId.hashCode());
@@ -653,7 +672,8 @@ public class PaymentData implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder("PaymentData (");
 
-        sb.append(invoiceId);
+        sb.append(id);
+        sb.append(", ").append(invoiceId);
         sb.append(", ").append(paymentId);
         sb.append(", ").append(partyId);
         sb.append(", ").append(partyShopId);

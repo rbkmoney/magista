@@ -8,6 +8,7 @@ CREATE TYPE mst.PAYMENT_FLOW AS ENUM ('instant', 'hold');
 CREATE TYPE mst.ON_HOLD_EXPIRATION AS ENUM ('cancel', 'capture');
 
 create table mst.invoice_data (
+  id                     BIGSERIAL                   NOT NULL,
   party_id               UUID                        NOT NULL,
   party_shop_id          CHARACTER VARYING           NOT NULL,
   party_contract_id      CHARACTER VARYING           NOT NULL,
@@ -99,7 +100,8 @@ insert into mst.invoice_event (
   ORDER BY id;
 
 create table mst.payment_data (
-  invoice_id                      CHARACTER VARYING           NOT NULL  REFERENCES mst.invoice_data,
+  id                              BIGSERIAL                   NOT NULL,
+  invoice_id                      CHARACTER VARYING           NOT NULL  REFERENCES mst.invoice_data(invoice_id),
   payment_id                      CHARACTER VARYING           NOT NULL,
   party_id                        UUID                        NOT NULL,
   party_shop_id                   CHARACTER VARYING           NOT NULL,

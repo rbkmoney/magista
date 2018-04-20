@@ -48,8 +48,10 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final Identity<AdjustmentRecord, Long> IDENTITY_ADJUSTMENT = Identities0.IDENTITY_ADJUSTMENT;
+    public static final Identity<InvoiceDataRecord, Long> IDENTITY_INVOICE_DATA = Identities0.IDENTITY_INVOICE_DATA;
     public static final Identity<InvoiceEventRecord, Long> IDENTITY_INVOICE_EVENT = Identities0.IDENTITY_INVOICE_EVENT;
     public static final Identity<InvoiceEventStatRecord, Long> IDENTITY_INVOICE_EVENT_STAT = Identities0.IDENTITY_INVOICE_EVENT_STAT;
+    public static final Identity<PaymentDataRecord, Long> IDENTITY_PAYMENT_DATA = Identities0.IDENTITY_PAYMENT_DATA;
     public static final Identity<PaymentEventRecord, Long> IDENTITY_PAYMENT_EVENT = Identities0.IDENTITY_PAYMENT_EVENT;
     public static final Identity<PayoutEventStatRecord, Long> IDENTITY_PAYOUT_EVENT_STAT = Identities0.IDENTITY_PAYOUT_EVENT_STAT;
     public static final Identity<RefundRecord, Long> IDENTITY_REFUND = Identities0.IDENTITY_REFUND;
@@ -81,8 +83,10 @@ public class Keys {
 
     private static class Identities0 extends AbstractKeys {
         public static Identity<AdjustmentRecord, Long> IDENTITY_ADJUSTMENT = createIdentity(Adjustment.ADJUSTMENT, Adjustment.ADJUSTMENT.ID);
+        public static Identity<InvoiceDataRecord, Long> IDENTITY_INVOICE_DATA = createIdentity(InvoiceData.INVOICE_DATA, InvoiceData.INVOICE_DATA.ID);
         public static Identity<InvoiceEventRecord, Long> IDENTITY_INVOICE_EVENT = createIdentity(InvoiceEvent.INVOICE_EVENT, InvoiceEvent.INVOICE_EVENT.ID);
         public static Identity<InvoiceEventStatRecord, Long> IDENTITY_INVOICE_EVENT_STAT = createIdentity(InvoiceEventStat.INVOICE_EVENT_STAT, InvoiceEventStat.INVOICE_EVENT_STAT.ID);
+        public static Identity<PaymentDataRecord, Long> IDENTITY_PAYMENT_DATA = createIdentity(PaymentData.PAYMENT_DATA, PaymentData.PAYMENT_DATA.ID);
         public static Identity<PaymentEventRecord, Long> IDENTITY_PAYMENT_EVENT = createIdentity(PaymentEvent.PAYMENT_EVENT, PaymentEvent.PAYMENT_EVENT.ID);
         public static Identity<PayoutEventStatRecord, Long> IDENTITY_PAYOUT_EVENT_STAT = createIdentity(PayoutEventStat.PAYOUT_EVENT_STAT, PayoutEventStat.PAYOUT_EVENT_STAT.ID);
         public static Identity<RefundRecord, Long> IDENTITY_REFUND = createIdentity(Refund.REFUND, Refund.REFUND.ID);

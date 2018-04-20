@@ -38,7 +38,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Mst extends SchemaImpl {
 
-    private static final long serialVersionUID = 403918323;
+    private static final long serialVersionUID = -1869313886;
 
     /**
      * The reference instance of <code>mst</code>
@@ -111,8 +111,10 @@ public class Mst extends SchemaImpl {
     private final List<Sequence<?>> getSequences0() {
         return Arrays.<Sequence<?>>asList(
             Sequences.ADJUSTMENT_ID_SEQ,
+            Sequences.INVOICE_DATA_ID_SEQ,
             Sequences.INVOICE_EVENT_ID_SEQ,
             Sequences.INVOICE_EVENT_STAT_ID_SEQ,
+            Sequences.PAYMENT_DATA_ID_SEQ,
             Sequences.PAYMENT_EVENT_ID_SEQ,
             Sequences.PAYOUT_EVENT_STAT_ID_SEQ,
             Sequences.REFUND_ID_SEQ);
