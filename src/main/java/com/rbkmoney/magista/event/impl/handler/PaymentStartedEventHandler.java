@@ -58,7 +58,6 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
         PaymentRoute paymentRoute = invoicePaymentStarted.getRoute();
         paymentData.setPaymentProviderId(paymentRoute.getProvider().getId());
         paymentData.setPaymentTerminalId(paymentRoute.getTerminal().getId());
-        paymentData.setPaymentDomainRevision(invoicePayment.getDomainRevision());
 
         Cash cost = invoicePayment.getCost();
         paymentData.setPaymentAmount(cost.getAmount());
@@ -131,6 +130,7 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
                 paymentEvent.setPaymentExternalFailureReason(failure.getReason());
             }
         }
+        paymentEvent.setPaymentDomainRevision(invoicePayment.getDomainRevision());
 
         List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentStarted.getCashFlow();
         Map<FeeType, Long> fees = DamselUtil.getFees(finalCashFlowPostings);

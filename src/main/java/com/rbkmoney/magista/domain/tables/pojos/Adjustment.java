@@ -26,7 +26,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Adjustment implements Serializable {
 
-    private static final long serialVersionUID = 292010400;
+    private static final long serialVersionUID = 2002216904;
 
     private Long             id;
     private Long             eventId;
@@ -45,6 +45,7 @@ public class Adjustment implements Serializable {
     private Long             adjustmentFee;
     private Long             adjustmentProviderFee;
     private Long             adjustmentExternalFee;
+    private Long             adjustmentDomainRevision;
 
     public Adjustment() {}
 
@@ -66,6 +67,7 @@ public class Adjustment implements Serializable {
         this.adjustmentFee = value.adjustmentFee;
         this.adjustmentProviderFee = value.adjustmentProviderFee;
         this.adjustmentExternalFee = value.adjustmentExternalFee;
+        this.adjustmentDomainRevision = value.adjustmentDomainRevision;
     }
 
     public Adjustment(
@@ -85,7 +87,8 @@ public class Adjustment implements Serializable {
         String           adjustmentReason,
         Long             adjustmentFee,
         Long             adjustmentProviderFee,
-        Long             adjustmentExternalFee
+        Long             adjustmentExternalFee,
+        Long             adjustmentDomainRevision
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -104,6 +107,7 @@ public class Adjustment implements Serializable {
         this.adjustmentFee = adjustmentFee;
         this.adjustmentProviderFee = adjustmentProviderFee;
         this.adjustmentExternalFee = adjustmentExternalFee;
+        this.adjustmentDomainRevision = adjustmentDomainRevision;
     }
 
     public Long getId() {
@@ -242,6 +246,14 @@ public class Adjustment implements Serializable {
         this.adjustmentExternalFee = adjustmentExternalFee;
     }
 
+    public Long getAdjustmentDomainRevision() {
+        return this.adjustmentDomainRevision;
+    }
+
+    public void setAdjustmentDomainRevision(Long adjustmentDomainRevision) {
+        this.adjustmentDomainRevision = adjustmentDomainRevision;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -353,6 +365,12 @@ public class Adjustment implements Serializable {
         }
         else if (!adjustmentExternalFee.equals(other.adjustmentExternalFee))
             return false;
+        if (adjustmentDomainRevision == null) {
+            if (other.adjustmentDomainRevision != null)
+                return false;
+        }
+        else if (!adjustmentDomainRevision.equals(other.adjustmentDomainRevision))
+            return false;
         return true;
     }
 
@@ -377,6 +395,7 @@ public class Adjustment implements Serializable {
         result = prime * result + ((this.adjustmentFee == null) ? 0 : this.adjustmentFee.hashCode());
         result = prime * result + ((this.adjustmentProviderFee == null) ? 0 : this.adjustmentProviderFee.hashCode());
         result = prime * result + ((this.adjustmentExternalFee == null) ? 0 : this.adjustmentExternalFee.hashCode());
+        result = prime * result + ((this.adjustmentDomainRevision == null) ? 0 : this.adjustmentDomainRevision.hashCode());
         return result;
     }
 
@@ -401,6 +420,7 @@ public class Adjustment implements Serializable {
         sb.append(", ").append(adjustmentFee);
         sb.append(", ").append(adjustmentProviderFee);
         sb.append(", ").append(adjustmentExternalFee);
+        sb.append(", ").append(adjustmentDomainRevision);
 
         sb.append(")");
         return sb.toString();

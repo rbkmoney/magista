@@ -128,7 +128,6 @@ create table mst.payment_data (
   payment_phone_number            CHARACTER VARYING,
   payment_email                   CHARACTER VARYING,
   payment_created_at              TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  payment_domain_revision         BIGINT                      NOT NULL,
   payment_party_revision          BIGINT,
   payment_context_type            CHARACTER VARYING,
   payment_context                 bytea,
@@ -153,6 +152,7 @@ create table mst.payment_event (
   payment_fee                     BIGINT                      NOT NULL,
   payment_provider_fee            BIGINT                      NOT NULL,
   payment_external_fee            BIGINT                      NOT NULL,
+  payment_domain_revision         BIGINT                      NOT NULL,
   CONSTRAINT payment_event_pkey PRIMARY KEY (id),
   FOREIGN KEY (invoice_id, payment_id) REFERENCES payment_data (invoice_id, payment_id)
 );
@@ -189,7 +189,6 @@ insert into mst.payment_data (
   payment_phone_number,
   payment_email,
   payment_created_at,
-  payment_domain_revision,
   payment_party_revision,
   payment_context_type,
   payment_context
@@ -221,7 +220,6 @@ insert into mst.payment_data (
     payment_phone_number,
     payment_email,
     payment_created_at,
-    payment_domain_revision,
     payment_party_revision,
     payment_context_type,
     payment_context
@@ -242,7 +240,8 @@ insert into mst.payment_event (
   payment_external_failure_reason,
   payment_fee,
   payment_provider_fee,
-  payment_external_fee
+  payment_external_fee,
+  payment_domain_revision
 ) select
     event_id,
     event_created_at,
@@ -255,7 +254,8 @@ insert into mst.payment_event (
     payment_external_failure_reason,
     coalesce(payment_fee, 0),
     coalesce(payment_provider_fee, 0),
-    coalesce(payment_external_fee, 0)
+    coalesce(payment_external_fee, 0),
+    payment_domain_revision
   FROM mst.invoice_event_stat
   WHERE event_category = 'PAYMENT'
   ORDER BY id;

@@ -31,7 +31,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = -922023744;
+    private static final long serialVersionUID = 1118009039;
 
     /**
      * Setter for <code>mst.payment_data.id</code>.
@@ -426,59 +426,45 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
     }
 
     /**
-     * Setter for <code>mst.payment_data.payment_domain_revision</code>.
-     */
-    public void setPaymentDomainRevision(Long value) {
-        set(28, value);
-    }
-
-    /**
-     * Getter for <code>mst.payment_data.payment_domain_revision</code>.
-     */
-    public Long getPaymentDomainRevision() {
-        return (Long) get(28);
-    }
-
-    /**
      * Setter for <code>mst.payment_data.payment_party_revision</code>.
      */
     public void setPaymentPartyRevision(Long value) {
-        set(29, value);
+        set(28, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_party_revision</code>.
      */
     public Long getPaymentPartyRevision() {
-        return (Long) get(29);
+        return (Long) get(28);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_context_type</code>.
      */
     public void setPaymentContextType(String value) {
-        set(30, value);
+        set(29, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_context_type</code>.
      */
     public String getPaymentContextType() {
-        return (String) get(30);
+        return (String) get(29);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_context</code>.
      */
     public void setPaymentContext(byte... value) {
-        set(31, value);
+        set(30, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_context</code>.
      */
     public byte[] getPaymentContext() {
-        return (byte[]) get(31);
+        return (byte[]) get(30);
     }
 
     // -------------------------------------------------------------------------
@@ -507,7 +493,7 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
     /**
      * Create a detached, initialised PaymentDataRecord
      */
-    public PaymentDataRecord(Long id, String invoiceId, String paymentId, UUID partyId, String partyShopId, String partyContractId, String paymentCurrencyCode, Long paymentAmount, String paymentCustomerId, PaymentTool paymentTool, String paymentBankCardMaskedPan, String paymentBankCardBin, String paymentBankCardToken, String paymentBankCardSystem, String paymentTerminalProvider, String paymentDigitalWalletId, String paymentDigitalWalletProvider, Integer paymentProviderId, Integer paymentTerminalId, PaymentFlow paymentFlow, OnHoldExpiration paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentSessionId, String paymentFingerprint, String paymentIp, String paymentPhoneNumber, String paymentEmail, LocalDateTime paymentCreatedAt, Long paymentDomainRevision, Long paymentPartyRevision, String paymentContextType, byte[] paymentContext) {
+    public PaymentDataRecord(Long id, String invoiceId, String paymentId, UUID partyId, String partyShopId, String partyContractId, String paymentCurrencyCode, Long paymentAmount, String paymentCustomerId, PaymentTool paymentTool, String paymentBankCardMaskedPan, String paymentBankCardBin, String paymentBankCardToken, String paymentBankCardSystem, String paymentTerminalProvider, String paymentDigitalWalletId, String paymentDigitalWalletProvider, Integer paymentProviderId, Integer paymentTerminalId, PaymentFlow paymentFlow, OnHoldExpiration paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentSessionId, String paymentFingerprint, String paymentIp, String paymentPhoneNumber, String paymentEmail, LocalDateTime paymentCreatedAt, Long paymentPartyRevision, String paymentContextType, byte[] paymentContext) {
         super(PaymentData.PAYMENT_DATA);
 
         set(0, id);
@@ -538,9 +524,8 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
         set(25, paymentPhoneNumber);
         set(26, paymentEmail);
         set(27, paymentCreatedAt);
-        set(28, paymentDomainRevision);
-        set(29, paymentPartyRevision);
-        set(30, paymentContextType);
-        set(31, paymentContext);
+        set(28, paymentPartyRevision);
+        set(29, paymentContextType);
+        set(30, paymentContext);
     }
 }

@@ -27,7 +27,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Refund implements Serializable {
 
-    private static final long serialVersionUID = 213241229;
+    private static final long serialVersionUID = 296155994;
 
     private Long             id;
     private Long             eventId;
@@ -50,6 +50,7 @@ public class Refund implements Serializable {
     private Long             refundFee;
     private Long             refundProviderFee;
     private Long             refundExternalFee;
+    private Long             refundDomainRevision;
 
     public Refund() {}
 
@@ -75,6 +76,7 @@ public class Refund implements Serializable {
         this.refundFee = value.refundFee;
         this.refundProviderFee = value.refundProviderFee;
         this.refundExternalFee = value.refundExternalFee;
+        this.refundDomainRevision = value.refundDomainRevision;
     }
 
     public Refund(
@@ -98,7 +100,8 @@ public class Refund implements Serializable {
         Long             refundAmount,
         Long             refundFee,
         Long             refundProviderFee,
-        Long             refundExternalFee
+        Long             refundExternalFee,
+        Long             refundDomainRevision
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -121,6 +124,7 @@ public class Refund implements Serializable {
         this.refundFee = refundFee;
         this.refundProviderFee = refundProviderFee;
         this.refundExternalFee = refundExternalFee;
+        this.refundDomainRevision = refundDomainRevision;
     }
 
     public Long getId() {
@@ -291,6 +295,14 @@ public class Refund implements Serializable {
         this.refundExternalFee = refundExternalFee;
     }
 
+    public Long getRefundDomainRevision() {
+        return this.refundDomainRevision;
+    }
+
+    public void setRefundDomainRevision(Long refundDomainRevision) {
+        this.refundDomainRevision = refundDomainRevision;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -426,6 +438,12 @@ public class Refund implements Serializable {
         }
         else if (!refundExternalFee.equals(other.refundExternalFee))
             return false;
+        if (refundDomainRevision == null) {
+            if (other.refundDomainRevision != null)
+                return false;
+        }
+        else if (!refundDomainRevision.equals(other.refundDomainRevision))
+            return false;
         return true;
     }
 
@@ -454,6 +472,7 @@ public class Refund implements Serializable {
         result = prime * result + ((this.refundFee == null) ? 0 : this.refundFee.hashCode());
         result = prime * result + ((this.refundProviderFee == null) ? 0 : this.refundProviderFee.hashCode());
         result = prime * result + ((this.refundExternalFee == null) ? 0 : this.refundExternalFee.hashCode());
+        result = prime * result + ((this.refundDomainRevision == null) ? 0 : this.refundDomainRevision.hashCode());
         return result;
     }
 
@@ -482,6 +501,7 @@ public class Refund implements Serializable {
         sb.append(", ").append(refundFee);
         sb.append(", ").append(refundProviderFee);
         sb.append(", ").append(refundExternalFee);
+        sb.append(", ").append(refundDomainRevision);
 
         sb.append(")");
         return sb.toString();

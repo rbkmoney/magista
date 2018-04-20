@@ -70,6 +70,7 @@ public class RefundCreatedHandler implements Handler<InvoiceChange, StockEvent> 
             refund.setRefundAmount(refundCash.getAmount());
             refund.setRefundCurrencyCode(refundCash.getCurrency().getSymbolicCode());
         }
+        refund.setRefundDomainRevision(invoicePaymentRefund.getDomainRevision());
 
         Map<FeeType, Long> fees = DamselUtil.getFees(invoicePaymentRefundCreated.getCashFlow());
         refund.setRefundFee(fees.get(FeeType.FEE));

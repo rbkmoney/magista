@@ -77,6 +77,7 @@ public class PaymentAdjustmentService {
             paymentEventStat.setPaymentFee(adjustment.getAdjustmentFee());
             paymentEventStat.setPaymentExternalFee(adjustment.getAdjustmentExternalFee());
             paymentEventStat.setPaymentProviderFee(adjustment.getAdjustmentProviderFee());
+            paymentEventStat.setPaymentDomainRevision(adjustment.getAdjustmentDomainRevision());
             invoiceEventService.saveInvoicePaymentEvent(paymentEventStat);
 
             PaymentEvent paymentEvent = new PaymentEvent();
@@ -92,6 +93,7 @@ public class PaymentAdjustmentService {
             paymentEvent.setPaymentFee(adjustment.getAdjustmentFee());
             paymentEvent.setPaymentProviderFee(adjustment.getAdjustmentProviderFee());
             paymentEvent.setPaymentExternalFee(adjustment.getAdjustmentExternalFee());
+            paymentEvent.setPaymentDomainRevision(adjustment.getAdjustmentDomainRevision());
             paymentService.savePaymentChange(paymentEvent);
         }
 

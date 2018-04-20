@@ -39,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Refund extends TableImpl<RefundRecord> {
 
-    private static final long serialVersionUID = 765421569;
+    private static final long serialVersionUID = 1553281586;
 
     /**
      * The reference instance of <code>mst.refund</code>
@@ -158,6 +158,11 @@ public class Refund extends TableImpl<RefundRecord> {
      * The column <code>mst.refund.refund_external_fee</code>.
      */
     public final TableField<RefundRecord, Long> REFUND_EXTERNAL_FEE = createField("refund_external_fee", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+
+    /**
+     * The column <code>mst.refund.refund_domain_revision</code>.
+     */
+    public final TableField<RefundRecord, Long> REFUND_DOMAIN_REVISION = createField("refund_domain_revision", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * Create a <code>mst.refund</code> table reference

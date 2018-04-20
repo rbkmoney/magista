@@ -27,7 +27,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentEvent implements Serializable {
 
-    private static final long serialVersionUID = 703515967;
+    private static final long serialVersionUID = -33850132;
 
     private Long                 id;
     private Long                 eventId;
@@ -42,6 +42,7 @@ public class PaymentEvent implements Serializable {
     private Long                 paymentFee;
     private Long                 paymentProviderFee;
     private Long                 paymentExternalFee;
+    private Long                 paymentDomainRevision;
 
     public PaymentEvent() {}
 
@@ -59,6 +60,7 @@ public class PaymentEvent implements Serializable {
         this.paymentFee = value.paymentFee;
         this.paymentProviderFee = value.paymentProviderFee;
         this.paymentExternalFee = value.paymentExternalFee;
+        this.paymentDomainRevision = value.paymentDomainRevision;
     }
 
     public PaymentEvent(
@@ -74,7 +76,8 @@ public class PaymentEvent implements Serializable {
         String               paymentExternalFailureReason,
         Long                 paymentFee,
         Long                 paymentProviderFee,
-        Long                 paymentExternalFee
+        Long                 paymentExternalFee,
+        Long                 paymentDomainRevision
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -89,6 +92,7 @@ public class PaymentEvent implements Serializable {
         this.paymentFee = paymentFee;
         this.paymentProviderFee = paymentProviderFee;
         this.paymentExternalFee = paymentExternalFee;
+        this.paymentDomainRevision = paymentDomainRevision;
     }
 
     public Long getId() {
@@ -195,6 +199,14 @@ public class PaymentEvent implements Serializable {
         this.paymentExternalFee = paymentExternalFee;
     }
 
+    public Long getPaymentDomainRevision() {
+        return this.paymentDomainRevision;
+    }
+
+    public void setPaymentDomainRevision(Long paymentDomainRevision) {
+        this.paymentDomainRevision = paymentDomainRevision;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -282,6 +294,12 @@ public class PaymentEvent implements Serializable {
         }
         else if (!paymentExternalFee.equals(other.paymentExternalFee))
             return false;
+        if (paymentDomainRevision == null) {
+            if (other.paymentDomainRevision != null)
+                return false;
+        }
+        else if (!paymentDomainRevision.equals(other.paymentDomainRevision))
+            return false;
         return true;
     }
 
@@ -302,6 +320,7 @@ public class PaymentEvent implements Serializable {
         result = prime * result + ((this.paymentFee == null) ? 0 : this.paymentFee.hashCode());
         result = prime * result + ((this.paymentProviderFee == null) ? 0 : this.paymentProviderFee.hashCode());
         result = prime * result + ((this.paymentExternalFee == null) ? 0 : this.paymentExternalFee.hashCode());
+        result = prime * result + ((this.paymentDomainRevision == null) ? 0 : this.paymentDomainRevision.hashCode());
         return result;
     }
 
@@ -322,6 +341,7 @@ public class PaymentEvent implements Serializable {
         sb.append(", ").append(paymentFee);
         sb.append(", ").append(paymentProviderFee);
         sb.append(", ").append(paymentExternalFee);
+        sb.append(", ").append(paymentDomainRevision);
 
         sb.append(")");
         return sb.toString();

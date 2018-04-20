@@ -29,7 +29,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData implements Serializable {
 
-    private static final long serialVersionUID = -1151789833;
+    private static final long serialVersionUID = 696590502;
 
     private Long             id;
     private String           invoiceId;
@@ -59,7 +59,6 @@ public class PaymentData implements Serializable {
     private String           paymentPhoneNumber;
     private String           paymentEmail;
     private LocalDateTime    paymentCreatedAt;
-    private Long             paymentDomainRevision;
     private Long             paymentPartyRevision;
     private String           paymentContextType;
     private byte[]           paymentContext;
@@ -95,7 +94,6 @@ public class PaymentData implements Serializable {
         this.paymentPhoneNumber = value.paymentPhoneNumber;
         this.paymentEmail = value.paymentEmail;
         this.paymentCreatedAt = value.paymentCreatedAt;
-        this.paymentDomainRevision = value.paymentDomainRevision;
         this.paymentPartyRevision = value.paymentPartyRevision;
         this.paymentContextType = value.paymentContextType;
         this.paymentContext = value.paymentContext;
@@ -130,7 +128,6 @@ public class PaymentData implements Serializable {
         String           paymentPhoneNumber,
         String           paymentEmail,
         LocalDateTime    paymentCreatedAt,
-        Long             paymentDomainRevision,
         Long             paymentPartyRevision,
         String           paymentContextType,
         byte[]           paymentContext
@@ -163,7 +160,6 @@ public class PaymentData implements Serializable {
         this.paymentPhoneNumber = paymentPhoneNumber;
         this.paymentEmail = paymentEmail;
         this.paymentCreatedAt = paymentCreatedAt;
-        this.paymentDomainRevision = paymentDomainRevision;
         this.paymentPartyRevision = paymentPartyRevision;
         this.paymentContextType = paymentContextType;
         this.paymentContext = paymentContext;
@@ -393,14 +389,6 @@ public class PaymentData implements Serializable {
         this.paymentCreatedAt = paymentCreatedAt;
     }
 
-    public Long getPaymentDomainRevision() {
-        return this.paymentDomainRevision;
-    }
-
-    public void setPaymentDomainRevision(Long paymentDomainRevision) {
-        this.paymentDomainRevision = paymentDomainRevision;
-    }
-
     public Long getPaymentPartyRevision() {
         return this.paymentPartyRevision;
     }
@@ -602,12 +590,6 @@ public class PaymentData implements Serializable {
         }
         else if (!paymentCreatedAt.equals(other.paymentCreatedAt))
             return false;
-        if (paymentDomainRevision == null) {
-            if (other.paymentDomainRevision != null)
-                return false;
-        }
-        else if (!paymentDomainRevision.equals(other.paymentDomainRevision))
-            return false;
         if (paymentPartyRevision == null) {
             if (other.paymentPartyRevision != null)
                 return false;
@@ -661,7 +643,6 @@ public class PaymentData implements Serializable {
         result = prime * result + ((this.paymentPhoneNumber == null) ? 0 : this.paymentPhoneNumber.hashCode());
         result = prime * result + ((this.paymentEmail == null) ? 0 : this.paymentEmail.hashCode());
         result = prime * result + ((this.paymentCreatedAt == null) ? 0 : this.paymentCreatedAt.hashCode());
-        result = prime * result + ((this.paymentDomainRevision == null) ? 0 : this.paymentDomainRevision.hashCode());
         result = prime * result + ((this.paymentPartyRevision == null) ? 0 : this.paymentPartyRevision.hashCode());
         result = prime * result + ((this.paymentContextType == null) ? 0 : this.paymentContextType.hashCode());
         result = prime * result + ((this.paymentContext == null) ? 0 : Arrays.hashCode(this.paymentContext));
@@ -700,7 +681,6 @@ public class PaymentData implements Serializable {
         sb.append(", ").append(paymentPhoneNumber);
         sb.append(", ").append(paymentEmail);
         sb.append(", ").append(paymentCreatedAt);
-        sb.append(", ").append(paymentDomainRevision);
         sb.append(", ").append(paymentPartyRevision);
         sb.append(", ").append(paymentContextType);
         sb.append(", ").append("[binary...]");

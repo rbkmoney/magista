@@ -63,6 +63,7 @@ public class PaymentService {
                 paymentEvent.setPaymentFee(lastPaymentEvent.getPaymentFee());
                 paymentEvent.setPaymentExternalFee(lastPaymentEvent.getPaymentExternalFee());
                 paymentEvent.setPaymentProviderFee(lastPaymentEvent.getPaymentProviderFee());
+                paymentEvent.setPaymentDomainRevision(lastPaymentEvent.getPaymentDomainRevision());
             }
 
             paymentDao.savePaymentEvent(paymentEvent);
