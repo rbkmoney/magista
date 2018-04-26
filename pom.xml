@@ -13,11 +13,11 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.9.24-SNAPSHOT</version>
+    <version>1.9.25-SNAPSHOT</version>
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
-        <damsel.version>1.228-b0806eb</damsel.version>
+        <damsel.version>1.240-4e64623-epic</damsel.version>
         <shared.resources.version>0.2.1</shared.resources.version>
         <server.port>8022</server.port>
         <dockerfile.base.service.tag>22c57470c4fc47161894f036b7cf9d70f42b75f5</dockerfile.base.service.tag>
@@ -110,6 +110,16 @@
             <groupId>com.rbkmoney</groupId>
             <artifactId>eventstock-client</artifactId>
             <version>1.1.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.rbkmoney.geck</groupId>
+                    <artifactId>common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.rbkmoney.geck</groupId>
+                    <artifactId>filter</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -128,8 +138,13 @@
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.geck</groupId>
+            <artifactId>filter</artifactId>
+            <version>0.6.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney.geck</groupId>
             <artifactId>serializer</artifactId>
-            <version>0.6.8</version>
+            <version>0.6.9</version>
         </dependency>
         <!--Test libs-->
         <dependency>
@@ -232,26 +247,26 @@
                 <artifactId>jooq-codegen-maven</artifactId>
                 <version>${jooq.version}</version>
                 <!--<dependencies>-->
-                    <!--<dependency>-->
-                        <!--<groupId>javax.xml.bind</groupId>-->
-                        <!--<artifactId>jaxb-api</artifactId>-->
-                        <!--<version>2.3.0</version>-->
-                    <!--</dependency>-->
-                    <!--<dependency>-->
-                        <!--<groupId>com.sun.xml.bind</groupId>-->
-                        <!--<artifactId>jaxb-impl</artifactId>-->
-                        <!--<version>2.3.0</version>-->
-                    <!--</dependency>-->
-                    <!--<dependency>-->
-                        <!--<groupId>com.sun.xml.bind</groupId>-->
-                        <!--<artifactId>jaxb-core</artifactId>-->
-                        <!--<version>2.3.0</version>-->
-                    <!--</dependency>-->
-                    <!--<dependency>-->
-                        <!--<groupId>javax.activation</groupId>-->
-                        <!--<artifactId>activation</artifactId>-->
-                        <!--<version>1.1.1</version>-->
-                    <!--</dependency>-->
+                <!--<dependency>-->
+                <!--<groupId>javax.xml.bind</groupId>-->
+                <!--<artifactId>jaxb-api</artifactId>-->
+                <!--<version>2.3.0</version>-->
+                <!--</dependency>-->
+                <!--<dependency>-->
+                <!--<groupId>com.sun.xml.bind</groupId>-->
+                <!--<artifactId>jaxb-impl</artifactId>-->
+                <!--<version>2.3.0</version>-->
+                <!--</dependency>-->
+                <!--<dependency>-->
+                <!--<groupId>com.sun.xml.bind</groupId>-->
+                <!--<artifactId>jaxb-core</artifactId>-->
+                <!--<version>2.3.0</version>-->
+                <!--</dependency>-->
+                <!--<dependency>-->
+                <!--<groupId>javax.activation</groupId>-->
+                <!--<artifactId>activation</artifactId>-->
+                <!--<version>1.1.1</version>-->
+                <!--</dependency>-->
                 <!--</dependencies>-->
                 <configuration>
                     <jdbc>

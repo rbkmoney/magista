@@ -147,6 +147,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.PAYMENT_SYSTEM,
                 INVOICE_EVENT_STAT.PAYMENT_BIN,
                 INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN,
+                INVOICE_EVENT_STAT.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
                 INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER,
                 INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_ID,
                 INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_PROVIDER,
@@ -194,6 +195,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             invoiceEventStat.setPaymentSystem(rs.getString(INVOICE_EVENT_STAT.PAYMENT_SYSTEM.getName()));
             invoiceEventStat.setPaymentBin(rs.getString(INVOICE_EVENT_STAT.PAYMENT_BIN.getName()));
             invoiceEventStat.setPaymentMaskedPan(rs.getString(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN.getName()));
+            invoiceEventStat.setPaymentBankCardTokenProvider(
+                    TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()), BankCardTokenProvider.class)
+            );
             invoiceEventStat.setPaymentTerminalProvider(rs.getString(INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER.getName()));
             invoiceEventStat.setPaymentDigitalWalletId(rs.getString(INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_ID.getName()));
             invoiceEventStat.setPaymentDigitalWalletProvider(rs.getString(INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()));

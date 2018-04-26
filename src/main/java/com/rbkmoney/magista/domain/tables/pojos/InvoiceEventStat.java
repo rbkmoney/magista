@@ -4,6 +4,7 @@
 package com.rbkmoney.magista.domain.tables.pojos;
 
 
+import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
@@ -30,75 +31,76 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 923513820;
+    private static final long serialVersionUID = 1017717320;
 
-    private Long                 id;
-    private Long                 eventId;
-    private InvoiceEventCategory eventCategory;
-    private InvoiceEventType     eventType;
-    private LocalDateTime        eventCreatedAt;
-    private String               partyId;
-    private String               partyEmail;
-    private String               partyShopId;
-    private String               partyShopName;
-    private String               partyShopDescription;
-    private String               partyShopUrl;
-    private Integer              partyShopCategoryId;
-    private String               partyShopPayoutToolId;
-    private String               partyContractId;
-    private String               partyContractRegisteredNumber;
-    private String               partyContractInn;
-    private String               invoiceId;
-    private InvoiceStatus        invoiceStatus;
-    private String               invoiceStatusDetails;
-    private String               invoiceProduct;
-    private String               invoiceDescription;
-    private Long                 invoiceAmount;
-    private String               invoiceCurrencyCode;
-    private LocalDateTime        invoiceDue;
-    private LocalDateTime        invoiceCreatedAt;
-    private byte[]               invoiceContext;
-    private String               paymentId;
-    private InvoicePaymentStatus paymentStatus;
-    private String               paymentExternalFailure;
-    private String               paymentExternalFailureReason;
-    private Long                 paymentAmount;
-    private String               paymentCurrencyCode;
-    private Long                 paymentFee;
-    private Long                 paymentProviderFee;
-    private Long                 paymentExternalFee;
-    private String               paymentTool;
-    private String               paymentMaskedPan;
-    private String               paymentBin;
-    private String               paymentToken;
-    private String               paymentSystem;
-    private String               paymentSessionId;
-    private Integer              paymentCountryId;
-    private Integer              paymentCityId;
-    private String               paymentIp;
-    private String               paymentPhoneNumber;
-    private String               paymentEmail;
-    private String               paymentFingerprint;
-    private LocalDateTime        paymentCreatedAt;
-    private byte[]               paymentContext;
-    private FailureClass         paymentOperationFailureClass;
-    private String               invoiceTemplateId;
-    private String               invoiceCart;
-    private String               paymentFlow;
-    private String               paymentHoldOnExpiration;
-    private LocalDateTime        paymentHoldUntil;
-    private String               paymentTerminalProvider;
-    private String               paymentCustomerId;
-    private Integer              paymentProviderId;
-    private Integer              paymentTerminalId;
-    private Long                 paymentDomainRevision;
-    private String               invoiceContextType;
-    private String               paymentContextType;
-    private Long                 paymentAdjustmentAmount;
-    private Long                 invoicePartyRevision;
-    private Long                 paymentPartyRevision;
-    private String               paymentDigitalWalletId;
-    private String               paymentDigitalWalletProvider;
+    private Long                  id;
+    private Long                  eventId;
+    private InvoiceEventCategory  eventCategory;
+    private InvoiceEventType      eventType;
+    private LocalDateTime         eventCreatedAt;
+    private String                partyId;
+    private String                partyEmail;
+    private String                partyShopId;
+    private String                partyShopName;
+    private String                partyShopDescription;
+    private String                partyShopUrl;
+    private Integer               partyShopCategoryId;
+    private String                partyShopPayoutToolId;
+    private String                partyContractId;
+    private String                partyContractRegisteredNumber;
+    private String                partyContractInn;
+    private String                invoiceId;
+    private InvoiceStatus         invoiceStatus;
+    private String                invoiceStatusDetails;
+    private String                invoiceProduct;
+    private String                invoiceDescription;
+    private Long                  invoiceAmount;
+    private String                invoiceCurrencyCode;
+    private LocalDateTime         invoiceDue;
+    private LocalDateTime         invoiceCreatedAt;
+    private byte[]                invoiceContext;
+    private String                paymentId;
+    private InvoicePaymentStatus  paymentStatus;
+    private String                paymentExternalFailure;
+    private String                paymentExternalFailureReason;
+    private Long                  paymentAmount;
+    private String                paymentCurrencyCode;
+    private Long                  paymentFee;
+    private Long                  paymentProviderFee;
+    private Long                  paymentExternalFee;
+    private String                paymentTool;
+    private String                paymentMaskedPan;
+    private String                paymentBin;
+    private String                paymentToken;
+    private String                paymentSystem;
+    private String                paymentSessionId;
+    private Integer               paymentCountryId;
+    private Integer               paymentCityId;
+    private String                paymentIp;
+    private String                paymentPhoneNumber;
+    private String                paymentEmail;
+    private String                paymentFingerprint;
+    private LocalDateTime         paymentCreatedAt;
+    private byte[]                paymentContext;
+    private FailureClass          paymentOperationFailureClass;
+    private String                invoiceTemplateId;
+    private String                invoiceCart;
+    private String                paymentFlow;
+    private String                paymentHoldOnExpiration;
+    private LocalDateTime         paymentHoldUntil;
+    private String                paymentTerminalProvider;
+    private String                paymentCustomerId;
+    private Integer               paymentProviderId;
+    private Integer               paymentTerminalId;
+    private Long                  paymentDomainRevision;
+    private String                invoiceContextType;
+    private String                paymentContextType;
+    private Long                  paymentAdjustmentAmount;
+    private Long                  invoicePartyRevision;
+    private Long                  paymentPartyRevision;
+    private String                paymentDigitalWalletId;
+    private String                paymentDigitalWalletProvider;
+    private BankCardTokenProvider paymentBankCardTokenProvider;
 
     public InvoiceEventStat() {}
 
@@ -170,76 +172,78 @@ public class InvoiceEventStat implements Serializable {
         this.paymentPartyRevision = value.paymentPartyRevision;
         this.paymentDigitalWalletId = value.paymentDigitalWalletId;
         this.paymentDigitalWalletProvider = value.paymentDigitalWalletProvider;
+        this.paymentBankCardTokenProvider = value.paymentBankCardTokenProvider;
     }
 
     public InvoiceEventStat(
-        Long                 id,
-        Long                 eventId,
-        InvoiceEventCategory eventCategory,
-        InvoiceEventType     eventType,
-        LocalDateTime        eventCreatedAt,
-        String               partyId,
-        String               partyEmail,
-        String               partyShopId,
-        String               partyShopName,
-        String               partyShopDescription,
-        String               partyShopUrl,
-        Integer              partyShopCategoryId,
-        String               partyShopPayoutToolId,
-        String               partyContractId,
-        String               partyContractRegisteredNumber,
-        String               partyContractInn,
-        String               invoiceId,
-        InvoiceStatus        invoiceStatus,
-        String               invoiceStatusDetails,
-        String               invoiceProduct,
-        String               invoiceDescription,
-        Long                 invoiceAmount,
-        String               invoiceCurrencyCode,
-        LocalDateTime        invoiceDue,
-        LocalDateTime        invoiceCreatedAt,
-        byte[]               invoiceContext,
-        String               paymentId,
-        InvoicePaymentStatus paymentStatus,
-        String               paymentExternalFailure,
-        String               paymentExternalFailureReason,
-        Long                 paymentAmount,
-        String               paymentCurrencyCode,
-        Long                 paymentFee,
-        Long                 paymentProviderFee,
-        Long                 paymentExternalFee,
-        String               paymentTool,
-        String               paymentMaskedPan,
-        String               paymentBin,
-        String               paymentToken,
-        String               paymentSystem,
-        String               paymentSessionId,
-        Integer              paymentCountryId,
-        Integer              paymentCityId,
-        String               paymentIp,
-        String               paymentPhoneNumber,
-        String               paymentEmail,
-        String               paymentFingerprint,
-        LocalDateTime        paymentCreatedAt,
-        byte[]               paymentContext,
-        FailureClass         paymentOperationFailureClass,
-        String               invoiceTemplateId,
-        String               invoiceCart,
-        String               paymentFlow,
-        String               paymentHoldOnExpiration,
-        LocalDateTime        paymentHoldUntil,
-        String               paymentTerminalProvider,
-        String               paymentCustomerId,
-        Integer              paymentProviderId,
-        Integer              paymentTerminalId,
-        Long                 paymentDomainRevision,
-        String               invoiceContextType,
-        String               paymentContextType,
-        Long                 paymentAdjustmentAmount,
-        Long                 invoicePartyRevision,
-        Long                 paymentPartyRevision,
-        String               paymentDigitalWalletId,
-        String               paymentDigitalWalletProvider
+        Long                  id,
+        Long                  eventId,
+        InvoiceEventCategory  eventCategory,
+        InvoiceEventType      eventType,
+        LocalDateTime         eventCreatedAt,
+        String                partyId,
+        String                partyEmail,
+        String                partyShopId,
+        String                partyShopName,
+        String                partyShopDescription,
+        String                partyShopUrl,
+        Integer               partyShopCategoryId,
+        String                partyShopPayoutToolId,
+        String                partyContractId,
+        String                partyContractRegisteredNumber,
+        String                partyContractInn,
+        String                invoiceId,
+        InvoiceStatus         invoiceStatus,
+        String                invoiceStatusDetails,
+        String                invoiceProduct,
+        String                invoiceDescription,
+        Long                  invoiceAmount,
+        String                invoiceCurrencyCode,
+        LocalDateTime         invoiceDue,
+        LocalDateTime         invoiceCreatedAt,
+        byte[]                invoiceContext,
+        String                paymentId,
+        InvoicePaymentStatus  paymentStatus,
+        String                paymentExternalFailure,
+        String                paymentExternalFailureReason,
+        Long                  paymentAmount,
+        String                paymentCurrencyCode,
+        Long                  paymentFee,
+        Long                  paymentProviderFee,
+        Long                  paymentExternalFee,
+        String                paymentTool,
+        String                paymentMaskedPan,
+        String                paymentBin,
+        String                paymentToken,
+        String                paymentSystem,
+        String                paymentSessionId,
+        Integer               paymentCountryId,
+        Integer               paymentCityId,
+        String                paymentIp,
+        String                paymentPhoneNumber,
+        String                paymentEmail,
+        String                paymentFingerprint,
+        LocalDateTime         paymentCreatedAt,
+        byte[]                paymentContext,
+        FailureClass          paymentOperationFailureClass,
+        String                invoiceTemplateId,
+        String                invoiceCart,
+        String                paymentFlow,
+        String                paymentHoldOnExpiration,
+        LocalDateTime         paymentHoldUntil,
+        String                paymentTerminalProvider,
+        String                paymentCustomerId,
+        Integer               paymentProviderId,
+        Integer               paymentTerminalId,
+        Long                  paymentDomainRevision,
+        String                invoiceContextType,
+        String                paymentContextType,
+        Long                  paymentAdjustmentAmount,
+        Long                  invoicePartyRevision,
+        Long                  paymentPartyRevision,
+        String                paymentDigitalWalletId,
+        String                paymentDigitalWalletProvider,
+        BankCardTokenProvider paymentBankCardTokenProvider
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -308,6 +312,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentPartyRevision = paymentPartyRevision;
         this.paymentDigitalWalletId = paymentDigitalWalletId;
         this.paymentDigitalWalletProvider = paymentDigitalWalletProvider;
+        this.paymentBankCardTokenProvider = paymentBankCardTokenProvider;
     }
 
     public Long getId() {
@@ -846,6 +851,14 @@ public class InvoiceEventStat implements Serializable {
         this.paymentDigitalWalletProvider = paymentDigitalWalletProvider;
     }
 
+    public BankCardTokenProvider getPaymentBankCardTokenProvider() {
+        return this.paymentBankCardTokenProvider;
+    }
+
+    public void setPaymentBankCardTokenProvider(BankCardTokenProvider paymentBankCardTokenProvider) {
+        this.paymentBankCardTokenProvider = paymentBankCardTokenProvider;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -1257,6 +1270,12 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentDigitalWalletProvider.equals(other.paymentDigitalWalletProvider))
             return false;
+        if (paymentBankCardTokenProvider == null) {
+            if (other.paymentBankCardTokenProvider != null)
+                return false;
+        }
+        else if (!paymentBankCardTokenProvider.equals(other.paymentBankCardTokenProvider))
+            return false;
         return true;
     }
 
@@ -1331,6 +1350,7 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((this.paymentPartyRevision == null) ? 0 : this.paymentPartyRevision.hashCode());
         result = prime * result + ((this.paymentDigitalWalletId == null) ? 0 : this.paymentDigitalWalletId.hashCode());
         result = prime * result + ((this.paymentDigitalWalletProvider == null) ? 0 : this.paymentDigitalWalletProvider.hashCode());
+        result = prime * result + ((this.paymentBankCardTokenProvider == null) ? 0 : this.paymentBankCardTokenProvider.hashCode());
         return result;
     }
 
@@ -1405,6 +1425,7 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentPartyRevision);
         sb.append(", ").append(paymentDigitalWalletId);
         sb.append(", ").append(paymentDigitalWalletProvider);
+        sb.append(", ").append(paymentBankCardTokenProvider);
 
         sb.append(")");
         return sb.toString();
