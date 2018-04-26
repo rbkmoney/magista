@@ -1,7 +1,6 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.damsel.base.InvalidRequest;
-import com.rbkmoney.damsel.merch_stat.DatasetTooBig;
 import com.rbkmoney.damsel.merch_stat.MerchantStatisticsSrv.Iface;
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
@@ -25,27 +24,27 @@ public class MerchantStatisticsHandler implements Iface {
     }
 
     @Override
-    public StatResponse getPayments(StatRequest statRequest) throws InvalidRequest, DatasetTooBig, TException {
+    public StatResponse getPayments(StatRequest statRequest) throws InvalidRequest, TException {
         return getStatResponse(statRequest);
     }
 
     @Override
-    public StatResponse getInvoices(StatRequest statRequest) throws InvalidRequest, DatasetTooBig, TException {
+    public StatResponse getInvoices(StatRequest statRequest) throws InvalidRequest, TException {
         return getStatResponse(statRequest);
     }
 
     @Override
-    public StatResponse getCustomers(StatRequest statRequest) throws InvalidRequest, DatasetTooBig, TException {
+    public StatResponse getCustomers(StatRequest statRequest) throws InvalidRequest, TException {
         return getStatResponse(statRequest);
     }
 
     @Override
-    public StatResponse getStatistics(StatRequest statRequest) throws InvalidRequest, DatasetTooBig, TException {
+    public StatResponse getStatistics(StatRequest statRequest) throws InvalidRequest, TException {
         return getStatResponse(statRequest);
     }
 
     @Override
-    public StatResponse getPayouts(StatRequest statRequest) throws InvalidRequest, DatasetTooBig, TException {
+    public StatResponse getPayouts(StatRequest statRequest) throws InvalidRequest, TException {
         return getStatResponse(statRequest);
     }
 
