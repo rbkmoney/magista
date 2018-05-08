@@ -10,8 +10,8 @@ import com.rbkmoney.damsel.merch_stat.BankCard;
 import com.rbkmoney.damsel.merch_stat.CustomerPayer;
 import com.rbkmoney.damsel.merch_stat.DigitalWallet;
 import com.rbkmoney.damsel.merch_stat.DigitalWalletProvider;
-import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.InternationalBankAccount;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
 import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
 import com.rbkmoney.damsel.merch_stat.InvoicePaid;
@@ -330,12 +330,21 @@ public class DamselUtil {
         PaymentTool._Fields paymentTool = PaymentTool._Fields.findByName(invoicePaymentStat.getPaymentTool());
         switch (paymentTool) {
             case BANK_CARD:
-                return PaymentTool.bank_card(new BankCard(
+                BankCard bankCard = new BankCard(
                         invoicePaymentStat.getPaymentToken(),
                         BankCardPaymentSystem.valueOf(invoicePaymentStat.getPaymentSystem()),
                         invoicePaymentStat.getPaymentBin(),
                         invoicePaymentStat.getPaymentMaskedPan()
-                ));
+                );
+                bankCard.setTokenProvider(
+                        TypeUtil.toEnumField(
+                                Optional.ofNullable(invoicePaymentStat.getPaymentBankCardTokenProvider())
+                                        .map(bankCardTokenProvider -> bankCardTokenProvider.toString())
+                                        .orElse(null),
+                                BankCardTokenProvider.class
+                        )
+                );
+                return PaymentTool.bank_card(bankCard);
             case PAYMENT_TERMINAL:
                 return PaymentTool.payment_terminal(new PaymentTerminal(
                         TerminalPaymentProvider.valueOf(invoicePaymentStat.getPaymentTerminalProvider())
@@ -380,10 +389,10 @@ public class DamselUtil {
             case OPERATION_TIMEOUT:
                 return OperationFailure.operation_timeout(new OperationTimeout());
             case FAILURE:
-                ExternalFailure externalFailure = new ExternalFailure();
+                Failure externalFailure = new Failure();
                 externalFailure.setCode(invoicePaymentStat.getPaymentExternalFailureCode());
-                externalFailure.setDescription(invoicePaymentStat.getPaymentExternalFailureDescription());
-                return OperationFailure.external_failure(externalFailure);
+                externalFailure.setReason(invoicePaymentStat.getPaymentExternalFailureDescription());
+                return OperationFailure.failure(externalFailure);
             default:
                 throw new NotFoundException(String.format("Failure type '%s' not found", invoicePaymentStat.getPaymentFailureClass()));
         }

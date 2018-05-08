@@ -6,6 +6,7 @@ import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
@@ -138,6 +139,9 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
             invoiceEventStat.setPaymentSystem(bankCard.getPaymentSystem().toString());
             invoiceEventStat.setPaymentBin(bankCard.getBin());
             invoiceEventStat.setPaymentToken(bankCard.getToken());
+            if (bankCard.isSetTokenProvider()) {
+                invoiceEventStat.setPaymentBankCardTokenProvider(TypeUtil.toEnumField(bankCard.getTokenProvider().name(), BankCardTokenProvider.class));
+            }
         }
     }
 
