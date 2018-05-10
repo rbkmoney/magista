@@ -11,6 +11,7 @@ import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.util.TypeUtil;
 import org.jooq.*;
+import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -506,7 +507,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         ADJUSTMENT.PARTY_CONTRACT_ID,
                         INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE
                 );
-
+        System.out.println(query.getSQL(ParamType.INLINED));
         return Optional.ofNullable(
                 fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
                         .put("merchant_id", rs.getString("merchant_id"))
