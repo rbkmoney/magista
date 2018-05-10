@@ -6,6 +6,7 @@ package com.rbkmoney.magista.domain.tables;
 
 import com.rbkmoney.magista.domain.Keys;
 import com.rbkmoney.magista.domain.Mst;
+import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
@@ -41,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 1127574;
+    private static final long serialVersionUID = 1187063691;
 
     /**
      * The reference instance of <code>mst.invoice_event_stat</code>
@@ -390,6 +391,11 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
      * The column <code>mst.invoice_event_stat.payment_digital_wallet_provider</code>.
      */
     public final TableField<InvoiceEventStatRecord, String> PAYMENT_DIGITAL_WALLET_PROVIDER = createField("payment_digital_wallet_provider", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.invoice_event_stat.payment_bank_card_token_provider</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, BankCardTokenProvider> PAYMENT_BANK_CARD_TOKEN_PROVIDER = createField("payment_bank_card_token_provider", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class), this, "");
 
     /**
      * Create a <code>mst.invoice_event_stat</code> table reference

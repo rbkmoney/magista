@@ -340,12 +340,21 @@ public class DamselUtil {
         PaymentTool._Fields paymentTool = PaymentTool._Fields.findByName(invoicePaymentStat.getPaymentTool());
         switch (paymentTool) {
             case BANK_CARD:
-                return PaymentTool.bank_card(new BankCard(
+                BankCard bankCard = new BankCard(
                         invoicePaymentStat.getPaymentToken(),
                         BankCardPaymentSystem.valueOf(invoicePaymentStat.getPaymentSystem()),
                         invoicePaymentStat.getPaymentBin(),
                         invoicePaymentStat.getPaymentMaskedPan()
-                ));
+                );
+                bankCard.setTokenProvider(
+                        TypeUtil.toEnumField(
+                                Optional.ofNullable(invoicePaymentStat.getPaymentBankCardTokenProvider())
+                                        .map(bankCardTokenProvider -> bankCardTokenProvider.toString())
+                                        .orElse(null),
+                                BankCardTokenProvider.class
+                        )
+                );
+                return PaymentTool.bank_card(bankCard);
             case PAYMENT_TERMINAL:
                 return PaymentTool.payment_terminal(new PaymentTerminal(
                         TerminalPaymentProvider.valueOf(invoicePaymentStat.getPaymentTerminalProvider())

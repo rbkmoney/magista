@@ -44,6 +44,16 @@ public class AccountingReportFunction extends ReportBaseFunction {
                 )
         );
 
+        CompletableFuture<Map<String, String>> adjustmentCompletableFuture = CompletableFuture.supplyAsync(
+                () -> getContext(context).getDao().getAdjustmentAccountingData(
+                        getQueryParameters().getMerchantId(),
+                        getQueryParameters().getContractId(),
+                        getQueryParameters().getCurrencyCode(),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(getQueryParameters().getFromTime())),
+                        TypeUtil.toLocalDateTime(getQueryParameters().getToTime())
+                )
+        );
+
         CompletableFuture<Map<String, String>> payoutCompletableFuture = CompletableFuture.supplyAsync(
                 () -> getContext(context).getDao().getPayoutAccountingData(
                         getQueryParameters().getMerchantId(),
@@ -61,8 +71,14 @@ public class AccountingReportFunction extends ReportBaseFunction {
                     return map;
                 }
         ).thenCombineAsync(
-                payoutCompletableFuture, (paymentsWithRefunds, payouts) -> {
+                adjustmentCompletableFuture, (paymentsWithRefunds, adjustments) -> {
                     Map map = new HashMap(paymentsWithRefunds);
+                    map.putAll(adjustments);
+                    return map;
+                }
+        ).thenCombineAsync(
+                payoutCompletableFuture, (paymentsWithRefundsAndAdjustments, payouts) -> {
+                    Map map = new HashMap(paymentsWithRefundsAndAdjustments);
                     map.putAll(payouts);
                     return map;
                 }

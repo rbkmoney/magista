@@ -25,6 +25,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.rbkmoney.magista.domain.tables.Adjustment.ADJUSTMENT;
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
@@ -147,6 +148,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.PAYMENT_SYSTEM,
                 INVOICE_EVENT_STAT.PAYMENT_BIN,
                 INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN,
+                INVOICE_EVENT_STAT.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
                 INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER,
                 INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_ID,
                 INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_PROVIDER,
@@ -194,6 +196,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             invoiceEventStat.setPaymentSystem(rs.getString(INVOICE_EVENT_STAT.PAYMENT_SYSTEM.getName()));
             invoiceEventStat.setPaymentBin(rs.getString(INVOICE_EVENT_STAT.PAYMENT_BIN.getName()));
             invoiceEventStat.setPaymentMaskedPan(rs.getString(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN.getName()));
+            invoiceEventStat.setPaymentBankCardTokenProvider(
+                    TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()), BankCardTokenProvider.class)
+            );
             invoiceEventStat.setPaymentTerminalProvider(rs.getString(INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER.getName()));
             invoiceEventStat.setPaymentDigitalWalletId(rs.getString(INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_ID.getName()));
             invoiceEventStat.setPaymentDigitalWalletProvider(rs.getString(INVOICE_EVENT_STAT.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()));
@@ -405,7 +410,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                 .and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId))
                                 .and(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
                                 .and(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.eq(currencyCode))
-                                .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
+                                .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured))
+                                .and(INVOICE_EVENT_STAT.EVENT_TYPE.ne(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED)),
                         INVOICE_EVENT_STAT.EVENT_CREATED_AT,
                         fromTime,
                         Optional.of(toTime)
@@ -472,6 +478,53 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         .put("contract_id", contractId)
                         .put("currency_code", currencyCode)
                         .put("funds_refunded", "0")
+                        .build()
+        );
+    }
+
+    @Override
+    public Map<String, String> getAdjustmentAccountingData(String merchantId, String contractId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
+        Query query = getDslContext().select(
+                ADJUSTMENT.PARTY_ID.as("merchant_id"),
+                ADJUSTMENT.PARTY_CONTRACT_ID.as("contract_id"),
+                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.as("currency_code"),
+                DSL.sum(INVOICE_EVENT_STAT.PAYMENT_FEE.minus(ADJUSTMENT.ADJUSTMENT_FEE)).as("funds_adjusted")
+        ).from(ADJUSTMENT)
+                .join(INVOICE_EVENT_STAT)
+                .on(
+                        appendDateTimeRangeConditions(
+                                ADJUSTMENT.PARTY_ID.eq(merchantId)
+                                        .and(ADJUSTMENT.PARTY_CONTRACT_ID.eq(contractId))
+                                        .and(ADJUSTMENT.INVOICE_ID.eq(INVOICE_EVENT_STAT.INVOICE_ID))
+                                        .and(ADJUSTMENT.PAYMENT_ID.eq(INVOICE_EVENT_STAT.PAYMENT_ID))
+                                        .and(ADJUSTMENT.ADJUSTMENT_STATUS.eq(AdjustmentStatus.captured))
+                                        .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT))
+                                        .and(INVOICE_EVENT_STAT.EVENT_TYPE.ne(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED))
+                                        .and(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.eq(currencyCode))
+                                        .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
+                                ADJUSTMENT.EVENT_CREATED_AT,
+                                fromTime,
+                                Optional.of(toTime)
+                        )
+                ).groupBy(
+                        ADJUSTMENT.PARTY_ID,
+                        ADJUSTMENT.PARTY_CONTRACT_ID,
+                        INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE
+                );
+        System.out.println(query.getSQL(ParamType.INLINED));
+        return Optional.ofNullable(
+                fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
+                        .put("merchant_id", rs.getString("merchant_id"))
+                        .put("contract_id", rs.getString("contract_id"))
+                        .put("currency_code", rs.getString("currency_code"))
+                        .put("funds_adjusted", rs.getString("funds_adjusted"))
+                        .build())
+        ).orElse(
+                ImmutableMap.<String, String>builder()
+                        .put("merchant_id", merchantId)
+                        .put("contract_id", contractId)
+                        .put("currency_code", currencyCode)
+                        .put("funds_adjusted", "0")
                         .build()
         );
     }
