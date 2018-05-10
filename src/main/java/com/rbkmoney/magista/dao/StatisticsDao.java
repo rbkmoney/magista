@@ -147,6 +147,14 @@ public interface StatisticsDao {
             LocalDateTime toTime
     ) throws DaoException;
 
+    Map<String, String> getAdjustmentAccountingData(
+            String merchantId,
+            String contractId,
+            String currencyCode,
+            Optional<LocalDateTime> fromTime,
+            LocalDateTime toTime
+    ) throws DaoException;
+
     Map<String, String> getPayoutAccountingData(
             String merchantId,
             String contractId,

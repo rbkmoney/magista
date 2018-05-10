@@ -34,12 +34,13 @@ public class AccountingReportTest extends AbstractIntegrationTest {
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getData().getRecords().size());
         Map<String, String> result1 = statResponse.getData().getRecords().get(0);
-        assertEquals(7, result1.size());
+        assertEquals(8, result1.size());
         assertEquals("test_party_1", result1.get("merchant_id"));
         assertEquals("test_contract_1", result1.get("contract_id"));
         assertEquals("RUB", result1.get("currency_code"));
         assertEquals("3000", result1.get("funds_acquired"));
         assertEquals("75", result1.get("fee_charged"));
+        assertEquals("2", result1.get("funds_adjusted"));
         assertEquals("950", result1.get("funds_paid_out"));
         assertEquals("1000", result1.get("funds_refunded"));
         assertEquals(0, statResponse.getTotalCount());
@@ -48,12 +49,13 @@ public class AccountingReportTest extends AbstractIntegrationTest {
         StatResponse statResponse2 = queryProcessor.processQuery(json2);
         assertEquals(1, statResponse2.getData().getRecords().size());
         Map<String, String> result2 = statResponse2.getData().getRecords().get(0);
-        assertEquals(7, result2.size());
+        assertEquals(8, result2.size());
         assertEquals("test_party_1", result2.get("merchant_id"));
         assertEquals("test_contract_1", result2.get("contract_id"));
         assertEquals("RUB", result2.get("currency_code"));
         assertEquals("6000", result2.get("funds_acquired"));
         assertEquals("150", result2.get("fee_charged"));
+        assertEquals("0", result2.get("funds_adjusted"));
         assertEquals("2875", result2.get("funds_paid_out"));
         assertEquals("2000", result2.get("funds_refunded"));
         assertEquals(0, statResponse2.getTotalCount());
@@ -62,12 +64,13 @@ public class AccountingReportTest extends AbstractIntegrationTest {
         StatResponse statResponse3 = queryProcessor.processQuery(json3);
         assertEquals(1, statResponse3.getData().getRecords().size());
         Map<String, String> result3 = statResponse3.getData().getRecords().get(0);
-        assertEquals(7, result3.size());
+        assertEquals(8, result3.size());
         assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result3.get("merchant_id"));
         assertEquals("1", result3.get("contract_id"));
         assertEquals("RUB", result3.get("currency_code"));
         assertEquals("444000", result3.get("funds_acquired"));
         assertEquals("19980", result3.get("fee_charged"));
+        assertEquals("0", result3.get("funds_adjusted"));
         assertEquals("0", result3.get("funds_paid_out"));
         assertEquals("0", result3.get("funds_refunded"));
 
@@ -75,12 +78,13 @@ public class AccountingReportTest extends AbstractIntegrationTest {
         StatResponse statResponse4 = queryProcessor.processQuery(json4);
         assertEquals(1, statResponse4.getData().getRecords().size());
         Map<String, String> result4 = statResponse4.getData().getRecords().get(0);
-        assertEquals(7, result4.size());
+        assertEquals(8, result4.size());
         assertEquals("74480e4f-1a36-4edd-8175-7a9e984313b0", result4.get("merchant_id"));
         assertEquals("2", result4.get("contract_id"));
         assertEquals("RUB", result4.get("currency_code"));
         assertEquals("3631200", result4.get("funds_acquired"));
         assertEquals("163403", result4.get("fee_charged"));
+        assertEquals("0", result4.get("funds_adjusted"));
         assertEquals("0", result4.get("funds_paid_out"));
         assertEquals("0", result4.get("funds_refunded"));
 
@@ -93,12 +97,13 @@ public class AccountingReportTest extends AbstractIntegrationTest {
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getData().getRecords().size());
         Map<String, String> result4 = statResponse.getData().getRecords().get(0);
-        assertEquals(7, result4.size());
+        assertEquals(8, result4.size());
         assertEquals("not_found", result4.get("merchant_id"));
         assertEquals("404", result4.get("contract_id"));
         assertEquals("RUB", result4.get("currency_code"));
         assertEquals("0", result4.get("funds_acquired"));
         assertEquals("0", result4.get("fee_charged"));
+        assertEquals("0", result4.get("funds_adjusted"));
         assertEquals("0", result4.get("funds_paid_out"));
         assertEquals("0", result4.get("funds_refunded"));
     }
