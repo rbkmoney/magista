@@ -258,7 +258,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
     }
 
     public static ConditionParameterSource buildPaymentConditionParameterSource(InvoicesParameters parameters) {
-        return new ConditionParameterSource()
+        ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_STATUS,
                         toEnumField(
@@ -275,5 +275,13 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), LIKE)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, parameters.getPanMask(), LIKE)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS);
+
+        if (!conditionParameterSource.getConditionFields().isEmpty()) {
+            conditionParameterSource
+                    .addValue(INVOICE_EVENT_STAT.PARTY_ID, parameters.getMerchantId(), EQUALS)
+                    .addValue(INVOICE_EVENT_STAT.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                    .addValue(INVOICE_EVENT_STAT.INVOICE_ID, parameters.getInvoiceId(), EQUALS);
+        }
+        return conditionParameterSource;
     }
 }
