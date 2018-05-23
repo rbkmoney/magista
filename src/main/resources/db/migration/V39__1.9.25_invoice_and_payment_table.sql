@@ -157,7 +157,7 @@ create table mst.payment_event (
   FOREIGN KEY (invoice_id, payment_id) REFERENCES payment_data (invoice_id, payment_id)
 );
 
-CREATE INDEX payment_event_invoice_id_event_created_at_idx
+CREATE INDEX payment_event_invoice_id_payment_id_event_created_at_idx
   ON mst.payment_event
   using btree (invoice_id, payment_id, event_created_at);
 
