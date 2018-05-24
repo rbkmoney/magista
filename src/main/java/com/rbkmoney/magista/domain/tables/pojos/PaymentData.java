@@ -4,6 +4,7 @@
 package com.rbkmoney.magista.domain.tables.pojos;
 
 
+import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
@@ -29,39 +30,40 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData implements Serializable {
 
-    private static final long serialVersionUID = 696590502;
+    private static final long serialVersionUID = -461921710;
 
-    private Long             id;
-    private String           invoiceId;
-    private String           paymentId;
-    private UUID             partyId;
-    private String           partyShopId;
-    private String           partyContractId;
-    private String           paymentCurrencyCode;
-    private Long             paymentAmount;
-    private String           paymentCustomerId;
-    private PaymentTool      paymentTool;
-    private String           paymentBankCardMaskedPan;
-    private String           paymentBankCardBin;
-    private String           paymentBankCardToken;
-    private String           paymentBankCardSystem;
-    private String           paymentTerminalProvider;
-    private String           paymentDigitalWalletId;
-    private String           paymentDigitalWalletProvider;
-    private Integer          paymentProviderId;
-    private Integer          paymentTerminalId;
-    private PaymentFlow      paymentFlow;
-    private OnHoldExpiration paymentHoldOnExpiration;
-    private LocalDateTime    paymentHoldUntil;
-    private String           paymentSessionId;
-    private String           paymentFingerprint;
-    private String           paymentIp;
-    private String           paymentPhoneNumber;
-    private String           paymentEmail;
-    private LocalDateTime    paymentCreatedAt;
-    private Long             paymentPartyRevision;
-    private String           paymentContextType;
-    private byte[]           paymentContext;
+    private Long                  id;
+    private String                invoiceId;
+    private String                paymentId;
+    private UUID                  partyId;
+    private String                partyShopId;
+    private String                partyContractId;
+    private String                paymentCurrencyCode;
+    private Long                  paymentAmount;
+    private String                paymentCustomerId;
+    private PaymentTool           paymentTool;
+    private String                paymentBankCardMaskedPan;
+    private String                paymentBankCardBin;
+    private String                paymentBankCardToken;
+    private String                paymentBankCardSystem;
+    private BankCardTokenProvider paymentBankCardTokenProvider;
+    private String                paymentTerminalProvider;
+    private String                paymentDigitalWalletId;
+    private String                paymentDigitalWalletProvider;
+    private Integer               paymentProviderId;
+    private Integer               paymentTerminalId;
+    private PaymentFlow           paymentFlow;
+    private OnHoldExpiration      paymentHoldOnExpiration;
+    private LocalDateTime         paymentHoldUntil;
+    private String                paymentSessionId;
+    private String                paymentFingerprint;
+    private String                paymentIp;
+    private String                paymentPhoneNumber;
+    private String                paymentEmail;
+    private LocalDateTime         paymentCreatedAt;
+    private Long                  paymentPartyRevision;
+    private String                paymentContextType;
+    private byte[]                paymentContext;
 
     public PaymentData() {}
 
@@ -80,6 +82,7 @@ public class PaymentData implements Serializable {
         this.paymentBankCardBin = value.paymentBankCardBin;
         this.paymentBankCardToken = value.paymentBankCardToken;
         this.paymentBankCardSystem = value.paymentBankCardSystem;
+        this.paymentBankCardTokenProvider = value.paymentBankCardTokenProvider;
         this.paymentTerminalProvider = value.paymentTerminalProvider;
         this.paymentDigitalWalletId = value.paymentDigitalWalletId;
         this.paymentDigitalWalletProvider = value.paymentDigitalWalletProvider;
@@ -100,37 +103,38 @@ public class PaymentData implements Serializable {
     }
 
     public PaymentData(
-        Long             id,
-        String           invoiceId,
-        String           paymentId,
-        UUID             partyId,
-        String           partyShopId,
-        String           partyContractId,
-        String           paymentCurrencyCode,
-        Long             paymentAmount,
-        String           paymentCustomerId,
-        PaymentTool      paymentTool,
-        String           paymentBankCardMaskedPan,
-        String           paymentBankCardBin,
-        String           paymentBankCardToken,
-        String           paymentBankCardSystem,
-        String           paymentTerminalProvider,
-        String           paymentDigitalWalletId,
-        String           paymentDigitalWalletProvider,
-        Integer          paymentProviderId,
-        Integer          paymentTerminalId,
-        PaymentFlow      paymentFlow,
-        OnHoldExpiration paymentHoldOnExpiration,
-        LocalDateTime    paymentHoldUntil,
-        String           paymentSessionId,
-        String           paymentFingerprint,
-        String           paymentIp,
-        String           paymentPhoneNumber,
-        String           paymentEmail,
-        LocalDateTime    paymentCreatedAt,
-        Long             paymentPartyRevision,
-        String           paymentContextType,
-        byte[]           paymentContext
+        Long                  id,
+        String                invoiceId,
+        String                paymentId,
+        UUID                  partyId,
+        String                partyShopId,
+        String                partyContractId,
+        String                paymentCurrencyCode,
+        Long                  paymentAmount,
+        String                paymentCustomerId,
+        PaymentTool           paymentTool,
+        String                paymentBankCardMaskedPan,
+        String                paymentBankCardBin,
+        String                paymentBankCardToken,
+        String                paymentBankCardSystem,
+        BankCardTokenProvider paymentBankCardTokenProvider,
+        String                paymentTerminalProvider,
+        String                paymentDigitalWalletId,
+        String                paymentDigitalWalletProvider,
+        Integer               paymentProviderId,
+        Integer               paymentTerminalId,
+        PaymentFlow           paymentFlow,
+        OnHoldExpiration      paymentHoldOnExpiration,
+        LocalDateTime         paymentHoldUntil,
+        String                paymentSessionId,
+        String                paymentFingerprint,
+        String                paymentIp,
+        String                paymentPhoneNumber,
+        String                paymentEmail,
+        LocalDateTime         paymentCreatedAt,
+        Long                  paymentPartyRevision,
+        String                paymentContextType,
+        byte[]                paymentContext
     ) {
         this.id = id;
         this.invoiceId = invoiceId;
@@ -146,6 +150,7 @@ public class PaymentData implements Serializable {
         this.paymentBankCardBin = paymentBankCardBin;
         this.paymentBankCardToken = paymentBankCardToken;
         this.paymentBankCardSystem = paymentBankCardSystem;
+        this.paymentBankCardTokenProvider = paymentBankCardTokenProvider;
         this.paymentTerminalProvider = paymentTerminalProvider;
         this.paymentDigitalWalletId = paymentDigitalWalletId;
         this.paymentDigitalWalletProvider = paymentDigitalWalletProvider;
@@ -275,6 +280,14 @@ public class PaymentData implements Serializable {
 
     public void setPaymentBankCardSystem(String paymentBankCardSystem) {
         this.paymentBankCardSystem = paymentBankCardSystem;
+    }
+
+    public BankCardTokenProvider getPaymentBankCardTokenProvider() {
+        return this.paymentBankCardTokenProvider;
+    }
+
+    public void setPaymentBankCardTokenProvider(BankCardTokenProvider paymentBankCardTokenProvider) {
+        this.paymentBankCardTokenProvider = paymentBankCardTokenProvider;
     }
 
     public String getPaymentTerminalProvider() {
@@ -506,6 +519,12 @@ public class PaymentData implements Serializable {
         }
         else if (!paymentBankCardSystem.equals(other.paymentBankCardSystem))
             return false;
+        if (paymentBankCardTokenProvider == null) {
+            if (other.paymentBankCardTokenProvider != null)
+                return false;
+        }
+        else if (!paymentBankCardTokenProvider.equals(other.paymentBankCardTokenProvider))
+            return false;
         if (paymentTerminalProvider == null) {
             if (other.paymentTerminalProvider != null)
                 return false;
@@ -629,6 +648,7 @@ public class PaymentData implements Serializable {
         result = prime * result + ((this.paymentBankCardBin == null) ? 0 : this.paymentBankCardBin.hashCode());
         result = prime * result + ((this.paymentBankCardToken == null) ? 0 : this.paymentBankCardToken.hashCode());
         result = prime * result + ((this.paymentBankCardSystem == null) ? 0 : this.paymentBankCardSystem.hashCode());
+        result = prime * result + ((this.paymentBankCardTokenProvider == null) ? 0 : this.paymentBankCardTokenProvider.hashCode());
         result = prime * result + ((this.paymentTerminalProvider == null) ? 0 : this.paymentTerminalProvider.hashCode());
         result = prime * result + ((this.paymentDigitalWalletId == null) ? 0 : this.paymentDigitalWalletId.hashCode());
         result = prime * result + ((this.paymentDigitalWalletProvider == null) ? 0 : this.paymentDigitalWalletProvider.hashCode());
@@ -667,6 +687,7 @@ public class PaymentData implements Serializable {
         sb.append(", ").append(paymentBankCardBin);
         sb.append(", ").append(paymentBankCardToken);
         sb.append(", ").append(paymentBankCardSystem);
+        sb.append(", ").append(paymentBankCardTokenProvider);
         sb.append(", ").append(paymentTerminalProvider);
         sb.append(", ").append(paymentDigitalWalletId);
         sb.append(", ").append(paymentDigitalWalletProvider);

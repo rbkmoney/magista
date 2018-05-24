@@ -6,6 +6,7 @@ package com.rbkmoney.magista.domain.tables;
 
 import com.rbkmoney.magista.domain.Keys;
 import com.rbkmoney.magista.domain.Mst;
+import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
@@ -41,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData extends TableImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = 1972245090;
+    private static final long serialVersionUID = -543333944;
 
     /**
      * The reference instance of <code>mst.payment_data</code>
@@ -125,6 +126,11 @@ public class PaymentData extends TableImpl<PaymentDataRecord> {
      * The column <code>mst.payment_data.payment_bank_card_system</code>.
      */
     public final TableField<PaymentDataRecord, String> PAYMENT_BANK_CARD_SYSTEM = createField("payment_bank_card_system", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payment_data.payment_bank_card_token_provider</code>.
+     */
+    public final TableField<PaymentDataRecord, BankCardTokenProvider> PAYMENT_BANK_CARD_TOKEN_PROVIDER = createField("payment_bank_card_token_provider", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class), this, "");
 
     /**
      * The column <code>mst.payment_data.payment_terminal_provider</code>.

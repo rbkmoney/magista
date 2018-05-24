@@ -4,6 +4,7 @@
 package com.rbkmoney.magista.domain.tables.records;
 
 
+import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
@@ -31,7 +32,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = 1118009039;
+    private static final long serialVersionUID = -1326247104;
 
     /**
      * Setter for <code>mst.payment_data.id</code>.
@@ -230,241 +231,255 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
     }
 
     /**
+     * Setter for <code>mst.payment_data.payment_bank_card_token_provider</code>.
+     */
+    public void setPaymentBankCardTokenProvider(BankCardTokenProvider value) {
+        set(14, value);
+    }
+
+    /**
+     * Getter for <code>mst.payment_data.payment_bank_card_token_provider</code>.
+     */
+    public BankCardTokenProvider getPaymentBankCardTokenProvider() {
+        return (BankCardTokenProvider) get(14);
+    }
+
+    /**
      * Setter for <code>mst.payment_data.payment_terminal_provider</code>.
      */
     public void setPaymentTerminalProvider(String value) {
-        set(14, value);
+        set(15, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_terminal_provider</code>.
      */
     public String getPaymentTerminalProvider() {
-        return (String) get(14);
+        return (String) get(15);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_digital_wallet_id</code>.
      */
     public void setPaymentDigitalWalletId(String value) {
-        set(15, value);
+        set(16, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_digital_wallet_id</code>.
      */
     public String getPaymentDigitalWalletId() {
-        return (String) get(15);
+        return (String) get(16);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_digital_wallet_provider</code>.
      */
     public void setPaymentDigitalWalletProvider(String value) {
-        set(16, value);
+        set(17, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_digital_wallet_provider</code>.
      */
     public String getPaymentDigitalWalletProvider() {
-        return (String) get(16);
+        return (String) get(17);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_provider_id</code>.
      */
     public void setPaymentProviderId(Integer value) {
-        set(17, value);
+        set(18, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_provider_id</code>.
      */
     public Integer getPaymentProviderId() {
-        return (Integer) get(17);
+        return (Integer) get(18);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_terminal_id</code>.
      */
     public void setPaymentTerminalId(Integer value) {
-        set(18, value);
+        set(19, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_terminal_id</code>.
      */
     public Integer getPaymentTerminalId() {
-        return (Integer) get(18);
+        return (Integer) get(19);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_flow</code>.
      */
     public void setPaymentFlow(PaymentFlow value) {
-        set(19, value);
+        set(20, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_flow</code>.
      */
     public PaymentFlow getPaymentFlow() {
-        return (PaymentFlow) get(19);
+        return (PaymentFlow) get(20);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_hold_on_expiration</code>.
      */
     public void setPaymentHoldOnExpiration(OnHoldExpiration value) {
-        set(20, value);
+        set(21, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_hold_on_expiration</code>.
      */
     public OnHoldExpiration getPaymentHoldOnExpiration() {
-        return (OnHoldExpiration) get(20);
+        return (OnHoldExpiration) get(21);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_hold_until</code>.
      */
     public void setPaymentHoldUntil(LocalDateTime value) {
-        set(21, value);
+        set(22, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_hold_until</code>.
      */
     public LocalDateTime getPaymentHoldUntil() {
-        return (LocalDateTime) get(21);
+        return (LocalDateTime) get(22);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_session_id</code>.
      */
     public void setPaymentSessionId(String value) {
-        set(22, value);
+        set(23, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_session_id</code>.
      */
     public String getPaymentSessionId() {
-        return (String) get(22);
+        return (String) get(23);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_fingerprint</code>.
      */
     public void setPaymentFingerprint(String value) {
-        set(23, value);
+        set(24, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_fingerprint</code>.
      */
     public String getPaymentFingerprint() {
-        return (String) get(23);
+        return (String) get(24);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_ip</code>.
      */
     public void setPaymentIp(String value) {
-        set(24, value);
+        set(25, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_ip</code>.
      */
     public String getPaymentIp() {
-        return (String) get(24);
+        return (String) get(25);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_phone_number</code>.
      */
     public void setPaymentPhoneNumber(String value) {
-        set(25, value);
+        set(26, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_phone_number</code>.
      */
     public String getPaymentPhoneNumber() {
-        return (String) get(25);
+        return (String) get(26);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_email</code>.
      */
     public void setPaymentEmail(String value) {
-        set(26, value);
+        set(27, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_email</code>.
      */
     public String getPaymentEmail() {
-        return (String) get(26);
+        return (String) get(27);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_created_at</code>.
      */
     public void setPaymentCreatedAt(LocalDateTime value) {
-        set(27, value);
+        set(28, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_created_at</code>.
      */
     public LocalDateTime getPaymentCreatedAt() {
-        return (LocalDateTime) get(27);
+        return (LocalDateTime) get(28);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_party_revision</code>.
      */
     public void setPaymentPartyRevision(Long value) {
-        set(28, value);
+        set(29, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_party_revision</code>.
      */
     public Long getPaymentPartyRevision() {
-        return (Long) get(28);
+        return (Long) get(29);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_context_type</code>.
      */
     public void setPaymentContextType(String value) {
-        set(29, value);
+        set(30, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_context_type</code>.
      */
     public String getPaymentContextType() {
-        return (String) get(29);
+        return (String) get(30);
     }
 
     /**
      * Setter for <code>mst.payment_data.payment_context</code>.
      */
     public void setPaymentContext(byte... value) {
-        set(30, value);
+        set(31, value);
     }
 
     /**
      * Getter for <code>mst.payment_data.payment_context</code>.
      */
     public byte[] getPaymentContext() {
-        return (byte[]) get(30);
+        return (byte[]) get(31);
     }
 
     // -------------------------------------------------------------------------
@@ -493,7 +508,7 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
     /**
      * Create a detached, initialised PaymentDataRecord
      */
-    public PaymentDataRecord(Long id, String invoiceId, String paymentId, UUID partyId, String partyShopId, String partyContractId, String paymentCurrencyCode, Long paymentAmount, String paymentCustomerId, PaymentTool paymentTool, String paymentBankCardMaskedPan, String paymentBankCardBin, String paymentBankCardToken, String paymentBankCardSystem, String paymentTerminalProvider, String paymentDigitalWalletId, String paymentDigitalWalletProvider, Integer paymentProviderId, Integer paymentTerminalId, PaymentFlow paymentFlow, OnHoldExpiration paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentSessionId, String paymentFingerprint, String paymentIp, String paymentPhoneNumber, String paymentEmail, LocalDateTime paymentCreatedAt, Long paymentPartyRevision, String paymentContextType, byte[] paymentContext) {
+    public PaymentDataRecord(Long id, String invoiceId, String paymentId, UUID partyId, String partyShopId, String partyContractId, String paymentCurrencyCode, Long paymentAmount, String paymentCustomerId, PaymentTool paymentTool, String paymentBankCardMaskedPan, String paymentBankCardBin, String paymentBankCardToken, String paymentBankCardSystem, BankCardTokenProvider paymentBankCardTokenProvider, String paymentTerminalProvider, String paymentDigitalWalletId, String paymentDigitalWalletProvider, Integer paymentProviderId, Integer paymentTerminalId, PaymentFlow paymentFlow, OnHoldExpiration paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentSessionId, String paymentFingerprint, String paymentIp, String paymentPhoneNumber, String paymentEmail, LocalDateTime paymentCreatedAt, Long paymentPartyRevision, String paymentContextType, byte[] paymentContext) {
         super(PaymentData.PAYMENT_DATA);
 
         set(0, id);
@@ -510,22 +525,23 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
         set(11, paymentBankCardBin);
         set(12, paymentBankCardToken);
         set(13, paymentBankCardSystem);
-        set(14, paymentTerminalProvider);
-        set(15, paymentDigitalWalletId);
-        set(16, paymentDigitalWalletProvider);
-        set(17, paymentProviderId);
-        set(18, paymentTerminalId);
-        set(19, paymentFlow);
-        set(20, paymentHoldOnExpiration);
-        set(21, paymentHoldUntil);
-        set(22, paymentSessionId);
-        set(23, paymentFingerprint);
-        set(24, paymentIp);
-        set(25, paymentPhoneNumber);
-        set(26, paymentEmail);
-        set(27, paymentCreatedAt);
-        set(28, paymentPartyRevision);
-        set(29, paymentContextType);
-        set(30, paymentContext);
+        set(14, paymentBankCardTokenProvider);
+        set(15, paymentTerminalProvider);
+        set(16, paymentDigitalWalletId);
+        set(17, paymentDigitalWalletProvider);
+        set(18, paymentProviderId);
+        set(19, paymentTerminalId);
+        set(20, paymentFlow);
+        set(21, paymentHoldOnExpiration);
+        set(22, paymentHoldUntil);
+        set(23, paymentSessionId);
+        set(24, paymentFingerprint);
+        set(25, paymentIp);
+        set(26, paymentPhoneNumber);
+        set(27, paymentEmail);
+        set(28, paymentCreatedAt);
+        set(29, paymentPartyRevision);
+        set(30, paymentContextType);
+        set(31, paymentContext);
     }
 }

@@ -10,6 +10,7 @@ import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
 import com.rbkmoney.magista.domain.enums.FailureClass;
+import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
@@ -167,6 +168,11 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
             paymentData.setPaymentBankCardSystem(bankCard.getPaymentSystem().toString());
             paymentData.setPaymentBankCardBin(bankCard.getBin());
             paymentData.setPaymentBankCardToken(bankCard.getToken());
+            if (bankCard.isSetTokenProvider()) {
+                paymentData.setPaymentBankCardTokenProvider(
+                        TypeUtil.toEnumField(bankCard.getTokenProvider().name(), BankCardTokenProvider.class)
+                );
+            }
         }
     }
 
