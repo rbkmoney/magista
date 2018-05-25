@@ -2,9 +2,9 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.util.TypeUtil;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;

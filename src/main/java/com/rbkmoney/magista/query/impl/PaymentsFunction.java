@@ -2,6 +2,7 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.dao.ConditionParameterSource;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
@@ -14,18 +15,17 @@ import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.util.DamselUtil;
-import com.rbkmoney.magista.util.TypeUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
-import static com.rbkmoney.magista.util.TypeUtil.toEnumField;
-import static com.rbkmoney.magista.util.TypeUtil.toLocalDateTime;
-import static org.jooq.Comparator.*;
+import static org.jooq.Comparator.EQUALS;
+import static org.jooq.Comparator.LIKE;
 
 /**
  * Created by vpankrashkin on 03.08.16.

@@ -21,9 +21,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;
+import static com.rbkmoney.geck.common.util.TypeUtil.toEnumFields;
+import static com.rbkmoney.geck.common.util.TypeUtil.toLocalDateTime;
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
-import static com.rbkmoney.magista.util.TypeUtil.*;
 import static org.jooq.Comparator.*;
 
 public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResponse> implements CompositeQuery<PayoutEventStat, StatResponse> {
