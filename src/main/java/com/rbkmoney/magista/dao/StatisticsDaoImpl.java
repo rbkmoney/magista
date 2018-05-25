@@ -157,6 +157,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 INVOICE_EVENT_STAT.INVOICE_ID,
                 INVOICE_EVENT_STAT.PARTY_ID,
                 INVOICE_EVENT_STAT.PARTY_SHOP_ID,
+                INVOICE_EVENT_STAT.PAYMENT_SHORT_ID,
                 INVOICE_EVENT_STAT.PAYMENT_CREATED_AT,
                 INVOICE_EVENT_STAT.PAYMENT_STATUS,
                 INVOICE_EVENT_STAT.PAYMENT_FAILURE_CLASS,
@@ -199,6 +200,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             invoiceEventStat.setPartyShopId(rs.getString(INVOICE_EVENT_STAT.PARTY_SHOP_ID.getName()));
             invoiceEventStat.setInvoiceId(rs.getString(INVOICE_EVENT_STAT.INVOICE_ID.getName()));
             invoiceEventStat.setPaymentId(rs.getString(INVOICE_EVENT_STAT.PAYMENT_ID.getName()));
+            invoiceEventStat.setPaymentShortId(rs.getString(INVOICE_EVENT_STAT.PAYMENT_SHORT_ID.getName()));
             invoiceEventStat.setPaymentCreatedAt(rs.getObject(INVOICE_EVENT_STAT.PAYMENT_CREATED_AT.getName(), LocalDateTime.class));
             invoiceEventStat.setPaymentStatus(
                     TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.PAYMENT_STATUS.getName()),

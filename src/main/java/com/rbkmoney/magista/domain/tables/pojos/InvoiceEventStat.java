@@ -32,7 +32,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat implements Serializable {
 
-    private static final long serialVersionUID = 475920769;
+    private static final long serialVersionUID = -339243846;
 
     private Long                       id;
     private Long                       eventId;
@@ -119,6 +119,7 @@ public class InvoiceEventStat implements Serializable {
     private Long                       paymentRefundAmount;
     private String                     paymentRefundCurrencyCode;
     private BankCardTokenProvider      paymentBankCardTokenProvider;
+    private String                     paymentShortId;
 
     public InvoiceEventStat() {}
 
@@ -208,6 +209,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentRefundAmount = value.paymentRefundAmount;
         this.paymentRefundCurrencyCode = value.paymentRefundCurrencyCode;
         this.paymentBankCardTokenProvider = value.paymentBankCardTokenProvider;
+        this.paymentShortId = value.paymentShortId;
     }
 
     public InvoiceEventStat(
@@ -295,7 +297,8 @@ public class InvoiceEventStat implements Serializable {
         String                     paymentDigitalWalletProvider,
         Long                       paymentRefundAmount,
         String                     paymentRefundCurrencyCode,
-        BankCardTokenProvider      paymentBankCardTokenProvider
+        BankCardTokenProvider      paymentBankCardTokenProvider,
+        String                     paymentShortId
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -382,6 +385,7 @@ public class InvoiceEventStat implements Serializable {
         this.paymentRefundAmount = paymentRefundAmount;
         this.paymentRefundCurrencyCode = paymentRefundCurrencyCode;
         this.paymentBankCardTokenProvider = paymentBankCardTokenProvider;
+        this.paymentShortId = paymentShortId;
     }
 
     public Long getId() {
@@ -1064,6 +1068,14 @@ public class InvoiceEventStat implements Serializable {
         this.paymentBankCardTokenProvider = paymentBankCardTokenProvider;
     }
 
+    public String getPaymentShortId() {
+        return this.paymentShortId;
+    }
+
+    public void setPaymentShortId(String paymentShortId) {
+        this.paymentShortId = paymentShortId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -1583,6 +1595,12 @@ public class InvoiceEventStat implements Serializable {
         }
         else if (!paymentBankCardTokenProvider.equals(other.paymentBankCardTokenProvider))
             return false;
+        if (paymentShortId == null) {
+            if (other.paymentShortId != null)
+                return false;
+        }
+        else if (!paymentShortId.equals(other.paymentShortId))
+            return false;
         return true;
     }
 
@@ -1675,6 +1693,7 @@ public class InvoiceEventStat implements Serializable {
         result = prime * result + ((this.paymentRefundAmount == null) ? 0 : this.paymentRefundAmount.hashCode());
         result = prime * result + ((this.paymentRefundCurrencyCode == null) ? 0 : this.paymentRefundCurrencyCode.hashCode());
         result = prime * result + ((this.paymentBankCardTokenProvider == null) ? 0 : this.paymentBankCardTokenProvider.hashCode());
+        result = prime * result + ((this.paymentShortId == null) ? 0 : this.paymentShortId.hashCode());
         return result;
     }
 
@@ -1767,6 +1786,7 @@ public class InvoiceEventStat implements Serializable {
         sb.append(", ").append(paymentRefundAmount);
         sb.append(", ").append(paymentRefundCurrencyCode);
         sb.append(", ").append(paymentBankCardTokenProvider);
+        sb.append(", ").append(paymentShortId);
 
         sb.append(")");
         return sb.toString();

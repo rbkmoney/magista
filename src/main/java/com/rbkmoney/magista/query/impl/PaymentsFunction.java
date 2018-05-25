@@ -3,6 +3,7 @@ package com.rbkmoney.magista.query.impl;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.magista.dao.ConditionParameterSource;
+import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
@@ -24,8 +25,7 @@ import java.util.stream.Stream;
 import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
 import static com.rbkmoney.magista.util.TypeUtil.toEnumField;
-import static com.rbkmoney.magista.util.TypeUtil.toLocalDateTime;
-import static org.jooq.Comparator.*;
+import static org.jooq.Comparator.EQUALS;
 
 /**
  * Created by vpankrashkin on 03.08.16.
@@ -151,8 +151,21 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             return getLongParameter(PAYMENT_AMOUNT_PARAM, false);
         }
 
-        public String getPanMask() {
-            return getStringParameter(PAYMENT_PAN_MASK_PARAM, false);
+        public String getPaymentBankCardBin() {
+            return getStringParameter(PAYMENT_BANK_CARD_BIN_PARAM, false);
+        }
+
+        public String getPaymentBankCardLastDigits() {
+            return getStringParameter(PAYMENT_BANK_CARD_LAST_DIGITS_PARAM, false);
+        }
+
+
+        public String getPaymentBankCardSystem() {
+            return getStringParameter(PAYMENT_BANK_CARD_PAYMENT_SYSTEM_PARAM, false);
+        }
+
+        public String getPaymentBankCardTokenProvider() {
+            return getStringParameter(PAYMENT_BANK_CARD_TOKEN_PROVIDER_PARAM, false);
         }
     }
 
@@ -163,10 +176,16 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             super.validateParameters(parameters);
             PaymentsParameters paymentsParameters = super.checkParamsType(parameters, PaymentsParameters.class);
 
-            String val = paymentsParameters.getPanMask();
-            if (val != null && !val.matches("[\\d*]+")) {
-                checkParamsResult(true, PAYMENT_PAN_MASK_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            String bin = paymentsParameters.getPaymentBankCardBin();
+            if (bin != null && !bin.matches("^\\d{6,8}$")) {
+                checkParamsResult(true, PAYMENT_BANK_CARD_BIN_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
+
+            String lastDigits = paymentsParameters.getPaymentBankCardLastDigits();
+            if (lastDigits != null && !lastDigits.matches("^\\d{2,4}$")) {
+                checkParamsResult(true, PAYMENT_BANK_CARD_LAST_DIGITS_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            }
+
             validateTimePeriod(paymentsParameters.getFromTime(), paymentsParameters.getToTime());
         }
     }
@@ -295,10 +314,15 @@ public class PaymentsFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_EMAIL, parameters.getPaymentEmail(), LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_IP, parameters.getPaymentIp(), LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, parameters.getPanMask(), LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_BIN, parameters.getPaymentBankCardBin(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, parameters.getPaymentBankCardLastDigits(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_SYSTEM, parameters.getPaymentBankCardSystem(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
+                        toEnumField(parameters.getPaymentBankCardTokenProvider(), BankCardTokenProvider.class),
+                        EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
                 .addInConditionValue(INVOICE_EVENT_STAT.PARTY_SHOP_CATEGORY_ID, parameters.getShopCategoryIds());
     }

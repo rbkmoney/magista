@@ -266,6 +266,7 @@ public class DamselUtil {
         StatPayment statPayment = new StatPayment();
 
         statPayment.setId(invoicePaymentStat.getPaymentId());
+        statPayment.setShortId(invoicePaymentStat.getPaymentShortId());
         statPayment.setInvoiceId(invoicePaymentStat.getInvoiceId());
         statPayment.setOwnerId(invoicePaymentStat.getPartyId());
         statPayment.setShopId(invoicePaymentStat.getPartyShopId());

@@ -167,6 +167,33 @@ public class InvoiceEventService {
         }
     }
 
+    public void handleTerminalRecieptEvent(InvoiceEventStat paymentTerminalRecieptEvent) throws NotFoundException, StorageException {
+        log.debug("Handle payment terminal reciept event, paymentId='{}', invoiceId='{}', eventId='{}', paymentShortId='{}'",
+                paymentTerminalRecieptEvent.getPaymentId(), paymentTerminalRecieptEvent.getInvoiceId(), paymentTerminalRecieptEvent.getEventId(), paymentTerminalRecieptEvent.getPaymentShortId());
+
+        try {
+            InvoiceEventStat invoicePaymentEvent = getInvoicePaymentEventByIds(
+                    paymentTerminalRecieptEvent.getInvoiceId(),
+                    paymentTerminalRecieptEvent.getPaymentId()
+            );
+
+            invoicePaymentEvent.setEventType(InvoiceEventType.PAYMENT_TERMINAL_RECIEPT);
+            invoicePaymentEvent.setEventId(paymentTerminalRecieptEvent.getEventId());
+            invoicePaymentEvent.setEventCreatedAt(paymentTerminalRecieptEvent.getEventCreatedAt());
+
+            invoicePaymentEvent.setPaymentShortId(paymentTerminalRecieptEvent.getPaymentShortId());
+
+            invoiceEventDao.update(invoicePaymentEvent);
+            log.info("Payment terminal reciept event have been handled, paymentId='{}', invoiceId='{}', eventId='{}', paymentShortId='{}'",
+                    invoicePaymentEvent.getPaymentId(), invoicePaymentEvent.getInvoiceId(), invoicePaymentEvent.getEventId(), invoicePaymentEvent.getPaymentShortId());
+
+        } catch (DaoException ex) {
+            String message = String.format("Failed to handle payment terminal reciept event, paymentId='%s', invoiceId='%s', eventId='%d', paymentShortId='%s'",
+                    paymentTerminalRecieptEvent.getPaymentId(), paymentTerminalRecieptEvent.getInvoiceId(), paymentTerminalRecieptEvent.getEventId(), paymentTerminalRecieptEvent.getPaymentShortId());
+            throw new StorageException(message, ex);
+        }
+    }
+
     public void changeInvoicePaymentStatus(InvoiceEventStat invoicePaymentStatusEvent) throws NotFoundException, StorageException {
         log.debug("Change invoice payment event status, paymentId='{}', invoiceId='{}', eventId='{}', invoiceStatus='{}'",
                 invoicePaymentStatusEvent.getPaymentId(), invoicePaymentStatusEvent.getInvoiceId(), invoicePaymentStatusEvent.getEventId(), invoicePaymentStatusEvent.getPaymentStatus());
