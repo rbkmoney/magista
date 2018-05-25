@@ -258,6 +258,7 @@ public class InvoiceEventService {
             invoicePaymentEvent.setPartyId(invoiceEvent.getPartyId());
             invoicePaymentEvent.setPartyEmail(invoiceEvent.getPartyEmail());
             invoicePaymentEvent.setPartyContractId(invoiceEvent.getPartyContractId());
+            invoicePaymentEvent.setPaymentInstitutionId(invoiceEvent.getPaymentInstitutionId());
             invoicePaymentEvent.setPartyContractInn(invoiceEvent.getPartyContractInn());
             invoicePaymentEvent.setPartyContractRegisteredNumber(invoiceEvent.getPartyContractRegisteredNumber());
 
