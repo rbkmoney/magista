@@ -3,6 +3,7 @@ package com.rbkmoney.magista.query.impl;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.magista.dao.ConditionParameterSource;
+import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
@@ -270,10 +271,15 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_EMAIL, parameters.getPaymentEmail(), LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_IP, parameters.getPaymentIp(), LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, parameters.getPanMask(), LIKE)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_BIN, parameters.getPaymentBankCardBin(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, parameters.getPaymentBankCardLastDigits(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_SYSTEM, parameters.getPaymentBankCardSystem(), EQUALS)
+                .addValue(INVOICE_EVENT_STAT.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
+                        toEnumField(parameters.getPaymentBankCardTokenProvider(), BankCardTokenProvider.class),
+                        EQUALS)
                 .addValue(INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS);
 
         if (!conditionParameterSource.getConditionFields().isEmpty()) {

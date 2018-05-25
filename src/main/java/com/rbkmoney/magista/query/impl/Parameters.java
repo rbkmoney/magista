@@ -26,7 +26,10 @@ public class Parameters {
     public static final String PAYMENT_EMAIL_PARAM = "payment_email";
     public static final String PAYMENT_IP_PARAM = "payment_ip";
     public static final String PAYMENT_FINGERPRINT_PARAM = "payment_fingerprint";
-    public static final String PAYMENT_PAN_MASK_PARAM = "payment_pan_mask";
+    public static final String PAYMENT_BANK_CARD_BIN_PARAM = "payment_bin";
+    public static final String PAYMENT_BANK_CARD_LAST_DIGITS_PARAM = "payment_last_digits";
+    public static final String PAYMENT_BANK_CARD_PAYMENT_SYSTEM_PARAM = "payment_system";
+    public static final String PAYMENT_BANK_CARD_TOKEN_PROVIDER_PARAM = "payment_token_provider";
     public static final String PAYMENT_METHOD_PARAM = "payment_method";
     public static final String PAYMENT_TERMINAL_PROVIDER_PARAM = "payment_terminal_provider";
     public static final String PAYMENT_AMOUNT_PARAM = "payment_amount";
