@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = -1366774026;
+    private static final long serialVersionUID = 1905287448;
 
     /**
      * The reference instance of <code>mst.payout_event_stat</code>
@@ -284,7 +284,7 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
      */
     @Override
     public UniqueKey<PayoutEventStatRecord> getPrimaryKey() {
-        return Keys.PAYMENT_EVENT_PKEY;
+        return Keys.PAYOUT_EVENT_PKEY;
     }
 
     /**
@@ -292,7 +292,7 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
      */
     @Override
     public List<UniqueKey<PayoutEventStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<PayoutEventStatRecord>>asList(Keys.PAYMENT_EVENT_PKEY);
+        return Arrays.<UniqueKey<PayoutEventStatRecord>>asList(Keys.PAYOUT_EVENT_PKEY);
     }
 
     /**

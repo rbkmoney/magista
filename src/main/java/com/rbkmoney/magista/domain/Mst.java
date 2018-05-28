@@ -5,7 +5,11 @@ package com.rbkmoney.magista.domain;
 
 
 import com.rbkmoney.magista.domain.tables.Adjustment;
+import com.rbkmoney.magista.domain.tables.InvoiceData;
+import com.rbkmoney.magista.domain.tables.InvoiceEvent;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
+import com.rbkmoney.magista.domain.tables.PaymentData;
+import com.rbkmoney.magista.domain.tables.PaymentEvent;
 import com.rbkmoney.magista.domain.tables.PayoutEventStat;
 import com.rbkmoney.magista.domain.tables.Refund;
 
@@ -34,7 +38,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Mst extends SchemaImpl {
 
-    private static final long serialVersionUID = -1374128738;
+    private static final long serialVersionUID = -1869313886;
 
     /**
      * The reference instance of <code>mst</code>
@@ -47,9 +51,29 @@ public class Mst extends SchemaImpl {
     public final Adjustment ADJUSTMENT = com.rbkmoney.magista.domain.tables.Adjustment.ADJUSTMENT;
 
     /**
+     * The table <code>mst.invoice_data</code>.
+     */
+    public final InvoiceData INVOICE_DATA = com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
+
+    /**
+     * The table <code>mst.invoice_event</code>.
+     */
+    public final InvoiceEvent INVOICE_EVENT = com.rbkmoney.magista.domain.tables.InvoiceEvent.INVOICE_EVENT;
+
+    /**
      * The table <code>mst.invoice_event_stat</code>.
      */
     public final InvoiceEventStat INVOICE_EVENT_STAT = com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
+
+    /**
+     * The table <code>mst.payment_data</code>.
+     */
+    public final PaymentData PAYMENT_DATA = com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
+
+    /**
+     * The table <code>mst.payment_event</code>.
+     */
+    public final PaymentEvent PAYMENT_EVENT = com.rbkmoney.magista.domain.tables.PaymentEvent.PAYMENT_EVENT;
 
     /**
      * The table <code>mst.payout_event_stat</code>.
@@ -87,7 +111,11 @@ public class Mst extends SchemaImpl {
     private final List<Sequence<?>> getSequences0() {
         return Arrays.<Sequence<?>>asList(
             Sequences.ADJUSTMENT_ID_SEQ,
+            Sequences.INVOICE_DATA_ID_SEQ,
+            Sequences.INVOICE_EVENT_ID_SEQ,
             Sequences.INVOICE_EVENT_STAT_ID_SEQ,
+            Sequences.PAYMENT_DATA_ID_SEQ,
+            Sequences.PAYMENT_EVENT_ID_SEQ,
             Sequences.PAYOUT_EVENT_STAT_ID_SEQ,
             Sequences.REFUND_ID_SEQ);
     }
@@ -102,7 +130,11 @@ public class Mst extends SchemaImpl {
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
             Adjustment.ADJUSTMENT,
+            InvoiceData.INVOICE_DATA,
+            InvoiceEvent.INVOICE_EVENT,
             InvoiceEventStat.INVOICE_EVENT_STAT,
+            PaymentData.PAYMENT_DATA,
+            PaymentEvent.PAYMENT_EVENT,
             PayoutEventStat.PAYOUT_EVENT_STAT,
             Refund.REFUND);
     }

@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.util.TypeUtil;
+import com.rbkmoney.geck.common.util.TypeUtil;
 import org.jooq.Field;
 import org.jooq.Table;
 import org.jooq.TableRecord;

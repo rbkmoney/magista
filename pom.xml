@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.rbkmoney</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.8.RELEASE</version>
+        <version>1.5.9.RELEASE</version>
     </parent>
 
     <groupId>com.rbkmoney.magista</groupId>
@@ -246,28 +246,6 @@
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
                 <version>${jooq.version}</version>
-                <!--<dependencies>-->
-                <!--<dependency>-->
-                <!--<groupId>javax.xml.bind</groupId>-->
-                <!--<artifactId>jaxb-api</artifactId>-->
-                <!--<version>2.3.0</version>-->
-                <!--</dependency>-->
-                <!--<dependency>-->
-                <!--<groupId>com.sun.xml.bind</groupId>-->
-                <!--<artifactId>jaxb-impl</artifactId>-->
-                <!--<version>2.3.0</version>-->
-                <!--</dependency>-->
-                <!--<dependency>-->
-                <!--<groupId>com.sun.xml.bind</groupId>-->
-                <!--<artifactId>jaxb-core</artifactId>-->
-                <!--<version>2.3.0</version>-->
-                <!--</dependency>-->
-                <!--<dependency>-->
-                <!--<groupId>javax.activation</groupId>-->
-                <!--<artifactId>activation</artifactId>-->
-                <!--<version>1.1.1</version>-->
-                <!--</dependency>-->
-                <!--</dependencies>-->
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
@@ -287,6 +265,14 @@
                             <includes>.*</includes>
                             <excludes>schema_version</excludes>
                             <inputSchema>${db.schema}</inputSchema>
+                            <forcedTypes>
+                                <forcedType>
+                                    <userType>com.fasterxml.jackson.databind.JsonNode</userType>
+                                    <binding>com.rbkmoney.magista.dao.binding.JsonBinder</binding>
+                                    <expression>.*JSON.*</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                            </forcedTypes>
                         </database>
                         <target>
                             <packageName>com.rbkmoney.magista.domain</packageName>

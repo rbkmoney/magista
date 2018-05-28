@@ -22,7 +22,7 @@ public class DamselUtilTest {
         }, "metadata");
         cart = mockTBaseProcessor.process(cart, new TBaseHandler<>(InvoiceCart.class));
 
-        String jsonCart = DamselUtil.toJson(cart);
+        String jsonCart = DamselUtil.toJsonString(cart);
         assertEquals(cart, DamselUtil.fromJson(jsonCart, InvoiceCart.class));
 
     }

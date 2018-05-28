@@ -70,6 +70,7 @@ public class AdjustmentCreatedHandler implements Handler<InvoiceChange, StockEve
         adjustment.setAdjustmentStatusCreatedAt(
                 DamselUtil.getAdjustmentStatusCreatedAt(invoicePaymentAdjustment.getStatus())
         );
+        adjustment.setAdjustmentDomainRevision(invoicePaymentAdjustment.getDomainRevision());
 
         Map<FeeType, Long> fees = DamselUtil.getFees(invoicePaymentAdjustment.getNewCashFlow());
         adjustment.setAdjustmentFee(fees.get(FeeType.FEE));

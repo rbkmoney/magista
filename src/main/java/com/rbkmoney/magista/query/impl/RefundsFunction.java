@@ -2,6 +2,7 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.dao.ConditionParameterSource;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
 import com.rbkmoney.magista.domain.tables.pojos.Refund;
@@ -14,16 +15,15 @@ import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.util.DamselUtil;
-import com.rbkmoney.magista.util.TypeUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;
 import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
-import static com.rbkmoney.magista.util.TypeUtil.toEnumField;
 import static org.jooq.Comparator.EQUALS;
 
 public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> implements CompositeQuery<Refund, StatResponse> {
