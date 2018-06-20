@@ -4,8 +4,6 @@
 package com.rbkmoney.magista.domain.tables;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.rbkmoney.magista.dao.binding.JsonBinder;
 import com.rbkmoney.magista.domain.Keys;
 import com.rbkmoney.magista.domain.Mst;
 import com.rbkmoney.magista.domain.tables.records.InvoiceDataRecord;
@@ -39,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceData extends TableImpl<InvoiceDataRecord> {
 
-    private static final long serialVersionUID = -1110016388;
+    private static final long serialVersionUID = -769747370;
 
     /**
      * The reference instance of <code>mst.invoice_data</code>
@@ -122,7 +120,7 @@ public class InvoiceData extends TableImpl<InvoiceDataRecord> {
     /**
      * The column <code>mst.invoice_data.invoice_cart_json</code>.
      */
-    public final TableField<InvoiceDataRecord, JsonNode> INVOICE_CART_JSON = createField("invoice_cart_json", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "", new JsonBinder());
+    public final TableField<InvoiceDataRecord, String> INVOICE_CART_JSON = createField("invoice_cart_json", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * The column <code>mst.invoice_data.invoice_context_type</code>.

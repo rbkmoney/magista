@@ -58,7 +58,7 @@ public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, StockE
         invoiceData.setInvoiceProduct(details.getProduct());
         invoiceData.setInvoiceDescription(details.getDescription());
         if (details.isSetCart()) {
-            invoiceData.setInvoiceCartJson(DamselUtil.toJson(details.getCart()));
+            invoiceData.setInvoiceCartJson(DamselUtil.toJsonString(details.getCart()));
         }
 
         if (invoice.isSetPartyRevision()) {

@@ -4,8 +4,6 @@
 package com.rbkmoney.magista.domain.tables.pojos;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -27,7 +25,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceData implements Serializable {
 
-    private static final long serialVersionUID = 1752520194;
+    private static final long serialVersionUID = 390552111;
 
     private Long          id;
     private UUID          partyId;
@@ -42,7 +40,7 @@ public class InvoiceData implements Serializable {
     private LocalDateTime invoiceCreatedAt;
     private Long          invoicePartyRevision;
     private String        invoiceTemplateId;
-    private JsonNode      invoiceCartJson;
+    private String        invoiceCartJson;
     private String        invoiceContextType;
     private byte[]        invoiceContext;
 
@@ -81,7 +79,7 @@ public class InvoiceData implements Serializable {
         LocalDateTime invoiceCreatedAt,
         Long          invoicePartyRevision,
         String        invoiceTemplateId,
-        JsonNode      invoiceCartJson,
+        String        invoiceCartJson,
         String        invoiceContextType,
         byte[]        invoiceContext
     ) {
@@ -207,11 +205,11 @@ public class InvoiceData implements Serializable {
         this.invoiceTemplateId = invoiceTemplateId;
     }
 
-    public JsonNode getInvoiceCartJson() {
+    public String getInvoiceCartJson() {
         return this.invoiceCartJson;
     }
 
-    public void setInvoiceCartJson(JsonNode invoiceCartJson) {
+    public void setInvoiceCartJson(String invoiceCartJson) {
         this.invoiceCartJson = invoiceCartJson;
     }
 

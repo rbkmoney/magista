@@ -13,7 +13,7 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.9.26-SNAPSHOT</version>
+    <version>1.9.27-SNAPSHOT</version>
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
@@ -265,14 +265,6 @@
                             <includes>.*</includes>
                             <excludes>schema_version</excludes>
                             <inputSchema>${db.schema}</inputSchema>
-                            <forcedTypes>
-                                <forcedType>
-                                    <userType>com.fasterxml.jackson.databind.JsonNode</userType>
-                                    <binding>com.rbkmoney.magista.dao.binding.JsonBinder</binding>
-                                    <expression>.*JSON.*</expression>
-                                    <types>.*</types>
-                                </forcedType>
-                            </forcedTypes>
                         </database>
                         <target>
                             <packageName>com.rbkmoney.magista.domain</packageName>
