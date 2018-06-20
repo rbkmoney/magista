@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public abstract class AbstractEventFlow {
 
@@ -55,13 +56,10 @@ public abstract class AbstractEventFlow {
 
     public abstract void processEvent(StockEvent stockEvent);
 
-    protected <C> Handler getHandler(C change) {
-        for (Handler handler : handlers) {
-            if (handler.accept(change)) {
-                return handler;
-            }
-        }
-        return null;
+    protected <C> List<Handler> getHandlers(C change) {
+        return handlers.stream()
+                .filter(handler -> handler.accept(change))
+                .collect(Collectors.toList());
     }
 
     protected void submitAndPutInQueue(Callable<Processor> task) {

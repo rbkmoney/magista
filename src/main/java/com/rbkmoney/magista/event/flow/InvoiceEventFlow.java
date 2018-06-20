@@ -21,12 +21,14 @@ public class InvoiceEventFlow extends AbstractEventFlow {
         Event event = stockEvent.getSourceEvent().getProcessingEvent();
         if (event.getPayload().isSetInvoiceChanges()) {
             for (InvoiceChange invoiceChange : event.getPayload().getInvoiceChanges()) {
-                Handler handler = getHandler(invoiceChange);
-                if (handler != null) {
-                    log.info("Start invoice event handling, id='{}', type='{}'",
-                            stockEvent.getSourceEvent().getProcessingEvent().getId(), handler.getChangeType());
-                    submitAndPutInQueue(() -> handler.handle(invoiceChange, stockEvent));
-                }
+                List<Handler> handlers = getHandlers(invoiceChange);
+                handlers.forEach(
+                        handler -> {
+                            log.info("Start invoice event handling, id='{}', eventType='{}', handlerType='{}'",
+                                    stockEvent.getSourceEvent().getProcessingEvent().getId(), handler.getChangeType(), handler.getClass().getSimpleName());
+                            submitAndPutInQueue(() -> handler.handle(invoiceChange, stockEvent));
+                        }
+                );
             }
         }
     }

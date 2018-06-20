@@ -21,14 +21,15 @@ public class PayoutEventFlow extends AbstractEventFlow {
         Event event = stockEvent.getSourceEvent().getPayoutEvent();
         if (event.getPayload().isSetPayoutChanges()) {
             for (PayoutChange payoutChange : event.getPayload().getPayoutChanges()) {
-                Handler handler = getHandler(payoutChange);
-                if (handler != null) {
-                    log.info("Start payout event handling, id='{}', type='{}'",
-                            stockEvent.getSourceEvent().getPayoutEvent().getId(), handler.getChangeType());
-                    submitAndPutInQueue(() -> handler.handle(payoutChange, stockEvent));
-                }
+                List<Handler> handlers = getHandlers(payoutChange);
+                handlers.forEach(
+                        handler -> {
+                            log.info("Start payout event handling, id='{}', eventType='{}', handlerType='{}'",
+                                    stockEvent.getSourceEvent().getPayoutEvent().getId(), handler.getChangeType(), handler.getClass().getSimpleName());
+                            submitAndPutInQueue(() -> handler.handle(payoutChange, stockEvent));
+                        }
+                );
             }
         }
     }
-
 }
