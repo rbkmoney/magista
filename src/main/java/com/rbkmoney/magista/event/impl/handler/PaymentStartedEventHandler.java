@@ -136,9 +136,9 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
         List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentStarted.getCashFlow();
         Map<FeeType, Long> fees = DamselUtil.getFees(finalCashFlowPostings);
 
-        paymentEvent.setPaymentFee(fees.get(FeeType.FEE));
-        paymentEvent.setPaymentExternalFee(fees.get(FeeType.EXTERNAL_FEE));
-        paymentEvent.setPaymentProviderFee(fees.get(FeeType.PROVIDER_FEE));
+        paymentEvent.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
+        paymentEvent.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
+        paymentEvent.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
 
         return () -> paymentService.savePayment(paymentData, paymentEvent);
     }
