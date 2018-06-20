@@ -1,0 +1,1 @@
+ALTER TABLE mst.invoice_data ALTER COLUMN invoice_cart_json TYPE CHARACTER VARYING USING invoice_cart_json::CHARACTER VARYING;
