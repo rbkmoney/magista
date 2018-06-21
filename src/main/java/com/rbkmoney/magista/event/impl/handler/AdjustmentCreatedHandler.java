@@ -73,9 +73,9 @@ public class AdjustmentCreatedHandler implements Handler<InvoiceChange, StockEve
         adjustment.setAdjustmentDomainRevision(invoicePaymentAdjustment.getDomainRevision());
 
         Map<FeeType, Long> fees = DamselUtil.getFees(invoicePaymentAdjustment.getNewCashFlow());
-        adjustment.setAdjustmentFee(fees.get(FeeType.FEE));
-        adjustment.setAdjustmentProviderFee(fees.get(FeeType.PROVIDER_FEE));
-        adjustment.setAdjustmentExternalFee(fees.get(FeeType.EXTERNAL_FEE));
+        adjustment.setAdjustmentFee(fees.getOrDefault(FeeType.FEE, 0L));
+        adjustment.setAdjustmentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
+        adjustment.setAdjustmentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
 
         return () -> paymentAdjustmentService.savePaymentAdjustment(adjustment);
     }

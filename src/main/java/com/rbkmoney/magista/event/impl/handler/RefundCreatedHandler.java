@@ -73,9 +73,9 @@ public class RefundCreatedHandler implements Handler<InvoiceChange, StockEvent> 
         refund.setRefundDomainRevision(invoicePaymentRefund.getDomainRevision());
 
         Map<FeeType, Long> fees = DamselUtil.getFees(invoicePaymentRefundCreated.getCashFlow());
-        refund.setRefundFee(fees.get(FeeType.FEE));
-        refund.setRefundProviderFee(fees.get(FeeType.PROVIDER_FEE));
-        refund.setRefundExternalFee(fees.get(FeeType.EXTERNAL_FEE));
+        refund.setRefundFee(fees.getOrDefault(FeeType.FEE, 0L));
+        refund.setRefundProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
+        refund.setRefundExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
 
         return () -> paymentRefundService.savePaymentRefund(refund);
     }

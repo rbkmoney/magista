@@ -67,6 +67,7 @@ public class PaymentAdjustmentService {
                 adjustment.setAdjustmentExternalFee(previousAdjustmentEvent.getAdjustmentExternalFee());
                 adjustment.setAdjustmentProviderFee(previousAdjustmentEvent.getAdjustmentProviderFee());
                 adjustment.setAdjustmentReason(previousAdjustmentEvent.getAdjustmentReason());
+                adjustment.setAdjustmentDomainRevision(previousAdjustmentEvent.getAdjustmentDomainRevision());
                 break;
         }
 
