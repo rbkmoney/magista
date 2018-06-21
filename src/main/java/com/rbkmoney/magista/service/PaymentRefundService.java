@@ -59,6 +59,7 @@ public class PaymentRefundService {
                 refund.setRefundExternalFee(previousRefundEvent.getRefundExternalFee());
                 refund.setRefundProviderFee(previousRefundEvent.getRefundProviderFee());
                 refund.setRefundReason(previousRefundEvent.getRefundReason());
+                refund.setRefundDomainRevision(previousRefundEvent.getRefundDomainRevision());
                 break;
         }
 
