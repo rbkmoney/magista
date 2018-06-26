@@ -13,7 +13,6 @@ import com.rbkmoney.damsel.merch_stat.PaymentTool;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
-import com.rbkmoney.magista.domain.tables.InvoiceData;
 import com.rbkmoney.magista.domain.tables.InvoiceEvent;
 import com.rbkmoney.magista.domain.tables.PaymentData;
 import com.rbkmoney.magista.domain.tables.PaymentEvent;
@@ -75,7 +74,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 parameters,
                 fromTime,
                 toTime
-        ).limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
+        ).orderBy(INVOICE_DATA.as("invoice_data").INVOICE_CREATED_AT.desc())
+                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
         return fetch(query, (rs, i) -> {
             StatInvoice statInvoice = new StatInvoice();
@@ -218,7 +218,12 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 case failed:
                     InvoicePaymentFailed invoicePaymentFailed = new InvoicePaymentFailed();
                     invoicePaymentFailed.setAt(eventCreatedAtString);
-//                    invoicePaymentFailed.setFailure();
+                    OperationFailure operationFailure = DamselUtil.toOperationFailure(
+                            TypeUtil.toEnumField(rs.getString(PAYMENT_EVENT.PAYMENT_OPERATION_FAILURE_CLASS.getName()), FailureClass.class),
+                            rs.getString(PAYMENT_EVENT.PAYMENT_EXTERNAL_FAILURE.getName()),
+                            rs.getString(PAYMENT_EVENT.PAYMENT_EXTERNAL_FAILURE_REASON.getName())
+                    );
+                    invoicePaymentFailed.setFailure(operationFailure);
                     paymentStatus = InvoicePaymentStatus.failed(invoicePaymentFailed);
                     break;
                 case captured:
@@ -739,38 +744,6 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         return params;
     }
 
-    private Condition buildPaymentCondition(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> contractId,
-            ConditionParameterSource paymentParameterSource,
-            Optional<LocalDateTime> fromTime,
-            Optional<LocalDateTime> toTime
-    ) {
-        Condition condition = INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT);
-        if (merchantId.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId.get()));
-        }
-        if (shopId.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(shopId.get()));
-        }
-        if (contractId.isPresent()) {
-            condition = condition.and(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId.get()));
-        }
-        condition = appendDateTimeRangeConditions(
-                condition,
-                INVOICE_EVENT_STAT.EVENT_CREATED_AT,
-                fromTime,
-                toTime);
-
-        condition = INVOICE_EVENT_STAT.ID.in(
-                getDslContext().select(DSL.max(INVOICE_EVENT_STAT.ID)).from(INVOICE_EVENT_STAT)
-                        .where(condition).groupBy(INVOICE_EVENT_STAT.INVOICE_ID, INVOICE_EVENT_STAT.PAYMENT_ID)
-        );
-
-        return appendConditions(condition, Operator.AND, paymentParameterSource);
-    }
-
     private SelectOnConditionStep buildPaymentSelectConditionStepQuery(
             PaymentsFunction.PaymentsParameters parameters,
             Optional<LocalDateTime> fromTime,
@@ -845,19 +818,18 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<LocalDateTime> toTime,
             SelectField<?>... fields
     ) {
-        InvoiceData invoiceData = INVOICE_DATA.as("invoice_data");
         InvoiceEvent invoiceEvent = INVOICE_EVENT.as("invoice_event");
 
         SelectOnConditionStep selectOnConditionStep = getDslContext()
                 .select(fields)
-                .from(invoiceData)
+                .from(INVOICE_DATA)
                 .join(
                         DSL.lateral(
                                 getDslContext()
                                         .selectFrom(INVOICE_EVENT)
                                         .where(
                                                 appendDateTimeRangeConditions(
-                                                        invoiceData.INVOICE_ID.eq(INVOICE_EVENT.INVOICE_ID),
+                                                        INVOICE_DATA.INVOICE_ID.eq(INVOICE_EVENT.INVOICE_ID),
                                                         INVOICE_EVENT.EVENT_CREATED_AT,
                                                         fromTime,
                                                         toTime
@@ -869,22 +841,22 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         appendDateTimeRangeConditions(
                                 appendConditions(DSL.trueCondition(), Operator.AND,
                                         new ConditionParameterSource()
-                                                .addValue(invoiceData.PARTY_ID,
+                                                .addValue(INVOICE_DATA.PARTY_ID,
                                                         Optional.ofNullable(parameters.getMerchantId())
                                                                 .map(merchantId -> UUID.fromString(merchantId))
                                                                 .orElse(null),
                                                         EQUALS)
-                                                .addValue(invoiceData.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                                                .addValue(invoiceData.PARTY_CONTRACT_ID, parameters.getContractId(), EQUALS)
-                                                .addValue(invoiceData.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                                                .addValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                                                .addValue(INVOICE_DATA.PARTY_CONTRACT_ID, parameters.getContractId(), EQUALS)
+                                                .addValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                                                 .addValue(invoiceEvent.INVOICE_STATUS,
                                                         toEnumField(
                                                                 parameters.getInvoiceStatus(),
                                                                 com.rbkmoney.magista.domain.enums.InvoiceStatus.class
                                                         ),
                                                         EQUALS)
-                                                .addValue(invoiceData.INVOICE_AMOUNT, parameters.getInvoiceAmount(), EQUALS)),
-                                invoiceData.INVOICE_CREATED_AT,
+                                                .addValue(INVOICE_DATA.INVOICE_AMOUNT, parameters.getInvoiceAmount(), EQUALS)),
+                                INVOICE_DATA.INVOICE_CREATED_AT,
                                 fromTime,
                                 toTime
                         )
@@ -916,12 +888,12 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                     .select(paymentData.fields())
                                     .from(PAYMENT_DATA)
                                     .where(
-                                            invoiceData.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID)
+                                            INVOICE_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID)
                                     ).limit(1)
                     ).as(paymentData)
             ).on(
                     appendConditions(
-                            invoiceData.INVOICE_ID.eq(paymentData.INVOICE_ID),
+                            INVOICE_DATA.INVOICE_ID.eq(paymentData.INVOICE_ID),
                             Operator.AND,
                             paymentParameterSource
                     )

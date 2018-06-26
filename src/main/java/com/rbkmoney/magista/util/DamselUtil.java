@@ -420,62 +420,6 @@ public class DamselUtil {
         }
     }
 
-    public static StatInvoice toStatInvoice(InvoiceEventStat invoiceEventStat) {
-        StatInvoice statInvoice = new StatInvoice();
-        statInvoice.setId(invoiceEventStat.getInvoiceId());
-        statInvoice.setOwnerId(invoiceEventStat.getPartyId());
-        statInvoice.setShopId(invoiceEventStat.getPartyShopId());
-        statInvoice.setCreatedAt(TypeUtil.temporalToString(invoiceEventStat.getInvoiceCreatedAt()));
-
-        statInvoice.setStatus(toStatInvoiceStatus(invoiceEventStat));
-
-        statInvoice.setProduct(invoiceEventStat.getInvoiceProduct());
-        statInvoice.setDescription(invoiceEventStat.getInvoiceDescription());
-
-        statInvoice.setDue(
-                TypeUtil.temporalToString(invoiceEventStat.getInvoiceDue())
-        );
-        statInvoice.setAmount(invoiceEventStat.getInvoiceAmount());
-        statInvoice.setCurrencySymbolicCode(invoiceEventStat.getInvoiceCurrencyCode());
-
-        if (Objects.nonNull(invoiceEventStat.getInvoiceCart())) {
-            statInvoice.setCart(DamselUtil.fromJson(invoiceEventStat.getInvoiceCart(), InvoiceCart.class));
-        }
-
-        if (invoiceEventStat.getInvoiceContext() != null) {
-            Content content = new Content();
-            content.setType(invoiceEventStat.getInvoiceContextType());
-            content.setData(invoiceEventStat.getInvoiceContext());
-            statInvoice.setContext(content);
-        }
-
-        return statInvoice;
-    }
-
-    public static InvoiceStatus toStatInvoiceStatus(InvoiceEventStat invoiceEventStat) throws NotFoundException {
-        InvoiceStatus._Fields invoiceStatus = InvoiceStatus._Fields.findByName(
-                invoiceEventStat.getInvoiceStatus().getLiteral()
-        );
-        switch (invoiceStatus) {
-            case UNPAID:
-                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.unpaid(new InvoiceUnpaid());
-            case PAID:
-                InvoicePaid invoicePaid = new InvoicePaid();
-                invoicePaid.setAt(TypeUtil.temporalToString(invoiceEventStat.getEventCreatedAt()));
-                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.paid(invoicePaid);
-            case CANCELLED:
-                InvoiceCancelled invoiceCancelled = new InvoiceCancelled(invoiceEventStat.getInvoiceStatusDetails());
-                invoiceCancelled.setAt(TypeUtil.temporalToString(invoiceEventStat.getEventCreatedAt()));
-                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.cancelled(invoiceCancelled);
-            case FULFILLED:
-                InvoiceFulfilled invoiceFulfilled = new InvoiceFulfilled(invoiceEventStat.getInvoiceStatusDetails());
-                invoiceFulfilled.setAt(TypeUtil.temporalToString(invoiceEventStat.getEventCreatedAt()));
-                return com.rbkmoney.damsel.merch_stat.InvoiceStatus.fulfilled(invoiceFulfilled);
-            default:
-                throw new NotFoundException(String.format("Status '%s' not found", invoiceEventStat.getInvoiceStatus()));
-        }
-    }
-
     public static StatRefund toStatRefund(Refund refundEvent) {
         StatRefund statRefund = new StatRefund();
         statRefund.setId(refundEvent.getRefundId());
