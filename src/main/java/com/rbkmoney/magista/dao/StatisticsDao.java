@@ -1,9 +1,13 @@
 package com.rbkmoney.magista.dao;
 
+import com.rbkmoney.damsel.merch_stat.StatInvoice;
+import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
+import com.rbkmoney.magista.query.impl.InvoicesFunction;
+import com.rbkmoney.magista.query.impl.PaymentsFunction;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -15,12 +19,9 @@ import java.util.Optional;
  * Created by vpankrashkin on 10.08.16.
  */
 public interface StatisticsDao {
-    Collection<InvoiceEventStat> getInvoices(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> contractId,
-            ConditionParameterSource invoiceParameterSource,
-            ConditionParameterSource paymentParameterSource,
+
+    Collection<Map.Entry<Long, StatInvoice>> getInvoices(
+            InvoicesFunction.InvoicesParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
             Optional<Integer> offset,
@@ -28,20 +29,13 @@ public interface StatisticsDao {
     ) throws DaoException;
 
     int getInvoicesCount(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> contractId,
-            ConditionParameterSource invoiceParameterSource,
-            ConditionParameterSource paymentParameterSource,
+            InvoicesFunction.InvoicesParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) throws DaoException;
 
-    Collection<InvoiceEventStat> getPayments(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> contractId,
-            ConditionParameterSource parameterSource,
+    Collection<Map.Entry<Long, StatPayment>> getPayments(
+            PaymentsFunction.PaymentsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
             Optional<Integer> offset,
@@ -49,10 +43,7 @@ public interface StatisticsDao {
     ) throws DaoException;
 
     Integer getPaymentsCount(
-            Optional<String> merchantId,
-            Optional<String> shopId,
-            Optional<String> contractId,
-            ConditionParameterSource parameterSource,
+            PaymentsFunction.PaymentsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
     ) throws DaoException;

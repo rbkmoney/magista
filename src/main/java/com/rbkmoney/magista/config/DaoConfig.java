@@ -20,10 +20,8 @@ public class DaoConfig {
 
     @Bean
     @DependsOn("dbInitializer")
-    public StatisticsDao statisticsDao(DataSource ds,
-                                       @Value("${cache.maxSize}") long cacheMaxSize,
-                                       @Value("${cache.expireTime}") long expireTime) {
-        return new StatisticsDaoImpl(ds, cacheMaxSize, expireTime);
+    public StatisticsDao statisticsDao(DataSource ds) {
+        return new StatisticsDaoImpl(ds);
     }
 
     @Bean

@@ -8,6 +8,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static com.rbkmoney.magista.query.impl.Parameters.*;
 
