@@ -74,7 +74,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 parameters,
                 fromTime,
                 toTime
-        ).orderBy(INVOICE_DATA.as("invoice_data").INVOICE_CREATED_AT.desc())
+        ).orderBy(INVOICE_DATA.INVOICE_CREATED_AT.desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
         return fetch(query, (rs, i) -> {
@@ -84,6 +84,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             statInvoice.setShopId(rs.getString(INVOICE_DATA.PARTY_SHOP_ID.getName()));
             statInvoice.setAmount(rs.getLong(INVOICE_DATA.INVOICE_AMOUNT.getName()));
             statInvoice.setCurrencySymbolicCode(rs.getString(INVOICE_DATA.INVOICE_CURRENCY_CODE.getName()));
+            statInvoice.setProduct(rs.getString(INVOICE_DATA.INVOICE_PRODUCT.getName()));
             statInvoice.setDescription(rs.getString(INVOICE_DATA.INVOICE_DESCRIPTION.getName()));
             statInvoice.setCreatedAt(
                     TypeUtil.temporalToString(
