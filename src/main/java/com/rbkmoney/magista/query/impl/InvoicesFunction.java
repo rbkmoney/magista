@@ -1,10 +1,9 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.dao.ConditionParameterSource;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
@@ -13,21 +12,17 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.util.DamselUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;
-import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
-import static org.jooq.Comparator.*;
 
 /**
  * Created by vpankrashkin on 03.08.16.
  */
-public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatResponse> implements CompositeQuery<InvoiceEventStat, StatResponse> {
+public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvoice>, StatResponse> implements CompositeQuery<Map.Entry<Long, StatInvoice>, StatResponse> {
 
     public static final String FUNC_NAME = "invoices";
 
@@ -39,19 +34,19 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
     }
 
     @Override
-    public QueryResult<InvoiceEventStat, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+    public QueryResult<Map.Entry<Long, StatInvoice>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
         QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
 
         return execute(context, collectedResults.getCollectedStream());
     }
 
     @Override
-    public QueryResult<InvoiceEventStat, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
+    public QueryResult<Map.Entry<Long, StatInvoice>, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
         if (collectedResults.size() != 2) {
             throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
         }
 
-        QueryResult<InvoiceEventStat, List<InvoiceEventStat>> invoicesResult = (QueryResult<InvoiceEventStat, List<InvoiceEventStat>>) collectedResults.get(0);
+        QueryResult<Map.Entry<Long, StatInvoice>, List<Map.Entry<Long, StatInvoice>>> invoicesResult = (QueryResult<Map.Entry<Long, StatInvoice>, List<Map.Entry<Long, StatInvoice>>>) collectedResults.get(0);
         QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
@@ -59,7 +54,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
                 () -> {
                     StatResponseData statResponseData = StatResponseData.invoices(
                             invoicesResult.getDataStream()
-                                    .map(invoice -> DamselUtil.toStatInvoice(invoice))
+                                    .map(invoiceResponse -> invoiceResponse.getValue())
                                     .collect(Collectors.toList())
                     );
                     StatResponse statResponse = new StatResponse(statResponseData);
@@ -194,16 +189,12 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         }
 
         @Override
-        public QueryResult<InvoiceEventStat, Collection<InvoiceEventStat>> execute(QueryContext context) throws QueryExecutionException {
+        public QueryResult<Map.Entry<Long, StatInvoice>, Collection<Map.Entry<Long, StatInvoice>>> execute(QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
             InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Collection<InvoiceEventStat> result = functionContext.getDao().getInvoices(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        Optional.ofNullable(parameters.getContractId()),
-                        buildInvoiceConditionParameterSource(parameters),
-                        buildPaymentConditionParameterSource(parameters),
+                Collection<Map.Entry<Long, StatInvoice>> result = functionContext.getDao().getInvoices(
+                        parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
                         Optional.ofNullable(parameters.getFrom()),
@@ -229,11 +220,7 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
             InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Integer result = functionContext.getDao().getInvoicesCount(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        Optional.ofNullable(parameters.getContractId()),
-                        buildInvoiceConditionParameterSource(parameters),
-                        buildPaymentConditionParameterSource(parameters),
+                        parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime()))
                 );
@@ -244,39 +231,4 @@ public class InvoicesFunction extends PagedBaseFunction<InvoiceEventStat, StatRe
         }
     }
 
-    public static ConditionParameterSource buildInvoiceConditionParameterSource(InvoicesParameters parameters) {
-        return new ConditionParameterSource()
-                .addValue(INVOICE_EVENT_STAT.PARTY_ID, parameters.getMerchantId(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID, parameters.getContractId(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.INVOICE_STATUS,
-                        toEnumField(
-                                parameters.getInvoiceStatus(),
-                                com.rbkmoney.magista.domain.enums.InvoiceStatus.class
-                        ),
-                        EQUALS)
-                .addValue(INVOICE_EVENT_STAT.INVOICE_AMOUNT, parameters.getInvoiceAmount(), EQUALS)
-                .addInConditionValue(INVOICE_EVENT_STAT.PARTY_SHOP_CATEGORY_ID, parameters.getShopCategoryIds());
-    }
-
-    public static ConditionParameterSource buildPaymentConditionParameterSource(InvoicesParameters parameters) {
-        return new ConditionParameterSource()
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_STATUS,
-                        toEnumField(
-                                parameters.getPaymentStatus(),
-                                com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class
-                        ),
-                        EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_FLOW, parameters.getPaymentFlow(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_EMAIL, parameters.getPaymentEmail(), LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_IP, parameters.getPaymentIp(), LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_MASKED_PAN, parameters.getPanMask(), LIKE)
-                .addValue(INVOICE_EVENT_STAT.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS);
-    }
 }
