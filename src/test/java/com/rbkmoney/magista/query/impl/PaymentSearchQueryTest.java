@@ -8,9 +8,7 @@ import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import com.rbkmoney.magista.util.DamselUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,12 +38,12 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
 
     @Test
     @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
-    public void testPayments() throws TException {
+    public void testPayments() {
         String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(2, statResponse.getData().getPayments().size());
         assertEquals(2, statResponse.getTotalCount());
-        new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
+        DamselUtil.toJson(statResponse);
     }
 
     @Test
@@ -60,6 +58,7 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
             Assert.assertTrue(statInstant.isBefore(instant));
             instant = statInstant;
         }
+        DamselUtil.toJson(statResponse);
     }
 
     @Test
@@ -71,6 +70,7 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
                 payment -> payment.getStatus().isSetFailed()
                         && payment.getStatus().getFailed().getFailure().isSetOperationTimeout()
         ));
+        DamselUtil.toJson(statResponse);
     }
 
     @Test
@@ -86,6 +86,7 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
                                         && payment.getFlow().getHold().getOnHoldExpiration().equals(OnHoldExpiration.capture)
                         )
         );
+        DamselUtil.toJson(statResponse);
 
         //cancel
         json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'payment_id': 'PAYMENT_ID_2', 'payment_flow': 'hold', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
@@ -97,6 +98,7 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
                                         && payment.getFlow().getHold().getOnHoldExpiration().equals(OnHoldExpiration.cancel)
                         )
         );
+        DamselUtil.toJson(statResponse);
 
         //instant
         json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'payment_id': 'PAYMENT_ID_3', 'payment_flow': 'instant', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
@@ -107,15 +109,16 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
                                 payment -> payment.getFlow().isSetInstant()
                         )
         );
+        DamselUtil.toJson(statResponse);
     }
 
     @Test
     @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
-    public void testPaymentsWithoutMerchantAndShopId() throws TException {
+    public void testPaymentsWithoutMerchantAndShopId() {
         String json = "{'query': {'payments': {'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(3, statResponse.getTotalCount());
-        new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
+        DamselUtil.toJson(statResponse);
     }
 
     @Test
@@ -125,6 +128,7 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getTotalCount());
         assertEquals(euroset, statResponse.getData().getPayments().get(0).getPayer().getPaymentResource().getPaymentTool().getPaymentTerminal().getTerminalType());
+        DamselUtil.toJson(statResponse);
     }
 
     @Test
@@ -134,6 +138,7 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertEquals(1, statResponse.getTotalCount());
         assertEquals("test", statResponse.getData().getPayments().get(0).getPayer().getCustomer().getCustomerId());
+        DamselUtil.toJson(statResponse);
     }
 
     @Test
@@ -145,6 +150,7 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
                 payment -> payment.getStatus().isSetFailed()
                         && payment.getStatus().getFailed().getFailure().isSetFailure()
         ));
+        DamselUtil.toJson(statResponse);
     }
 
 
