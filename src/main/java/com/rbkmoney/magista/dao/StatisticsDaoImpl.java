@@ -751,6 +751,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<LocalDateTime> toTime,
             SelectField<?>... fields
     ) {
+        PaymentEvent paymentEvent = PAYMENT_EVENT.as("payment_event");
         ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
                 .addValue(
                         PAYMENT_DATA.PARTY_ID,
@@ -763,7 +764,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .addValue(PAYMENT_DATA.PARTY_CONTRACT_ID, parameters.getContractId(), EQUALS)
                 .addValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
-                .addValue(PaymentEvent.PAYMENT_EVENT.PAYMENT_STATUS,
+                .addValue(paymentEvent.PAYMENT_STATUS,
                         toEnumField(parameters.getPaymentStatus(), com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_FLOW,
@@ -802,7 +803,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                                 )
                                         ).orderBy(PAYMENT_EVENT.ID.desc())
                                         .limit(1)
-                        ).as("payment_event")
+                        ).as(paymentEvent)
                 ).on(
                         appendDateTimeRangeConditions(
                                 appendConditions(DSL.trueCondition(), Operator.AND, conditionParameterSource),
