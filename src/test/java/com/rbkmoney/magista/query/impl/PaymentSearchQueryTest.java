@@ -64,7 +64,7 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
     @Test
     @Sql("classpath:data/sql/search/payment_operation_timeout_search_data.sql")
     public void testOperationTimeout() {
-        String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-28T18:10:10Z', 'size':'1'}}}";
+        String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-28T18:10:10Z', 'payment_status': 'failed', 'size':'1'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertTrue(statResponse.getData().getPayments().stream().allMatch(
                 payment -> payment.getStatus().isSetFailed()
@@ -144,7 +144,7 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
     @Test
     @Sql("classpath:data/sql/search/payment_external_failure_search_data.sql")
     public void testExternalFailure() {
-        String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-28T18:10:10Z', 'size':'1'}}}";
+        String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'payment_status': 'failed', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-28T18:10:10Z', 'size':'1'}}}";
         StatResponse statResponse = queryProcessor.processQuery(json);
         assertTrue(statResponse.getData().getPayments().stream().allMatch(
                 payment -> payment.getStatus().isSetFailed()
