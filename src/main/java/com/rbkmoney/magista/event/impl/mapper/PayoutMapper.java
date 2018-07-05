@@ -65,6 +65,7 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
                     payoutEventStat.setPayoutAccountActualAddress(legalEntity.getActualAddress());
                     payoutEventStat.setPayoutAccountRegisteredAddress(legalEntity.getRegisteredAddress());
                     payoutEventStat.setPayoutAccountRegisteredNumber(legalEntity.getRegisteredNumber());
+                    payoutEventStat.setPayoutAccountPurpose(account.getPurpose());
                     InternationalBankAccount bankAccount = account.getBankAccount();
                     payoutEventStat.setPayoutAccountBankId(bankAccount.getAccountHolder());
                     payoutEventStat.setPayoutAccountBankName(bankAccount.getBankName());
