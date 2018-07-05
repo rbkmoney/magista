@@ -256,7 +256,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 paymentResourcePayer.setFingerprint(rs.getString(PAYMENT_DATA.PAYMENT_FINGERPRINT.getName()));
                 paymentResourcePayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
                 paymentResourcePayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
-                paymentResourcePayer.setSessionId(PAYMENT_DATA.PAYMENT_SESSION_ID.getName());
+                paymentResourcePayer.setSessionId(rs.getString(PAYMENT_DATA.PAYMENT_SESSION_ID.getName()));
 
 
                 com.rbkmoney.magista.domain.enums.PaymentTool paymentToolType = TypeUtil.toEnumField(
@@ -316,6 +316,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 default:
                     throw new NotFoundException(String.format("Payment flow '%s' not found", paymentFlow.getLiteral()));
             }
+            statPayment.setShortId(rs.getString(PAYMENT_EVENT.PAYMENT_SHORT_ID.getName()));
 
             byte[] context = rs.getBytes(PAYMENT_DATA.PAYMENT_CONTEXT.getName());
             if (context != null) {

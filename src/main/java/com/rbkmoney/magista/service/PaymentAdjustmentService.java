@@ -87,10 +87,6 @@ public class PaymentAdjustmentService {
             paymentEvent.setEventCreatedAt(adjustment.getEventCreatedAt());
             paymentEvent.setInvoiceId(adjustment.getInvoiceId());
             paymentEvent.setPaymentId(adjustment.getPaymentId());
-            paymentEvent.setPaymentStatus(paymentEventStat.getPaymentStatus());
-            paymentEvent.setPaymentOperationFailureClass(paymentEventStat.getPaymentOperationFailureClass());
-            paymentEvent.setPaymentExternalFailure(paymentEventStat.getPaymentExternalFailure());
-            paymentEvent.setPaymentExternalFailureReason(paymentEventStat.getPaymentExternalFailureReason());
             paymentEvent.setPaymentFee(adjustment.getAdjustmentFee());
             paymentEvent.setPaymentProviderFee(adjustment.getAdjustmentProviderFee());
             paymentEvent.setPaymentExternalFee(adjustment.getAdjustmentExternalFee());
