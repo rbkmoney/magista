@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentEvent extends TableImpl<PaymentEventRecord> {
 
-    private static final long serialVersionUID = 1392904025;
+    private static final long serialVersionUID = -1644040901;
 
     /**
      * The reference instance of <code>mst.payment_event</code>
@@ -124,6 +124,11 @@ public class PaymentEvent extends TableImpl<PaymentEventRecord> {
      * The column <code>mst.payment_event.payment_domain_revision</code>.
      */
     public final TableField<PaymentEventRecord, Long> PAYMENT_DOMAIN_REVISION = createField("payment_domain_revision", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>mst.payment_event.payment_short_id</code>.
+     */
+    public final TableField<PaymentEventRecord, String> PAYMENT_SHORT_ID = createField("payment_short_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * Create a <code>mst.payment_event</code> table reference

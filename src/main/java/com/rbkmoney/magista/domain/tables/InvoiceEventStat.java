@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
 
-    private static final long serialVersionUID = 1187063691;
+    private static final long serialVersionUID = -1829342436;
 
     /**
      * The reference instance of <code>mst.invoice_event_stat</code>
@@ -396,6 +396,11 @@ public class InvoiceEventStat extends TableImpl<InvoiceEventStatRecord> {
      * The column <code>mst.invoice_event_stat.payment_bank_card_token_provider</code>.
      */
     public final TableField<InvoiceEventStatRecord, BankCardTokenProvider> PAYMENT_BANK_CARD_TOKEN_PROVIDER = createField("payment_bank_card_token_provider", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class), this, "");
+
+    /**
+     * The column <code>mst.invoice_event_stat.payment_institution_id</code>.
+     */
+    public final TableField<InvoiceEventStatRecord, Integer> PAYMENT_INSTITUTION_ID = createField("payment_institution_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * Create a <code>mst.invoice_event_stat</code> table reference

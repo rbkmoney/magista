@@ -2,13 +2,13 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.dao.InvoiceDao;
 import com.rbkmoney.magista.dao.PaymentDao;
-import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
+import com.rbkmoney.magista.util.BeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,18 +54,11 @@ public class PaymentService {
     public void savePaymentChange(PaymentEvent paymentEvent) throws NotFoundException, StorageException {
         log.info("Trying to save payment change, paymentEvent='{}'", paymentEvent);
         try {
-            if (paymentEvent.getEventType() != InvoiceEventType.INVOICE_PAYMENT_ADJUSTED) {
-                PaymentEvent lastPaymentEvent = paymentDao.getPaymentEvent(paymentEvent.getInvoiceId(), paymentEvent.getPaymentId());
-                if (lastPaymentEvent == null) {
-                    throw new NotFoundException(String.format("Payment changes not found, invoiceId='%s', paymentId='%s'", paymentEvent.getInvoiceId(), paymentEvent.getPaymentId()));
-                }
-
-                paymentEvent.setPaymentFee(lastPaymentEvent.getPaymentFee());
-                paymentEvent.setPaymentExternalFee(lastPaymentEvent.getPaymentExternalFee());
-                paymentEvent.setPaymentProviderFee(lastPaymentEvent.getPaymentProviderFee());
-                paymentEvent.setPaymentDomainRevision(lastPaymentEvent.getPaymentDomainRevision());
+            PaymentEvent lastPaymentEvent = paymentDao.getPaymentEvent(paymentEvent.getInvoiceId(), paymentEvent.getPaymentId());
+            if (lastPaymentEvent == null) {
+                throw new NotFoundException(String.format("Payment changes not found, invoiceId='%s', paymentId='%s'", paymentEvent.getInvoiceId(), paymentEvent.getPaymentId()));
             }
-
+            BeanUtil.merge(lastPaymentEvent, paymentEvent, "id");
             paymentDao.savePaymentEvent(paymentEvent);
             log.info("Payment change have been saved, paymentEvent='{}'", paymentEvent);
         } catch (DaoException ex) {

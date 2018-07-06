@@ -75,6 +75,10 @@ public class InvoicePartyMapper implements Mapper<InvoiceEventContext> {
             }
 
             invoiceEventStat.setPartyContractId(contract.getId());
+            if (contract.isSetPaymentInstitution()) {
+                invoiceEventStat.setPaymentInstitutionId(contract.getPaymentInstitution().getId());
+            }
+
             if (contract.isSetContractor()
                     && contract.getContractor().isSetLegalEntity()
                     && contract.getContractor().getLegalEntity().isSetRussianLegalEntity()) {
