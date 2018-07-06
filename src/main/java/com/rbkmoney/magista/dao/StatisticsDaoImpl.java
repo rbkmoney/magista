@@ -805,14 +805,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                         ).orderBy(PAYMENT_EVENT.ID.desc())
                                         .limit(1)
                         ).as(paymentEvent)
-                ).on(
-                        appendDateTimeRangeConditions(
-                                appendConditions(DSL.trueCondition(), Operator.AND, conditionParameterSource),
-                                PAYMENT_DATA.PAYMENT_CREATED_AT,
-                                fromTime,
-                                toTime
-                        )
-                );
+                ).on(appendConditions(DSL.trueCondition(), Operator.AND, conditionParameterSource));
     }
 
     private SelectOnConditionStep buildInvoiceSelectConditionStepQuery(
