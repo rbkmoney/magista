@@ -34,8 +34,8 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
 
     private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
-    private PayoutsFunction(Object descriptor, QueryParameters params, CompositeQuery subquery) {
-        super(descriptor, params, FUNC_NAME);
+    private PayoutsFunction(Object descriptor, QueryParameters params, String continuationToken, CompositeQuery subquery) {
+        super(descriptor, params, FUNC_NAME, continuationToken);
         this.subquery = subquery;
     }
 
@@ -165,15 +165,15 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
         private PayoutsValidator validator = new PayoutsValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(PayoutsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart));
+        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildSingleQuery(PayoutsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
             validator.validateQuery(resultQuery);
             return resultQuery;
         }
 
-        private CompositeQuery createQuery(QueryPart queryPart) {
+        private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters()),
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken),
                     new GetCountFunction(queryPart.getDescriptor() + ":" + GetCountFunction.FUNC_NAME, queryPart.getParameters())
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
@@ -181,7 +181,7 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
                     getParameters(queryPart.getParent()),
                     queries
             );
-            return createPayoutsFunction(queryPart.getDescriptor(), queryPart.getParameters(), compositeQuery);
+            return createPayoutsFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken, compositeQuery);
         }
 
         @Override
@@ -190,8 +190,8 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
         }
     }
 
-    private static PayoutsFunction createPayoutsFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
-        PayoutsFunction payoutsFunction = new PayoutsFunction(descriptor, queryParameters, subquery);
+    private static PayoutsFunction createPayoutsFunction(Object descriptor, QueryParameters queryParameters, String continuationToken, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
+        PayoutsFunction payoutsFunction = new PayoutsFunction(descriptor, queryParameters, continuationToken, subquery);
         subquery.setParentQuery(payoutsFunction);
         return payoutsFunction;
     }
@@ -199,8 +199,8 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
     private static class GetDataFunction extends PagedBaseFunction<PayoutEventStat, Collection<PayoutEventStat>> {
         private static final String FUNC_NAME = PayoutsFunction.FUNC_NAME + "_data";
 
-        public GetDataFunction(Object descriptor, QueryParameters params) {
-            super(descriptor, params, FUNC_NAME);
+        public GetDataFunction(Object descriptor, QueryParameters params, String continuationToken) {
+            super(descriptor, params, FUNC_NAME, continuationToken);
         }
 
         @Override

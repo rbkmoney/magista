@@ -12,6 +12,7 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.magista.util.TokenUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,8 +29,8 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
 
     private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
-    private InvoicesFunction(Object descriptor, QueryParameters params, CompositeQuery subquery) {
-        super(descriptor, params, FUNC_NAME);
+    private InvoicesFunction(Object descriptor, QueryParameters params, String continuationToken, CompositeQuery subquery) {
+        super(descriptor, params, FUNC_NAME, continuationToken);
         this.subquery = subquery;
     }
 
@@ -42,23 +43,23 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
 
     @Override
     public QueryResult<Map.Entry<Long, StatInvoice>, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
-        if (collectedResults.size() != 2) {
-            throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
-        }
-
         QueryResult<Map.Entry<Long, StatInvoice>, List<Map.Entry<Long, StatInvoice>>> invoicesResult = (QueryResult<Map.Entry<Long, StatInvoice>, List<Map.Entry<Long, StatInvoice>>>) collectedResults.get(0);
-        QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
                 () -> invoicesResult.getDataStream(),
                 () -> {
                     StatResponseData statResponseData = StatResponseData.invoices(
                             invoicesResult.getDataStream()
-                                    .map(invoiceResponse -> invoiceResponse.getValue())
+                                    .map(Map.Entry::getValue)
                                     .collect(Collectors.toList())
                     );
                     StatResponse statResponse = new StatResponse(statResponseData);
-                    statResponse.setTotalCount(countResult.getCollectedStream());
+                    invoicesResult.getDataStream()
+                            .max(Comparator.comparing(Map.Entry::getKey)).ifPresent(
+                            invoiceResponse -> statResponse.setContinuationToken(
+                                    TokenUtil.buildToken(getQueryParameters(), invoiceResponse.getKey())
+                            )
+                    );
                     return statResponse;
                 });
     }
@@ -149,23 +150,22 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
         private InvoicesValidator validator = new InvoicesValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(InvoicesParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart));
+        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildSingleQuery(InvoicesParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
             validator.validateQuery(resultQuery);
             return resultQuery;
         }
 
-        private CompositeQuery createQuery(QueryPart queryPart) {
+        private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters()),
-                    new GetCountFunction(queryPart.getDescriptor() + ":" + GetCountFunction.FUNC_NAME, queryPart.getParameters())
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken)
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
                     queryPart.getDescriptor(),
                     getParameters(queryPart.getParent()),
                     queries
             );
-            return createInvoicesFunction(queryPart.getDescriptor(), queryPart.getParameters(), compositeQuery);
+            return createInvoicesFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken, compositeQuery);
         }
 
         @Override
@@ -175,8 +175,8 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
 
     }
 
-    private static InvoicesFunction createInvoicesFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
-        InvoicesFunction invoicesFunction = new InvoicesFunction(descriptor, queryParameters, subquery);
+    private static InvoicesFunction createInvoicesFunction(Object descriptor, QueryParameters queryParameters, String continuationToken, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
+        InvoicesFunction invoicesFunction = new InvoicesFunction(descriptor, queryParameters, continuationToken, subquery);
         subquery.setParentQuery(invoicesFunction);
         return invoicesFunction;
     }
@@ -184,8 +184,8 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
     private static class GetDataFunction extends PagedBaseFunction {
         private static final String FUNC_NAME = PaymentsFunction.FUNC_NAME + "_data";
 
-        public GetDataFunction(Object descriptor, QueryParameters params) {
-            super(descriptor, params, FUNC_NAME);
+        public GetDataFunction(Object descriptor, QueryParameters params, String continuationToken) {
+            super(descriptor, params, FUNC_NAME, continuationToken);
         }
 
         @Override
@@ -197,34 +197,10 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
                         parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
-                        Optional.ofNullable(parameters.getFrom()),
+                        getFromId(),
                         Optional.ofNullable(parameters.getSize())
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);
-            } catch (DaoException e) {
-                throw new QueryExecutionException(e);
-            }
-        }
-    }
-
-    private static class GetCountFunction extends ScopedBaseFunction<Integer, Integer> {
-        private static final String FUNC_NAME = PaymentsFunction.FUNC_NAME + "_count";
-
-        public GetCountFunction(Object descriptor, QueryParameters params) {
-            super(descriptor, params, FUNC_NAME);
-        }
-
-        @Override
-        public QueryResult<Integer, Integer> execute(QueryContext context) throws QueryExecutionException {
-            FunctionQueryContext functionContext = getContext(context);
-            InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
-            try {
-                Integer result = functionContext.getDao().getInvoicesCount(
-                        parameters,
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime()))
-                );
-                return new BaseQueryResult<>(() -> Stream.of(result), () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }

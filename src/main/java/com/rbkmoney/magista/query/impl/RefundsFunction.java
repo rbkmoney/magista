@@ -32,8 +32,8 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
 
     private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
-    private RefundsFunction(Object descriptor, QueryParameters params, CompositeQuery subquery) {
-        super(descriptor, params, FUNC_NAME);
+    private RefundsFunction(Object descriptor, QueryParameters params, String continuationToken, CompositeQuery subquery) {
+        super(descriptor, params, FUNC_NAME, continuationToken);
         this.subquery = subquery;
     }
 
@@ -163,15 +163,15 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
         private RefundsValidator validator = new RefundsValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(RefundsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart));
+        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildSingleQuery(RefundsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
             validator.validateQuery(resultQuery);
             return resultQuery;
         }
 
-        private CompositeQuery createQuery(QueryPart queryPart) {
+        private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters()),
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken),
                     new GetCountFunction(queryPart.getDescriptor() + ":" + GetCountFunction.FUNC_NAME, queryPart.getParameters())
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
@@ -179,7 +179,7 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
                     getParameters(queryPart.getParent()),
                     queries
             );
-            return createRefundsFunction(queryPart.getDescriptor(), queryPart.getParameters(), compositeQuery);
+            return createRefundsFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken, compositeQuery);
         }
 
         @Override
@@ -188,8 +188,8 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
         }
     }
 
-    private static RefundsFunction createRefundsFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
-        RefundsFunction refundsFunction = new RefundsFunction(descriptor, queryParameters, subquery);
+    private static RefundsFunction createRefundsFunction(Object descriptor, QueryParameters queryParameters, String continuationToken, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
+        RefundsFunction refundsFunction = new RefundsFunction(descriptor, queryParameters, continuationToken, subquery);
         subquery.setParentQuery(refundsFunction);
         return refundsFunction;
     }
@@ -197,8 +197,8 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
     private static class GetDataFunction extends PagedBaseFunction<Refund, Collection<Refund>> {
         private static final String FUNC_NAME = RefundsFunction.FUNC_NAME + "_data";
 
-        public GetDataFunction(Object descriptor, QueryParameters params) {
-            super(descriptor, params, FUNC_NAME);
+        public GetDataFunction(Object descriptor, QueryParameters params, String continuationToken) {
+            super(descriptor, params, FUNC_NAME, continuationToken);
         }
 
         @Override

@@ -17,6 +17,7 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.magista.util.TokenUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
@@ -38,8 +39,8 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
 
     private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
-    private PaymentsFunction(Object descriptor, QueryParameters params, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
-        super(descriptor, params, FUNC_NAME);
+    private PaymentsFunction(Object descriptor, QueryParameters params, String continuationToken, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
+        super(descriptor, params, FUNC_NAME, continuationToken);
         this.subquery = subquery;
     }
 
@@ -52,12 +53,7 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
 
     @Override
     public QueryResult<Map.Entry<Long, StatPayment>, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
-        if (collectedResults.size() != 2) {
-            throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
-        }
-
         QueryResult<Map.Entry<Long, StatPayment>, List<Map.Entry<Long, StatPayment>>> paymentsResult = (QueryResult<Map.Entry<Long, StatPayment>, List<Map.Entry<Long, StatPayment>>>) collectedResults.get(0);
-        QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
                 () -> paymentsResult.getDataStream(),
@@ -65,7 +61,12 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
                     StatResponseData statResponseData = StatResponseData.payments(paymentsResult.getDataStream()
                             .map(paymentResponse -> paymentResponse.getValue()).collect(Collectors.toList()));
                     StatResponse statResponse = new StatResponse(statResponseData);
-                    statResponse.setTotalCount(countResult.getCollectedStream());
+                    paymentsResult.getDataStream()
+                            .min(Comparator.comparing(Map.Entry::getKey)).ifPresent(
+                            invoiceResponse -> statResponse.setContinuationToken(
+                                    TokenUtil.buildToken(getQueryParameters(), invoiceResponse.getKey())
+                            )
+                    );
                     return statResponse;
                 }
         );
@@ -222,23 +223,22 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
         private PaymentsValidator validator = new PaymentsValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(PaymentsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart));
+        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildSingleQuery(PaymentsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
             validator.validateQuery(resultQuery);
             return resultQuery;
         }
 
-        private CompositeQuery createQuery(QueryPart queryPart) {
+        private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters()),
-                    new GetCountFunction(queryPart.getDescriptor() + ":" + GetCountFunction.FUNC_NAME, queryPart.getParameters())
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken)
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
                     queryPart.getDescriptor(),
                     getParameters(queryPart.getParent()),
                     queries
             );
-            return createPaymentsFunction(queryPart.getDescriptor(), queryPart.getParameters(), compositeQuery);
+            return createPaymentsFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken, compositeQuery);
         }
 
         @Override
@@ -247,8 +247,8 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
         }
     }
 
-    private static PaymentsFunction createPaymentsFunction(Object descriptor, QueryParameters queryParameters, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
-        PaymentsFunction paymentsFunction = new PaymentsFunction(descriptor, queryParameters, subquery);
+    private static PaymentsFunction createPaymentsFunction(Object descriptor, QueryParameters queryParameters, String continuationToken, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
+        PaymentsFunction paymentsFunction = new PaymentsFunction(descriptor, queryParameters, continuationToken, subquery);
         subquery.setParentQuery(paymentsFunction);
         return paymentsFunction;
     }
@@ -256,8 +256,8 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
     private static class GetDataFunction extends PagedBaseFunction<Map.Entry<Long, StatPayment>, Collection<Map.Entry<Long, StatPayment>>> {
         private static final String FUNC_NAME = PaymentsFunction.FUNC_NAME + "_data";
 
-        public GetDataFunction(Object descriptor, QueryParameters params) {
-            super(descriptor, params, FUNC_NAME);
+        public GetDataFunction(Object descriptor, QueryParameters params, String continuationToken) {
+            super(descriptor, params, FUNC_NAME, continuationToken);
         }
 
         @Override
@@ -269,34 +269,10 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
                         parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
-                        Optional.ofNullable(parameters.getFrom()),
+                        getFromId(),
                         Optional.ofNullable(parameters.getSize())
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);
-            } catch (DaoException e) {
-                throw new QueryExecutionException(e);
-            }
-        }
-    }
-
-    private static class GetCountFunction extends ScopedBaseFunction<Integer, Integer> {
-        private static final String FUNC_NAME = PaymentsFunction.FUNC_NAME + "_count";
-
-        public GetCountFunction(Object descriptor, QueryParameters params) {
-            super(descriptor, params, FUNC_NAME);
-        }
-
-        @Override
-        public QueryResult<Integer, Integer> execute(QueryContext context) throws QueryExecutionException {
-            FunctionQueryContext functionContext = getContext(context);
-            PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
-            try {
-                Integer result = functionContext.getDao().getPaymentsCount(
-                        parameters,
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime()))
-                );
-                return new BaseQueryResult<>(() -> Stream.of(result), () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }

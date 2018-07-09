@@ -38,6 +38,6 @@ public class QueryBuilderImplTest {
 
     Query buildQuery(String json) {
         List<QueryPart> queryParts = parser.parseQuery(json);
-        return builder.buildQuery(queryParts, null, null);
+        return builder.buildQuery(queryParts, null, null, null);
     }
 }

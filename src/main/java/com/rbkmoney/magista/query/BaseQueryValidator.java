@@ -2,6 +2,7 @@ package com.rbkmoney.magista.query;
 
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
+import java.util.UUID;
 
 /**
  * Created by vpankrashkin on 23.08.16.
