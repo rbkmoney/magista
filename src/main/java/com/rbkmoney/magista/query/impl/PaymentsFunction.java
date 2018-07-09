@@ -4,11 +4,6 @@ import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.dao.ConditionParameterSource;
-import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
-import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
-import com.rbkmoney.magista.domain.enums.PaymentFlow;
-import com.rbkmoney.magista.domain.enums.PaymentTool;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
@@ -24,11 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;
-import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
-import static com.rbkmoney.magista.domain.tables.PaymentEvent.PAYMENT_EVENT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
-import static org.jooq.Comparator.EQUALS;
 
 /**
  * Created by vpankrashkin on 03.08.16.
@@ -61,12 +52,15 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
                     StatResponseData statResponseData = StatResponseData.payments(paymentsResult.getDataStream()
                             .map(paymentResponse -> paymentResponse.getValue()).collect(Collectors.toList()));
                     StatResponse statResponse = new StatResponse(statResponseData);
-                    paymentsResult.getDataStream()
-                            .min(Comparator.comparing(Map.Entry::getKey)).ifPresent(
-                            invoiceResponse -> statResponse.setContinuationToken(
-                                    TokenUtil.buildToken(getQueryParameters(), invoiceResponse.getKey())
-                            )
-                    );
+                    if (!paymentsResult.getCollectedStream().isEmpty()) {
+                        List<Map.Entry<Long, StatPayment>> paymentStats = paymentsResult.getCollectedStream();
+                        statResponse.setContinuationToken(
+                                TokenUtil.buildToken(
+                                        getQueryParameters(),
+                                        paymentStats.get(paymentStats.size() - 1).getKey()
+                                )
+                        );
+                    }
                     return statResponse;
                 }
         );

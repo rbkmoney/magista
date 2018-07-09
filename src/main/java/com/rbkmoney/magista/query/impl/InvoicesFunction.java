@@ -54,12 +54,15 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
                                     .collect(Collectors.toList())
                     );
                     StatResponse statResponse = new StatResponse(statResponseData);
-                    invoicesResult.getDataStream()
-                            .max(Comparator.comparing(Map.Entry::getKey)).ifPresent(
-                            invoiceResponse -> statResponse.setContinuationToken(
-                                    TokenUtil.buildToken(getQueryParameters(), invoiceResponse.getKey())
-                            )
-                    );
+                    if (!invoicesResult.getCollectedStream().isEmpty()) {
+                        List<Map.Entry<Long, StatInvoice>> invoiceStats = invoicesResult.getCollectedStream();
+                        statResponse.setContinuationToken(
+                                TokenUtil.buildToken(
+                                        getQueryParameters(),
+                                        invoiceStats.get(invoiceStats.size() - 1).getKey()
+                                )
+                        );
+                    }
                     return statResponse;
                 });
     }
