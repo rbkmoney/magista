@@ -214,7 +214,7 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
                         Optional.ofNullable(parameters.getFrom()),
-                        Optional.ofNullable(parameters.getSize())
+                        parameters.getSize()
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);
             } catch (DaoException e) {

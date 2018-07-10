@@ -56,8 +56,6 @@ import static org.jooq.Comparator.LESS;
 public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public static final int MAX_LIMIT = 1000;
-
     public StatisticsDaoImpl(DataSource ds) {
         super(ds);
     }
@@ -68,7 +66,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
             Optional<Long> fromId,
-            Optional<Integer> limit
+            int limit
     ) throws DaoException {
 
         Query query = buildInvoiceSelectConditionStepQuery(
@@ -77,7 +75,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 toTime,
                 fromId
         ).orderBy(INVOICE_DATA.INVOICE_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT));
+                .limit(limit);
         return fetch(query, (rs, i) -> {
             StatInvoice statInvoice = new StatInvoice();
             statInvoice.setId(rs.getString(INVOICE_DATA.INVOICE_ID.getName()));
@@ -159,7 +157,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
             Optional<Long> fromId,
-            Optional<Integer> limit
+            int limit
     ) throws DaoException {
         Query query = buildPaymentSelectConditionStepQuery(
                 parameters,
@@ -167,7 +165,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 toTime,
                 fromId
         ).orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT));
+                .limit(limit);
         return fetch(query, (rs, i) -> {
             StatPayment statPayment = new StatPayment();
             statPayment.setId(rs.getString(PAYMENT_DATA.PAYMENT_ID.getName()));
@@ -327,12 +325,12 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
             Optional<Integer> offset,
-            Optional<Integer> limit
+            int limit
     ) throws DaoException {
         Query query = getDslContext().selectFrom(REFUND)
                 .where(buildRefundCondition(merchantId, shopId, contractId, parameterSource, fromTime, toTime))
                 .orderBy(REFUND.REFUND_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
+                .limit(limit)
                 .offset(offset.orElse(0));
         return fetch(query, (rs, i) -> {
             Refund refund = new Refund();
@@ -379,11 +377,11 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> shopId,
             ConditionParameterSource parameterSource,
             Optional<Integer> offset,
-            Optional<Integer> limit
+            int limit
     ) throws DaoException {
         Query query = buildPayoutSelectConditionStepQuery(parameterSource)
                 .orderBy(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
+                .limit(limit)
                 .offset(offset.orElse(0));
 
         return fetch(query, PayoutEventDaoImpl.ROW_MAPPER);

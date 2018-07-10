@@ -25,7 +25,7 @@ public interface StatisticsDao {
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
             Optional<Long> fromId,
-            Optional<Integer> limit
+            int limit
     ) throws DaoException;
 
     Collection<Map.Entry<Long, StatPayment>> getPayments(
@@ -33,7 +33,7 @@ public interface StatisticsDao {
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
             Optional<Long> fromId,
-            Optional<Integer> limit
+            int limit
     ) throws DaoException;
 
     Collection<Refund> getRefunds(
@@ -44,7 +44,7 @@ public interface StatisticsDao {
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
             Optional<Integer> offset,
-            Optional<Integer> limit
+            int limit
     ) throws DaoException;
 
     Integer getRefundsCount(
@@ -61,7 +61,7 @@ public interface StatisticsDao {
             Optional<String> shopId,
             ConditionParameterSource parameterSource,
             Optional<Integer> offset,
-            Optional<Integer> limit
+            int limit
     ) throws DaoException;
 
     Integer getPayoutsCount(

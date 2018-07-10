@@ -54,8 +54,9 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
                                     .collect(Collectors.toList())
                     );
                     StatResponse statResponse = new StatResponse(statResponseData);
-                    if (!invoicesResult.getCollectedStream().isEmpty()) {
-                        List<Map.Entry<Long, StatInvoice>> invoiceStats = invoicesResult.getCollectedStream();
+
+                    List<Map.Entry<Long, StatInvoice>> invoiceStats = invoicesResult.getCollectedStream();
+                    if (!invoicesResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == invoiceStats.size()) {
                         statResponse.setContinuationToken(
                                 TokenUtil.buildToken(
                                         getQueryParameters(),
@@ -201,7 +202,7 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
                         getFromId(),
-                        Optional.ofNullable(parameters.getSize())
+                        parameters.getSize()
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);
             } catch (DaoException e) {

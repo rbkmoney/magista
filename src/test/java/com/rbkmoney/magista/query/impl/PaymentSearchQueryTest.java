@@ -10,6 +10,7 @@ import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
+import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.TokenUtil;
 import org.junit.Assert;
@@ -51,6 +52,12 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
         assertEquals(2, statResponse.getData().getPayments().size());
         assertEquals((Long) 1L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
         DamselUtil.toJson(statResponse);
+    }
+
+    @Test(expected = QueryParserException.class)
+    public void testWhenSizeOverflow() {
+        String json = "{'query': {'payments': {'size': 1001}}}";
+        queryProcessor.processQuery(new StatRequest(json));
     }
 
     @Test

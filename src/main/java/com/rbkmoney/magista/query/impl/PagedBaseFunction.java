@@ -7,7 +7,6 @@ import com.rbkmoney.magista.util.TokenUtil;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.rbkmoney.magista.query.impl.Parameters.FROM_PARAMETER;
 import static com.rbkmoney.magista.query.impl.Parameters.SIZE_PARAMETER;
@@ -16,6 +15,8 @@ import static com.rbkmoney.magista.query.impl.Parameters.SIZE_PARAMETER;
  * Created by vpankrashkin on 23.08.16.
  */
 public abstract class PagedBaseFunction<T, CT> extends ScopedBaseFunction<T, CT> {
+
+    public static final int MAX_SIZE_VALUE = 1000;
 
     private String continuationToken;
 
@@ -47,7 +48,8 @@ public abstract class PagedBaseFunction<T, CT> extends ScopedBaseFunction<T, CT>
         }
 
         public Integer getSize() {
-            return getIntParameter(SIZE_PARAMETER, true);
+            return Optional.ofNullable(getIntParameter(SIZE_PARAMETER, true))
+                    .orElse(MAX_SIZE_VALUE);
         }
 
     }
@@ -59,6 +61,19 @@ public abstract class PagedBaseFunction<T, CT> extends ScopedBaseFunction<T, CT>
             if (query instanceof PagedBaseFunction) {
                 validateContinuationToken(query.getQueryParameters(), ((PagedBaseFunction) query).getContinuationToken());
             }
+        }
+
+        @Override
+        public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
+            super.validateParameters(parameters);
+            PagedBaseParameters pagedBaseParameters = super.checkParamsType(parameters, PagedBaseParameters.class);
+            checkParamsResult(pagedBaseParameters.getSize() > MAX_SIZE_VALUE,
+                    String.format(
+                            "Size must be less or equals to %d but was %d",
+                            MAX_SIZE_VALUE,
+                            pagedBaseParameters.getSize()
+                    )
+            );
         }
 
         private void validateContinuationToken(QueryParameters queryParameters, String continuationToken) throws BadTokenException {

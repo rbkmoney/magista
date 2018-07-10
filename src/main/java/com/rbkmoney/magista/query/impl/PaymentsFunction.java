@@ -52,8 +52,8 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
                     StatResponseData statResponseData = StatResponseData.payments(paymentsResult.getDataStream()
                             .map(paymentResponse -> paymentResponse.getValue()).collect(Collectors.toList()));
                     StatResponse statResponse = new StatResponse(statResponseData);
-                    if (!paymentsResult.getCollectedStream().isEmpty()) {
-                        List<Map.Entry<Long, StatPayment>> paymentStats = paymentsResult.getCollectedStream();
+                    List<Map.Entry<Long, StatPayment>> paymentStats = paymentsResult.getCollectedStream();
+                    if (!paymentsResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == paymentStats.size()) {
                         statResponse.setContinuationToken(
                                 TokenUtil.buildToken(
                                         getQueryParameters(),
@@ -264,7 +264,7 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
                         getFromId(),
-                        Optional.ofNullable(parameters.getSize())
+                        parameters.getSize()
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);
             } catch (DaoException e) {

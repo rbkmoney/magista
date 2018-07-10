@@ -9,6 +9,7 @@ import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
+import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.TokenUtil;
 import org.junit.Before;
@@ -47,6 +48,12 @@ public class InvoiceSearchQueryTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testWhenSizeOverflow() {
+        String json = "{'query': {'invoices': {'size': 1001}}}";
+        queryProcessor.processQuery(new StatRequest(json));
+    }
+
+    @Test(expected = QueryParserException.class)
     @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
     public void testContinuationTokenWithInvoices() {
         String json = "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z', 'size': 1}}}";

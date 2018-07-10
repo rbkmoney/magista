@@ -213,7 +213,7 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
                         Optional.ofNullable(parameters.getShopId()),
                         buildPayoutConditionParameterSource(parameters),
                         Optional.ofNullable(parameters.getFrom()),
-                        Optional.ofNullable(parameters.getSize())
+                        parameters.getSize()
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);
             } catch (DaoException e) {
