@@ -50,7 +50,6 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
         System.out.println(statResponse);
         assertEquals(2, statResponse.getData().getPayments().size());
-        assertEquals((Long) 1L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
         DamselUtil.toJson(statResponse);
     }
 

@@ -43,17 +43,16 @@ public class InvoiceSearchQueryTest extends AbstractIntegrationTest {
         String json = "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
         assertEquals(2, statResponse.getData().getInvoices().size());
-        System.out.println(statResponse.getContinuationToken());
         DamselUtil.toJson(statResponse);
     }
 
-    @Test
+    @Test(expected = QueryParserException.class)
     public void testWhenSizeOverflow() {
         String json = "{'query': {'invoices': {'size': 1001}}}";
         queryProcessor.processQuery(new StatRequest(json));
     }
 
-    @Test(expected = QueryParserException.class)
+    @Test
     @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
     public void testContinuationTokenWithInvoices() {
         String json = "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z', 'size': 1}}}";
