@@ -56,10 +56,6 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
         paymentData.setInvoiceId(invoiceId);
         paymentData.setPaymentId(paymentId);
 
-        PaymentRoute paymentRoute = invoicePaymentStarted.getRoute();
-        paymentData.setPaymentProviderId(paymentRoute.getProvider().getId());
-        paymentData.setPaymentTerminalId(paymentRoute.getTerminal().getId());
-
         Cash cost = invoicePayment.getCost();
         paymentData.setPaymentAmount(cost.getAmount());
         paymentData.setPaymentCurrencyCode(cost.getCurrency().getSymbolicCode());
@@ -133,12 +129,19 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
         }
         paymentEvent.setPaymentDomainRevision(invoicePayment.getDomainRevision());
 
-        List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentStarted.getCashFlow();
-        Map<FeeType, Long> fees = DamselUtil.getFees(finalCashFlowPostings);
+        if (invoicePaymentStarted.isSetRoute()) {
+            PaymentRoute paymentRoute = invoicePaymentStarted.getRoute();
+            paymentEvent.setPaymentProviderId(paymentRoute.getProvider().getId());
+            paymentEvent.setPaymentTerminalId(paymentRoute.getTerminal().getId());
+        }
 
-        paymentEvent.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
-        paymentEvent.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
-        paymentEvent.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
+        if (invoicePaymentStarted.isSetCashFlow()) {
+            List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentStarted.getCashFlow();
+            Map<FeeType, Long> fees = DamselUtil.getFees(finalCashFlowPostings);
+            paymentEvent.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
+            paymentEvent.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
+            paymentEvent.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
+        }
 
         return () -> paymentService.savePayment(paymentData, paymentEvent);
     }
@@ -180,7 +183,6 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
         paymentData.setPaymentEmail(contactInfo.getEmail());
         paymentData.setPaymentPhoneNumber(contactInfo.getPhoneNumber());
     }
-
 
     @Override
     public ChangeType getChangeType() {

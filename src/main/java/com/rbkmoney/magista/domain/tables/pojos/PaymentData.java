@@ -30,7 +30,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData implements Serializable {
 
-    private static final long serialVersionUID = -461921710;
+    private static final long serialVersionUID = -1103835035;
 
     private Long                  id;
     private String                invoiceId;
@@ -50,8 +50,6 @@ public class PaymentData implements Serializable {
     private String                paymentTerminalProvider;
     private String                paymentDigitalWalletId;
     private String                paymentDigitalWalletProvider;
-    private Integer               paymentProviderId;
-    private Integer               paymentTerminalId;
     private PaymentFlow           paymentFlow;
     private OnHoldExpiration      paymentHoldOnExpiration;
     private LocalDateTime         paymentHoldUntil;
@@ -86,8 +84,6 @@ public class PaymentData implements Serializable {
         this.paymentTerminalProvider = value.paymentTerminalProvider;
         this.paymentDigitalWalletId = value.paymentDigitalWalletId;
         this.paymentDigitalWalletProvider = value.paymentDigitalWalletProvider;
-        this.paymentProviderId = value.paymentProviderId;
-        this.paymentTerminalId = value.paymentTerminalId;
         this.paymentFlow = value.paymentFlow;
         this.paymentHoldOnExpiration = value.paymentHoldOnExpiration;
         this.paymentHoldUntil = value.paymentHoldUntil;
@@ -121,8 +117,6 @@ public class PaymentData implements Serializable {
         String                paymentTerminalProvider,
         String                paymentDigitalWalletId,
         String                paymentDigitalWalletProvider,
-        Integer               paymentProviderId,
-        Integer               paymentTerminalId,
         PaymentFlow           paymentFlow,
         OnHoldExpiration      paymentHoldOnExpiration,
         LocalDateTime         paymentHoldUntil,
@@ -154,8 +148,6 @@ public class PaymentData implements Serializable {
         this.paymentTerminalProvider = paymentTerminalProvider;
         this.paymentDigitalWalletId = paymentDigitalWalletId;
         this.paymentDigitalWalletProvider = paymentDigitalWalletProvider;
-        this.paymentProviderId = paymentProviderId;
-        this.paymentTerminalId = paymentTerminalId;
         this.paymentFlow = paymentFlow;
         this.paymentHoldOnExpiration = paymentHoldOnExpiration;
         this.paymentHoldUntil = paymentHoldUntil;
@@ -312,22 +304,6 @@ public class PaymentData implements Serializable {
 
     public void setPaymentDigitalWalletProvider(String paymentDigitalWalletProvider) {
         this.paymentDigitalWalletProvider = paymentDigitalWalletProvider;
-    }
-
-    public Integer getPaymentProviderId() {
-        return this.paymentProviderId;
-    }
-
-    public void setPaymentProviderId(Integer paymentProviderId) {
-        this.paymentProviderId = paymentProviderId;
-    }
-
-    public Integer getPaymentTerminalId() {
-        return this.paymentTerminalId;
-    }
-
-    public void setPaymentTerminalId(Integer paymentTerminalId) {
-        this.paymentTerminalId = paymentTerminalId;
     }
 
     public PaymentFlow getPaymentFlow() {
@@ -543,18 +519,6 @@ public class PaymentData implements Serializable {
         }
         else if (!paymentDigitalWalletProvider.equals(other.paymentDigitalWalletProvider))
             return false;
-        if (paymentProviderId == null) {
-            if (other.paymentProviderId != null)
-                return false;
-        }
-        else if (!paymentProviderId.equals(other.paymentProviderId))
-            return false;
-        if (paymentTerminalId == null) {
-            if (other.paymentTerminalId != null)
-                return false;
-        }
-        else if (!paymentTerminalId.equals(other.paymentTerminalId))
-            return false;
         if (paymentFlow == null) {
             if (other.paymentFlow != null)
                 return false;
@@ -652,8 +616,6 @@ public class PaymentData implements Serializable {
         result = prime * result + ((this.paymentTerminalProvider == null) ? 0 : this.paymentTerminalProvider.hashCode());
         result = prime * result + ((this.paymentDigitalWalletId == null) ? 0 : this.paymentDigitalWalletId.hashCode());
         result = prime * result + ((this.paymentDigitalWalletProvider == null) ? 0 : this.paymentDigitalWalletProvider.hashCode());
-        result = prime * result + ((this.paymentProviderId == null) ? 0 : this.paymentProviderId.hashCode());
-        result = prime * result + ((this.paymentTerminalId == null) ? 0 : this.paymentTerminalId.hashCode());
         result = prime * result + ((this.paymentFlow == null) ? 0 : this.paymentFlow.hashCode());
         result = prime * result + ((this.paymentHoldOnExpiration == null) ? 0 : this.paymentHoldOnExpiration.hashCode());
         result = prime * result + ((this.paymentHoldUntil == null) ? 0 : this.paymentHoldUntil.hashCode());
@@ -691,8 +653,6 @@ public class PaymentData implements Serializable {
         sb.append(", ").append(paymentTerminalProvider);
         sb.append(", ").append(paymentDigitalWalletId);
         sb.append(", ").append(paymentDigitalWalletProvider);
-        sb.append(", ").append(paymentProviderId);
-        sb.append(", ").append(paymentTerminalId);
         sb.append(", ").append(paymentFlow);
         sb.append(", ").append(paymentHoldOnExpiration);
         sb.append(", ").append(paymentHoldUntil);
