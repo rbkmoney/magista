@@ -12,10 +12,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.namedparam.*;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -101,6 +98,10 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
 
     public void executeOne(Query query) throws DaoException {
         execute(query, 1);
+    }
+
+    public void execute(String sql) throws DaoException {
+        execute(sql, EmptySqlParameterSource.INSTANCE, -1);
     }
 
     public void execute(Query query) throws DaoException {

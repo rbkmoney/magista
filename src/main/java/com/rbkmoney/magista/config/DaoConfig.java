@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
@@ -19,9 +20,10 @@ public class DaoConfig {
     @Bean
     @DependsOn("dbInitializer")
     public StatisticsDao statisticsDao(DataSource ds,
+                                       PlatformTransactionManager transactionManager,
                                        @Value("${cache.maxSize}") long cacheMaxSize,
                                        @Value("${cache.expireTime}") long expireTime) {
-        return new StatisticsDaoImpl(ds, cacheMaxSize, expireTime);
+        return new StatisticsDaoImpl(ds, transactionManager, cacheMaxSize, expireTime);
     }
 
     @Bean
