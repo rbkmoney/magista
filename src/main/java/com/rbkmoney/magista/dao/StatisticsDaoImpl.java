@@ -16,6 +16,8 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -39,8 +41,11 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
     private final Cache<Map.Entry<Condition, String>, List<Map.Entry<LocalDateTime, Integer>>> statCache;
 
-    public StatisticsDaoImpl(DataSource ds, long cacheMaxSize, long expireTime) {
+    private final TransactionTemplate transactionTemplate;
+
+    public StatisticsDaoImpl(DataSource ds, PlatformTransactionManager transactionManager, long cacheMaxSize, long expireTime) {
         super(ds);
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
         statCache = Caffeine.newBuilder()
                 .maximumSize(cacheMaxSize)
                 .expireAfterWrite(expireTime, TimeUnit.MILLISECONDS)
@@ -89,29 +94,31 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         }
 
         Query query = withStep.selectFrom(DSL.table("_t1"))
-                .where(!paymentParameterSource.getConditionFields().isEmpty() ? "_t1.invoice_id IN (SELECT invoice_id FROM _t2)": "1 = 1")
+                .where(!paymentParameterSource.getConditionFields().isEmpty() ? "_t1.invoice_id IN (SELECT invoice_id FROM _t2)" : "1 = 1")
                 .orderBy(DSL.field("invoice_created_at").desc())
                 .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
                 .offset(offset.orElse(0));
+        return transactionTemplate.execute(transactionCallback -> {
+            execute("SET LOCAL enable_nestloop TO off");
+            return fetch(query, (rs, i) -> {
+                InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
+                invoiceEventStat.setPartyId(rs.getString(INVOICE_EVENT_STAT.PARTY_ID.getName()));
+                invoiceEventStat.setPartyShopId(rs.getString(INVOICE_EVENT_STAT.PARTY_SHOP_ID.getName()));
+                invoiceEventStat.setInvoiceId(rs.getString(INVOICE_EVENT_STAT.INVOICE_ID.getName()));
+                invoiceEventStat.setInvoiceCreatedAt(rs.getObject(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.getName(), LocalDateTime.class));
+                invoiceEventStat.setInvoiceStatus(TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.INVOICE_STATUS.getName()), InvoiceStatus.class));
+                invoiceEventStat.setInvoiceStatusDetails(rs.getString(INVOICE_EVENT_STAT.INVOICE_STATUS_DETAILS.getName()));
+                invoiceEventStat.setInvoiceProduct(rs.getString(INVOICE_EVENT_STAT.INVOICE_PRODUCT.getName()));
+                invoiceEventStat.setInvoiceDescription(rs.getString(INVOICE_EVENT_STAT.INVOICE_DESCRIPTION.getName()));
+                invoiceEventStat.setInvoiceDue(rs.getObject(INVOICE_EVENT_STAT.INVOICE_DUE.getName(), LocalDateTime.class));
+                invoiceEventStat.setInvoiceAmount(rs.getLong(INVOICE_EVENT_STAT.INVOICE_AMOUNT.getName()));
+                invoiceEventStat.setInvoiceCurrencyCode(rs.getString(INVOICE_EVENT_STAT.INVOICE_CURRENCY_CODE.getName()));
+                invoiceEventStat.setInvoiceCart(rs.getString(INVOICE_EVENT_STAT.INVOICE_CART.getName()));
+                invoiceEventStat.setInvoiceContextType(rs.getString(INVOICE_EVENT_STAT.INVOICE_CONTEXT_TYPE.getName()));
+                invoiceEventStat.setInvoiceContext(rs.getBytes(INVOICE_EVENT_STAT.INVOICE_CONTEXT.getName()));
 
-        return fetch(query, (rs, i) -> {
-            InvoiceEventStat invoiceEventStat = new InvoiceEventStat();
-            invoiceEventStat.setPartyId(rs.getString(INVOICE_EVENT_STAT.PARTY_ID.getName()));
-            invoiceEventStat.setPartyShopId(rs.getString(INVOICE_EVENT_STAT.PARTY_SHOP_ID.getName()));
-            invoiceEventStat.setInvoiceId(rs.getString(INVOICE_EVENT_STAT.INVOICE_ID.getName()));
-            invoiceEventStat.setInvoiceCreatedAt(rs.getObject(INVOICE_EVENT_STAT.INVOICE_CREATED_AT.getName(), LocalDateTime.class));
-            invoiceEventStat.setInvoiceStatus(TypeUtil.toEnumField(rs.getString(INVOICE_EVENT_STAT.INVOICE_STATUS.getName()), InvoiceStatus.class));
-            invoiceEventStat.setInvoiceStatusDetails(rs.getString(INVOICE_EVENT_STAT.INVOICE_STATUS_DETAILS.getName()));
-            invoiceEventStat.setInvoiceProduct(rs.getString(INVOICE_EVENT_STAT.INVOICE_PRODUCT.getName()));
-            invoiceEventStat.setInvoiceDescription(rs.getString(INVOICE_EVENT_STAT.INVOICE_DESCRIPTION.getName()));
-            invoiceEventStat.setInvoiceDue(rs.getObject(INVOICE_EVENT_STAT.INVOICE_DUE.getName(), LocalDateTime.class));
-            invoiceEventStat.setInvoiceAmount(rs.getLong(INVOICE_EVENT_STAT.INVOICE_AMOUNT.getName()));
-            invoiceEventStat.setInvoiceCurrencyCode(rs.getString(INVOICE_EVENT_STAT.INVOICE_CURRENCY_CODE.getName()));
-            invoiceEventStat.setInvoiceCart(rs.getString(INVOICE_EVENT_STAT.INVOICE_CART.getName()));
-            invoiceEventStat.setInvoiceContextType(rs.getString(INVOICE_EVENT_STAT.INVOICE_CONTEXT_TYPE.getName()));
-            invoiceEventStat.setInvoiceContext(rs.getBytes(INVOICE_EVENT_STAT.INVOICE_CONTEXT.getName()));
-
-            return invoiceEventStat;
+                return invoiceEventStat;
+            });
         });
     }
 
@@ -141,8 +148,11 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         Query query = withStep.select(DSL.count())
                 .from(DSL.table("_t1"))
-                .where(!paymentParameterSource.getConditionFields().isEmpty() ? "_t1.invoice_id IN (SELECT invoice_id FROM _t2)": "1 = 1");
-        return fetchOne(query, Integer.class);
+                .where(!paymentParameterSource.getConditionFields().isEmpty() ? "_t1.invoice_id IN (SELECT invoice_id FROM _t2)" : "1 = 1");
+        return transactionTemplate.execute(transactionCallback -> {
+            execute("SET LOCAL enable_nestloop TO off");
+            return fetchOne(query, Integer.class);
+        });
     }
 
     @Override
