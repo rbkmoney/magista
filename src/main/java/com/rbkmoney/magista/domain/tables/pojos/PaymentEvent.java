@@ -27,7 +27,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentEvent implements Serializable {
 
-    private static final long serialVersionUID = 1801571865;
+    private static final long serialVersionUID = 559742396;
 
     private Long                 id;
     private Long                 eventId;
@@ -44,6 +44,8 @@ public class PaymentEvent implements Serializable {
     private Long                 paymentExternalFee;
     private Long                 paymentDomainRevision;
     private String               paymentShortId;
+    private Integer              paymentProviderId;
+    private Integer              paymentTerminalId;
 
     public PaymentEvent() {}
 
@@ -63,6 +65,8 @@ public class PaymentEvent implements Serializable {
         this.paymentExternalFee = value.paymentExternalFee;
         this.paymentDomainRevision = value.paymentDomainRevision;
         this.paymentShortId = value.paymentShortId;
+        this.paymentProviderId = value.paymentProviderId;
+        this.paymentTerminalId = value.paymentTerminalId;
     }
 
     public PaymentEvent(
@@ -80,7 +84,9 @@ public class PaymentEvent implements Serializable {
         Long                 paymentProviderFee,
         Long                 paymentExternalFee,
         Long                 paymentDomainRevision,
-        String               paymentShortId
+        String               paymentShortId,
+        Integer              paymentProviderId,
+        Integer              paymentTerminalId
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -97,6 +103,8 @@ public class PaymentEvent implements Serializable {
         this.paymentExternalFee = paymentExternalFee;
         this.paymentDomainRevision = paymentDomainRevision;
         this.paymentShortId = paymentShortId;
+        this.paymentProviderId = paymentProviderId;
+        this.paymentTerminalId = paymentTerminalId;
     }
 
     public Long getId() {
@@ -219,6 +227,22 @@ public class PaymentEvent implements Serializable {
         this.paymentShortId = paymentShortId;
     }
 
+    public Integer getPaymentProviderId() {
+        return this.paymentProviderId;
+    }
+
+    public void setPaymentProviderId(Integer paymentProviderId) {
+        this.paymentProviderId = paymentProviderId;
+    }
+
+    public Integer getPaymentTerminalId() {
+        return this.paymentTerminalId;
+    }
+
+    public void setPaymentTerminalId(Integer paymentTerminalId) {
+        this.paymentTerminalId = paymentTerminalId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -318,6 +342,18 @@ public class PaymentEvent implements Serializable {
         }
         else if (!paymentShortId.equals(other.paymentShortId))
             return false;
+        if (paymentProviderId == null) {
+            if (other.paymentProviderId != null)
+                return false;
+        }
+        else if (!paymentProviderId.equals(other.paymentProviderId))
+            return false;
+        if (paymentTerminalId == null) {
+            if (other.paymentTerminalId != null)
+                return false;
+        }
+        else if (!paymentTerminalId.equals(other.paymentTerminalId))
+            return false;
         return true;
     }
 
@@ -340,6 +376,8 @@ public class PaymentEvent implements Serializable {
         result = prime * result + ((this.paymentExternalFee == null) ? 0 : this.paymentExternalFee.hashCode());
         result = prime * result + ((this.paymentDomainRevision == null) ? 0 : this.paymentDomainRevision.hashCode());
         result = prime * result + ((this.paymentShortId == null) ? 0 : this.paymentShortId.hashCode());
+        result = prime * result + ((this.paymentProviderId == null) ? 0 : this.paymentProviderId.hashCode());
+        result = prime * result + ((this.paymentTerminalId == null) ? 0 : this.paymentTerminalId.hashCode());
         return result;
     }
 
@@ -362,6 +400,8 @@ public class PaymentEvent implements Serializable {
         sb.append(", ").append(paymentExternalFee);
         sb.append(", ").append(paymentDomainRevision);
         sb.append(", ").append(paymentShortId);
+        sb.append(", ").append(paymentProviderId);
+        sb.append(", ").append(paymentTerminalId);
 
         sb.append(")");
         return sb.toString();

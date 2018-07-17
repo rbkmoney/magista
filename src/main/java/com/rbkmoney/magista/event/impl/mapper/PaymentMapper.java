@@ -44,10 +44,6 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
 
         invoiceEventStat.setPaymentId(invoicePayment.getId());
 
-        PaymentRoute paymentRoute = invoicePaymentStarted.getRoute();
-        invoiceEventStat.setPaymentProviderId(paymentRoute.getProvider().getId());
-        invoiceEventStat.setPaymentTerminalId(paymentRoute.getTerminal().getId());
-
         invoiceEventStat.setPaymentDomainRevision(invoicePayment.getDomainRevision());
 
         Payer payer = invoicePayment.getPayer();
@@ -118,6 +114,12 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
             invoiceEventStat.setPaymentHoldUntil(
                     TypeUtil.stringToLocalDateTime(hold.getHeldUntil())
             );
+        }
+
+        if (invoicePaymentStarted.isSetRoute()) {
+            PaymentRoute paymentRoute = invoicePaymentStarted.getRoute();
+            invoiceEventStat.setPaymentProviderId(paymentRoute.getProvider().getId());
+            invoiceEventStat.setPaymentTerminalId(paymentRoute.getTerminal().getId());
         }
 
         return invoiceEventStat;

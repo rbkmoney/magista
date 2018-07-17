@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentEvent extends TableImpl<PaymentEventRecord> {
 
-    private static final long serialVersionUID = -1644040901;
+    private static final long serialVersionUID = 1818193459;
 
     /**
      * The reference instance of <code>mst.payment_event</code>
@@ -108,17 +108,17 @@ public class PaymentEvent extends TableImpl<PaymentEventRecord> {
     /**
      * The column <code>mst.payment_event.payment_fee</code>.
      */
-    public final TableField<PaymentEventRecord, Long> PAYMENT_FEE = createField("payment_fee", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<PaymentEventRecord, Long> PAYMENT_FEE = createField("payment_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>mst.payment_event.payment_provider_fee</code>.
      */
-    public final TableField<PaymentEventRecord, Long> PAYMENT_PROVIDER_FEE = createField("payment_provider_fee", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<PaymentEventRecord, Long> PAYMENT_PROVIDER_FEE = createField("payment_provider_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>mst.payment_event.payment_external_fee</code>.
      */
-    public final TableField<PaymentEventRecord, Long> PAYMENT_EXTERNAL_FEE = createField("payment_external_fee", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<PaymentEventRecord, Long> PAYMENT_EXTERNAL_FEE = createField("payment_external_fee", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>mst.payment_event.payment_domain_revision</code>.
@@ -129,6 +129,16 @@ public class PaymentEvent extends TableImpl<PaymentEventRecord> {
      * The column <code>mst.payment_event.payment_short_id</code>.
      */
     public final TableField<PaymentEventRecord, String> PAYMENT_SHORT_ID = createField("payment_short_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payment_event.payment_provider_id</code>.
+     */
+    public final TableField<PaymentEventRecord, Integer> PAYMENT_PROVIDER_ID = createField("payment_provider_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>mst.payment_event.payment_terminal_id</code>.
+     */
+    public final TableField<PaymentEventRecord, Integer> PAYMENT_TERMINAL_ID = createField("payment_terminal_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * Create a <code>mst.payment_event</code> table reference
