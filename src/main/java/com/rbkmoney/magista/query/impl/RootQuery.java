@@ -22,6 +22,7 @@ import static com.rbkmoney.magista.query.impl.Parameters.QUERY_PARAMETER;
  */
 public class RootQuery extends BaseQuery {
     private final Query childQuery;
+
     private RootQuery(Object descriptor, QueryParameters params, Query childQuery) {
         super(descriptor, params);
         this.childQuery = childQuery;
@@ -74,8 +75,8 @@ public class RootQuery extends BaseQuery {
                             "Request must contain at least one query"
                     );
                 }
-            } else if (query instanceof CompositeQuery){
-                checkParamsResult(true, "Request can't hold more than one query, received count: "+((CompositeQuery) query).getChildQueries().size());
+            } else if (query instanceof CompositeQuery) {
+                checkParamsResult(true, "Request can't hold more than one query, received count: " + ((CompositeQuery) query).getChildQueries().size());
             } else {
                 assert false : "No other types expected here";
             }
@@ -109,14 +110,14 @@ public class RootQuery extends BaseQuery {
         private RootValidator validator = new RootValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(RootParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, baseBuilder));
+        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildSingleQuery(RootParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken, baseBuilder));
             validator.validateQuery(resultQuery);
             return resultQuery;
         }
 
-        private RootQuery createQuery(QueryPart queryPart, QueryBuilder baseBuilder) {
-            Query childQuery = baseBuilder.buildQuery(queryPart.getChildren(), queryPart, baseBuilder);
+        private RootQuery createQuery(QueryPart queryPart, String continuationToken, QueryBuilder baseBuilder) {
+            Query childQuery = baseBuilder.buildQuery(queryPart.getChildren(), continuationToken, queryPart, baseBuilder);
             RootQuery rootQuery = new RootQuery(queryPart.getDescriptor(), queryPart.getParameters(), childQuery);
             childQuery.setParentQuery(rootQuery);
             return rootQuery;

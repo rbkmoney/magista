@@ -48,14 +48,13 @@ import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
 import static org.jooq.Comparator.EQUALS;
+import static org.jooq.Comparator.LESS;
 
 /**
  * Created by vpankrashkin on 10.08.16.
  */
 public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-
-    public static final int MAX_LIMIT = 1000;
 
     public StatisticsDaoImpl(DataSource ds) {
         super(ds);
@@ -66,17 +65,17 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             InvoicesFunction.InvoicesParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Integer> offset,
-            Optional<Integer> limit
+            Optional<Long> fromId,
+            int limit
     ) throws DaoException {
 
         Query query = buildInvoiceSelectConditionStepQuery(
                 parameters,
                 fromTime,
-                toTime
+                toTime,
+                fromId
         ).orderBy(INVOICE_DATA.INVOICE_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
-                .offset(offset.orElse(0));
+                .limit(limit);
         return fetch(query, (rs, i) -> {
             StatInvoice statInvoice = new StatInvoice();
             statInvoice.setId(rs.getString(INVOICE_DATA.INVOICE_ID.getName()));
@@ -148,23 +147,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 );
             }
 
-            return new AbstractMap.SimpleEntry<>(rs.getLong(INVOICE_EVENT.ID.getName()), statInvoice);
+            return new AbstractMap.SimpleEntry<>(rs.getLong(INVOICE_DATA.ID.getName()), statInvoice);
         });
-    }
-
-    @Override
-    public int getInvoicesCount(
-            InvoicesFunction.InvoicesParameters parameters,
-            Optional<LocalDateTime> fromTime,
-            Optional<LocalDateTime> toTime
-    ) throws DaoException {
-        Query query = buildInvoiceSelectConditionStepQuery(
-                parameters,
-                fromTime,
-                toTime,
-                DSL.count()
-        ).where(DSL.trueCondition());
-        return fetchOne(query, Integer.class);
     }
 
     @Override
@@ -172,16 +156,16 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             PaymentsFunction.PaymentsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Integer> offset,
-            Optional<Integer> limit
+            Optional<Long> fromId,
+            int limit
     ) throws DaoException {
         Query query = buildPaymentSelectConditionStepQuery(
                 parameters,
                 fromTime,
-                toTime
+                toTime,
+                fromId
         ).orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
-                .offset(offset.orElse(0));
+                .limit(limit);
         return fetch(query, (rs, i) -> {
             StatPayment statPayment = new StatPayment();
             statPayment.setId(rs.getString(PAYMENT_DATA.PAYMENT_ID.getName()));
@@ -328,23 +312,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 );
             }
 
-            return new AbstractMap.SimpleEntry<>(rs.getLong(PAYMENT_EVENT.ID.getName()), statPayment);
+            return new AbstractMap.SimpleEntry<>(rs.getLong(PAYMENT_DATA.ID.getName()), statPayment);
         });
-    }
-
-    @Override
-    public Integer getPaymentsCount(
-            PaymentsFunction.PaymentsParameters parameters,
-            Optional<LocalDateTime> fromTime,
-            Optional<LocalDateTime> toTime
-    ) throws DaoException {
-        Query query = buildPaymentSelectConditionStepQuery(
-                parameters,
-                fromTime,
-                toTime,
-                DSL.count()
-        ).where(DSL.trueCondition());
-        return fetchOne(query, Integer.class);
     }
 
     @Override
@@ -356,12 +325,12 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
             Optional<Integer> offset,
-            Optional<Integer> limit
+            int limit
     ) throws DaoException {
         Query query = getDslContext().selectFrom(REFUND)
                 .where(buildRefundCondition(merchantId, shopId, contractId, parameterSource, fromTime, toTime))
                 .orderBy(REFUND.REFUND_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
+                .limit(limit)
                 .offset(offset.orElse(0));
         return fetch(query, (rs, i) -> {
             Refund refund = new Refund();
@@ -408,11 +377,11 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             Optional<String> shopId,
             ConditionParameterSource parameterSource,
             Optional<Integer> offset,
-            Optional<Integer> limit
+            int limit
     ) throws DaoException {
         Query query = buildPayoutSelectConditionStepQuery(parameterSource)
                 .orderBy(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT.desc())
-                .limit(Math.min(limit.orElse(MAX_LIMIT), MAX_LIMIT))
+                .limit(limit)
                 .offset(offset.orElse(0));
 
         return fetch(query, PayoutEventDaoImpl.ROW_MAPPER);
@@ -750,6 +719,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             PaymentsFunction.PaymentsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
+            Optional<Long> fromId,
             SelectField<?>... fields
     ) {
         PaymentEvent paymentEvent = PAYMENT_EVENT.as("payment_event");
@@ -765,6 +735,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .addValue(PAYMENT_DATA.PARTY_CONTRACT_ID, parameters.getContractId(), EQUALS)
                 .addValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
+                .addValue(PAYMENT_DATA.ID, fromId.orElse(null), LESS)
                 .addValue(paymentEvent.PAYMENT_STATUS,
                         toEnumField(parameters.getPaymentStatus(), com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
                         EQUALS)
@@ -812,6 +783,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
             InvoicesFunction.InvoicesParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
+            Optional<Long> fromId,
             SelectField<?>... fields
     ) {
         InvoiceEvent invoiceEvent = INVOICE_EVENT.as("invoice_event");
@@ -845,6 +817,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                                 .addValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
                                                 .addValue(INVOICE_DATA.PARTY_CONTRACT_ID, parameters.getContractId(), EQUALS)
                                                 .addValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                                                .addValue(INVOICE_DATA.ID, fromId.orElse(null), LESS)
                                                 .addValue(invoiceEvent.INVOICE_STATUS,
                                                         toEnumField(
                                                                 parameters.getInvoiceStatus(),

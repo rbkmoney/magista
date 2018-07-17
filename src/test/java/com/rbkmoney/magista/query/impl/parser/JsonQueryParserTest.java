@@ -55,7 +55,6 @@ public class JsonQueryParserTest {
         assertEquals("1212", parameters.getPaymentBankCardLastDigits());
         assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
         assertEquals("2016-03-22T01:12:00Z", TypeUtil.temporalToString(parameters.getToTime()));
-        assertNull(parameters.getSize());
         assertNull(parameters.getFrom());
 
     }
@@ -132,7 +131,6 @@ public class JsonQueryParserTest {
         assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
         assertNull(parameters.getToTime());
         assertNull(parameters.getFrom());
-        assertNull(parameters.getSize());
     }
 
     @Test

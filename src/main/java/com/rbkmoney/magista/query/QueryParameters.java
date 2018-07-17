@@ -6,6 +6,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by vpankrashkin on 23.08.16.
@@ -97,6 +98,20 @@ public class QueryParameters {
 
     public Map<String, Object> getParametersMap() {
         return parameters;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        QueryParameters that = (QueryParameters) o;
+        return Objects.equals(parameters, that.parameters) &&
+                Objects.equals(derivedParameters, that.derivedParameters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(parameters, derivedParameters);
     }
 
     @Override

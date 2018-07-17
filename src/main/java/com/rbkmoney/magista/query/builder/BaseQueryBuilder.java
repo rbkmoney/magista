@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.query.builder;
 
+import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.Query;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import org.slf4j.Logger;
@@ -24,13 +25,13 @@ public abstract class BaseQueryBuilder implements QueryBuilder {
     }
 
     @Override
-    public Query buildQuery(List<QueryPart> queryParts, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+    public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
         try {
             List<Query> queries = queryParts.isEmpty() ? Collections.emptyList() : builders.stream()
                     .filter(
                             builder -> builder.apply(queryParts, parentQueryPart))
                     .map(
-                            builder -> builder.buildQuery(queryParts, parentQueryPart, baseBuilder == null ? this : baseBuilder)
+                            builder -> builder.buildQuery(queryParts, continuationToken, parentQueryPart, baseBuilder == null ? this : baseBuilder)
                     )
                     .collect(Collectors.toList());
             if (queries.size() > 1) {
@@ -41,7 +42,7 @@ public abstract class BaseQueryBuilder implements QueryBuilder {
                 log.warn("No builders matched following query parts: {}", queryParts);
                 throw new QueryBuilderException("Can't build query, no match to process");
             }
-        } catch (QueryBuilderException e) {
+        } catch (BadTokenException | QueryBuilderException e) {
             throw e;
         } catch (IllegalArgumentException iae) {
             throw new QueryBuilderException(iae.getMessage(), iae);

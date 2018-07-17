@@ -19,14 +19,14 @@ public abstract class BaseQueryValidator implements QueryValidator {
             Instant fromInstant = Instant.from(from);
             Instant toInstant = Instant.from(to);
             if (fromInstant.compareTo(toInstant) > 0) {
-                checkParamsResult(true, "TimeRange is not valid [from: "+fromInstant+", to: "+toInstant+"]");
+                checkParamsResult(true, "TimeRange is not valid [from: " + fromInstant + ", to: " + toInstant + "]");
             }
         }
     }
 
     protected <T extends QueryParameters> T checkParamsType(QueryParameters parameters, Class<? extends QueryParameters> expectedType) {
         if (!expectedType.isAssignableFrom(parameters.getClass())) {
-            checkParamsResult(true, "Parameters has wrong type:"+parameters.getClass() +", expected: "+expectedType);
+            checkParamsResult(true, "Parameters has wrong type:" + parameters.getClass() + ", expected: " + expectedType);
         }
         return (T) parameters;
     }
@@ -39,7 +39,7 @@ public abstract class BaseQueryValidator implements QueryValidator {
 
     protected void checkParamsResult(boolean hasError, String fieldName, String msg) {
         if (hasError) {
-            checkParamsResult(hasError, "Validation failed for field: "+fieldName+ ": "+msg);
+            checkParamsResult(hasError, "Validation failed for field: " + fieldName + ": " + msg);
         }
     }
 }
