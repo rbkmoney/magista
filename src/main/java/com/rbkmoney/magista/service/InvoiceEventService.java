@@ -6,6 +6,7 @@ import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
+import com.rbkmoney.magista.util.BeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,4 +170,37 @@ public class InvoiceEventService {
         }
     }
 
+    public void saveInvoicePaymentCashFlowEvent(InvoiceEventStat invoicePaymentCashFlowEvent) {
+        log.debug("Save invoice payment cash flow event, event='{}'", invoicePaymentCashFlowEvent);
+
+        try {
+            InvoiceEventStat invoicePaymentEvent = getInvoicePaymentEventByIds(
+                    invoicePaymentCashFlowEvent.getInvoiceId(),
+                    invoicePaymentCashFlowEvent.getPaymentId()
+            );
+            invoicePaymentCashFlowEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_CASH_FLOW_CHANGED);
+            BeanUtil.merge(invoicePaymentEvent, invoicePaymentCashFlowEvent, "id");
+            log.info("Invoice payment cash flow event have been saved, event='{}'", invoicePaymentCashFlowEvent);
+        } catch (DaoException ex) {
+            String message = String.format("Failed to save invoice payment cash flow event, event='%s'", invoicePaymentCashFlowEvent);
+            throw new StorageException(message, ex);
+        }
+    }
+
+    public void saveInvoicePaymentRouteEvent(InvoiceEventStat invoicePaymentRouteEventStat) {
+        log.debug("Save invoice payment route event, event='{}'", invoicePaymentRouteEventStat);
+
+        try {
+            InvoiceEventStat invoicePaymentEvent = getInvoicePaymentEventByIds(
+                    invoicePaymentRouteEventStat.getInvoiceId(),
+                    invoicePaymentRouteEventStat.getPaymentId()
+            );
+            invoicePaymentRouteEventStat.setEventType(InvoiceEventType.INVOICE_PAYMENT_ROUTE_CHANGED);
+            BeanUtil.merge(invoicePaymentEvent, invoicePaymentRouteEventStat, "id");
+            log.info("Invoice payment route event have been saved, event='{}'", invoicePaymentRouteEventStat);
+        } catch (DaoException ex) {
+            String message = String.format("Failed to save invoice payment route event, event='%s'", invoicePaymentRouteEventStat);
+            throw new StorageException(message, ex);
+        }
+    }
 }
