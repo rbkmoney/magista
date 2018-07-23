@@ -45,6 +45,10 @@ public class PaymentRefundService {
                 refund.setPartyId(paymentEventStat.getPartyId());
                 refund.setPartyShopId(paymentEventStat.getPartyShopId());
                 refund.setPartyContractId(paymentEventStat.getPartyContractId());
+                if (refund.getRefundAmount() == null) {
+                    refund.setRefundAmount(paymentEventStat.getPaymentAmount());
+                    refund.setRefundCurrencyCode(paymentEventStat.getPaymentCurrencyCode());
+                }
                 break;
             case INVOICE_PAYMENT_REFUND_STATUS_CHANGED:
                 Refund previousRefundEvent = getRefund(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId());
