@@ -28,7 +28,8 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
     public void savePaymentData(PaymentData paymentData) throws DaoException {
         Query query = getDslContext().insertInto(PAYMENT_DATA)
                 .set(getDslContext().newRecord(PAYMENT_DATA, paymentData))
-                .onDuplicateKeyIgnore();
+                .onDuplicateKeyUpdate()
+                .set(getDslContext().newRecord(PAYMENT_DATA, paymentData));
         executeOne(query);
     }
 
