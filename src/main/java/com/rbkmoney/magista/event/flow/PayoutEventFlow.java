@@ -6,6 +6,7 @@ import com.rbkmoney.damsel.payout_processing.PayoutChange;
 import com.rbkmoney.magista.event.Handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
@@ -13,8 +14,8 @@ public class PayoutEventFlow extends AbstractEventFlow {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public PayoutEventFlow(List<Handler> handlers, int threadPoolSize, int queueLimit, long timeout) {
-        super("PayoutEvent", handlers, threadPoolSize, queueLimit, timeout);
+    public PayoutEventFlow(List<Handler> handlers, TransactionTemplate transactionTemplate, int threadPoolSize, int queueLimit, long timeout) {
+        super("PayoutEvent", handlers, transactionTemplate, threadPoolSize, queueLimit, timeout);
     }
 
     public void processEvent(StockEvent stockEvent) {

@@ -9,8 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.PreDestroy;
+import javax.sql.DataSource;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -42,17 +45,20 @@ public class ProcessingService {
 
     private final List<Handler> handlers;
 
+    private final PlatformTransactionManager transactionManager;
+
     private final AtomicReference<InvoiceEventFlow> invoiceEventFlow = new AtomicReference<>();
     private final AtomicReference<PayoutEventFlow> payoutEventFlow = new AtomicReference<>();
 
     @Autowired
-    public ProcessingService(List<Handler> handlers) {
+    public ProcessingService(List<Handler> handlers, PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
         this.handlers = handlers;
     }
 
     public void start() {
-        InvoiceEventFlow newInvoiceEventFlow = new InvoiceEventFlow(handlers, processingHandlerThreadPoolSize, processingHandlerQueueLimit, processingHandlerTimeout);
-        PayoutEventFlow newPayoutEventFlow = new PayoutEventFlow(handlers, payoutHandlerThreadPoolSize, payoutHandlerQueueLimit, payoutHandlerTimeout);
+        InvoiceEventFlow newInvoiceEventFlow = new InvoiceEventFlow(handlers, new TransactionTemplate(transactionManager), processingHandlerThreadPoolSize, processingHandlerQueueLimit, processingHandlerTimeout);
+        PayoutEventFlow newPayoutEventFlow = new PayoutEventFlow(handlers, new TransactionTemplate(transactionManager), payoutHandlerThreadPoolSize, payoutHandlerQueueLimit, payoutHandlerTimeout);
 
         if (invoiceEventFlow.compareAndSet(null, newInvoiceEventFlow)) {
             newInvoiceEventFlow.start();
