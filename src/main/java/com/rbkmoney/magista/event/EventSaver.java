@@ -5,6 +5,9 @@ import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
@@ -19,11 +22,13 @@ public class EventSaver implements Runnable {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final BlockingQueue<Future<Processor>> queue;
+    private final TransactionTemplate transactionTemplate;
     private final long timeout;
     private volatile boolean isRun = true;
 
-    public EventSaver(BlockingQueue<Future<Processor>> queue, long timeout) {
+    public EventSaver(BlockingQueue<Future<Processor>> queue, TransactionTemplate transactionTemplate, long timeout) {
         this.queue = queue;
+        this.transactionTemplate = transactionTemplate;
         this.timeout = timeout;
     }
 
@@ -40,7 +45,13 @@ public class EventSaver implements Runnable {
                     Future<Processor> future = queue.peek();
                     if (future != null) {
                         Processor processor = future.get();
-                        processor.execute();
+                        transactionTemplate.execute(
+                                new TransactionCallbackWithoutResult() {
+                                    public void doInTransactionWithoutResult(TransactionStatus status) {
+                                        processor.execute();
+                                    }
+                                }
+                        );
                         queue.take();
                         //TODO one bad event can stop the whole processing flow, need to do smth with it...
                     } else {

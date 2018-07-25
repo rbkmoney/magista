@@ -6,6 +6,7 @@ import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 import java.util.concurrent.*;
@@ -27,7 +28,7 @@ public abstract class AbstractEventFlow {
 
     private AtomicBoolean isRun = new AtomicBoolean(false);
 
-    public AbstractEventFlow(String name, List<Handler> handlers, int threadPoolSize, int queueLimit, long timeout) {
+    public AbstractEventFlow(String name, List<Handler> handlers, TransactionTemplate transactionTemplate, int threadPoolSize, int queueLimit, long timeout) {
         this.threadGroup = new ThreadGroup(name + "Flow");
         this.threadGroup.setDaemon(true);
         this.handlers = handlers;
@@ -42,7 +43,7 @@ public abstract class AbstractEventFlow {
                 return thread;
             }
         });
-        this.eventSaver = new EventSaver(queue, timeout);
+        this.eventSaver = new EventSaver(queue, transactionTemplate, timeout);
         this.eventSaverThread = new Thread(threadGroup, eventSaver, name + "Saver");
         this.timeout = timeout;
     }
