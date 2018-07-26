@@ -1,5 +1,7 @@
 package com.rbkmoney.magista.service;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.damsel.domain.Party;
 import com.rbkmoney.damsel.domain.Shop;
 import com.rbkmoney.damsel.payment_processing.*;
@@ -10,11 +12,13 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.AbstractMap;
+import java.util.Map;
 
 /**
  * Created by tolkonepiu on 29/05/2017.
@@ -30,10 +34,19 @@ public class PartyService {
 
     private final RetryTemplate retryTemplate;
 
+    private final Cache<Map.Entry<String, PartyRevisionParam>, Party> partyCache;
+
     @Autowired
-    public PartyService(PartyManagementSrv.Iface partyManagementSrv, RetryTemplate retryTemplate) {
+    public PartyService(
+            PartyManagementSrv.Iface partyManagementSrv,
+            RetryTemplate retryTemplate,
+            @Value("${cache.maxSize}") long cacheMaximumSize
+    ) {
         this.partyManagementSrv = partyManagementSrv;
         this.retryTemplate = retryTemplate;
+        this.partyCache = Caffeine.newBuilder()
+                .maximumSize(cacheMaximumSize)
+                .build();
     }
 
     public Shop getShop(String partyId, String shopId) throws NotFoundException {
@@ -64,7 +77,6 @@ public class PartyService {
         return getParty(partyId, Instant.now());
     }
 
-    @Cacheable("parties")
     public Party getParty(String partyId, long partyRevision) throws NotFoundException, PartyException {
         return getParty(partyId, PartyRevisionParam.revision(partyRevision));
     }
@@ -80,15 +92,22 @@ public class PartyService {
                 log.warn("Failed to get party (partyId='{}', partyRevisionParam='{}'), retrying ({})...", partyId, partyRevisionParam, context.getRetryCount(), context.getLastThrowable());
             }
 
-            try {
-                return partyManagementSrv.checkout(userInfo, partyId, partyRevisionParam);
-            } catch (PartyNotFound ex) {
-                throw new NotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
-            } catch (InvalidPartyRevision ex) {
-                throw new NotFoundException(String.format("Invalid party revision, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex);
-            } catch (TException ex) {
-                throw new PartyException("Exception with get party from hg", ex);
-            }
+            return partyCache.get(
+                    new AbstractMap.SimpleEntry<>(partyId, partyRevisionParam),
+                    key -> {
+                        try {
+                            return partyManagementSrv.checkout(userInfo, key.getKey(), key.getValue());
+                        } catch (PartyNotFound ex) {
+                            throw new NotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
+                        } catch (InvalidPartyRevision ex) {
+                            throw new NotFoundException(String.format("Invalid party revision, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex);
+                        } catch (TException ex) {
+                            throw new PartyException("Exception with get party from hg", ex);
+                        }
+                    }
+            );
+
+
         });
         log.info("Party has been found, partyId='{}', partyRevisionParam='{}'", partyId, partyRevisionParam);
         return party;

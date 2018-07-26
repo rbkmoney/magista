@@ -25,13 +25,15 @@ public class InvoiceEventFlow extends AbstractEventFlow {
         if (event.getPayload().isSetInvoiceChanges()) {
             for (InvoiceChange invoiceChange : event.getPayload().getInvoiceChanges()) {
                 List<Handler> handlers = getHandlers(invoiceChange);
-                List<Processor> processors = handlers.stream()
-                        .map(handler -> {
-                            log.info("Start invoice event handling, id='{}', eventType='{}', handlerType='{}'",
-                                    stockEvent.getSourceEvent().getProcessingEvent().getId(), handler.getChangeType(), handler.getClass().getSimpleName());
-                            return handler.handle(invoiceChange, stockEvent);
-                        }).collect(Collectors.toList());
-                submitAndPutInQueue(() -> () -> processors.forEach(processor -> processor.execute()));
+                submitAndPutInQueue(() -> {
+                    List<Processor> processors = handlers.stream()
+                            .map(handler -> {
+                                log.info("Start invoice event handling, id='{}', eventType='{}', handlerType='{}'",
+                                        stockEvent.getSourceEvent().getProcessingEvent().getId(), handler.getChangeType(), handler.getClass().getSimpleName());
+                                return handler.handle(invoiceChange, stockEvent);
+                            }).collect(Collectors.toList());
+                    return () -> processors.forEach(processor -> processor.execute());
+                });
             }
         }
     }
