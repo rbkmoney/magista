@@ -2,10 +2,13 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.domain.Party;
 import com.rbkmoney.damsel.domain.Shop;
+import com.rbkmoney.damsel.payment_processing.InvalidPartyRevision;
 import com.rbkmoney.damsel.payment_processing.PartyManagementSrv;
+import com.rbkmoney.damsel.payment_processing.PartyNotFound;
 import com.rbkmoney.damsel.payment_processing.PartyRevisionParam;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.AbstractIntegrationTest;
+import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.service.PartyService;
 import org.apache.thrift.TException;
 import org.junit.Before;
@@ -87,5 +90,21 @@ public class PartyServiceTest extends AbstractIntegrationTest {
         start = System.currentTimeMillis();
         runnable.run();
         assertTrue(System.currentTimeMillis() - start < timeout);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void testGetPartyWhenNotFound() throws TException {
+        when(partyManagementClient.checkout(any(), eq("not-found"), any()))
+                .thenThrow(PartyNotFound.class);
+
+        partyService.getParty("not-found", 1L);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void testGetPartyWhenInvalidPartyRevision() throws TException {
+        when(partyManagementClient.checkout(any(), any(), eq(PartyRevisionParam.revision(-1L))))
+                .thenThrow(InvalidPartyRevision.class);
+
+        partyService.getParty(UUID.randomUUID().toString(), -1L);
     }
 }
