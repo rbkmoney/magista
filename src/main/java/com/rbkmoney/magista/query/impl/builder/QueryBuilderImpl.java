@@ -17,6 +17,7 @@ public class QueryBuilderImpl extends BaseQueryBuilder {
                 Arrays.asList(
                         new RootQuery.RootBuilder(),
                         new PaymentsFunction.PaymentsBuilder(),
+                        new PaymentsForReportFunction.PaymentsForReportBuilder(),
                         new InvoicesFunction.InvoicesBuilder(),
                         new RefundsFunction.RefundsBuilder(),
                         new PayoutsFunction.PayoutsBuilder(),

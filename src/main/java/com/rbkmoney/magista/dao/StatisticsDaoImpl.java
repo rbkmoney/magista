@@ -1,28 +1,21 @@
 package com.rbkmoney.magista.dao;
 
 import com.google.common.collect.ImmutableMap;
-import com.rbkmoney.damsel.base.Content;
-import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
-import com.rbkmoney.damsel.domain.BankCardTokenProvider;
-import com.rbkmoney.damsel.domain.InvoiceCart;
-import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.InvoicePaymentStatus;
-import com.rbkmoney.damsel.merch_stat.InvoiceStatus;
-import com.rbkmoney.damsel.merch_stat.OnHoldExpiration;
-import com.rbkmoney.damsel.merch_stat.PaymentTool;
+import com.rbkmoney.damsel.merch_stat.StatInvoice;
+import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.dao.mapper.StatInvoiceMapper;
+import com.rbkmoney.magista.dao.mapper.StatPaymentMapper;
 import com.rbkmoney.magista.domain.enums.*;
-import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.tables.InvoiceEvent;
 import com.rbkmoney.magista.domain.tables.PaymentData;
 import com.rbkmoney.magista.domain.tables.PaymentEvent;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.query.impl.InvoicesFunction;
 import com.rbkmoney.magista.query.impl.PaymentsFunction;
-import com.rbkmoney.magista.util.DamselUtil;
 import org.jooq.*;
 import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
@@ -31,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 import javax.sql.DataSource;
-import java.nio.ByteBuffer;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -56,8 +48,13 @@ import static org.jooq.Comparator.LESS;
 public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+    private final StatInvoiceMapper statInvoiceMapper;
+    private final StatPaymentMapper statPaymentMapper;
+
     public StatisticsDaoImpl(DataSource ds) {
         super(ds);
+        statInvoiceMapper = new StatInvoiceMapper();
+        statPaymentMapper = new StatPaymentMapper();
     }
 
     @Override
@@ -76,79 +73,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 fromId
         ).orderBy(INVOICE_DATA.INVOICE_CREATED_AT.desc())
                 .limit(limit);
-        return fetch(query, (rs, i) -> {
-            StatInvoice statInvoice = new StatInvoice();
-            statInvoice.setId(rs.getString(INVOICE_DATA.INVOICE_ID.getName()));
-            statInvoice.setOwnerId(rs.getString(INVOICE_DATA.PARTY_ID.getName()));
-            statInvoice.setShopId(rs.getString(INVOICE_DATA.PARTY_SHOP_ID.getName()));
-            statInvoice.setAmount(rs.getLong(INVOICE_DATA.INVOICE_AMOUNT.getName()));
-            statInvoice.setCurrencySymbolicCode(rs.getString(INVOICE_DATA.INVOICE_CURRENCY_CODE.getName()));
-            statInvoice.setProduct(rs.getString(INVOICE_DATA.INVOICE_PRODUCT.getName()));
-            statInvoice.setDescription(rs.getString(INVOICE_DATA.INVOICE_DESCRIPTION.getName()));
-            statInvoice.setCreatedAt(
-                    TypeUtil.temporalToString(
-                            rs.getObject(INVOICE_DATA.INVOICE_CREATED_AT.getName(), LocalDateTime.class)
-                    )
-            );
-            statInvoice.setDue(
-                    TypeUtil.temporalToString(
-                            rs.getObject(INVOICE_DATA.INVOICE_DUE.getName(), LocalDateTime.class)
-                    )
-            );
-
-            com.rbkmoney.magista.domain.enums.InvoiceStatus invoiceStatusType = TypeUtil.toEnumField(
-                    rs.getString(INVOICE_EVENT.INVOICE_STATUS.getName()),
-                    com.rbkmoney.magista.domain.enums.InvoiceStatus.class
-            );
-
-            String eventCreatedAtString = TypeUtil.temporalToString(
-                    rs.getObject(INVOICE_EVENT.EVENT_CREATED_AT.getName(), LocalDateTime.class)
-            );
-
-            InvoiceStatus invoiceStatus;
-            switch (invoiceStatusType) {
-                case cancelled:
-                    InvoiceCancelled invoiceCancelled = new InvoiceCancelled();
-                    invoiceCancelled.setDetails(rs.getString(INVOICE_EVENT.INVOICE_STATUS_DETAILS.getName()));
-                    invoiceCancelled.setAt(eventCreatedAtString);
-                    invoiceStatus = InvoiceStatus.cancelled(invoiceCancelled);
-                    break;
-                case unpaid:
-                    invoiceStatus = InvoiceStatus.unpaid(new InvoiceUnpaid());
-                    break;
-                case paid:
-                    InvoicePaid invoicePaid = new InvoicePaid();
-                    invoicePaid.setAt(eventCreatedAtString);
-                    invoiceStatus = InvoiceStatus.paid(invoicePaid);
-                    break;
-                case fulfilled:
-                    InvoiceFulfilled invoiceFulfilled = new InvoiceFulfilled();
-                    invoiceFulfilled.setAt(eventCreatedAtString);
-                    invoiceFulfilled.setDetails(rs.getString(INVOICE_EVENT.INVOICE_STATUS_DETAILS.getName()));
-                    invoiceStatus = InvoiceStatus.fulfilled(invoiceFulfilled);
-                    break;
-                default:
-                    throw new NotFoundException(String.format("Invoice status '%s' not found", invoiceStatusType.getLiteral()));
-            }
-            statInvoice.setStatus(invoiceStatus);
-
-            String invoiceCartJson = rs.getString(INVOICE_DATA.INVOICE_CART_JSON.getName());
-            if (invoiceCartJson != null) {
-                statInvoice.setCart(DamselUtil.fromJson(invoiceCartJson, InvoiceCart.class));
-            }
-
-            byte[] context = rs.getBytes(INVOICE_DATA.INVOICE_CONTEXT.getName());
-            if (context != null) {
-                statInvoice.setContext(
-                        new Content(
-                                rs.getString(INVOICE_DATA.INVOICE_CONTEXT_TYPE.getName()),
-                                ByteBuffer.wrap(context)
-                        )
-                );
-            }
-
-            return new AbstractMap.SimpleEntry<>(rs.getLong(INVOICE_DATA.ID.getName()), statInvoice);
-        });
+        return fetch(query, statInvoiceMapper);
     }
 
     @Override
@@ -166,154 +91,48 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 fromId
         ).orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
                 .limit(limit);
-        return fetch(query, (rs, i) -> {
-            StatPayment statPayment = new StatPayment();
-            statPayment.setId(rs.getString(PAYMENT_DATA.PAYMENT_ID.getName()));
-            statPayment.setInvoiceId(rs.getString(PAYMENT_DATA.INVOICE_ID.getName()));
-            statPayment.setOwnerId(rs.getString(PAYMENT_DATA.PARTY_ID.getName()));
-            statPayment.setShopId(rs.getString(PAYMENT_DATA.PARTY_SHOP_ID.getName()));
-            statPayment.setAmount(rs.getLong(PAYMENT_DATA.PAYMENT_AMOUNT.getName()));
-            statPayment.setFee(rs.getLong(PAYMENT_EVENT.PAYMENT_FEE.getName()));
-            statPayment.setCurrencySymbolicCode(rs.getString(PAYMENT_DATA.PAYMENT_CURRENCY_CODE.getName()));
-            statPayment.setCreatedAt(
-                    TypeUtil.temporalToString(
-                            rs.getObject(PAYMENT_DATA.PAYMENT_CREATED_AT.getName(), LocalDateTime.class)
-                    )
-            );
+        return fetch(query, statPaymentMapper);
+    }
 
+    @Override
+    public Collection<Map.Entry<Long, StatPayment>> getPaymentsForReport(
+            String partyId,
+            String shopId,
+            LocalDateTime fromTime,
+            LocalDateTime toTime,
+            Optional<Long> fromId,
+            int limit
+    ) throws DaoException {
+        PaymentEvent paymentEvent = PAYMENT_EVENT.as("payment_event");
 
-            String eventCreatedAtString = TypeUtil.temporalToString(
-                    rs.getObject(PAYMENT_EVENT.EVENT_CREATED_AT.getName(), LocalDateTime.class)
-            );
-            com.rbkmoney.magista.domain.enums.InvoicePaymentStatus invoicePaymentStatus = TypeUtil.toEnumField(
-                    rs.getString(PAYMENT_EVENT.PAYMENT_STATUS.getName()),
-                    com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class
-            );
+        Query query = getDslContext()
+                .select()
+                .from(PAYMENT_DATA)
+                .join(
+                        DSL.lateral(
+                                getDslContext()
+                                        .selectFrom(PAYMENT_EVENT)
+                                        .where(
+                                                PAYMENT_DATA.INVOICE_ID.eq(PAYMENT_EVENT.INVOICE_ID)
+                                                        .and(PAYMENT_DATA.PAYMENT_ID.eq(PAYMENT_EVENT.PAYMENT_ID))
+                                                        .and(PAYMENT_EVENT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured))
+                                                        .and(PAYMENT_EVENT.EVENT_CREATED_AT.ge(fromTime))
+                                                        .and(PAYMENT_EVENT.EVENT_CREATED_AT.lt(toTime))
+                                        ).orderBy(PAYMENT_EVENT.ID.desc())
+                                        .limit(1)
+                        ).as(paymentEvent)
+                ).on(
+                        PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(partyId))
+                                .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId))
+                                .and(
+                                        fromId.map(fromIdValue -> paymentEvent.ID.gt(fromIdValue))
+                                                .orElse(DSL.trueCondition())
+                                )
+                )
+                .orderBy(paymentEvent.EVENT_CREATED_AT)
+                .limit(limit);
 
-            InvoicePaymentStatus paymentStatus;
-            switch (invoicePaymentStatus) {
-                case pending:
-                    paymentStatus = InvoicePaymentStatus.pending(new InvoicePaymentPending());
-                    break;
-                case cancelled:
-                    InvoicePaymentCancelled invoicePaymentCancelled = new InvoicePaymentCancelled();
-                    invoicePaymentCancelled.setAt(eventCreatedAtString);
-                    paymentStatus = InvoicePaymentStatus.cancelled(invoicePaymentCancelled);
-                    break;
-                case failed:
-                    InvoicePaymentFailed invoicePaymentFailed = new InvoicePaymentFailed();
-                    invoicePaymentFailed.setAt(eventCreatedAtString);
-                    OperationFailure operationFailure = DamselUtil.toOperationFailure(
-                            TypeUtil.toEnumField(rs.getString(PAYMENT_EVENT.PAYMENT_OPERATION_FAILURE_CLASS.getName()), FailureClass.class),
-                            rs.getString(PAYMENT_EVENT.PAYMENT_EXTERNAL_FAILURE.getName()),
-                            rs.getString(PAYMENT_EVENT.PAYMENT_EXTERNAL_FAILURE_REASON.getName())
-                    );
-                    invoicePaymentFailed.setFailure(operationFailure);
-                    paymentStatus = InvoicePaymentStatus.failed(invoicePaymentFailed);
-                    break;
-                case captured:
-                    InvoicePaymentCaptured invoicePaymentCaptured = new InvoicePaymentCaptured();
-                    invoicePaymentCaptured.setAt(eventCreatedAtString);
-                    paymentStatus = InvoicePaymentStatus.captured(invoicePaymentCaptured);
-                    break;
-                case refunded:
-                    InvoicePaymentRefunded invoicePaymentRefunded = new InvoicePaymentRefunded();
-                    invoicePaymentRefunded.setAt(eventCreatedAtString);
-                    paymentStatus = InvoicePaymentStatus.refunded(invoicePaymentRefunded);
-                    break;
-                case processed:
-                    InvoicePaymentProcessed invoicePaymentProcessed = new InvoicePaymentProcessed();
-                    invoicePaymentProcessed.setAt(eventCreatedAtString);
-                    paymentStatus = InvoicePaymentStatus.processed(invoicePaymentProcessed);
-                    break;
-                default:
-                    throw new NotFoundException(String.format("Payment status '%s' not found", invoicePaymentStatus.getLiteral()));
-            }
-            statPayment.setStatus(paymentStatus);
-
-            String customerId = rs.getString(PAYMENT_DATA.PAYMENT_CUSTOMER_ID.getName());
-            if (customerId != null) {
-                statPayment.setPayer(Payer.customer(new CustomerPayer(customerId)));
-            } else {
-                PaymentResourcePayer paymentResourcePayer = new PaymentResourcePayer();
-                paymentResourcePayer.setIpAddress(rs.getString(PAYMENT_DATA.PAYMENT_IP.getName()));
-                paymentResourcePayer.setFingerprint(rs.getString(PAYMENT_DATA.PAYMENT_FINGERPRINT.getName()));
-                paymentResourcePayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
-                paymentResourcePayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
-                paymentResourcePayer.setSessionId(rs.getString(PAYMENT_DATA.PAYMENT_SESSION_ID.getName()));
-
-
-                com.rbkmoney.magista.domain.enums.PaymentTool paymentToolType = TypeUtil.toEnumField(
-                        rs.getString(PAYMENT_DATA.PAYMENT_TOOL.getName()),
-                        com.rbkmoney.magista.domain.enums.PaymentTool.class
-                );
-
-                PaymentTool paymentTool;
-                switch (paymentToolType) {
-                    case bank_card:
-                        BankCard bankCard = new BankCard(
-                                rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN.getName()),
-                                TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()), BankCardPaymentSystem.class),
-                                rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_BIN.getName()),
-                                rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_MASKED_PAN.getName())
-                        );
-                        bankCard.setTokenProvider(
-                                Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()))
-                                        .map(bankCardTokenProvider -> TypeUtil.toEnumField(bankCardTokenProvider, BankCardTokenProvider.class))
-                                        .orElse(null)
-                        );
-                        paymentTool = PaymentTool.bank_card(bankCard);
-                        break;
-                    case payment_terminal:
-                        paymentTool = PaymentTool.payment_terminal(new PaymentTerminal(
-                                TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER.getName()), TerminalPaymentProvider.class)
-                        ));
-                        break;
-                    case digital_wallet:
-                        paymentTool = PaymentTool.digital_wallet(new DigitalWallet(
-                                TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()), DigitalWalletProvider.class),
-                                rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_ID.getName())
-                        ));
-                        break;
-                    default:
-                        throw new NotFoundException(String.format("Payment tool '%s' not found", paymentToolType.getLiteral()));
-                }
-                paymentResourcePayer.setPaymentTool(paymentTool);
-
-                statPayment.setPayer(Payer.payment_resource(paymentResourcePayer));
-            }
-
-            PaymentFlow paymentFlow = TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_FLOW.getName()), PaymentFlow.class);
-            switch (paymentFlow) {
-                case hold:
-                    InvoicePaymentFlowHold invoicePaymentFlowHold = new InvoicePaymentFlowHold(
-                            TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_HOLD_ON_EXPIRATION.getName()), OnHoldExpiration.class),
-                            TypeUtil.temporalToString(
-                                    rs.getObject(PAYMENT_DATA.PAYMENT_HOLD_UNTIL.getName(), LocalDateTime.class)
-                            )
-                    );
-                    statPayment.setFlow(InvoicePaymentFlow.hold(invoicePaymentFlowHold));
-                    break;
-                case instant:
-                    statPayment.setFlow(InvoicePaymentFlow.instant(new InvoicePaymentFlowInstant()));
-                    break;
-                default:
-                    throw new NotFoundException(String.format("Payment flow '%s' not found", paymentFlow.getLiteral()));
-            }
-            statPayment.setShortId(rs.getString(PAYMENT_EVENT.PAYMENT_SHORT_ID.getName()));
-
-            byte[] context = rs.getBytes(PAYMENT_DATA.PAYMENT_CONTEXT.getName());
-            if (context != null) {
-                statPayment.setContext(
-                        new Content(
-                                rs.getString(PAYMENT_DATA.PAYMENT_CONTEXT_TYPE.getName()),
-                                ByteBuffer.wrap(context)
-                        )
-                );
-            }
-
-            return new AbstractMap.SimpleEntry<>(rs.getLong(PAYMENT_DATA.ID.getName()), statPayment);
-        });
+        return fetch(query, new StatPaymentMapper(PAYMENT_EVENT.ID));
     }
 
     @Override
@@ -847,6 +666,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         EQUALS)
                 .addValue(paymentData.PAYMENT_TOOL,
                         TypeUtil.toEnumField(parameters.getPaymentMethod(), com.rbkmoney.magista.domain.enums.PaymentTool.class),
+                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
+                        toEnumField(parameters.getPaymentBankCardTokenProvider(), com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
                         EQUALS)
                 .addValue(paymentData.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
                 .addValue(paymentData.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
