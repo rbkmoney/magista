@@ -15,10 +15,7 @@ import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.util.TokenUtil;
 
 import java.time.temporal.TemporalAccessor;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -96,6 +93,14 @@ public class PaymentsForReportFunction extends PagedBaseFunction<Map.Entry<Long,
             super(parameters, derivedParameters);
         }
 
+        public String getInvoiceId() {
+            return getStringParameter(INVOICE_ID_PARAM, false);
+        }
+
+        public String getPaymentId() {
+            return getStringParameter(PAYMENT_ID_PARAM, false);
+        }
+
         public TemporalAccessor getFromTime() {
             return getTimeParameter(FROM_TIME_PARAM, false);
         }
@@ -117,16 +122,8 @@ public class PaymentsForReportFunction extends PagedBaseFunction<Map.Entry<Long,
                 checkParamsResult(true, MERCHANT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
-            if (paymentsParameters.getShopId() == null) {
-                checkParamsResult(true, SHOP_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
-            }
-
-            if (paymentsParameters.getFromTime() == null) {
-                checkParamsResult(true, FROM_TIME_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
-            }
-
-            if (paymentsParameters.getToTime() == null) {
-                checkParamsResult(true, TO_TIME_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            if (paymentsParameters.getContractId() == null) {
+                checkParamsResult(true, CONTRACT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
             validateTimePeriod(paymentsParameters.getFromTime(), paymentsParameters.getToTime());
@@ -207,9 +204,11 @@ public class PaymentsForReportFunction extends PagedBaseFunction<Map.Entry<Long,
             try {
                 Collection<Map.Entry<Long, StatPayment>> result = functionContext.getDao().getPaymentsForReport(
                         parameters.getMerchantId(),
-                        parameters.getShopId(),
-                        TypeUtil.toLocalDateTime(parameters.getFromTime()),
-                        TypeUtil.toLocalDateTime(parameters.getToTime()),
+                        parameters.getContractId(),
+                        Optional.ofNullable(parameters.getInvoiceId()),
+                        Optional.ofNullable(parameters.getPaymentId()),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
                         getFromId(),
                         parameters.getSize()
                 );
