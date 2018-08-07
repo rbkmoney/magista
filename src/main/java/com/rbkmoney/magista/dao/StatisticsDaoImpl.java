@@ -407,7 +407,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                         .and(ADJUSTMENT.PAYMENT_ID.eq(INVOICE_EVENT_STAT.PAYMENT_ID))
                                         .and(ADJUSTMENT.ADJUSTMENT_STATUS.eq(AdjustmentStatus.captured))
                                         .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT))
-                                        .and(INVOICE_EVENT_STAT.EVENT_TYPE.ne(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED))
+                                        .and(INVOICE_EVENT_STAT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
                                         .and(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.eq(currencyCode))
                                         .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
                                 ADJUSTMENT.EVENT_CREATED_AT,
