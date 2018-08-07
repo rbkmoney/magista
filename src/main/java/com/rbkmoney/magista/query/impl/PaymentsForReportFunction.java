@@ -64,13 +64,13 @@ public class PaymentsForReportFunction extends PagedBaseFunction<Map.Entry<Long,
     }
 
     @Override
-    public PaymentsFunction.PaymentsParameters getQueryParameters() {
-        return (PaymentsFunction.PaymentsParameters) super.getQueryParameters();
+    public PaymentsForReportFunction.PaymentsForReportParameters getQueryParameters() {
+        return (PaymentsForReportFunction.PaymentsForReportParameters) super.getQueryParameters();
     }
 
     @Override
     protected QueryParameters createQueryParameters(QueryParameters parameters, QueryParameters derivedParameters) {
-        return new PaymentsFunction.PaymentsParameters(parameters, derivedParameters);
+        return new PaymentsForReportFunction.PaymentsForReportParameters(parameters, derivedParameters);
     }
 
     @Override
