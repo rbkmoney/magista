@@ -96,7 +96,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     @Override
     public Collection<Map.Entry<Long, StatPayment>> getPaymentsForReport(
             String partyId,
-            String contractId,
+            String shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<LocalDateTime> fromTime,
@@ -128,7 +128,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 ).on(
                         appendConditions(
                                 PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(partyId))
-                                        .and(PAYMENT_DATA.PARTY_CONTRACT_ID.eq(contractId)),
+                                        .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId)),
                                 Operator.AND,
                                 new ConditionParameterSource()
                                         .addValue(paymentEvent.ID, fromId.orElse(null), GREATER)
@@ -305,10 +305,10 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Map<String, String> getPaymentAccountingData(String merchantId, String contractId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
+    public Map<String, String> getPaymentAccountingData(String merchantId, String shopId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
         Query query = getDslContext().select(
                 INVOICE_EVENT_STAT.PARTY_ID.as("merchant_id"),
-                INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.as("contract_id"),
+                INVOICE_EVENT_STAT.PARTY_SHOP_ID.as("shop_id"),
                 INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.as("currency_code"),
                 DSL.sum(INVOICE_EVENT_STAT.PAYMENT_AMOUNT).as("funds_acquired"),
                 DSL.sum(INVOICE_EVENT_STAT.PAYMENT_FEE).as("fee_charged")
@@ -316,7 +316,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 appendDateTimeRangeConditions(
                         INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)
                                 .and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId))
-                                .and(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
+                                .and(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(shopId))
                                 .and(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.eq(currencyCode))
                                 .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured))
                                 .and(INVOICE_EVENT_STAT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED)),
@@ -326,14 +326,14 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 )
         ).groupBy(
                 INVOICE_EVENT_STAT.PARTY_ID,
-                INVOICE_EVENT_STAT.PARTY_CONTRACT_ID,
+                INVOICE_EVENT_STAT.PARTY_SHOP_ID,
                 INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE
         );
 
         return Optional.ofNullable(
                 fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
                         .put("merchant_id", rs.getString("merchant_id"))
-                        .put("contract_id", rs.getString("contract_id"))
+                        .put("shop_id", rs.getString("shop_id"))
                         .put("currency_code", rs.getString("currency_code"))
                         .put("funds_acquired", rs.getString("funds_acquired"))
                         .put("fee_charged", rs.getString("fee_charged"))
@@ -342,7 +342,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         ).orElse(
                 ImmutableMap.<String, String>builder()
                         .put("merchant_id", merchantId)
-                        .put("contract_id", contractId)
+                        .put("shop_id", shopId)
                         .put("currency_code", currencyCode)
                         .put("funds_acquired", "0")
                         .put("fee_charged", "0")
@@ -351,16 +351,16 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Map<String, String> getRefundAccountingData(String merchantId, String contractId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
+    public Map<String, String> getRefundAccountingData(String merchantId, String shopId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
         Query query = getDslContext().select(
                 REFUND.PARTY_ID.as("merchant_id"),
-                REFUND.PARTY_CONTRACT_ID.as("contract_id"),
+                REFUND.PARTY_SHOP_ID.as("shop_id"),
                 REFUND.REFUND_CURRENCY_CODE.as("currency_code"),
                 DSL.sum(REFUND.REFUND_AMOUNT.minus(REFUND.REFUND_FEE)).as("funds_refunded")
         ).from(REFUND).where(
                 appendDateTimeRangeConditions(
                         REFUND.PARTY_ID.eq(merchantId)
-                                .and(REFUND.PARTY_CONTRACT_ID.eq(contractId))
+                                .and(REFUND.PARTY_SHOP_ID.eq(shopId))
                                 .and(REFUND.REFUND_CURRENCY_CODE.eq(currencyCode))
                                 .and(REFUND.REFUND_STATUS.eq(RefundStatus.succeeded)),
                         REFUND.EVENT_CREATED_AT,
@@ -369,21 +369,21 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 )
         ).groupBy(
                 REFUND.PARTY_ID,
-                REFUND.PARTY_CONTRACT_ID,
+                REFUND.PARTY_SHOP_ID,
                 REFUND.REFUND_CURRENCY_CODE
         );
 
         return Optional.ofNullable(
                 fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
                         .put("merchant_id", rs.getString("merchant_id"))
-                        .put("contract_id", rs.getString("contract_id"))
+                        .put("shop_id", rs.getString("shop_id"))
                         .put("currency_code", rs.getString("currency_code"))
                         .put("funds_refunded", rs.getString("funds_refunded"))
                         .build())
         ).orElse(
                 ImmutableMap.<String, String>builder()
                         .put("merchant_id", merchantId)
-                        .put("contract_id", contractId)
+                        .put("shop_id", shopId)
                         .put("currency_code", currencyCode)
                         .put("funds_refunded", "0")
                         .build()
@@ -391,10 +391,10 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Map<String, String> getAdjustmentAccountingData(String merchantId, String contractId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
+    public Map<String, String> getAdjustmentAccountingData(String merchantId, String shopId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
         Query query = getDslContext().select(
                 ADJUSTMENT.PARTY_ID.as("merchant_id"),
-                ADJUSTMENT.PARTY_CONTRACT_ID.as("contract_id"),
+                ADJUSTMENT.PARTY_SHOP_ID.as("shop_id"),
                 INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.as("currency_code"),
                 DSL.sum(INVOICE_EVENT_STAT.PAYMENT_FEE.minus(ADJUSTMENT.ADJUSTMENT_FEE)).as("funds_adjusted")
         ).from(ADJUSTMENT)
@@ -402,7 +402,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .on(
                         appendDateTimeRangeConditions(
                                 ADJUSTMENT.PARTY_ID.eq(merchantId)
-                                        .and(ADJUSTMENT.PARTY_CONTRACT_ID.eq(contractId))
+                                        .and(ADJUSTMENT.PARTY_SHOP_ID.eq(shopId))
                                         .and(ADJUSTMENT.INVOICE_ID.eq(INVOICE_EVENT_STAT.INVOICE_ID))
                                         .and(ADJUSTMENT.PAYMENT_ID.eq(INVOICE_EVENT_STAT.PAYMENT_ID))
                                         .and(ADJUSTMENT.ADJUSTMENT_STATUS.eq(AdjustmentStatus.captured))
@@ -416,21 +416,20 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         )
                 ).groupBy(
                         ADJUSTMENT.PARTY_ID,
-                        ADJUSTMENT.PARTY_CONTRACT_ID,
+                        ADJUSTMENT.PARTY_SHOP_ID,
                         INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE
                 );
-        System.out.println(query.getSQL(ParamType.INLINED));
         return Optional.ofNullable(
                 fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
                         .put("merchant_id", rs.getString("merchant_id"))
-                        .put("contract_id", rs.getString("contract_id"))
+                        .put("shop_id", rs.getString("shop_id"))
                         .put("currency_code", rs.getString("currency_code"))
                         .put("funds_adjusted", rs.getString("funds_adjusted"))
                         .build())
         ).orElse(
                 ImmutableMap.<String, String>builder()
                         .put("merchant_id", merchantId)
-                        .put("contract_id", contractId)
+                        .put("shop_id", shopId)
                         .put("currency_code", currencyCode)
                         .put("funds_adjusted", "0")
                         .build()
@@ -438,9 +437,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Map<String, String> getPayoutAccountingData(String merchantId, String contractId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
+    public Map<String, String> getPayoutAccountingData(String merchantId, String shopId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
         Field<String> merchantIdField = DSL.field("merchant_id", String.class);
-        Field<String> contractIdField = DSL.field("contract_id", String.class);
+        Field<String> shopIdField = DSL.field("shop_id", String.class);
         Field<String> currencyCodeField = DSL.field("currency_code", String.class);
         Field<Long> fundsPaidOutField = DSL.field("funds_paid_out", Long.class);
         Field<Long> paidFundsField = DSL.field("paid_funds", Long.class);
@@ -448,13 +447,13 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
         Query query = getDslContext().select(
                 merchantIdField,
-                contractIdField,
+                shopIdField,
                 currencyCodeField,
                 paidFundsField.minus(DSL.coalesce(cancelledFundsField, 0)).as(fundsPaidOutField)
         ).from(
                 getDslContext().select(
                         PAYOUT_EVENT_STAT.PARTY_ID.as(merchantIdField),
-                        DSL.value(contractId).as(contractIdField),
+                        DSL.value(shopId).as(shopIdField),
                         PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.as(currencyCodeField),
                         DSL.sum(
                                 PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
@@ -463,12 +462,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 ).from(PAYOUT_EVENT_STAT).where(
                         appendDateTimeRangeConditions(
                                 PAYOUT_EVENT_STAT.PARTY_ID.eq(merchantId)
-                                        .and(PAYOUT_EVENT_STAT.PARTY_SHOP_ID.in(
-                                                getDslContext().select(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
-                                                        .from(INVOICE_EVENT_STAT)
-                                                        .where(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
-                                                        .groupBy(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
-                                        ))
+                                        .and(PAYOUT_EVENT_STAT.PARTY_SHOP_ID.eq(shopId))
                                         .and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid))
                                         .and(PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.eq(currencyCode)),
                                 PAYOUT_EVENT_STAT.EVENT_CREATED_AT,
@@ -486,12 +480,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                 ).as(cancelledFundsField)
                         ).from(PAYOUT_EVENT_STAT).where(
                                 appendDateTimeRangeConditions(
-                                        PAYOUT_EVENT_STAT.PARTY_SHOP_ID.in(
-                                                getDslContext().select(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
-                                                        .from(INVOICE_EVENT_STAT)
-                                                        .where(INVOICE_EVENT_STAT.PARTY_CONTRACT_ID.eq(contractId))
-                                                        .groupBy(INVOICE_EVENT_STAT.PARTY_SHOP_ID)
-                                        )
+                                        PAYOUT_EVENT_STAT.PARTY_SHOP_ID.eq(shopId)
                                                 .and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.cancelled))
                                                 .and(PAYOUT_EVENT_STAT.PAYOUT_ID.in(
                                                         getDslContext().select(PAYOUT_EVENT_STAT.PAYOUT_ID)
@@ -517,14 +506,14 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         return Optional.ofNullable(
                 fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
                         .put("merchant_id", rs.getString("merchant_id"))
-                        .put("contract_id", rs.getString("contract_id"))
+                        .put("shop_id", rs.getString("shop_id"))
                         .put("currency_code", rs.getString("currency_code"))
                         .put("funds_paid_out", rs.getString("funds_paid_out"))
                         .build())
         ).orElse(
                 ImmutableMap.<String, String>builder()
                         .put("merchant_id", merchantId)
-                        .put("contract_id", contractId)
+                        .put("shop_id", shopId)
                         .put("currency_code", currencyCode)
                         .put("funds_paid_out", "0")
                         .build()
