@@ -453,7 +453,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         ).from(
                 getDslContext().select(
                         PAYOUT_EVENT_STAT.PARTY_ID.as(merchantIdField),
-                        DSL.value(shopId).as(shopIdField),
+                        PAYOUT_EVENT_STAT.PARTY_SHOP_ID.as(shopIdField),
                         PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.as(currencyCodeField),
                         DSL.sum(
                                 PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
@@ -471,6 +471,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         )
                 ).groupBy(
                         PAYOUT_EVENT_STAT.PARTY_ID,
+                        PAYOUT_EVENT_STAT.PARTY_SHOP_ID,
                         PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
                 ).asTable().leftJoin(
                         getDslContext().select(
@@ -487,6 +488,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                                                 .from(PAYOUT_EVENT_STAT)
                                                                 .where(
                                                                         PAYOUT_EVENT_STAT.PARTY_ID.eq(merchantId)
+                                                                                .and(PAYOUT_EVENT_STAT.PARTY_SHOP_ID.eq(shopId))
                                                                                 .and(PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.eq(currencyCode))
                                                                                 .and(PAYOUT_EVENT_STAT.PAYOUT_STATUS.eq(PayoutStatus.paid))
                                                                 )
@@ -498,6 +500,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                 )
                         ).groupBy(
                                 PAYOUT_EVENT_STAT.PARTY_ID,
+                                PAYOUT_EVENT_STAT.PARTY_SHOP_ID,
                                 PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
                         ).asTable()
                 ).on()
