@@ -36,6 +36,17 @@ public interface StatisticsDao {
             int limit
     ) throws DaoException;
 
+    Collection<Map.Entry<Long, StatPayment>> getPaymentsForReport(
+            String partyId,
+            String contractId,
+            Optional<String> invoiceId,
+            Optional<String> paymentId,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime,
+            Optional<Long> fromId,
+            int limit
+    ) throws DaoException;
+
     Collection<Refund> getRefunds(
             Optional<String> merchantId,
             Optional<String> shopId,

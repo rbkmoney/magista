@@ -15,10 +15,12 @@ import com.rbkmoney.magista.service.PaymentService;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class InvoicePaymentCashFlowChangedEventHandler implements Handler<InvoiceChange, StockEvent> {
 
     private final PaymentService paymentService;
