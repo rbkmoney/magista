@@ -54,8 +54,8 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
             return getStringParameter(MERCHANT_ID_PARAM, false);
         }
 
-        public String getContractId() {
-            return getStringParameter(CONTRACT_ID_PARAM, false);
+        public String getShopId() {
+            return getStringParameter(SHOP_ID_PARAM, false);
         }
 
         public String getCurrencyCode() {
@@ -83,9 +83,9 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
                 checkParamsResult(true, MERCHANT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
-            String contractId = reportBaseParameters.getContractId();
-            if (contractId == null) {
-                checkParamsResult(true, CONTRACT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            String shopId = reportBaseParameters.getShopId();
+            if (shopId == null) {
+                checkParamsResult(true, SHOP_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
             String currencyCode = reportBaseParameters.getCurrencyCode();

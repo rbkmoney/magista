@@ -27,7 +27,7 @@ public class AccountingReportFunction extends ReportBaseFunction {
         CompletableFuture<Map<String, String>> paymentCompletableFuture = CompletableFuture.supplyAsync(
                 () -> getContext(context).getDao().getPaymentAccountingData(
                         getQueryParameters().getMerchantId(),
-                        getQueryParameters().getContractId(),
+                        getQueryParameters().getShopId(),
                         getQueryParameters().getCurrencyCode(),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(getQueryParameters().getFromTime())),
                         TypeUtil.toLocalDateTime(getQueryParameters().getToTime())
@@ -37,7 +37,7 @@ public class AccountingReportFunction extends ReportBaseFunction {
         CompletableFuture<Map<String, String>> refundCompletableFuture = CompletableFuture.supplyAsync(
                 () -> getContext(context).getDao().getRefundAccountingData(
                         getQueryParameters().getMerchantId(),
-                        getQueryParameters().getContractId(),
+                        getQueryParameters().getShopId(),
                         getQueryParameters().getCurrencyCode(),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(getQueryParameters().getFromTime())),
                         TypeUtil.toLocalDateTime(getQueryParameters().getToTime())
@@ -47,7 +47,7 @@ public class AccountingReportFunction extends ReportBaseFunction {
         CompletableFuture<Map<String, String>> adjustmentCompletableFuture = CompletableFuture.supplyAsync(
                 () -> getContext(context).getDao().getAdjustmentAccountingData(
                         getQueryParameters().getMerchantId(),
-                        getQueryParameters().getContractId(),
+                        getQueryParameters().getShopId(),
                         getQueryParameters().getCurrencyCode(),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(getQueryParameters().getFromTime())),
                         TypeUtil.toLocalDateTime(getQueryParameters().getToTime())
@@ -57,7 +57,7 @@ public class AccountingReportFunction extends ReportBaseFunction {
         CompletableFuture<Map<String, String>> payoutCompletableFuture = CompletableFuture.supplyAsync(
                 () -> getContext(context).getDao().getPayoutAccountingData(
                         getQueryParameters().getMerchantId(),
-                        getQueryParameters().getContractId(),
+                        getQueryParameters().getShopId(),
                         getQueryParameters().getCurrencyCode(),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(getQueryParameters().getFromTime())),
                         TypeUtil.toLocalDateTime(getQueryParameters().getToTime())
