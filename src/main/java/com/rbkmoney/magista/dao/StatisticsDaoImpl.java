@@ -17,7 +17,6 @@ import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.impl.InvoicesFunction;
 import com.rbkmoney.magista.query.impl.PaymentsFunction;
 import org.jooq.*;
-import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +106,54 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         PaymentEvent paymentEvent = PAYMENT_EVENT.as("payment_event");
 
         Query query = getDslContext()
-                .select()
+                .select(
+                        PAYMENT_DATA.INVOICE_ID,
+                        PAYMENT_DATA.PAYMENT_ID,
+                        PAYMENT_DATA.PARTY_ID,
+                        PAYMENT_DATA.PARTY_SHOP_ID,
+                        PAYMENT_DATA.PARTY_CONTRACT_ID,
+                        PAYMENT_DATA.PAYMENT_CURRENCY_CODE,
+                        PAYMENT_DATA.PAYMENT_AMOUNT,
+                        PAYMENT_DATA.PAYMENT_CUSTOMER_ID,
+                        PAYMENT_DATA.PAYMENT_TOOL,
+                        PAYMENT_DATA.PAYMENT_BANK_CARD_MASKED_PAN,
+                        PAYMENT_DATA.PAYMENT_BANK_CARD_BIN,
+                        PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN,
+                        PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM,
+                        PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
+                        PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER,
+                        PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_ID,
+                        PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_PROVIDER,
+                        PAYMENT_DATA.PAYMENT_FLOW,
+                        PAYMENT_DATA.PAYMENT_HOLD_ON_EXPIRATION,
+                        PAYMENT_DATA.PAYMENT_HOLD_UNTIL,
+                        PAYMENT_DATA.PAYMENT_SESSION_ID,
+                        PAYMENT_DATA.PAYMENT_FINGERPRINT,
+                        PAYMENT_DATA.PAYMENT_IP,
+                        PAYMENT_DATA.PAYMENT_PHONE_NUMBER,
+                        PAYMENT_DATA.PAYMENT_EMAIL,
+                        PAYMENT_DATA.PAYMENT_CREATED_AT,
+                        PAYMENT_DATA.PAYMENT_PARTY_REVISION,
+                        PAYMENT_DATA.PAYMENT_CONTEXT_TYPE,
+                        PAYMENT_DATA.PAYMENT_CONTEXT,
+                        paymentEvent.ID,
+                        paymentEvent.EVENT_ID,
+                        paymentEvent.EVENT_CREATED_AT,
+                        paymentEvent.EVENT_TYPE,
+                        paymentEvent.INVOICE_ID,
+                        paymentEvent.PAYMENT_ID,
+                        paymentEvent.PAYMENT_STATUS,
+                        paymentEvent.PAYMENT_OPERATION_FAILURE_CLASS,
+                        paymentEvent.PAYMENT_EXTERNAL_FAILURE,
+                        paymentEvent.PAYMENT_EXTERNAL_FAILURE_REASON,
+                        paymentEvent.PAYMENT_FEE,
+                        paymentEvent.PAYMENT_PROVIDER_FEE,
+                        paymentEvent.PAYMENT_EXTERNAL_FEE,
+                        paymentEvent.PAYMENT_DOMAIN_REVISION,
+                        paymentEvent.PAYMENT_SHORT_ID,
+                        paymentEvent.PAYMENT_PROVIDER_ID,
+                        paymentEvent.PAYMENT_TERMINAL_ID
+                )
                 .from(PAYMENT_DATA)
                 .join(
                         DSL.lateral(
