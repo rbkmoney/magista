@@ -181,6 +181,7 @@ public class InvoiceEventService {
             );
             invoicePaymentCashFlowEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_CASH_FLOW_CHANGED);
             BeanUtil.merge(invoicePaymentEvent, invoicePaymentCashFlowEvent, "id");
+            invoiceEventDao.insert(invoicePaymentCashFlowEvent);
             log.info("Invoice payment cash flow event have been saved, event='{}'", invoicePaymentCashFlowEvent);
         } catch (DaoException ex) {
             String message = String.format("Failed to save invoice payment cash flow event, event='%s'", invoicePaymentCashFlowEvent);
@@ -198,6 +199,7 @@ public class InvoiceEventService {
             );
             invoicePaymentRouteEventStat.setEventType(InvoiceEventType.INVOICE_PAYMENT_ROUTE_CHANGED);
             BeanUtil.merge(invoicePaymentEvent, invoicePaymentRouteEventStat, "id");
+            invoiceEventDao.insert(invoicePaymentRouteEventStat);
             log.info("Invoice payment route event have been saved, event='{}'", invoicePaymentRouteEventStat);
         } catch (DaoException ex) {
             String message = String.format("Failed to save invoice payment route event, event='%s'", invoicePaymentRouteEventStat);
