@@ -7,9 +7,9 @@ import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
+import com.rbkmoney.magista.domain.enums.RecurrentTokenSourceType;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.util.DamselUtil;
-import org.jooq.Record;
 import org.jooq.TableField;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -172,6 +172,22 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
             default:
                 throw new NotFoundException(String.format("Payment flow '%s' not found", paymentFlow.getLiteral()));
         }
+        statPayment.setIsRecurring(rs.getBoolean(PAYMENT_DATA.PAYMENT_RECURRENT_FLAG.getName()));
+        RecurrentTokenSourceType recurrentTokenSourceType = TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_TOKEN_SOURCE_TYPE.getName()), RecurrentTokenSourceType.class);
+        if (recurrentTokenSourceType != null) {
+            RecurrentIntention recurrentIntention = new RecurrentIntention();
+            switch (recurrentTokenSourceType) {
+                case payment:
+                    recurrentIntention.setTokenSource(RecurrentTokenSource.payment(
+                            new PaymentRecurrentTokenSource(
+                                    rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_TOKEN_SOURCE_INVOICE_ID.getName()),
+                                    rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_TOKEN_SOURCE_PAYMENT_ID.getName())
+                            )
+                    ));
+            }
+            statPayment.setRecurrentIntention(recurrentIntention);
+        }
+
         statPayment.setShortId(rs.getString(PAYMENT_EVENT.PAYMENT_SHORT_ID.getName()));
 
         byte[] context = rs.getBytes(PAYMENT_DATA.PAYMENT_CONTEXT.getName());

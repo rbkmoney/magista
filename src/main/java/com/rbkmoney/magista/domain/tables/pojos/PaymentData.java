@@ -8,6 +8,7 @@ import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
+import com.rbkmoney.magista.domain.enums.RecurrentTokenSourceType;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -30,38 +31,42 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData implements Serializable {
 
-    private static final long serialVersionUID = -1103835035;
+    private static final long serialVersionUID = 803275910;
 
-    private Long                  id;
-    private String                invoiceId;
-    private String                paymentId;
-    private UUID                  partyId;
-    private String                partyShopId;
-    private String                partyContractId;
-    private String                paymentCurrencyCode;
-    private Long                  paymentAmount;
-    private String                paymentCustomerId;
-    private PaymentTool           paymentTool;
-    private String                paymentBankCardMaskedPan;
-    private String                paymentBankCardBin;
-    private String                paymentBankCardToken;
-    private String                paymentBankCardSystem;
-    private BankCardTokenProvider paymentBankCardTokenProvider;
-    private String                paymentTerminalProvider;
-    private String                paymentDigitalWalletId;
-    private String                paymentDigitalWalletProvider;
-    private PaymentFlow           paymentFlow;
-    private OnHoldExpiration      paymentHoldOnExpiration;
-    private LocalDateTime         paymentHoldUntil;
-    private String                paymentSessionId;
-    private String                paymentFingerprint;
-    private String                paymentIp;
-    private String                paymentPhoneNumber;
-    private String                paymentEmail;
-    private LocalDateTime         paymentCreatedAt;
-    private Long                  paymentPartyRevision;
-    private String                paymentContextType;
-    private byte[]                paymentContext;
+    private Long                     id;
+    private String                   invoiceId;
+    private String                   paymentId;
+    private UUID                     partyId;
+    private String                   partyShopId;
+    private String                   partyContractId;
+    private String                   paymentCurrencyCode;
+    private Long                     paymentAmount;
+    private String                   paymentCustomerId;
+    private PaymentTool              paymentTool;
+    private String                   paymentBankCardMaskedPan;
+    private String                   paymentBankCardBin;
+    private String                   paymentBankCardToken;
+    private String                   paymentBankCardSystem;
+    private BankCardTokenProvider    paymentBankCardTokenProvider;
+    private String                   paymentTerminalProvider;
+    private String                   paymentDigitalWalletId;
+    private String                   paymentDigitalWalletProvider;
+    private PaymentFlow              paymentFlow;
+    private OnHoldExpiration         paymentHoldOnExpiration;
+    private LocalDateTime            paymentHoldUntil;
+    private String                   paymentSessionId;
+    private String                   paymentFingerprint;
+    private String                   paymentIp;
+    private String                   paymentPhoneNumber;
+    private String                   paymentEmail;
+    private LocalDateTime            paymentCreatedAt;
+    private Long                     paymentPartyRevision;
+    private String                   paymentContextType;
+    private byte[]                   paymentContext;
+    private Boolean                  paymentRecurrentFlag;
+    private RecurrentTokenSourceType paymentRecurrentTokenSourceType;
+    private String                   paymentRecurrentTokenSourceInvoiceId;
+    private String                   paymentRecurrentTokenSourcePaymentId;
 
     public PaymentData() {}
 
@@ -96,39 +101,47 @@ public class PaymentData implements Serializable {
         this.paymentPartyRevision = value.paymentPartyRevision;
         this.paymentContextType = value.paymentContextType;
         this.paymentContext = value.paymentContext;
+        this.paymentRecurrentFlag = value.paymentRecurrentFlag;
+        this.paymentRecurrentTokenSourceType = value.paymentRecurrentTokenSourceType;
+        this.paymentRecurrentTokenSourceInvoiceId = value.paymentRecurrentTokenSourceInvoiceId;
+        this.paymentRecurrentTokenSourcePaymentId = value.paymentRecurrentTokenSourcePaymentId;
     }
 
     public PaymentData(
-        Long                  id,
-        String                invoiceId,
-        String                paymentId,
-        UUID                  partyId,
-        String                partyShopId,
-        String                partyContractId,
-        String                paymentCurrencyCode,
-        Long                  paymentAmount,
-        String                paymentCustomerId,
-        PaymentTool           paymentTool,
-        String                paymentBankCardMaskedPan,
-        String                paymentBankCardBin,
-        String                paymentBankCardToken,
-        String                paymentBankCardSystem,
-        BankCardTokenProvider paymentBankCardTokenProvider,
-        String                paymentTerminalProvider,
-        String                paymentDigitalWalletId,
-        String                paymentDigitalWalletProvider,
-        PaymentFlow           paymentFlow,
-        OnHoldExpiration      paymentHoldOnExpiration,
-        LocalDateTime         paymentHoldUntil,
-        String                paymentSessionId,
-        String                paymentFingerprint,
-        String                paymentIp,
-        String                paymentPhoneNumber,
-        String                paymentEmail,
-        LocalDateTime         paymentCreatedAt,
-        Long                  paymentPartyRevision,
-        String                paymentContextType,
-        byte[]                paymentContext
+        Long                     id,
+        String                   invoiceId,
+        String                   paymentId,
+        UUID                     partyId,
+        String                   partyShopId,
+        String                   partyContractId,
+        String                   paymentCurrencyCode,
+        Long                     paymentAmount,
+        String                   paymentCustomerId,
+        PaymentTool              paymentTool,
+        String                   paymentBankCardMaskedPan,
+        String                   paymentBankCardBin,
+        String                   paymentBankCardToken,
+        String                   paymentBankCardSystem,
+        BankCardTokenProvider    paymentBankCardTokenProvider,
+        String                   paymentTerminalProvider,
+        String                   paymentDigitalWalletId,
+        String                   paymentDigitalWalletProvider,
+        PaymentFlow              paymentFlow,
+        OnHoldExpiration         paymentHoldOnExpiration,
+        LocalDateTime            paymentHoldUntil,
+        String                   paymentSessionId,
+        String                   paymentFingerprint,
+        String                   paymentIp,
+        String                   paymentPhoneNumber,
+        String                   paymentEmail,
+        LocalDateTime            paymentCreatedAt,
+        Long                     paymentPartyRevision,
+        String                   paymentContextType,
+        byte[]                   paymentContext,
+        Boolean                  paymentRecurrentFlag,
+        RecurrentTokenSourceType paymentRecurrentTokenSourceType,
+        String                   paymentRecurrentTokenSourceInvoiceId,
+        String                   paymentRecurrentTokenSourcePaymentId
     ) {
         this.id = id;
         this.invoiceId = invoiceId;
@@ -160,6 +173,10 @@ public class PaymentData implements Serializable {
         this.paymentPartyRevision = paymentPartyRevision;
         this.paymentContextType = paymentContextType;
         this.paymentContext = paymentContext;
+        this.paymentRecurrentFlag = paymentRecurrentFlag;
+        this.paymentRecurrentTokenSourceType = paymentRecurrentTokenSourceType;
+        this.paymentRecurrentTokenSourceInvoiceId = paymentRecurrentTokenSourceInvoiceId;
+        this.paymentRecurrentTokenSourcePaymentId = paymentRecurrentTokenSourcePaymentId;
     }
 
     public Long getId() {
@@ -402,6 +419,38 @@ public class PaymentData implements Serializable {
         this.paymentContext = paymentContext;
     }
 
+    public Boolean getPaymentRecurrentFlag() {
+        return this.paymentRecurrentFlag;
+    }
+
+    public void setPaymentRecurrentFlag(Boolean paymentRecurrentFlag) {
+        this.paymentRecurrentFlag = paymentRecurrentFlag;
+    }
+
+    public RecurrentTokenSourceType getPaymentRecurrentTokenSourceType() {
+        return this.paymentRecurrentTokenSourceType;
+    }
+
+    public void setPaymentRecurrentTokenSourceType(RecurrentTokenSourceType paymentRecurrentTokenSourceType) {
+        this.paymentRecurrentTokenSourceType = paymentRecurrentTokenSourceType;
+    }
+
+    public String getPaymentRecurrentTokenSourceInvoiceId() {
+        return this.paymentRecurrentTokenSourceInvoiceId;
+    }
+
+    public void setPaymentRecurrentTokenSourceInvoiceId(String paymentRecurrentTokenSourceInvoiceId) {
+        this.paymentRecurrentTokenSourceInvoiceId = paymentRecurrentTokenSourceInvoiceId;
+    }
+
+    public String getPaymentRecurrentTokenSourcePaymentId() {
+        return this.paymentRecurrentTokenSourcePaymentId;
+    }
+
+    public void setPaymentRecurrentTokenSourcePaymentId(String paymentRecurrentTokenSourcePaymentId) {
+        this.paymentRecurrentTokenSourcePaymentId = paymentRecurrentTokenSourcePaymentId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -591,6 +640,30 @@ public class PaymentData implements Serializable {
         }
         else if (!Arrays.equals(paymentContext, other.paymentContext))
             return false;
+        if (paymentRecurrentFlag == null) {
+            if (other.paymentRecurrentFlag != null)
+                return false;
+        }
+        else if (!paymentRecurrentFlag.equals(other.paymentRecurrentFlag))
+            return false;
+        if (paymentRecurrentTokenSourceType == null) {
+            if (other.paymentRecurrentTokenSourceType != null)
+                return false;
+        }
+        else if (!paymentRecurrentTokenSourceType.equals(other.paymentRecurrentTokenSourceType))
+            return false;
+        if (paymentRecurrentTokenSourceInvoiceId == null) {
+            if (other.paymentRecurrentTokenSourceInvoiceId != null)
+                return false;
+        }
+        else if (!paymentRecurrentTokenSourceInvoiceId.equals(other.paymentRecurrentTokenSourceInvoiceId))
+            return false;
+        if (paymentRecurrentTokenSourcePaymentId == null) {
+            if (other.paymentRecurrentTokenSourcePaymentId != null)
+                return false;
+        }
+        else if (!paymentRecurrentTokenSourcePaymentId.equals(other.paymentRecurrentTokenSourcePaymentId))
+            return false;
         return true;
     }
 
@@ -628,6 +701,10 @@ public class PaymentData implements Serializable {
         result = prime * result + ((this.paymentPartyRevision == null) ? 0 : this.paymentPartyRevision.hashCode());
         result = prime * result + ((this.paymentContextType == null) ? 0 : this.paymentContextType.hashCode());
         result = prime * result + ((this.paymentContext == null) ? 0 : Arrays.hashCode(this.paymentContext));
+        result = prime * result + ((this.paymentRecurrentFlag == null) ? 0 : this.paymentRecurrentFlag.hashCode());
+        result = prime * result + ((this.paymentRecurrentTokenSourceType == null) ? 0 : this.paymentRecurrentTokenSourceType.hashCode());
+        result = prime * result + ((this.paymentRecurrentTokenSourceInvoiceId == null) ? 0 : this.paymentRecurrentTokenSourceInvoiceId.hashCode());
+        result = prime * result + ((this.paymentRecurrentTokenSourcePaymentId == null) ? 0 : this.paymentRecurrentTokenSourcePaymentId.hashCode());
         return result;
     }
 
@@ -665,6 +742,10 @@ public class PaymentData implements Serializable {
         sb.append(", ").append(paymentPartyRevision);
         sb.append(", ").append(paymentContextType);
         sb.append(", ").append("[binary...]");
+        sb.append(", ").append(paymentRecurrentFlag);
+        sb.append(", ").append(paymentRecurrentTokenSourceType);
+        sb.append(", ").append(paymentRecurrentTokenSourceInvoiceId);
+        sb.append(", ").append(paymentRecurrentTokenSourcePaymentId);
 
         sb.append(")");
         return sb.toString();

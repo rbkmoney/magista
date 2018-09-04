@@ -2,6 +2,8 @@ package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.*;
+import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
+import com.rbkmoney.damsel.domain.PaymentTool;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
@@ -9,11 +11,9 @@ import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
-import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
-import com.rbkmoney.magista.domain.enums.InvoiceEventType;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
-import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.event.ChangeType;
@@ -68,6 +68,19 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
             InvoicePaymentFlowHold hold = paymentFlow.getHold();
             paymentData.setPaymentHoldOnExpiration(OnHoldExpiration.valueOf(hold.getOnHoldExpiration().name()));
             paymentData.setPaymentHoldUntil(TypeUtil.stringToLocalDateTime(hold.getHeldUntil()));
+        }
+
+        if (invoicePayment.isSetIsRecurring()) {
+            paymentData.setPaymentRecurrentFlag(invoicePayment.isIsRecurring());
+        }
+
+        if (invoicePayment.isSetRecurrentIntention()) {
+            RecurrentTokenSource recurrentTokenSource = invoicePayment.getRecurrentIntention().getTokenSource();
+            paymentData.setPaymentRecurrentTokenSourceType(TBaseUtil.unionFieldToEnum(recurrentTokenSource, RecurrentTokenSourceType.class));
+            if (recurrentTokenSource.isSetPayment()) {
+                paymentData.setPaymentRecurrentTokenSourceInvoiceId(recurrentTokenSource.getPayment().getInvoiceId());
+                paymentData.setPaymentRecurrentTokenSourcePaymentId(recurrentTokenSource.getPayment().getPaymentId());
+            }
         }
 
         if (invoicePayment.isSetContext()) {

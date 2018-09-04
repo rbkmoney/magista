@@ -8,6 +8,7 @@ import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
+import com.rbkmoney.magista.domain.enums.RecurrentTokenSourceType;
 import com.rbkmoney.magista.domain.tables.PaymentData;
 
 import java.time.LocalDateTime;
@@ -32,7 +33,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = -1982728231;
+    private static final long serialVersionUID = 528932873;
 
     /**
      * Setter for <code>mst.payment_data.id</code>.
@@ -454,6 +455,62 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
         return (byte[]) get(29);
     }
 
+    /**
+     * Setter for <code>mst.payment_data.payment_recurrent_flag</code>.
+     */
+    public void setPaymentRecurrentFlag(Boolean value) {
+        set(30, value);
+    }
+
+    /**
+     * Getter for <code>mst.payment_data.payment_recurrent_flag</code>.
+     */
+    public Boolean getPaymentRecurrentFlag() {
+        return (Boolean) get(30);
+    }
+
+    /**
+     * Setter for <code>mst.payment_data.payment_recurrent_token_source_type</code>.
+     */
+    public void setPaymentRecurrentTokenSourceType(RecurrentTokenSourceType value) {
+        set(31, value);
+    }
+
+    /**
+     * Getter for <code>mst.payment_data.payment_recurrent_token_source_type</code>.
+     */
+    public RecurrentTokenSourceType getPaymentRecurrentTokenSourceType() {
+        return (RecurrentTokenSourceType) get(31);
+    }
+
+    /**
+     * Setter for <code>mst.payment_data.payment_recurrent_token_source_invoice_id</code>.
+     */
+    public void setPaymentRecurrentTokenSourceInvoiceId(String value) {
+        set(32, value);
+    }
+
+    /**
+     * Getter for <code>mst.payment_data.payment_recurrent_token_source_invoice_id</code>.
+     */
+    public String getPaymentRecurrentTokenSourceInvoiceId() {
+        return (String) get(32);
+    }
+
+    /**
+     * Setter for <code>mst.payment_data.payment_recurrent_token_source_payment_id</code>.
+     */
+    public void setPaymentRecurrentTokenSourcePaymentId(String value) {
+        set(33, value);
+    }
+
+    /**
+     * Getter for <code>mst.payment_data.payment_recurrent_token_source_payment_id</code>.
+     */
+    public String getPaymentRecurrentTokenSourcePaymentId() {
+        return (String) get(33);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -480,7 +537,7 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
     /**
      * Create a detached, initialised PaymentDataRecord
      */
-    public PaymentDataRecord(Long id, String invoiceId, String paymentId, UUID partyId, String partyShopId, String partyContractId, String paymentCurrencyCode, Long paymentAmount, String paymentCustomerId, PaymentTool paymentTool, String paymentBankCardMaskedPan, String paymentBankCardBin, String paymentBankCardToken, String paymentBankCardSystem, BankCardTokenProvider paymentBankCardTokenProvider, String paymentTerminalProvider, String paymentDigitalWalletId, String paymentDigitalWalletProvider, PaymentFlow paymentFlow, OnHoldExpiration paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentSessionId, String paymentFingerprint, String paymentIp, String paymentPhoneNumber, String paymentEmail, LocalDateTime paymentCreatedAt, Long paymentPartyRevision, String paymentContextType, byte[] paymentContext) {
+    public PaymentDataRecord(Long id, String invoiceId, String paymentId, UUID partyId, String partyShopId, String partyContractId, String paymentCurrencyCode, Long paymentAmount, String paymentCustomerId, PaymentTool paymentTool, String paymentBankCardMaskedPan, String paymentBankCardBin, String paymentBankCardToken, String paymentBankCardSystem, BankCardTokenProvider paymentBankCardTokenProvider, String paymentTerminalProvider, String paymentDigitalWalletId, String paymentDigitalWalletProvider, PaymentFlow paymentFlow, OnHoldExpiration paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentSessionId, String paymentFingerprint, String paymentIp, String paymentPhoneNumber, String paymentEmail, LocalDateTime paymentCreatedAt, Long paymentPartyRevision, String paymentContextType, byte[] paymentContext, Boolean paymentRecurrentFlag, RecurrentTokenSourceType paymentRecurrentTokenSourceType, String paymentRecurrentTokenSourceInvoiceId, String paymentRecurrentTokenSourcePaymentId) {
         super(PaymentData.PAYMENT_DATA);
 
         set(0, id);
@@ -513,5 +570,9 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
         set(27, paymentPartyRevision);
         set(28, paymentContextType);
         set(29, paymentContext);
+        set(30, paymentRecurrentFlag);
+        set(31, paymentRecurrentTokenSourceType);
+        set(32, paymentRecurrentTokenSourceInvoiceId);
+        set(33, paymentRecurrentTokenSourcePaymentId);
     }
 }
