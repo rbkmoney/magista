@@ -184,6 +184,9 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
                                     rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_TOKEN_SOURCE_PAYMENT_ID.getName())
                             )
                     ));
+                    break;
+                default:
+                    throw new NotFoundException(String.format("Recurrent token source type '%s' not found", recurrentTokenSourceType.getLiteral()));
             }
             statPayment.setRecurrentIntention(recurrentIntention);
         }

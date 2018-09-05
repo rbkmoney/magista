@@ -21,12 +21,14 @@ public class PaymentDaoTest extends AbstractIntegrationTest {
 
     @Test
     public void insertAndFindPaymentDataTest() {
-        InvoiceData invoiceData = random(InvoiceData.class);
+        InvoiceData invoiceData = random(InvoiceData.class, "id");
+        invoiceDao.saveInvoiceData(invoiceData);
         invoiceDao.saveInvoiceData(invoiceData);
 
-        PaymentData paymentData = random(PaymentData.class, "invoiceId");
+        PaymentData paymentData = random(PaymentData.class, "id", "invoiceId");
         paymentData.setInvoiceId(invoiceData.getInvoiceId());
 
+        paymentDao.savePaymentData(paymentData);
         paymentDao.savePaymentData(paymentData);
 
         PaymentEvent paymentEvent = random(PaymentEvent.class, "invoiceId", "paymentId");

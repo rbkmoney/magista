@@ -112,4 +112,13 @@ public class InvoiceSearchQueryTest extends AbstractIntegrationTest {
         DamselUtil.toJson(statResponse);
     }
 
+    @Test
+    @Sql("classpath:data/sql/search/recurrent_payments_search_data.sql")
+    public void testRecurrentPayments() {
+        String json = "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(1, statResponse.getData().getInvoices().size());
+        DamselUtil.toJson(statResponse);
+    }
+
 }
