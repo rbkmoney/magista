@@ -91,7 +91,7 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
                         if (correspondentAccount.isSetBank()) {
                             InternationalBankDetails corrBankDetails = correspondentAccount.getBank();
                             payoutEventStat.setPayoutInternationalCorrespondentAccountBankName(corrBankDetails.getName());
-                            payoutEventStat.setPayoutAccountBankAddress(corrBankDetails.getAddress());
+                            payoutEventStat.setPayoutInternationalCorrespondentAccountBankAddress(corrBankDetails.getAddress());
                             payoutEventStat.setPayoutInternationalCorrespondentAccountBankBic(corrBankDetails.getBic());
                             payoutEventStat.setPayoutInternationalCorrespondentAccountBankAbaRtn(corrBankDetails.getAbaRtn());
                             payoutEventStat.setPayoutInternationalCorrespondentAccountBankCountryCode(
