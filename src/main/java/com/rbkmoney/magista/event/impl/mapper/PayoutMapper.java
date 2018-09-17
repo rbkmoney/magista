@@ -15,6 +15,7 @@ import com.rbkmoney.magista.util.FeeType;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class PayoutMapper implements Mapper<PayoutEventContext> {
@@ -68,11 +69,39 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
                     payoutEventStat.setPayoutAccountPurpose(account.getPurpose());
                     InternationalBankAccount bankAccount = account.getBankAccount();
                     payoutEventStat.setPayoutAccountBankId(bankAccount.getAccountHolder());
-                    payoutEventStat.setPayoutAccountBankName(bankAccount.getBankName());
                     payoutEventStat.setPayoutAccountBankIban(bankAccount.getIban());
-                    payoutEventStat.setPayoutAccountBankBic(bankAccount.getBic());
-                    payoutEventStat.setPayoutAccountBankLocalCode(bankAccount.getLocalBankCode());
-                    payoutEventStat.setPayoutAccountBankAddress(bankAccount.getBankAddress());
+                    if (bankAccount.isSetBank()) {
+                        InternationalBankDetails bankDetails = bankAccount.getBank();
+                        payoutEventStat.setPayoutAccountBankName(bankDetails.getName());
+                        payoutEventStat.setPayoutAccountBankAddress(bankDetails.getAddress());
+                        payoutEventStat.setPayoutAccountBankBic(bankDetails.getBic());
+                        payoutEventStat.setPayoutAccountBankAbaRtn(bankDetails.getAbaRtn());
+                        payoutEventStat.setPayoutAccountBankCountryCode(
+                                Optional.ofNullable(bankDetails.getCountry())
+                                        .map(country -> country.toString())
+                                        .orElse(null)
+                        );
+                    }
+
+                    if (bankAccount.isSetCorrespondentAccount()) {
+                        InternationalBankAccount correspondentAccount = bankAccount.getCorrespondentAccount();
+                        payoutEventStat.setPayoutInternationalCorrespondentAccountBankAccount(correspondentAccount.getAccountHolder());
+                        payoutEventStat.setPayoutInternationalCorrespondentAccountBankNumber(correspondentAccount.getNumber());
+                        payoutEventStat.setPayoutInternationalCorrespondentAccountBankIban(correspondentAccount.getIban());
+                        if (correspondentAccount.isSetBank()) {
+                            InternationalBankDetails corrBankDetails = correspondentAccount.getBank();
+                            payoutEventStat.setPayoutInternationalCorrespondentAccountBankName(corrBankDetails.getName());
+                            payoutEventStat.setPayoutInternationalCorrespondentAccountBankAddress(corrBankDetails.getAddress());
+                            payoutEventStat.setPayoutInternationalCorrespondentAccountBankBic(corrBankDetails.getBic());
+                            payoutEventStat.setPayoutInternationalCorrespondentAccountBankAbaRtn(corrBankDetails.getAbaRtn());
+                            payoutEventStat.setPayoutInternationalCorrespondentAccountBankCountryCode(
+                                    Optional.ofNullable(corrBankDetails.getCountry())
+                                            .map(country -> country.toString())
+                                            .orElse(null)
+                            );
+                        }
+                    }
+
                     LegalAgreement legalAgreement = account.getLegalAgreement();
                     payoutEventStat.setPayoutAccountLegalAgreementId(legalAgreement.getLegalAgreementId());
                     payoutEventStat.setPayoutAccountLegalAgreementSignedAt(TypeUtil.stringToLocalDateTime(legalAgreement.getSignedAt()));

@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = 1905287448;
+    private static final long serialVersionUID = 1144435178;
 
     /**
      * The reference instance of <code>mst.payout_event_stat</code>
@@ -240,6 +240,61 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
      * The column <code>mst.payout_event_stat.payout_summary</code>.
      */
     public final TableField<PayoutEventStatRecord, String> PAYOUT_SUMMARY = createField("payout_summary", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_account_bank_number</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_BANK_NUMBER = createField("payout_account_bank_number", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_account_bank_aba_rtn</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_BANK_ABA_RTN = createField("payout_account_bank_aba_rtn", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_account_bank_country_code</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_ACCOUNT_BANK_COUNTRY_CODE = createField("payout_account_bank_country_code", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_international_correspondent_account_bank_number</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_NUMBER = createField("payout_international_correspondent_account_bank_number", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_international_correspondent_account_bank_account</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ACCOUNT = createField("payout_international_correspondent_account_bank_account", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_international_correspondent_account_bank_name</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_NAME = createField("payout_international_correspondent_account_bank_name", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_international_correspondent_account_bank_address</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ADDRESS = createField("payout_international_correspondent_account_bank_address", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_international_correspondent_account_bank_bic</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_BIC = createField("payout_international_correspondent_account_bank_bic", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_international_correspondent_account_bank_iban</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_IBAN = createField("payout_international_correspondent_account_bank_iban", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_international_correspondent_account_bank_aba_rtn</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ABA_RTN = createField("payout_international_correspondent_account_bank_aba_rtn", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_international_correspondent_account_bank_country_code</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_COUNTRY_CODE = createField("payout_international_correspondent_account_bank_country_code", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * Create a <code>mst.payout_event_stat</code> table reference
