@@ -70,17 +70,8 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
             paymentData.setPaymentHoldUntil(TypeUtil.stringToLocalDateTime(hold.getHeldUntil()));
         }
 
-        if (invoicePayment.isSetIsRecurring()) {
-            paymentData.setPaymentRecurrentFlag(invoicePayment.isIsRecurring());
-        }
-
-        if (invoicePayment.isSetRecurrentIntention()) {
-            RecurrentTokenSource recurrentTokenSource = invoicePayment.getRecurrentIntention().getTokenSource();
-            paymentData.setPaymentRecurrentTokenSourceType(TBaseUtil.unionFieldToEnum(recurrentTokenSource, RecurrentTokenSourceType.class));
-            if (recurrentTokenSource.isSetPayment()) {
-                paymentData.setPaymentRecurrentTokenSourceInvoiceId(recurrentTokenSource.getPayment().getInvoiceId());
-                paymentData.setPaymentRecurrentTokenSourcePaymentId(recurrentTokenSource.getPayment().getPaymentId());
-            }
+        if (invoicePayment.isSetMakeRecurrent()) {
+            paymentData.setPaymentMakeRecurrentFlag(invoicePayment.isMakeRecurrent());
         }
 
         if (invoicePayment.isSetContext()) {
@@ -103,9 +94,11 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
             mapContactInfo(paymentData, resourcePayer.getContactInfo());
             mapPaymentTool(paymentData, paymentResource.getPaymentTool());
 
-            ClientInfo clientInfo = paymentResource.getClientInfo();
-            paymentData.setPaymentFingerprint(clientInfo.getFingerprint());
-            paymentData.setPaymentIp(clientInfo.getIpAddress());
+            if (paymentResource.isSetClientInfo()) {
+                ClientInfo clientInfo = paymentResource.getClientInfo();
+                paymentData.setPaymentFingerprint(clientInfo.getFingerprint());
+                paymentData.setPaymentIp(clientInfo.getIpAddress());
+            }
         }
 
         if (payer.isSetCustomer()) {
@@ -113,6 +106,15 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
             paymentData.setPaymentCustomerId(customerPayer.getCustomerId());
             mapPaymentTool(paymentData, customerPayer.getPaymentTool());
             mapContactInfo(paymentData, customerPayer.getContactInfo());
+        }
+
+        if (payer.isSetRecurrent()) {
+            RecurrentPayer recurrentPayer = payer.getRecurrent();
+            mapContactInfo(paymentData, recurrentPayer.getContactInfo());
+            mapPaymentTool(paymentData, recurrentPayer.getPaymentTool());
+            RecurrentParentPayment recurrentParentPayment = recurrentPayer.getRecurrentParent();
+            paymentData.setPaymentRecurrentPayerParentInvoiceId(recurrentParentPayment.getInvoiceId());
+            paymentData.setPaymentRecurrentPayerParentPaymentId(recurrentParentPayment.getPaymentId());
         }
 
         PaymentEvent paymentEvent = new PaymentEvent();

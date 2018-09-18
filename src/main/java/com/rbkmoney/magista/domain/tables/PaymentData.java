@@ -10,7 +10,6 @@ import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
-import com.rbkmoney.magista.domain.enums.RecurrentTokenSourceType;
 import com.rbkmoney.magista.domain.tables.records.PaymentDataRecord;
 
 import java.time.LocalDateTime;
@@ -43,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData extends TableImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = 1891636169;
+    private static final long serialVersionUID = 1056366056;
 
     /**
      * The reference instance of <code>mst.payment_data</code>
@@ -209,24 +208,19 @@ public class PaymentData extends TableImpl<PaymentDataRecord> {
     public final TableField<PaymentDataRecord, byte[]> PAYMENT_CONTEXT = createField("payment_context", org.jooq.impl.SQLDataType.BLOB, this, "");
 
     /**
-     * The column <code>mst.payment_data.payment_recurrent_flag</code>.
+     * The column <code>mst.payment_data.payment_make_recurrent_flag</code>.
      */
-    public final TableField<PaymentDataRecord, Boolean> PAYMENT_RECURRENT_FLAG = createField("payment_recurrent_flag", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+    public final TableField<PaymentDataRecord, Boolean> PAYMENT_MAKE_RECURRENT_FLAG = createField("payment_make_recurrent_flag", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
-     * The column <code>mst.payment_data.payment_recurrent_token_source_type</code>.
+     * The column <code>mst.payment_data.payment_recurrent_payer_parent_invoice_id</code>.
      */
-    public final TableField<PaymentDataRecord, RecurrentTokenSourceType> PAYMENT_RECURRENT_TOKEN_SOURCE_TYPE = createField("payment_recurrent_token_source_type", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.RecurrentTokenSourceType.class), this, "");
+    public final TableField<PaymentDataRecord, String> PAYMENT_RECURRENT_PAYER_PARENT_INVOICE_ID = createField("payment_recurrent_payer_parent_invoice_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
-     * The column <code>mst.payment_data.payment_recurrent_token_source_invoice_id</code>.
+     * The column <code>mst.payment_data.payment_recurrent_payer_parent_payment_id</code>.
      */
-    public final TableField<PaymentDataRecord, String> PAYMENT_RECURRENT_TOKEN_SOURCE_INVOICE_ID = createField("payment_recurrent_token_source_invoice_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
-
-    /**
-     * The column <code>mst.payment_data.payment_recurrent_token_source_payment_id</code>.
-     */
-    public final TableField<PaymentDataRecord, String> PAYMENT_RECURRENT_TOKEN_SOURCE_PAYMENT_ID = createField("payment_recurrent_token_source_payment_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+    public final TableField<PaymentDataRecord, String> PAYMENT_RECURRENT_PAYER_PARENT_PAYMENT_ID = createField("payment_recurrent_payer_parent_payment_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * Create a <code>mst.payment_data</code> table reference

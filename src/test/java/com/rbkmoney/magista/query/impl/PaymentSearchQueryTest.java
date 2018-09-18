@@ -201,11 +201,12 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
         assertEquals(1, statResponse.getData().getPayments().size());
 
         StatPayment statPayment = statResponse.getData().getPayments().get(0);
-        assertTrue(statPayment.isIsRecurring());
-        RecurrentTokenSource tokenSource = statPayment.getRecurrentIntention().getTokenSource();
-        assertTrue(tokenSource.isSetPayment());
-        assertEquals("PARENT_INVOICE_ID_1", tokenSource.getPayment().getInvoiceId());
-        assertEquals("PARENT_PAYMENT_ID_1", tokenSource.getPayment().getPaymentId());
+        assertTrue(statPayment.isMakeRecurrent());
+        assertTrue(statPayment.isSetPayer());
+        assertTrue(statPayment.getPayer().isSetRecurrent());
+        RecurrentPayer recurrentPayer = statPayment.getPayer().getRecurrent();
+        assertEquals("PARENT_INVOICE_ID_1", recurrentPayer.getRecurrentParent().getInvoiceId());
+        assertEquals("PARENT_PAYMENT_ID_1", recurrentPayer.getRecurrentParent().getPaymentId());
         DamselUtil.toJson(statResponse);
     }
 
