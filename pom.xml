@@ -13,7 +13,7 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.9.40-SNAPSHOT</version>
+    <version>1.9.41-SNAPSHOT</version>
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
@@ -28,7 +28,7 @@
         <db.user>postgres</db.user>
         <db.password>postgres</db.password>
         <db.schema>mst</db.schema>
-        <postgresql.jdbc.version>9.4.1212</postgresql.jdbc.version>
+        <postgresql.jdbc.version>42.2.5</postgresql.jdbc.version>
     </properties>
 
     <dependencies>
@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>${hikaricp.version}</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -105,7 +105,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>eventstock-client</artifactId>
-            <version>1.1.7</version>
+            <version>1.2.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.rbkmoney.geck</groupId>
