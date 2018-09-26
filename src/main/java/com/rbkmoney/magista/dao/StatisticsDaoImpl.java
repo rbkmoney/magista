@@ -621,7 +621,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM, parameters.getPaymentBankCardSystem(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_BIN, parameters.getPaymentBankCardBin(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_MASKED_PAN, parameters.getPaymentBankCardLastDigits(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS);
+                .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
+                .addValue(paymentEvent.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS);
 
         return getDslContext()
                 .select(fields)
@@ -712,7 +713,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .addValue(paymentData.PAYMENT_TOOL,
                         TypeUtil.toEnumField(parameters.getPaymentMethod(), com.rbkmoney.magista.domain.enums.PaymentTool.class),
                         EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
+                .addValue(paymentData.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
                         toEnumField(parameters.getPaymentBankCardTokenProvider(), com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
                         EQUALS)
                 .addValue(paymentData.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
@@ -724,7 +725,13 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .addValue(paymentData.PAYMENT_BANK_CARD_MASKED_PAN, parameters.getPaymentBankCardLastDigits(), EQUALS)
                 .addValue(paymentData.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS);
 
-        if (!paymentParameterSource.getConditionFields().isEmpty()) {
+        ConditionParameterSource paymentEventParameterSource = new ConditionParameterSource()
+                .addValue(paymentEvent.PAYMENT_STATUS,
+                        TypeUtil.toEnumField(parameters.getPaymentStatus(), com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
+                        EQUALS)
+                .addValue(paymentEvent.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS);
+
+        if (!paymentParameterSource.getConditionFields().isEmpty() || !paymentEventParameterSource.getConditionFields().isEmpty()) {
             selectOnConditionStep = selectOnConditionStep.join(
                     DSL.lateral(
                             getDslContext()
@@ -752,14 +759,11 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                     .limit(1)
                     ).as(paymentEvent)
             ).on(
-                    Optional.ofNullable(parameters.getPaymentStatus())
-                            .map(paymentStatusString -> paymentEvent.PAYMENT_STATUS.eq(
-                                    TypeUtil.toEnumField(
-                                            paymentStatusString,
-                                            com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class
-                                    )
-                                    )
-                            ).orElse(DSL.trueCondition())
+                    appendConditions(
+                            DSL.trueCondition(),
+                            Operator.AND,
+                            paymentEventParameterSource
+                    )
             );
         }
 
