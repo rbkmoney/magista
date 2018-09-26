@@ -35,6 +35,7 @@ public class Parameters {
     public static final String PAYMENT_TERMINAL_PROVIDER_PARAM = "payment_terminal_provider";
     public static final String PAYMENT_AMOUNT_PARAM = "payment_amount";
     public static final String PAYMENT_FLOW_PARAM = "payment_flow";
+    public static final String PAYMENT_DOMAIN_REVISION_PARAM = "payment_domain_revision";
     public static final String PAYMENT_CUSTOMER_ID_PARAM = "payment_customer_id";
 
     public static final String REFUND_ID_PARAM = "refund_id";
