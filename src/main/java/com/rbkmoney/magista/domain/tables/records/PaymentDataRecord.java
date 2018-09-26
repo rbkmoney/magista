@@ -32,7 +32,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = -1982728231;
+    private static final long serialVersionUID = 1802577566;
 
     /**
      * Setter for <code>mst.payment_data.id</code>.
@@ -454,6 +454,48 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
         return (byte[]) get(29);
     }
 
+    /**
+     * Setter for <code>mst.payment_data.payment_make_recurrent_flag</code>.
+     */
+    public void setPaymentMakeRecurrentFlag(Boolean value) {
+        set(30, value);
+    }
+
+    /**
+     * Getter for <code>mst.payment_data.payment_make_recurrent_flag</code>.
+     */
+    public Boolean getPaymentMakeRecurrentFlag() {
+        return (Boolean) get(30);
+    }
+
+    /**
+     * Setter for <code>mst.payment_data.payment_recurrent_payer_parent_invoice_id</code>.
+     */
+    public void setPaymentRecurrentPayerParentInvoiceId(String value) {
+        set(31, value);
+    }
+
+    /**
+     * Getter for <code>mst.payment_data.payment_recurrent_payer_parent_invoice_id</code>.
+     */
+    public String getPaymentRecurrentPayerParentInvoiceId() {
+        return (String) get(31);
+    }
+
+    /**
+     * Setter for <code>mst.payment_data.payment_recurrent_payer_parent_payment_id</code>.
+     */
+    public void setPaymentRecurrentPayerParentPaymentId(String value) {
+        set(32, value);
+    }
+
+    /**
+     * Getter for <code>mst.payment_data.payment_recurrent_payer_parent_payment_id</code>.
+     */
+    public String getPaymentRecurrentPayerParentPaymentId() {
+        return (String) get(32);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -480,7 +522,7 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
     /**
      * Create a detached, initialised PaymentDataRecord
      */
-    public PaymentDataRecord(Long id, String invoiceId, String paymentId, UUID partyId, String partyShopId, String partyContractId, String paymentCurrencyCode, Long paymentAmount, String paymentCustomerId, PaymentTool paymentTool, String paymentBankCardMaskedPan, String paymentBankCardBin, String paymentBankCardToken, String paymentBankCardSystem, BankCardTokenProvider paymentBankCardTokenProvider, String paymentTerminalProvider, String paymentDigitalWalletId, String paymentDigitalWalletProvider, PaymentFlow paymentFlow, OnHoldExpiration paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentSessionId, String paymentFingerprint, String paymentIp, String paymentPhoneNumber, String paymentEmail, LocalDateTime paymentCreatedAt, Long paymentPartyRevision, String paymentContextType, byte[] paymentContext) {
+    public PaymentDataRecord(Long id, String invoiceId, String paymentId, UUID partyId, String partyShopId, String partyContractId, String paymentCurrencyCode, Long paymentAmount, String paymentCustomerId, PaymentTool paymentTool, String paymentBankCardMaskedPan, String paymentBankCardBin, String paymentBankCardToken, String paymentBankCardSystem, BankCardTokenProvider paymentBankCardTokenProvider, String paymentTerminalProvider, String paymentDigitalWalletId, String paymentDigitalWalletProvider, PaymentFlow paymentFlow, OnHoldExpiration paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentSessionId, String paymentFingerprint, String paymentIp, String paymentPhoneNumber, String paymentEmail, LocalDateTime paymentCreatedAt, Long paymentPartyRevision, String paymentContextType, byte[] paymentContext, Boolean paymentMakeRecurrentFlag, String paymentRecurrentPayerParentInvoiceId, String paymentRecurrentPayerParentPaymentId) {
         super(PaymentData.PAYMENT_DATA);
 
         set(0, id);
@@ -513,5 +555,8 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
         set(27, paymentPartyRevision);
         set(28, paymentContextType);
         set(29, paymentContext);
+        set(30, paymentMakeRecurrentFlag);
+        set(31, paymentRecurrentPayerParentInvoiceId);
+        set(32, paymentRecurrentPayerParentPaymentId);
     }
 }

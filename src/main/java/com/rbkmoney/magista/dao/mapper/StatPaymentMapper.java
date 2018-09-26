@@ -3,13 +3,13 @@ package com.rbkmoney.magista.dao.mapper;
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
 import com.rbkmoney.damsel.domain.BankCardTokenProvider;
+import com.rbkmoney.damsel.domain.PayoutTool;
 import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.util.DamselUtil;
-import org.jooq.Record;
 import org.jooq.TableField;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -104,9 +104,10 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
         statPayment.setStatus(paymentStatus);
 
         String customerId = rs.getString(PAYMENT_DATA.PAYMENT_CUSTOMER_ID.getName());
+        String paymentSessionId = rs.getString(PAYMENT_DATA.PAYMENT_SESSION_ID.getName());
         if (customerId != null) {
             statPayment.setPayer(Payer.customer(new CustomerPayer(customerId)));
-        } else {
+        } else if (paymentSessionId != null) {
             PaymentResourcePayer paymentResourcePayer = new PaymentResourcePayer();
             paymentResourcePayer.setIpAddress(rs.getString(PAYMENT_DATA.PAYMENT_IP.getName()));
             paymentResourcePayer.setFingerprint(rs.getString(PAYMENT_DATA.PAYMENT_FINGERPRINT.getName()));
@@ -114,45 +115,22 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
             paymentResourcePayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
             paymentResourcePayer.setSessionId(rs.getString(PAYMENT_DATA.PAYMENT_SESSION_ID.getName()));
 
-
-            com.rbkmoney.magista.domain.enums.PaymentTool paymentToolType = TypeUtil.toEnumField(
-                    rs.getString(PAYMENT_DATA.PAYMENT_TOOL.getName()),
-                    com.rbkmoney.magista.domain.enums.PaymentTool.class
-            );
-
-            PaymentTool paymentTool;
-            switch (paymentToolType) {
-                case bank_card:
-                    BankCard bankCard = new BankCard(
-                            rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN.getName()),
-                            TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()), BankCardPaymentSystem.class),
-                            rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_BIN.getName()),
-                            rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_MASKED_PAN.getName())
-                    );
-                    bankCard.setTokenProvider(
-                            Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()))
-                                    .map(bankCardTokenProvider -> TypeUtil.toEnumField(bankCardTokenProvider, BankCardTokenProvider.class))
-                                    .orElse(null)
-                    );
-                    paymentTool = PaymentTool.bank_card(bankCard);
-                    break;
-                case payment_terminal:
-                    paymentTool = PaymentTool.payment_terminal(new PaymentTerminal(
-                            TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER.getName()), TerminalPaymentProvider.class)
-                    ));
-                    break;
-                case digital_wallet:
-                    paymentTool = PaymentTool.digital_wallet(new DigitalWallet(
-                            TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()), DigitalWalletProvider.class),
-                            rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_ID.getName())
-                    ));
-                    break;
-                default:
-                    throw new NotFoundException(String.format("Payment tool '%s' not found", paymentToolType.getLiteral()));
-            }
-            paymentResourcePayer.setPaymentTool(paymentTool);
+            paymentResourcePayer.setPaymentTool(buildPaymentTool(rs));
 
             statPayment.setPayer(Payer.payment_resource(paymentResourcePayer));
+        } else {
+            RecurrentPayer recurrentPayer = new RecurrentPayer();
+            recurrentPayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
+            recurrentPayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
+
+            recurrentPayer.setPaymentTool(buildPaymentTool(rs));
+
+            RecurrentParentPayment recurrentParentPayment = new RecurrentParentPayment();
+            recurrentParentPayment.setInvoiceId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_INVOICE_ID.getName()));
+            recurrentParentPayment.setPaymentId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_PAYMENT_ID.getName()));
+            recurrentPayer.setRecurrentParent(recurrentParentPayment);
+
+            statPayment.setPayer(Payer.recurrent(recurrentPayer));
         }
 
         PaymentFlow paymentFlow = TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_FLOW.getName()), PaymentFlow.class);
@@ -172,6 +150,8 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
             default:
                 throw new NotFoundException(String.format("Payment flow '%s' not found", paymentFlow.getLiteral()));
         }
+        statPayment.setMakeRecurrent(rs.getBoolean(PAYMENT_DATA.PAYMENT_MAKE_RECURRENT_FLAG.getName()));
+
         statPayment.setShortId(rs.getString(PAYMENT_EVENT.PAYMENT_SHORT_ID.getName()));
 
         byte[] context = rs.getBytes(PAYMENT_DATA.PAYMENT_CONTEXT.getName());
@@ -185,5 +165,39 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
         }
 
         return new AbstractMap.SimpleEntry<>(rs.getLong(idField.getName()), statPayment);
+    }
+
+    private PaymentTool buildPaymentTool(ResultSet rs) throws SQLException {
+        com.rbkmoney.magista.domain.enums.PaymentTool paymentToolType = TypeUtil.toEnumField(
+                rs.getString(PAYMENT_DATA.PAYMENT_TOOL.getName()),
+                com.rbkmoney.magista.domain.enums.PaymentTool.class
+        );
+
+        switch (paymentToolType) {
+            case bank_card:
+                BankCard bankCard = new BankCard(
+                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN.getName()),
+                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()), BankCardPaymentSystem.class),
+                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_BIN.getName()),
+                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_MASKED_PAN.getName())
+                );
+                bankCard.setTokenProvider(
+                        Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()))
+                                .map(bankCardTokenProvider -> TypeUtil.toEnumField(bankCardTokenProvider, BankCardTokenProvider.class))
+                                .orElse(null)
+                );
+                return PaymentTool.bank_card(bankCard);
+            case payment_terminal:
+                return PaymentTool.payment_terminal(new PaymentTerminal(
+                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER.getName()), TerminalPaymentProvider.class)
+                ));
+            case digital_wallet:
+                return PaymentTool.digital_wallet(new DigitalWallet(
+                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()), DigitalWalletProvider.class),
+                        rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_ID.getName())
+                ));
+            default:
+                throw new NotFoundException(String.format("Payment tool '%s' not found", paymentToolType.getLiteral()));
+        }
     }
 }

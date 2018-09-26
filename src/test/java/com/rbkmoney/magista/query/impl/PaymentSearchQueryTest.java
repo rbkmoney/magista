@@ -1,9 +1,6 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.damsel.merch_stat.OnHoldExpiration;
-import com.rbkmoney.damsel.merch_stat.StatPayment;
-import com.rbkmoney.damsel.merch_stat.StatRequest;
-import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.dao.StatisticsDao;
@@ -207,6 +204,22 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
         statRequest = new StatRequest(json);
         statResponse = queryProcessor.processQuery(statRequest);
         assertEquals(0, statResponse.getData().getPayments().size());
+    }
+
+    @Sql("classpath:data/sql/search/recurrent_payments_search_data.sql")
+    public void testRecurrentPayments() {
+        String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'invoice_id': 'INVOICE_ID_1', 'payment_id': 'PAYMENT_ID_1'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(1, statResponse.getData().getPayments().size());
+
+        StatPayment statPayment = statResponse.getData().getPayments().get(0);
+        assertTrue(statPayment.isMakeRecurrent());
+        assertTrue(statPayment.isSetPayer());
+        assertTrue(statPayment.getPayer().isSetRecurrent());
+        RecurrentPayer recurrentPayer = statPayment.getPayer().getRecurrent();
+        assertEquals("PARENT_INVOICE_ID_1", recurrentPayer.getRecurrentParent().getInvoiceId());
+        assertEquals("PARENT_PAYMENT_ID_1", recurrentPayer.getRecurrentParent().getPaymentId());
+        DamselUtil.toJson(statResponse);
     }
 
 }
