@@ -13,11 +13,11 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.9.40-SNAPSHOT</version>
+    <version>1.9.42-SNAPSHOT</version>
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
-        <damsel.version>1.267-a95c2b3-epic</damsel.version>
+        <damsel.version>1.256-2afe121</damsel.version>
         <shared.resources.version>0.2.1</shared.resources.version>
         <server.port>8022</server.port>
         <dockerfile.base.service.tag>22c57470c4fc47161894f036b7cf9d70f42b75f5</dockerfile.base.service.tag>
@@ -28,7 +28,7 @@
         <db.user>postgres</db.user>
         <db.password>postgres</db.password>
         <db.schema>mst</db.schema>
-        <postgresql.jdbc.version>9.4.1212</postgresql.jdbc.version>
+        <postgresql.jdbc.version>42.2.5</postgresql.jdbc.version>
     </properties>
 
     <dependencies>
@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>${hikaricp.version}</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -105,7 +105,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>eventstock-client</artifactId>
-            <version>1.1.7</version>
+            <version>1.2.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.rbkmoney.geck</groupId>
