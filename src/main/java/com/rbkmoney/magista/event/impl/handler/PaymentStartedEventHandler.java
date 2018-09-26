@@ -2,6 +2,8 @@ package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.*;
+import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
+import com.rbkmoney.damsel.domain.PaymentTool;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
@@ -9,11 +11,9 @@ import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
-import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
-import com.rbkmoney.magista.domain.enums.InvoiceEventType;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
-import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.event.ChangeType;
@@ -70,6 +70,10 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
             paymentData.setPaymentHoldUntil(TypeUtil.stringToLocalDateTime(hold.getHeldUntil()));
         }
 
+        if (invoicePayment.isSetMakeRecurrent()) {
+            paymentData.setPaymentMakeRecurrentFlag(invoicePayment.isMakeRecurrent());
+        }
+
         if (invoicePayment.isSetContext()) {
             Content content = invoicePayment.getContext();
             paymentData.setPaymentContextType(content.getType());
@@ -90,9 +94,11 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
             mapContactInfo(paymentData, resourcePayer.getContactInfo());
             mapPaymentTool(paymentData, paymentResource.getPaymentTool());
 
-            ClientInfo clientInfo = paymentResource.getClientInfo();
-            paymentData.setPaymentFingerprint(clientInfo.getFingerprint());
-            paymentData.setPaymentIp(clientInfo.getIpAddress());
+            if (paymentResource.isSetClientInfo()) {
+                ClientInfo clientInfo = paymentResource.getClientInfo();
+                paymentData.setPaymentFingerprint(clientInfo.getFingerprint());
+                paymentData.setPaymentIp(clientInfo.getIpAddress());
+            }
         }
 
         if (payer.isSetCustomer()) {
@@ -100,6 +106,15 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
             paymentData.setPaymentCustomerId(customerPayer.getCustomerId());
             mapPaymentTool(paymentData, customerPayer.getPaymentTool());
             mapContactInfo(paymentData, customerPayer.getContactInfo());
+        }
+
+        if (payer.isSetRecurrent()) {
+            RecurrentPayer recurrentPayer = payer.getRecurrent();
+            mapContactInfo(paymentData, recurrentPayer.getContactInfo());
+            mapPaymentTool(paymentData, recurrentPayer.getPaymentTool());
+            RecurrentParentPayment recurrentParentPayment = recurrentPayer.getRecurrentParent();
+            paymentData.setPaymentRecurrentPayerParentInvoiceId(recurrentParentPayment.getInvoiceId());
+            paymentData.setPaymentRecurrentPayerParentPaymentId(recurrentParentPayment.getPaymentId());
         }
 
         PaymentEvent paymentEvent = new PaymentEvent();

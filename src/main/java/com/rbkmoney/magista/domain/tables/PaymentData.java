@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData extends TableImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = 252889245;
+    private static final long serialVersionUID = 1056366056;
 
     /**
      * The reference instance of <code>mst.payment_data</code>
@@ -206,6 +206,21 @@ public class PaymentData extends TableImpl<PaymentDataRecord> {
      * The column <code>mst.payment_data.payment_context</code>.
      */
     public final TableField<PaymentDataRecord, byte[]> PAYMENT_CONTEXT = createField("payment_context", org.jooq.impl.SQLDataType.BLOB, this, "");
+
+    /**
+     * The column <code>mst.payment_data.payment_make_recurrent_flag</code>.
+     */
+    public final TableField<PaymentDataRecord, Boolean> PAYMENT_MAKE_RECURRENT_FLAG = createField("payment_make_recurrent_flag", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+    /**
+     * The column <code>mst.payment_data.payment_recurrent_payer_parent_invoice_id</code>.
+     */
+    public final TableField<PaymentDataRecord, String> PAYMENT_RECURRENT_PAYER_PARENT_INVOICE_ID = createField("payment_recurrent_payer_parent_invoice_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payment_data.payment_recurrent_payer_parent_payment_id</code>.
+     */
+    public final TableField<PaymentDataRecord, String> PAYMENT_RECURRENT_PAYER_PARENT_PAYMENT_ID = createField("payment_recurrent_payer_parent_payment_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * Create a <code>mst.payment_data</code> table reference

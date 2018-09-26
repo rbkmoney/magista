@@ -125,6 +125,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_ID,
                         PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_PROVIDER,
                         PAYMENT_DATA.PAYMENT_FLOW,
+                        PAYMENT_DATA.PAYMENT_MAKE_RECURRENT_FLAG,
+                        PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_INVOICE_ID,
+                        PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_PAYMENT_ID,
                         PAYMENT_DATA.PAYMENT_HOLD_ON_EXPIRATION,
                         PAYMENT_DATA.PAYMENT_HOLD_UNTIL,
                         PAYMENT_DATA.PAYMENT_SESSION_ID,
@@ -712,7 +715,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .addValue(paymentData.PAYMENT_TOOL,
                         TypeUtil.toEnumField(parameters.getPaymentMethod(), com.rbkmoney.magista.domain.enums.PaymentTool.class),
                         EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
+                .addValue(paymentData.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
                         toEnumField(parameters.getPaymentBankCardTokenProvider(), com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
                         EQUALS)
                 .addValue(paymentData.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
