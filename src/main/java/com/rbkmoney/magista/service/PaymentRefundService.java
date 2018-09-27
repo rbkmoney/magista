@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.dao.RefundDao;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
+import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
@@ -17,11 +17,11 @@ public class PaymentRefundService {
 
     private final RefundDao refundDao;
 
-    private final InvoiceEventService invoiceEventService;
+    private final PaymentService paymentService;
 
-    public PaymentRefundService(RefundDao refundDao, InvoiceEventService invoiceEventService) {
+    public PaymentRefundService(RefundDao refundDao, PaymentService paymentService) {
         this.refundDao = refundDao;
-        this.invoiceEventService = invoiceEventService;
+        this.paymentService = paymentService;
     }
 
     public Refund getRefund(String invoiceId, String paymentId, String refundId) throws NotFoundException, StorageException {
@@ -41,13 +41,12 @@ public class PaymentRefundService {
                 refund.getEventType(), refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId());
         switch (refund.getEventType()) {
             case INVOICE_PAYMENT_REFUND_CREATED:
-                InvoiceEventStat paymentEventStat = invoiceEventService.getInvoicePaymentEventByIds(refund.getInvoiceId(), refund.getPaymentId());
-                refund.setPartyId(paymentEventStat.getPartyId());
-                refund.setPartyShopId(paymentEventStat.getPartyShopId());
-                refund.setPartyContractId(paymentEventStat.getPartyContractId());
+                PaymentData paymentData = paymentService.getPaymentData(refund.getInvoiceId(), refund.getPaymentId());
+                refund.setPartyId(paymentData.getPartyId().toString());
+                refund.setPartyShopId(paymentData.getPartyShopId());
                 if (refund.getRefundAmount() == null) {
-                    refund.setRefundAmount(paymentEventStat.getPaymentAmount());
-                    refund.setRefundCurrencyCode(paymentEventStat.getPaymentCurrencyCode());
+                    refund.setRefundAmount(paymentData.getPaymentAmount());
+                    refund.setRefundCurrencyCode(paymentData.getPaymentCurrencyCode());
                 }
                 break;
             case INVOICE_PAYMENT_REFUND_STATUS_CHANGED:
@@ -55,7 +54,6 @@ public class PaymentRefundService {
 
                 refund.setPartyId(previousRefundEvent.getPartyId());
                 refund.setPartyShopId(previousRefundEvent.getPartyShopId());
-                refund.setPartyContractId(previousRefundEvent.getPartyContractId());
                 refund.setRefundCreatedAt(previousRefundEvent.getRefundCreatedAt());
                 refund.setRefundCurrencyCode(previousRefundEvent.getRefundCurrencyCode());
                 refund.setRefundAmount(previousRefundEvent.getRefundAmount());

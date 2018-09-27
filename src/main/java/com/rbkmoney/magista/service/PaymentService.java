@@ -31,6 +31,15 @@ public class PaymentService {
         this.paymentDao = paymentDao;
     }
 
+    public PaymentData getPaymentData(String invoiceId, String paymentId) {
+        //TODO
+        PaymentData paymentData = paymentDao.getPaymentData(invoiceId, paymentId);
+        if (paymentData == null) {
+            throw new NotFoundException();
+        }
+        return paymentData;
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public void savePayment(PaymentData paymentData, PaymentEvent paymentEvent) throws NotFoundException, StorageException {
         log.info("Trying to save payment, paymentData='{}', paymentEvent='{}'", paymentData, paymentEvent);
@@ -41,7 +50,6 @@ public class PaymentService {
             }
             paymentData.setPartyId(invoiceData.getPartyId());
             paymentData.setPartyShopId(invoiceData.getPartyShopId());
-            paymentData.setPartyContractId(invoiceData.getPartyContractId());
 
             paymentDao.savePaymentData(paymentData);
             paymentDao.savePaymentEvent(paymentEvent);

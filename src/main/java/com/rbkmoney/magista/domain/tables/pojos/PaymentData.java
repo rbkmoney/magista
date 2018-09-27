@@ -7,6 +7,7 @@ package com.rbkmoney.magista.domain.tables.pojos;
 import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
+import com.rbkmoney.magista.domain.enums.PaymentPayerType;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
 
 import java.io.Serializable;
@@ -30,14 +31,13 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData implements Serializable {
 
-    private static final long serialVersionUID = -1148172068;
+    private static final long serialVersionUID = 1384231760;
 
     private Long                  id;
     private String                invoiceId;
     private String                paymentId;
     private UUID                  partyId;
     private String                partyShopId;
-    private String                partyContractId;
     private String                paymentCurrencyCode;
     private Long                  paymentAmount;
     private String                paymentCustomerId;
@@ -65,6 +65,9 @@ public class PaymentData implements Serializable {
     private Boolean               paymentMakeRecurrentFlag;
     private String                paymentRecurrentPayerParentInvoiceId;
     private String                paymentRecurrentPayerParentPaymentId;
+    private PaymentPayerType      paymentPayerType;
+    private Integer               paymentCountryId;
+    private Integer               paymentCityId;
 
     public PaymentData() {}
 
@@ -74,7 +77,6 @@ public class PaymentData implements Serializable {
         this.paymentId = value.paymentId;
         this.partyId = value.partyId;
         this.partyShopId = value.partyShopId;
-        this.partyContractId = value.partyContractId;
         this.paymentCurrencyCode = value.paymentCurrencyCode;
         this.paymentAmount = value.paymentAmount;
         this.paymentCustomerId = value.paymentCustomerId;
@@ -102,6 +104,9 @@ public class PaymentData implements Serializable {
         this.paymentMakeRecurrentFlag = value.paymentMakeRecurrentFlag;
         this.paymentRecurrentPayerParentInvoiceId = value.paymentRecurrentPayerParentInvoiceId;
         this.paymentRecurrentPayerParentPaymentId = value.paymentRecurrentPayerParentPaymentId;
+        this.paymentPayerType = value.paymentPayerType;
+        this.paymentCountryId = value.paymentCountryId;
+        this.paymentCityId = value.paymentCityId;
     }
 
     public PaymentData(
@@ -110,7 +115,6 @@ public class PaymentData implements Serializable {
         String                paymentId,
         UUID                  partyId,
         String                partyShopId,
-        String                partyContractId,
         String                paymentCurrencyCode,
         Long                  paymentAmount,
         String                paymentCustomerId,
@@ -137,14 +141,16 @@ public class PaymentData implements Serializable {
         byte[]                paymentContext,
         Boolean               paymentMakeRecurrentFlag,
         String                paymentRecurrentPayerParentInvoiceId,
-        String                paymentRecurrentPayerParentPaymentId
+        String                paymentRecurrentPayerParentPaymentId,
+        PaymentPayerType      paymentPayerType,
+        Integer               paymentCountryId,
+        Integer               paymentCityId
     ) {
         this.id = id;
         this.invoiceId = invoiceId;
         this.paymentId = paymentId;
         this.partyId = partyId;
         this.partyShopId = partyShopId;
-        this.partyContractId = partyContractId;
         this.paymentCurrencyCode = paymentCurrencyCode;
         this.paymentAmount = paymentAmount;
         this.paymentCustomerId = paymentCustomerId;
@@ -172,6 +178,9 @@ public class PaymentData implements Serializable {
         this.paymentMakeRecurrentFlag = paymentMakeRecurrentFlag;
         this.paymentRecurrentPayerParentInvoiceId = paymentRecurrentPayerParentInvoiceId;
         this.paymentRecurrentPayerParentPaymentId = paymentRecurrentPayerParentPaymentId;
+        this.paymentPayerType = paymentPayerType;
+        this.paymentCountryId = paymentCountryId;
+        this.paymentCityId = paymentCityId;
     }
 
     public Long getId() {
@@ -212,14 +221,6 @@ public class PaymentData implements Serializable {
 
     public void setPartyShopId(String partyShopId) {
         this.partyShopId = partyShopId;
-    }
-
-    public String getPartyContractId() {
-        return this.partyContractId;
-    }
-
-    public void setPartyContractId(String partyContractId) {
-        this.partyContractId = partyContractId;
     }
 
     public String getPaymentCurrencyCode() {
@@ -438,6 +439,30 @@ public class PaymentData implements Serializable {
         this.paymentRecurrentPayerParentPaymentId = paymentRecurrentPayerParentPaymentId;
     }
 
+    public PaymentPayerType getPaymentPayerType() {
+        return this.paymentPayerType;
+    }
+
+    public void setPaymentPayerType(PaymentPayerType paymentPayerType) {
+        this.paymentPayerType = paymentPayerType;
+    }
+
+    public Integer getPaymentCountryId() {
+        return this.paymentCountryId;
+    }
+
+    public void setPaymentCountryId(Integer paymentCountryId) {
+        this.paymentCountryId = paymentCountryId;
+    }
+
+    public Integer getPaymentCityId() {
+        return this.paymentCityId;
+    }
+
+    public void setPaymentCityId(Integer paymentCityId) {
+        this.paymentCityId = paymentCityId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -476,12 +501,6 @@ public class PaymentData implements Serializable {
                 return false;
         }
         else if (!partyShopId.equals(other.partyShopId))
-            return false;
-        if (partyContractId == null) {
-            if (other.partyContractId != null)
-                return false;
-        }
-        else if (!partyContractId.equals(other.partyContractId))
             return false;
         if (paymentCurrencyCode == null) {
             if (other.paymentCurrencyCode != null)
@@ -645,6 +664,24 @@ public class PaymentData implements Serializable {
         }
         else if (!paymentRecurrentPayerParentPaymentId.equals(other.paymentRecurrentPayerParentPaymentId))
             return false;
+        if (paymentPayerType == null) {
+            if (other.paymentPayerType != null)
+                return false;
+        }
+        else if (!paymentPayerType.equals(other.paymentPayerType))
+            return false;
+        if (paymentCountryId == null) {
+            if (other.paymentCountryId != null)
+                return false;
+        }
+        else if (!paymentCountryId.equals(other.paymentCountryId))
+            return false;
+        if (paymentCityId == null) {
+            if (other.paymentCityId != null)
+                return false;
+        }
+        else if (!paymentCityId.equals(other.paymentCityId))
+            return false;
         return true;
     }
 
@@ -657,7 +694,6 @@ public class PaymentData implements Serializable {
         result = prime * result + ((this.paymentId == null) ? 0 : this.paymentId.hashCode());
         result = prime * result + ((this.partyId == null) ? 0 : this.partyId.hashCode());
         result = prime * result + ((this.partyShopId == null) ? 0 : this.partyShopId.hashCode());
-        result = prime * result + ((this.partyContractId == null) ? 0 : this.partyContractId.hashCode());
         result = prime * result + ((this.paymentCurrencyCode == null) ? 0 : this.paymentCurrencyCode.hashCode());
         result = prime * result + ((this.paymentAmount == null) ? 0 : this.paymentAmount.hashCode());
         result = prime * result + ((this.paymentCustomerId == null) ? 0 : this.paymentCustomerId.hashCode());
@@ -685,6 +721,9 @@ public class PaymentData implements Serializable {
         result = prime * result + ((this.paymentMakeRecurrentFlag == null) ? 0 : this.paymentMakeRecurrentFlag.hashCode());
         result = prime * result + ((this.paymentRecurrentPayerParentInvoiceId == null) ? 0 : this.paymentRecurrentPayerParentInvoiceId.hashCode());
         result = prime * result + ((this.paymentRecurrentPayerParentPaymentId == null) ? 0 : this.paymentRecurrentPayerParentPaymentId.hashCode());
+        result = prime * result + ((this.paymentPayerType == null) ? 0 : this.paymentPayerType.hashCode());
+        result = prime * result + ((this.paymentCountryId == null) ? 0 : this.paymentCountryId.hashCode());
+        result = prime * result + ((this.paymentCityId == null) ? 0 : this.paymentCityId.hashCode());
         return result;
     }
 
@@ -697,7 +736,6 @@ public class PaymentData implements Serializable {
         sb.append(", ").append(paymentId);
         sb.append(", ").append(partyId);
         sb.append(", ").append(partyShopId);
-        sb.append(", ").append(partyContractId);
         sb.append(", ").append(paymentCurrencyCode);
         sb.append(", ").append(paymentAmount);
         sb.append(", ").append(paymentCustomerId);
@@ -725,6 +763,9 @@ public class PaymentData implements Serializable {
         sb.append(", ").append(paymentMakeRecurrentFlag);
         sb.append(", ").append(paymentRecurrentPayerParentInvoiceId);
         sb.append(", ").append(paymentRecurrentPayerParentPaymentId);
+        sb.append(", ").append(paymentPayerType);
+        sb.append(", ").append(paymentCountryId);
+        sb.append(", ").append(paymentCityId);
 
         sb.append(")");
         return sb.toString();

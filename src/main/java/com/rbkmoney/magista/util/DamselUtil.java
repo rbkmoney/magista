@@ -283,7 +283,7 @@ public class DamselUtil {
         statRefund.setId(refundEvent.getRefundId());
         statRefund.setInvoiceId(refundEvent.getInvoiceId());
         statRefund.setPaymentId(refundEvent.getPaymentId());
-        statRefund.setOwnerId(refundEvent.getPartyId());
+        statRefund.setOwnerId(refundEvent.getPartyId().toString());
         statRefund.setShopId(refundEvent.getPartyShopId());
         statRefund.setCurrencySymbolicCode(refundEvent.getRefundCurrencyCode());
         statRefund.setStatus(toRefundStatus(refundEvent));

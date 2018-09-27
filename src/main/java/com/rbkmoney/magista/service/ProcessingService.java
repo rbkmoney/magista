@@ -45,20 +45,17 @@ public class ProcessingService {
 
     private final List<Handler> handlers;
 
-    private final PlatformTransactionManager transactionManager;
-
     private final AtomicReference<InvoiceEventFlow> invoiceEventFlow = new AtomicReference<>();
     private final AtomicReference<PayoutEventFlow> payoutEventFlow = new AtomicReference<>();
 
     @Autowired
     public ProcessingService(List<Handler> handlers, PlatformTransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
         this.handlers = handlers;
     }
 
     public void start() {
-        InvoiceEventFlow newInvoiceEventFlow = new InvoiceEventFlow(handlers, new TransactionTemplate(transactionManager), processingHandlerThreadPoolSize, processingHandlerQueueLimit, processingHandlerTimeout);
-        PayoutEventFlow newPayoutEventFlow = new PayoutEventFlow(handlers, new TransactionTemplate(transactionManager), payoutHandlerThreadPoolSize, payoutHandlerQueueLimit, payoutHandlerTimeout);
+        InvoiceEventFlow newInvoiceEventFlow = new InvoiceEventFlow(handlers, processingHandlerThreadPoolSize, processingHandlerQueueLimit, processingHandlerTimeout);
+        PayoutEventFlow newPayoutEventFlow = new PayoutEventFlow(handlers, payoutHandlerThreadPoolSize, payoutHandlerQueueLimit, payoutHandlerTimeout);
 
         if (invoiceEventFlow.compareAndSet(null, newInvoiceEventFlow)) {
             newInvoiceEventFlow.start();

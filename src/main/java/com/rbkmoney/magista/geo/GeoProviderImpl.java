@@ -37,6 +37,7 @@ public class GeoProviderImpl implements GeoProvider {
                     }
 
                     try {
+                        //TODO
                         return columbusClient.getLocation(ip);
                     } catch (TException ex) {
                         throw new ProviderException(ex);

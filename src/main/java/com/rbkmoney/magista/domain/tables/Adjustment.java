@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Adjustment extends TableImpl<AdjustmentRecord> {
 
-    private static final long serialVersionUID = 674409041;
+    private static final long serialVersionUID = 523924989;
 
     /**
      * The reference instance of <code>mst.adjustment</code>
@@ -97,11 +97,6 @@ public class Adjustment extends TableImpl<AdjustmentRecord> {
      * The column <code>mst.adjustment.party_shop_id</code>.
      */
     public final TableField<AdjustmentRecord, String> PARTY_SHOP_ID = createField("party_shop_id", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
-
-    /**
-     * The column <code>mst.adjustment.party_contract_id</code>.
-     */
-    public final TableField<AdjustmentRecord, String> PARTY_CONTRACT_ID = createField("party_contract_id", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
 
     /**
      * The column <code>mst.adjustment.adjustment_status</code>.

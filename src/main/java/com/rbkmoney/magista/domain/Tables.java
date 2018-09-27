@@ -7,7 +7,6 @@ package com.rbkmoney.magista.domain;
 import com.rbkmoney.magista.domain.tables.Adjustment;
 import com.rbkmoney.magista.domain.tables.InvoiceData;
 import com.rbkmoney.magista.domain.tables.InvoiceEvent;
-import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.PaymentData;
 import com.rbkmoney.magista.domain.tables.PaymentEvent;
 import com.rbkmoney.magista.domain.tables.PayoutEventStat;
@@ -43,11 +42,6 @@ public class Tables {
      * The table <code>mst.invoice_event</code>.
      */
     public static final InvoiceEvent INVOICE_EVENT = com.rbkmoney.magista.domain.tables.InvoiceEvent.INVOICE_EVENT;
-
-    /**
-     * The table <code>mst.invoice_event_stat</code>.
-     */
-    public static final InvoiceEventStat INVOICE_EVENT_STAT = com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 
     /**
      * The table <code>mst.payment_data</code>.

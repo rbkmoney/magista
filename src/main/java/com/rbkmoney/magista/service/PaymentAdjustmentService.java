@@ -3,9 +3,9 @@ package com.rbkmoney.magista.service;
 import com.rbkmoney.magista.dao.AdjustmentDao;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
-import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
+import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
+import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
@@ -23,14 +23,11 @@ public class PaymentAdjustmentService {
 
     private final AdjustmentDao adjustmentDao;
 
-    private final InvoiceEventService invoiceEventService;
-
     private final PaymentService paymentService;
 
     @Autowired
-    public PaymentAdjustmentService(AdjustmentDao adjustmentDao, InvoiceEventService invoiceEventService, PaymentService paymentService) {
+    public PaymentAdjustmentService(AdjustmentDao adjustmentDao, PaymentService paymentService) {
         this.adjustmentDao = adjustmentDao;
-        this.invoiceEventService = invoiceEventService;
         this.paymentService = paymentService;
     }
 
@@ -52,16 +49,14 @@ public class PaymentAdjustmentService {
                 adjustment.getEventType(), adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId());
         switch (adjustment.getEventType()) {
             case INVOICE_PAYMENT_ADJUSTMENT_CREATED:
-                InvoiceEventStat paymentEventStat = invoiceEventService.getInvoicePaymentEventByIds(adjustment.getInvoiceId(), adjustment.getPaymentId());
-                adjustment.setPartyId(paymentEventStat.getPartyId());
-                adjustment.setPartyShopId(paymentEventStat.getPartyShopId());
-                adjustment.setPartyContractId(paymentEventStat.getPartyContractId());
+                PaymentData paymentData = paymentService.getPaymentData(adjustment.getInvoiceId(), adjustment.getPaymentId());
+                adjustment.setPartyId(paymentData.getPartyId().toString());
+                adjustment.setPartyShopId(paymentData.getPartyShopId());
                 break;
             case INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED:
                 Adjustment previousAdjustmentEvent = getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId());
                 adjustment.setPartyId(previousAdjustmentEvent.getPartyId());
                 adjustment.setPartyShopId(previousAdjustmentEvent.getPartyShopId());
-                adjustment.setPartyContractId(previousAdjustmentEvent.getPartyContractId());
                 adjustment.setAdjustmentCreatedAt(previousAdjustmentEvent.getAdjustmentCreatedAt());
                 adjustment.setAdjustmentFee(previousAdjustmentEvent.getAdjustmentFee());
                 adjustment.setAdjustmentExternalFee(previousAdjustmentEvent.getAdjustmentExternalFee());
@@ -72,15 +67,6 @@ public class PaymentAdjustmentService {
         }
 
         if (adjustment.getAdjustmentStatus() == AdjustmentStatus.captured) {
-            InvoiceEventStat paymentEventStat = invoiceEventService.getInvoicePaymentEventByIds(adjustment.getInvoiceId(), adjustment.getPaymentId());
-            paymentEventStat.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
-            paymentEventStat.setId(null);
-            paymentEventStat.setPaymentFee(adjustment.getAdjustmentFee());
-            paymentEventStat.setPaymentExternalFee(adjustment.getAdjustmentExternalFee());
-            paymentEventStat.setPaymentProviderFee(adjustment.getAdjustmentProviderFee());
-            paymentEventStat.setPaymentDomainRevision(adjustment.getAdjustmentDomainRevision());
-            invoiceEventService.saveInvoicePaymentEvent(paymentEventStat);
-
             PaymentEvent paymentEvent = new PaymentEvent();
             paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
             paymentEvent.setEventId(adjustment.getEventId());

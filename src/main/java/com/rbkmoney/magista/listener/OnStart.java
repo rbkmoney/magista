@@ -5,7 +5,6 @@ import com.rbkmoney.eventstock.client.EventConstraint;
 import com.rbkmoney.eventstock.client.EventPublisher;
 import com.rbkmoney.eventstock.client.SubscriberConfig;
 import com.rbkmoney.eventstock.client.poll.EventFlowFilter;
-import com.rbkmoney.magista.service.InvoiceEventService;
 import com.rbkmoney.magista.service.PayoutEventService;
 import com.rbkmoney.magista.service.ProcessingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ public class OnStart implements ApplicationListener<ApplicationReadyEvent> {
 
     private final ProcessingService processingService;
 
-    private final InvoiceEventService invoiceEventService;
     private final PayoutEventService payoutEventService;
 
     @Value("${bm.pooling.enabled}")
@@ -37,12 +35,10 @@ public class OnStart implements ApplicationListener<ApplicationReadyEvent> {
     public OnStart(EventPublisher processingEventPublisher,
                    EventPublisher payoutEventPublisher,
                    ProcessingService processingService,
-                   InvoiceEventService invoiceEventService,
                    PayoutEventService payoutEventService) {
         this.processingEventPublisher = processingEventPublisher;
         this.payoutEventPublisher = payoutEventPublisher;
 
-        this.invoiceEventService = invoiceEventService;
         this.payoutEventService = payoutEventService;
 
         this.processingService = processingService;
@@ -58,7 +54,7 @@ public class OnStart implements ApplicationListener<ApplicationReadyEvent> {
     }
 
     private void subscribeToInvoiceEventStock() {
-        processingEventPublisher.subscribe(buildSubscriberConfig(invoiceEventService.getLastEventId()));
+//        processingEventPublisher.subscribe(buildSubscriberConfig(invoiceEventService.getLastEventId()));
     }
 
     private void subscribeToPayoutEventStock() {
