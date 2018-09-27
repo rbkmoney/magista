@@ -32,7 +32,12 @@ public class PaymentService {
     }
 
     public PaymentData getPaymentData(String invoiceId, String paymentId) {
-        return null;
+        //TODO
+        PaymentData paymentData = paymentDao.getPaymentData(invoiceId, paymentId);
+        if (paymentData == null) {
+            throw new NotFoundException();
+        }
+        return paymentData;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

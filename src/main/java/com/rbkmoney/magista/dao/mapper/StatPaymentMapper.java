@@ -3,11 +3,11 @@ package com.rbkmoney.magista.dao.mapper;
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
 import com.rbkmoney.damsel.domain.BankCardTokenProvider;
-import com.rbkmoney.damsel.domain.PayoutTool;
 import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
+import com.rbkmoney.magista.domain.enums.PaymentPayerType;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.jooq.TableField;
@@ -102,36 +102,7 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
                 throw new NotFoundException(String.format("Payment status '%s' not found", invoicePaymentStatus.getLiteral()));
         }
         statPayment.setStatus(paymentStatus);
-
-        String customerId = rs.getString(PAYMENT_DATA.PAYMENT_CUSTOMER_ID.getName());
-        String paymentSessionId = rs.getString(PAYMENT_DATA.PAYMENT_SESSION_ID.getName());
-        if (customerId != null) {
-            statPayment.setPayer(Payer.customer(new CustomerPayer(customerId)));
-        } else if (paymentSessionId != null) {
-            PaymentResourcePayer paymentResourcePayer = new PaymentResourcePayer();
-            paymentResourcePayer.setIpAddress(rs.getString(PAYMENT_DATA.PAYMENT_IP.getName()));
-            paymentResourcePayer.setFingerprint(rs.getString(PAYMENT_DATA.PAYMENT_FINGERPRINT.getName()));
-            paymentResourcePayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
-            paymentResourcePayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
-            paymentResourcePayer.setSessionId(rs.getString(PAYMENT_DATA.PAYMENT_SESSION_ID.getName()));
-
-            paymentResourcePayer.setPaymentTool(buildPaymentTool(rs));
-
-            statPayment.setPayer(Payer.payment_resource(paymentResourcePayer));
-        } else {
-            RecurrentPayer recurrentPayer = new RecurrentPayer();
-            recurrentPayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
-            recurrentPayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
-
-            recurrentPayer.setPaymentTool(buildPaymentTool(rs));
-
-            RecurrentParentPayment recurrentParentPayment = new RecurrentParentPayment();
-            recurrentParentPayment.setInvoiceId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_INVOICE_ID.getName()));
-            recurrentParentPayment.setPaymentId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_PAYMENT_ID.getName()));
-            recurrentPayer.setRecurrentParent(recurrentParentPayment);
-
-            statPayment.setPayer(Payer.recurrent(recurrentPayer));
-        }
+        statPayment.setPayer(buildPayer(rs));
 
         PaymentFlow paymentFlow = TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_FLOW.getName()), PaymentFlow.class);
         switch (paymentFlow) {
@@ -165,6 +136,43 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
         }
 
         return new AbstractMap.SimpleEntry<>(rs.getLong(idField.getName()), statPayment);
+    }
+
+    private Payer buildPayer(ResultSet rs) throws SQLException {
+        PaymentPayerType paymentPayerType = TypeUtil.toEnumField(
+                rs.getString(PAYMENT_DATA.PAYMENT_PAYER_TYPE.getName()),
+                PaymentPayerType.class
+        );
+
+        switch (paymentPayerType) {
+            case payment_resource:
+                PaymentResourcePayer paymentResourcePayer = new PaymentResourcePayer();
+                paymentResourcePayer.setIpAddress(rs.getString(PAYMENT_DATA.PAYMENT_IP.getName()));
+                paymentResourcePayer.setFingerprint(rs.getString(PAYMENT_DATA.PAYMENT_FINGERPRINT.getName()));
+                paymentResourcePayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
+                paymentResourcePayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
+                paymentResourcePayer.setSessionId(rs.getString(PAYMENT_DATA.PAYMENT_SESSION_ID.getName()));
+
+                paymentResourcePayer.setPaymentTool(buildPaymentTool(rs));
+                return Payer.payment_resource(paymentResourcePayer);
+            case customer:
+                return Payer.customer(new CustomerPayer(rs.getString(PAYMENT_DATA.PAYMENT_CUSTOMER_ID.getName())));
+            case recurrent:
+                RecurrentPayer recurrentPayer = new RecurrentPayer();
+                recurrentPayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
+                recurrentPayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
+
+                recurrentPayer.setPaymentTool(buildPaymentTool(rs));
+
+                RecurrentParentPayment recurrentParentPayment = new RecurrentParentPayment();
+                recurrentParentPayment.setInvoiceId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_INVOICE_ID.getName()));
+                recurrentParentPayment.setPaymentId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_PAYMENT_ID.getName()));
+                recurrentPayer.setRecurrentParent(recurrentParentPayment);
+
+                return Payer.recurrent(recurrentPayer);
+            default:
+                throw new NotFoundException(String.format("Payment type '%s' not found", paymentPayerType.getLiteral()));
+        }
     }
 
     private PaymentTool buildPaymentTool(ResultSet rs) throws SQLException {

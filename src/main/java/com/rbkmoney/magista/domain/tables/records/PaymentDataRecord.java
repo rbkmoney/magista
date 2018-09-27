@@ -7,6 +7,7 @@ package com.rbkmoney.magista.domain.tables.records;
 import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
+import com.rbkmoney.magista.domain.enums.PaymentPayerType;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
 import com.rbkmoney.magista.domain.tables.PaymentData;
 
@@ -32,7 +33,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = 174637122;
+    private static final long serialVersionUID = 722265862;
 
     /**
      * Setter for <code>mst.payment_data.id</code>.
@@ -482,6 +483,48 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
         return (String) get(31);
     }
 
+    /**
+     * Setter for <code>mst.payment_data.payment_payer_type</code>.
+     */
+    public void setPaymentPayerType(PaymentPayerType value) {
+        set(32, value);
+    }
+
+    /**
+     * Getter for <code>mst.payment_data.payment_payer_type</code>.
+     */
+    public PaymentPayerType getPaymentPayerType() {
+        return (PaymentPayerType) get(32);
+    }
+
+    /**
+     * Setter for <code>mst.payment_data.payment_country_id</code>.
+     */
+    public void setPaymentCountryId(Integer value) {
+        set(33, value);
+    }
+
+    /**
+     * Getter for <code>mst.payment_data.payment_country_id</code>.
+     */
+    public Integer getPaymentCountryId() {
+        return (Integer) get(33);
+    }
+
+    /**
+     * Setter for <code>mst.payment_data.payment_city_id</code>.
+     */
+    public void setPaymentCityId(Integer value) {
+        set(34, value);
+    }
+
+    /**
+     * Getter for <code>mst.payment_data.payment_city_id</code>.
+     */
+    public Integer getPaymentCityId() {
+        return (Integer) get(34);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -508,7 +551,7 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
     /**
      * Create a detached, initialised PaymentDataRecord
      */
-    public PaymentDataRecord(Long id, String invoiceId, String paymentId, UUID partyId, String partyShopId, String paymentCurrencyCode, Long paymentAmount, String paymentCustomerId, PaymentTool paymentTool, String paymentBankCardMaskedPan, String paymentBankCardBin, String paymentBankCardToken, String paymentBankCardSystem, BankCardTokenProvider paymentBankCardTokenProvider, String paymentTerminalProvider, String paymentDigitalWalletId, String paymentDigitalWalletProvider, PaymentFlow paymentFlow, OnHoldExpiration paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentSessionId, String paymentFingerprint, String paymentIp, String paymentPhoneNumber, String paymentEmail, LocalDateTime paymentCreatedAt, Long paymentPartyRevision, String paymentContextType, byte[] paymentContext, Boolean paymentMakeRecurrentFlag, String paymentRecurrentPayerParentInvoiceId, String paymentRecurrentPayerParentPaymentId) {
+    public PaymentDataRecord(Long id, String invoiceId, String paymentId, UUID partyId, String partyShopId, String paymentCurrencyCode, Long paymentAmount, String paymentCustomerId, PaymentTool paymentTool, String paymentBankCardMaskedPan, String paymentBankCardBin, String paymentBankCardToken, String paymentBankCardSystem, BankCardTokenProvider paymentBankCardTokenProvider, String paymentTerminalProvider, String paymentDigitalWalletId, String paymentDigitalWalletProvider, PaymentFlow paymentFlow, OnHoldExpiration paymentHoldOnExpiration, LocalDateTime paymentHoldUntil, String paymentSessionId, String paymentFingerprint, String paymentIp, String paymentPhoneNumber, String paymentEmail, LocalDateTime paymentCreatedAt, Long paymentPartyRevision, String paymentContextType, byte[] paymentContext, Boolean paymentMakeRecurrentFlag, String paymentRecurrentPayerParentInvoiceId, String paymentRecurrentPayerParentPaymentId, PaymentPayerType paymentPayerType, Integer paymentCountryId, Integer paymentCityId) {
         super(PaymentData.PAYMENT_DATA);
 
         set(0, id);
@@ -543,5 +586,8 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
         set(29, paymentMakeRecurrentFlag);
         set(30, paymentRecurrentPayerParentInvoiceId);
         set(31, paymentRecurrentPayerParentPaymentId);
+        set(32, paymentPayerType);
+        set(33, paymentCountryId);
+        set(34, paymentCityId);
     }
 }

@@ -16,12 +16,23 @@ import static com.rbkmoney.magista.domain.Tables.PAYMENT_EVENT;
 @Component
 public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
 
+    private final RowMapper<PaymentData> paymentDataRowMapper;
     private final RowMapper<PaymentEvent> paymentEventRowMapper;
 
     @Autowired
     public PaymentDaoImpl(DataSource dataSource) {
         super(dataSource);
+        this.paymentDataRowMapper = new RecordRowMapper<>(PAYMENT_DATA, PaymentData.class);
         this.paymentEventRowMapper = new RecordRowMapper<>(PAYMENT_EVENT, PaymentEvent.class);
+    }
+
+    @Override
+    public PaymentData getPaymentData(String invoiceId, String paymentId) throws DaoException {
+        //TODO
+        Query query = getDslContext().selectFrom(PAYMENT_DATA)
+                .where(PAYMENT_DATA.INVOICE_ID.eq(invoiceId))
+                .and(PAYMENT_DATA.PAYMENT_ID.eq(paymentId));
+        return fetchOne(query, paymentDataRowMapper);
     }
 
     @Override

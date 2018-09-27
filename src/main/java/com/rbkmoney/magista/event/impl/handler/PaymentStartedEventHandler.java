@@ -5,6 +5,7 @@ import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.damsel.domain.PaymentTool;
 import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
@@ -19,6 +20,7 @@ import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
+import com.rbkmoney.magista.provider.GeoProvider;
 import com.rbkmoney.magista.service.PaymentService;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
@@ -33,9 +35,12 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
 
     private final PaymentService paymentService;
 
+    private final GeoProvider geoProvider;
+
     @Autowired
-    public PaymentStartedEventHandler(PaymentService paymentService) {
+    public PaymentStartedEventHandler(PaymentService paymentService, GeoProvider geoProvider) {
         this.paymentService = paymentService;
+        this.geoProvider = geoProvider;
     }
 
     @Override
@@ -85,36 +90,46 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
         }
 
         Payer payer = invoicePayment.getPayer();
-        if (payer.isSetPaymentResource()) {
-            PaymentResourcePayer resourcePayer = payer.getPaymentResource();
 
-            DisposablePaymentResource paymentResource = resourcePayer.getResource();
-            paymentData.setPaymentSessionId(paymentResource.getPaymentSessionId());
+        paymentData.setPaymentPayerType(TBaseUtil.unionFieldToEnum(payer, PaymentPayerType.class));
+        switch (paymentData.getPaymentPayerType()) {
+            case payment_resource:
+                PaymentResourcePayer resourcePayer = payer.getPaymentResource();
 
-            mapContactInfo(paymentData, resourcePayer.getContactInfo());
-            mapPaymentTool(paymentData, paymentResource.getPaymentTool());
+                DisposablePaymentResource paymentResource = resourcePayer.getResource();
+                paymentData.setPaymentSessionId(paymentResource.getPaymentSessionId());
 
-            if (paymentResource.isSetClientInfo()) {
-                ClientInfo clientInfo = paymentResource.getClientInfo();
-                paymentData.setPaymentFingerprint(clientInfo.getFingerprint());
-                paymentData.setPaymentIp(clientInfo.getIpAddress());
-            }
-        }
+                mapContactInfo(paymentData, resourcePayer.getContactInfo());
+                mapPaymentTool(paymentData, paymentResource.getPaymentTool());
 
-        if (payer.isSetCustomer()) {
-            CustomerPayer customerPayer = payer.getCustomer();
-            paymentData.setPaymentCustomerId(customerPayer.getCustomerId());
-            mapPaymentTool(paymentData, customerPayer.getPaymentTool());
-            mapContactInfo(paymentData, customerPayer.getContactInfo());
-        }
+                if (paymentResource.isSetClientInfo()) {
+                    ClientInfo clientInfo = paymentResource.getClientInfo();
+                    paymentData.setPaymentFingerprint(clientInfo.getFingerprint());
 
-        if (payer.isSetRecurrent()) {
-            RecurrentPayer recurrentPayer = payer.getRecurrent();
-            mapContactInfo(paymentData, recurrentPayer.getContactInfo());
-            mapPaymentTool(paymentData, recurrentPayer.getPaymentTool());
-            RecurrentParentPayment recurrentParentPayment = recurrentPayer.getRecurrentParent();
-            paymentData.setPaymentRecurrentPayerParentInvoiceId(recurrentParentPayment.getInvoiceId());
-            paymentData.setPaymentRecurrentPayerParentPaymentId(recurrentParentPayment.getPaymentId());
+                    if (clientInfo.isSetIpAddress()) {
+                        String ipAddress = clientInfo.getIpAddress();
+                        paymentData.setPaymentIp(ipAddress);
+                        LocationInfo locationInfo = geoProvider.getLocationInfo(ipAddress);
+                        paymentData.setPaymentCountryId(locationInfo.getCountryGeoId());
+                        paymentData.setPaymentCityId(locationInfo.getCityGeoId());
+                    }
+                }
+                break;
+            case customer:
+                CustomerPayer customerPayer = payer.getCustomer();
+                paymentData.setPaymentCustomerId(customerPayer.getCustomerId());
+                mapPaymentTool(paymentData, customerPayer.getPaymentTool());
+                mapContactInfo(paymentData, customerPayer.getContactInfo());
+                break;
+            case recurrent:
+                RecurrentPayer recurrentPayer = payer.getRecurrent();
+                mapContactInfo(paymentData, recurrentPayer.getContactInfo());
+                mapPaymentTool(paymentData, recurrentPayer.getPaymentTool());
+                RecurrentParentPayment recurrentParentPayment = recurrentPayer.getRecurrentParent();
+                paymentData.setPaymentRecurrentPayerParentInvoiceId(recurrentParentPayment.getInvoiceId());
+                paymentData.setPaymentRecurrentPayerParentPaymentId(recurrentParentPayment.getPaymentId());
+                break;
+
         }
 
         PaymentEvent paymentEvent = new PaymentEvent();
