@@ -57,9 +57,11 @@ public class PaymentMapper implements Mapper<InvoiceEventContext> {
             mapContactInfo(invoiceEventStat, resourcePayer.getContactInfo());
             mapPaymentTool(invoiceEventStat, paymentResource.getPaymentTool());
 
-            ClientInfo clientInfo = paymentResource.getClientInfo();
-            invoiceEventStat.setPaymentFingerprint(clientInfo.getFingerprint());
-            invoiceEventStat.setPaymentIp(clientInfo.getIpAddress());
+            if (paymentResource.isSetClientInfo()) {
+                ClientInfo clientInfo = paymentResource.getClientInfo();
+                invoiceEventStat.setPaymentFingerprint(clientInfo.getFingerprint());
+                invoiceEventStat.setPaymentIp(clientInfo.getIpAddress());
+            }
         }
 
         if (payer.isSetCustomer()) {
