@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData extends TableImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = 1056366056;
+    private static final long serialVersionUID = 1408522679;
 
     /**
      * The reference instance of <code>mst.payment_data</code>
@@ -81,11 +81,6 @@ public class PaymentData extends TableImpl<PaymentDataRecord> {
      * The column <code>mst.payment_data.party_shop_id</code>.
      */
     public final TableField<PaymentDataRecord, String> PARTY_SHOP_ID = createField("party_shop_id", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
-
-    /**
-     * The column <code>mst.payment_data.party_contract_id</code>.
-     */
-    public final TableField<PaymentDataRecord, String> PARTY_CONTRACT_ID = createField("party_contract_id", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), this, "");
 
     /**
      * The column <code>mst.payment_data.payment_currency_code</code>.

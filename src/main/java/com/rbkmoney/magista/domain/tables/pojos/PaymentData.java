@@ -30,14 +30,13 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData implements Serializable {
 
-    private static final long serialVersionUID = -1148172068;
+    private static final long serialVersionUID = 432978083;
 
     private Long                  id;
     private String                invoiceId;
     private String                paymentId;
     private UUID                  partyId;
     private String                partyShopId;
-    private String                partyContractId;
     private String                paymentCurrencyCode;
     private Long                  paymentAmount;
     private String                paymentCustomerId;
@@ -74,7 +73,6 @@ public class PaymentData implements Serializable {
         this.paymentId = value.paymentId;
         this.partyId = value.partyId;
         this.partyShopId = value.partyShopId;
-        this.partyContractId = value.partyContractId;
         this.paymentCurrencyCode = value.paymentCurrencyCode;
         this.paymentAmount = value.paymentAmount;
         this.paymentCustomerId = value.paymentCustomerId;
@@ -110,7 +108,6 @@ public class PaymentData implements Serializable {
         String                paymentId,
         UUID                  partyId,
         String                partyShopId,
-        String                partyContractId,
         String                paymentCurrencyCode,
         Long                  paymentAmount,
         String                paymentCustomerId,
@@ -144,7 +141,6 @@ public class PaymentData implements Serializable {
         this.paymentId = paymentId;
         this.partyId = partyId;
         this.partyShopId = partyShopId;
-        this.partyContractId = partyContractId;
         this.paymentCurrencyCode = paymentCurrencyCode;
         this.paymentAmount = paymentAmount;
         this.paymentCustomerId = paymentCustomerId;
@@ -212,14 +208,6 @@ public class PaymentData implements Serializable {
 
     public void setPartyShopId(String partyShopId) {
         this.partyShopId = partyShopId;
-    }
-
-    public String getPartyContractId() {
-        return this.partyContractId;
-    }
-
-    public void setPartyContractId(String partyContractId) {
-        this.partyContractId = partyContractId;
     }
 
     public String getPaymentCurrencyCode() {
@@ -477,12 +465,6 @@ public class PaymentData implements Serializable {
         }
         else if (!partyShopId.equals(other.partyShopId))
             return false;
-        if (partyContractId == null) {
-            if (other.partyContractId != null)
-                return false;
-        }
-        else if (!partyContractId.equals(other.partyContractId))
-            return false;
         if (paymentCurrencyCode == null) {
             if (other.paymentCurrencyCode != null)
                 return false;
@@ -657,7 +639,6 @@ public class PaymentData implements Serializable {
         result = prime * result + ((this.paymentId == null) ? 0 : this.paymentId.hashCode());
         result = prime * result + ((this.partyId == null) ? 0 : this.partyId.hashCode());
         result = prime * result + ((this.partyShopId == null) ? 0 : this.partyShopId.hashCode());
-        result = prime * result + ((this.partyContractId == null) ? 0 : this.partyContractId.hashCode());
         result = prime * result + ((this.paymentCurrencyCode == null) ? 0 : this.paymentCurrencyCode.hashCode());
         result = prime * result + ((this.paymentAmount == null) ? 0 : this.paymentAmount.hashCode());
         result = prime * result + ((this.paymentCustomerId == null) ? 0 : this.paymentCustomerId.hashCode());
@@ -697,7 +678,6 @@ public class PaymentData implements Serializable {
         sb.append(", ").append(paymentId);
         sb.append(", ").append(partyId);
         sb.append(", ").append(partyShopId);
-        sb.append(", ").append(partyContractId);
         sb.append(", ").append(paymentCurrencyCode);
         sb.append(", ").append(paymentAmount);
         sb.append(", ").append(paymentCustomerId);

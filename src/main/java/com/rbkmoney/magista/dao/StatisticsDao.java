@@ -2,7 +2,6 @@ package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.damsel.merch_stat.StatPayment;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
@@ -50,7 +49,6 @@ public interface StatisticsDao {
     Collection<Refund> getRefunds(
             Optional<String> merchantId,
             Optional<String> shopId,
-            Optional<String> contractId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
@@ -61,7 +59,6 @@ public interface StatisticsDao {
     Integer getRefundsCount(
             Optional<String> merchantId,
             Optional<String> shopId,
-            Optional<String> contractId,
             ConditionParameterSource parameterSource,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime
