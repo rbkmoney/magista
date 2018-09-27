@@ -28,7 +28,7 @@ public abstract class AbstractEventFlow {
 
     private AtomicBoolean isRun = new AtomicBoolean(false);
 
-    public AbstractEventFlow(String name, List<Handler> handlers, TransactionTemplate transactionTemplate, int threadPoolSize, int queueLimit, long timeout) {
+    public AbstractEventFlow(String name, List<Handler> handlers, int threadPoolSize, int queueLimit, long timeout) {
         this.threadGroup = new ThreadGroup(name + "Flow");
         this.threadGroup.setDaemon(true);
         this.handlers = handlers;
@@ -43,7 +43,7 @@ public abstract class AbstractEventFlow {
                 return thread;
             }
         });
-        this.eventSaver = new EventSaver(queue, transactionTemplate, timeout);
+        this.eventSaver = new EventSaver(queue, timeout);
         this.eventSaverThread = new Thread(threadGroup, eventSaver, name + "Saver");
         this.timeout = timeout;
     }
@@ -57,10 +57,13 @@ public abstract class AbstractEventFlow {
 
     public abstract void processEvent(StockEvent stockEvent);
 
-    protected <C> List<Handler> getHandlers(C change) {
-        return handlers.stream()
-                .filter(handler -> handler.accept(change))
-                .collect(Collectors.toList());
+    protected <C> Handler getHandler(C change) {
+        for (Handler handler : handlers) {
+            if (handler.accept(change)) {
+                return handler;
+            }
+        }
+        return null;
     }
 
     protected void submitAndPutInQueue(Callable<Processor> task) {

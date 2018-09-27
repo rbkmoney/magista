@@ -26,16 +26,6 @@ import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 
 public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>> {
 
-    private final TableField idField;
-
-    public StatPaymentMapper() {
-        this.idField = PAYMENT_DATA.ID;
-    }
-
-    public StatPaymentMapper(TableField idField) {
-        this.idField = idField;
-    }
-
 
     @Override
     public Map.Entry<Long, StatPayment> mapRow(ResultSet rs, int i) throws SQLException {
@@ -135,7 +125,7 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
             );
         }
 
-        return new AbstractMap.SimpleEntry<>(rs.getLong(idField.getName()), statPayment);
+        return new AbstractMap.SimpleEntry<>(rs.getLong(PAYMENT_DATA.ID.getName()), statPayment);
     }
 
     private Payer buildPayer(ResultSet rs) throws SQLException {
