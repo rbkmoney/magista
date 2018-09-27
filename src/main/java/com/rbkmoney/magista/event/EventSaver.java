@@ -53,14 +53,10 @@ public class EventSaver implements Runnable {
                                 }
                         );
                         queue.take();
-                        //TODO one bad event can stop the whole processing flow, need to do smth with it...
                     } else {
                         TimeUnit.MILLISECONDS.sleep(timeout);
                     }
-                } catch (ExecutionException | AdjustmentException | NotFoundException ex) {
-                    queue.take();
-                    log.error("Failed to handle event, skipped", ex);
-                } catch (StorageException ex) {
+                } catch (Exception ex) {
                     log.error("Failed to save event after handling", ex);
                     TimeUnit.MILLISECONDS.sleep(timeout);
                 }
