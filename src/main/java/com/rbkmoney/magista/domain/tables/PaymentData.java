@@ -9,6 +9,7 @@ import com.rbkmoney.magista.domain.Mst;
 import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
+import com.rbkmoney.magista.domain.enums.PaymentPayerType;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
 import com.rbkmoney.magista.domain.tables.records.PaymentDataRecord;
 
@@ -42,7 +43,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData extends TableImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = 1056366056;
+    private static final long serialVersionUID = 1426878270;
 
     /**
      * The reference instance of <code>mst.payment_data</code>
@@ -221,6 +222,11 @@ public class PaymentData extends TableImpl<PaymentDataRecord> {
      * The column <code>mst.payment_data.payment_recurrent_payer_parent_payment_id</code>.
      */
     public final TableField<PaymentDataRecord, String> PAYMENT_RECURRENT_PAYER_PARENT_PAYMENT_ID = createField("payment_recurrent_payer_parent_payment_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payment_data.payment_payer_type</code>.
+     */
+    public final TableField<PaymentDataRecord, PaymentPayerType> PAYMENT_PAYER_TYPE = createField("payment_payer_type", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(com.rbkmoney.magista.domain.enums.PaymentPayerType.class), this, "");
 
     /**
      * Create a <code>mst.payment_data</code> table reference

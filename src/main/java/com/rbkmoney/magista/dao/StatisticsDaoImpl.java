@@ -188,7 +188,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 .orderBy(paymentEvent.EVENT_CREATED_AT)
                 .limit(limit);
 
-        return fetch(query, new StatPaymentMapper(PAYMENT_EVENT.ID));
+        return fetch(query, statPaymentMapper);
     }
 
     @Override
