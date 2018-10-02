@@ -19,6 +19,7 @@ import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
+import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.service.PaymentService;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
@@ -85,36 +86,41 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
         }
 
         Payer payer = invoicePayment.getPayer();
-        if (payer.isSetPaymentResource()) {
-            PaymentResourcePayer resourcePayer = payer.getPaymentResource();
 
-            DisposablePaymentResource paymentResource = resourcePayer.getResource();
-            paymentData.setPaymentSessionId(paymentResource.getPaymentSessionId());
+        PaymentPayerType payerType = TBaseUtil.unionFieldToEnum(payer, PaymentPayerType.class);
+        paymentData.setPaymentPayerType(payerType);
+        switch (paymentData.getPaymentPayerType()) {
+            case payment_resource:
+                PaymentResourcePayer resourcePayer = payer.getPaymentResource();
 
-            mapContactInfo(paymentData, resourcePayer.getContactInfo());
-            mapPaymentTool(paymentData, paymentResource.getPaymentTool());
+                DisposablePaymentResource paymentResource = resourcePayer.getResource();
+                paymentData.setPaymentSessionId(paymentResource.getPaymentSessionId());
 
-            if (paymentResource.isSetClientInfo()) {
-                ClientInfo clientInfo = paymentResource.getClientInfo();
-                paymentData.setPaymentFingerprint(clientInfo.getFingerprint());
-                paymentData.setPaymentIp(clientInfo.getIpAddress());
-            }
-        }
+                mapContactInfo(paymentData, resourcePayer.getContactInfo());
+                mapPaymentTool(paymentData, paymentResource.getPaymentTool());
 
-        if (payer.isSetCustomer()) {
-            CustomerPayer customerPayer = payer.getCustomer();
-            paymentData.setPaymentCustomerId(customerPayer.getCustomerId());
-            mapPaymentTool(paymentData, customerPayer.getPaymentTool());
-            mapContactInfo(paymentData, customerPayer.getContactInfo());
-        }
-
-        if (payer.isSetRecurrent()) {
-            RecurrentPayer recurrentPayer = payer.getRecurrent();
-            mapContactInfo(paymentData, recurrentPayer.getContactInfo());
-            mapPaymentTool(paymentData, recurrentPayer.getPaymentTool());
-            RecurrentParentPayment recurrentParentPayment = recurrentPayer.getRecurrentParent();
-            paymentData.setPaymentRecurrentPayerParentInvoiceId(recurrentParentPayment.getInvoiceId());
-            paymentData.setPaymentRecurrentPayerParentPaymentId(recurrentParentPayment.getPaymentId());
+                if (paymentResource.isSetClientInfo()) {
+                    ClientInfo clientInfo = paymentResource.getClientInfo();
+                    paymentData.setPaymentFingerprint(clientInfo.getFingerprint());
+                    paymentData.setPaymentIp(clientInfo.getIpAddress());
+                }
+                break;
+            case customer:
+                CustomerPayer customerPayer = payer.getCustomer();
+                paymentData.setPaymentCustomerId(customerPayer.getCustomerId());
+                mapPaymentTool(paymentData, customerPayer.getPaymentTool());
+                mapContactInfo(paymentData, customerPayer.getContactInfo());
+                break;
+            case recurrent:
+                RecurrentPayer recurrentPayer = payer.getRecurrent();
+                mapContactInfo(paymentData, recurrentPayer.getContactInfo());
+                mapPaymentTool(paymentData, recurrentPayer.getPaymentTool());
+                RecurrentParentPayment recurrentParentPayment = recurrentPayer.getRecurrentParent();
+                paymentData.setPaymentRecurrentPayerParentInvoiceId(recurrentParentPayment.getInvoiceId());
+                paymentData.setPaymentRecurrentPayerParentPaymentId(recurrentParentPayment.getPaymentId());
+                break;
+                default:
+                    throw new NotFoundException(String.format("Payment type '%s' not found", payerType));
         }
 
         PaymentEvent paymentEvent = new PaymentEvent();

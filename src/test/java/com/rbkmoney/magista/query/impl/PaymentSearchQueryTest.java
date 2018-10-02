@@ -45,7 +45,6 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
     public void testPayments() {
         String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        System.out.println(statResponse);
         assertEquals(2, statResponse.getData().getPayments().size());
         DamselUtil.toJson(statResponse);
     }

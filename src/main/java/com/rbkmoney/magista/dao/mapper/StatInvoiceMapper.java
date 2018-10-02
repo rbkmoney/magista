@@ -21,16 +21,6 @@ import static com.rbkmoney.magista.domain.tables.InvoiceEvent.INVOICE_EVENT;
 
 public class StatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>> {
 
-    private final TableField idField;
-
-    public StatInvoiceMapper() {
-        this.idField = INVOICE_DATA.ID;
-    }
-
-    public StatInvoiceMapper(TableField idField) {
-        this.idField = idField;
-    }
-
     @Override
     public Map.Entry<Long, StatInvoice> mapRow(ResultSet rs, int i) throws SQLException {
         StatInvoice statInvoice = new StatInvoice();
@@ -102,7 +92,7 @@ public class StatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>
                     )
             );
         }
-        return new AbstractMap.SimpleEntry<>(rs.getLong(idField.getName()), statInvoice);
+        return new AbstractMap.SimpleEntry<>(rs.getLong(INVOICE_DATA.ID.getName()), statInvoice);
     }
 
 }

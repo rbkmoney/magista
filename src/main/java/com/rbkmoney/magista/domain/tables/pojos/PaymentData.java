@@ -7,6 +7,7 @@ package com.rbkmoney.magista.domain.tables.pojos;
 import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
+import com.rbkmoney.magista.domain.enums.PaymentPayerType;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
 
 import java.io.Serializable;
@@ -30,7 +31,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentData implements Serializable {
 
-    private static final long serialVersionUID = -1148172068;
+    private static final long serialVersionUID = -1546125414;
 
     private Long                  id;
     private String                invoiceId;
@@ -65,6 +66,7 @@ public class PaymentData implements Serializable {
     private Boolean               paymentMakeRecurrentFlag;
     private String                paymentRecurrentPayerParentInvoiceId;
     private String                paymentRecurrentPayerParentPaymentId;
+    private PaymentPayerType      paymentPayerType;
 
     public PaymentData() {}
 
@@ -102,6 +104,7 @@ public class PaymentData implements Serializable {
         this.paymentMakeRecurrentFlag = value.paymentMakeRecurrentFlag;
         this.paymentRecurrentPayerParentInvoiceId = value.paymentRecurrentPayerParentInvoiceId;
         this.paymentRecurrentPayerParentPaymentId = value.paymentRecurrentPayerParentPaymentId;
+        this.paymentPayerType = value.paymentPayerType;
     }
 
     public PaymentData(
@@ -137,7 +140,8 @@ public class PaymentData implements Serializable {
         byte[]                paymentContext,
         Boolean               paymentMakeRecurrentFlag,
         String                paymentRecurrentPayerParentInvoiceId,
-        String                paymentRecurrentPayerParentPaymentId
+        String                paymentRecurrentPayerParentPaymentId,
+        PaymentPayerType      paymentPayerType
     ) {
         this.id = id;
         this.invoiceId = invoiceId;
@@ -172,6 +176,7 @@ public class PaymentData implements Serializable {
         this.paymentMakeRecurrentFlag = paymentMakeRecurrentFlag;
         this.paymentRecurrentPayerParentInvoiceId = paymentRecurrentPayerParentInvoiceId;
         this.paymentRecurrentPayerParentPaymentId = paymentRecurrentPayerParentPaymentId;
+        this.paymentPayerType = paymentPayerType;
     }
 
     public Long getId() {
@@ -438,6 +443,14 @@ public class PaymentData implements Serializable {
         this.paymentRecurrentPayerParentPaymentId = paymentRecurrentPayerParentPaymentId;
     }
 
+    public PaymentPayerType getPaymentPayerType() {
+        return this.paymentPayerType;
+    }
+
+    public void setPaymentPayerType(PaymentPayerType paymentPayerType) {
+        this.paymentPayerType = paymentPayerType;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -645,6 +658,12 @@ public class PaymentData implements Serializable {
         }
         else if (!paymentRecurrentPayerParentPaymentId.equals(other.paymentRecurrentPayerParentPaymentId))
             return false;
+        if (paymentPayerType == null) {
+            if (other.paymentPayerType != null)
+                return false;
+        }
+        else if (!paymentPayerType.equals(other.paymentPayerType))
+            return false;
         return true;
     }
 
@@ -685,6 +704,7 @@ public class PaymentData implements Serializable {
         result = prime * result + ((this.paymentMakeRecurrentFlag == null) ? 0 : this.paymentMakeRecurrentFlag.hashCode());
         result = prime * result + ((this.paymentRecurrentPayerParentInvoiceId == null) ? 0 : this.paymentRecurrentPayerParentInvoiceId.hashCode());
         result = prime * result + ((this.paymentRecurrentPayerParentPaymentId == null) ? 0 : this.paymentRecurrentPayerParentPaymentId.hashCode());
+        result = prime * result + ((this.paymentPayerType == null) ? 0 : this.paymentPayerType.hashCode());
         return result;
     }
 
@@ -725,6 +745,7 @@ public class PaymentData implements Serializable {
         sb.append(", ").append(paymentMakeRecurrentFlag);
         sb.append(", ").append(paymentRecurrentPayerParentInvoiceId);
         sb.append(", ").append(paymentRecurrentPayerParentPaymentId);
+        sb.append(", ").append(paymentPayerType);
 
         sb.append(")");
         return sb.toString();
