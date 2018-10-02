@@ -130,6 +130,7 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_PAYMENT_ID,
                         PAYMENT_DATA.PAYMENT_HOLD_ON_EXPIRATION,
                         PAYMENT_DATA.PAYMENT_HOLD_UNTIL,
+                        PAYMENT_DATA.PAYMENT_PAYER_TYPE,
                         PAYMENT_DATA.PAYMENT_SESSION_ID,
                         PAYMENT_DATA.PAYMENT_FINGERPRINT,
                         PAYMENT_DATA.PAYMENT_IP,
