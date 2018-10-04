@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.dao;
+package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.geck.common.util.TypeUtil;
 import org.jooq.Field;

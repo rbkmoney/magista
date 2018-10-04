@@ -8,9 +8,7 @@ import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.impl.context.InvoiceEventContext;
 import com.rbkmoney.magista.event.impl.mapper.InvoiceMapper;
 import com.rbkmoney.magista.event.impl.mapper.PaymentCommissionMapper;
-import com.rbkmoney.magista.event.impl.mapper.PaymentGeoMapper;
 import com.rbkmoney.magista.event.impl.mapper.PaymentMapper;
-import com.rbkmoney.magista.provider.GeoProvider;
 import com.rbkmoney.magista.service.InvoiceEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,12 +23,10 @@ import java.util.List;
 public class PaymentStartedHandler extends AbstractInvoiceEventHandler {
 
     private final InvoiceEventService invoiceEventService;
-    private final GeoProvider geoProvider;
 
     @Autowired
-    public PaymentStartedHandler(InvoiceEventService invoiceEventService, GeoProvider geoProvider) {
+    public PaymentStartedHandler(InvoiceEventService invoiceEventService) {
         this.invoiceEventService = invoiceEventService;
-        this.geoProvider = geoProvider;
     }
 
     @Override
@@ -49,8 +45,7 @@ public class PaymentStartedHandler extends AbstractInvoiceEventHandler {
         return Arrays.asList(
                 new InvoiceMapper(),
                 new PaymentMapper(),
-                new PaymentCommissionMapper(),
-                new PaymentGeoMapper(geoProvider)
+                new PaymentCommissionMapper()
         );
     }
 }

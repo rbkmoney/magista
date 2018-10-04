@@ -41,7 +41,6 @@ public class PaymentService {
             }
             paymentData.setPartyId(invoiceData.getPartyId());
             paymentData.setPartyShopId(invoiceData.getPartyShopId());
-            paymentData.setPartyContractId(invoiceData.getPartyContractId());
 
             paymentDao.savePaymentData(paymentData);
             paymentDao.savePaymentEvent(paymentEvent);

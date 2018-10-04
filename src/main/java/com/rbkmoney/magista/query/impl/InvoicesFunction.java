@@ -197,7 +197,7 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
             FunctionQueryContext functionContext = getContext(context);
             InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Collection<Map.Entry<Long, StatInvoice>> result = functionContext.getDao().getInvoices(
+                Collection<Map.Entry<Long, StatInvoice>> result = functionContext.getSearchDao().getInvoices(
                         parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),

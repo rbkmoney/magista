@@ -1,5 +1,8 @@
-package com.rbkmoney.magista.dao;
+package com.rbkmoney.magista.dao.impl;
 
+import com.rbkmoney.magista.dao.PayoutEventDao;
+import com.rbkmoney.magista.dao.impl.AbstractDao;
+import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
@@ -7,11 +10,13 @@ import org.jooq.Condition;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 
+@Component
 public class PayoutEventDaoImpl extends AbstractDao implements PayoutEventDao {
 
     public static final RowMapper<PayoutEventStat> ROW_MAPPER = new RecordRowMapper<>(PAYOUT_EVENT_STAT, PayoutEventStat.class);

@@ -25,7 +25,7 @@ public class AccountingReportFunction extends ReportBaseFunction {
     @Override
     public QueryResult<Map<String, String>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
         CompletableFuture<Map<String, String>> paymentCompletableFuture = CompletableFuture.supplyAsync(
-                () -> getContext(context).getDao().getPaymentAccountingData(
+                () -> getContext(context).getReportDao().getPaymentAccountingData(
                         getQueryParameters().getMerchantId(),
                         getQueryParameters().getShopId(),
                         getQueryParameters().getCurrencyCode(),
@@ -35,7 +35,7 @@ public class AccountingReportFunction extends ReportBaseFunction {
         );
 
         CompletableFuture<Map<String, String>> refundCompletableFuture = CompletableFuture.supplyAsync(
-                () -> getContext(context).getDao().getRefundAccountingData(
+                () -> getContext(context).getReportDao().getRefundAccountingData(
                         getQueryParameters().getMerchantId(),
                         getQueryParameters().getShopId(),
                         getQueryParameters().getCurrencyCode(),
@@ -45,7 +45,7 @@ public class AccountingReportFunction extends ReportBaseFunction {
         );
 
         CompletableFuture<Map<String, String>> adjustmentCompletableFuture = CompletableFuture.supplyAsync(
-                () -> getContext(context).getDao().getAdjustmentAccountingData(
+                () -> getContext(context).getReportDao().getAdjustmentAccountingData(
                         getQueryParameters().getMerchantId(),
                         getQueryParameters().getShopId(),
                         getQueryParameters().getCurrencyCode(),
@@ -55,7 +55,7 @@ public class AccountingReportFunction extends ReportBaseFunction {
         );
 
         CompletableFuture<Map<String, String>> payoutCompletableFuture = CompletableFuture.supplyAsync(
-                () -> getContext(context).getDao().getPayoutAccountingData(
+                () -> getContext(context).getReportDao().getPayoutAccountingData(
                         getQueryParameters().getMerchantId(),
                         getQueryParameters().getShopId(),
                         getQueryParameters().getCurrencyCode(),

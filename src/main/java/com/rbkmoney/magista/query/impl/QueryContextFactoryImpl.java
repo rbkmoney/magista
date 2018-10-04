@@ -1,5 +1,7 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.magista.dao.ReportDao;
+import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.query.QueryContext;
 import com.rbkmoney.magista.query.QueryContextFactory;
 import com.rbkmoney.magista.dao.StatisticsDao;
@@ -9,13 +11,20 @@ import com.rbkmoney.magista.dao.StatisticsDao;
  */
 public class QueryContextFactoryImpl implements QueryContextFactory {
 
-    public QueryContextFactoryImpl(StatisticsDao statisticsDao) {
+    private final StatisticsDao statisticsDao;
+
+    private final ReportDao reportDao;
+
+    private final SearchDao searchDao;
+
+    public QueryContextFactoryImpl(StatisticsDao statisticsDao, SearchDao searchDao, ReportDao reportDao) {
         this.statisticsDao = statisticsDao;
+        this.searchDao = searchDao;
+        this.reportDao = reportDao;
     }
 
-    private StatisticsDao statisticsDao;
     @Override
     public QueryContext getContext() {
-        return new FunctionQueryContext(statisticsDao);
+        return new FunctionQueryContext(statisticsDao, searchDao, reportDao);
     }
 }

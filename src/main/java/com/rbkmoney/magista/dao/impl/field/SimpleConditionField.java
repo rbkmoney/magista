@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.dao.field;
+package com.rbkmoney.magista.dao.impl.field;
 
 import org.jooq.Comparator;
 import org.jooq.Field;

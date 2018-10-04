@@ -1,21 +1,15 @@
-package com.rbkmoney.magista.query.impl;
+package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.StatInvoice;
-import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.AbstractIntegrationTest;
-import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.exception.BadTokenException;
-import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
-import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.TokenUtil;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,17 +21,6 @@ import static org.junit.Assert.*;
 @Transactional
 @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
 public class InvoiceSearchQueryTest extends AbstractIntegrationTest {
-
-    private QueryProcessorImpl queryProcessor;
-
-    @Autowired
-    StatisticsDao statisticsDao;
-
-    @Before
-    public void before() {
-        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao);
-        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
-    }
 
     @Test
     public void testInvoices() {

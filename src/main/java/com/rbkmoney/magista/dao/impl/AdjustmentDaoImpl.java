@@ -1,15 +1,20 @@
-package com.rbkmoney.magista.dao;
+package com.rbkmoney.magista.dao.impl;
 
+import com.rbkmoney.magista.dao.AdjustmentDao;
+import com.rbkmoney.magista.dao.impl.AbstractDao;
+import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 
 import static com.rbkmoney.magista.domain.Tables.ADJUSTMENT;
 
+@Component
 public class AdjustmentDaoImpl extends AbstractDao implements AdjustmentDao {
 
     private final RowMapper<Adjustment> adjustmentRowMapper;

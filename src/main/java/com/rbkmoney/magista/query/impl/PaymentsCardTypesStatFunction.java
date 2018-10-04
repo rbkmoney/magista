@@ -2,6 +2,7 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.parser.QueryPart;
@@ -26,11 +27,11 @@ public class PaymentsCardTypesStatFunction extends StatBaseFunction {
     @Override
     public QueryResult<Map<String, String>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
         try {
-            Collection<Map<String, String>> result = getContext(context).getDao().getPaymentsCardTypesStat(
+            Collection<Map<String, String>> result = getContext(context).getStatisticsDao().getPaymentsCardTypesStat(
                     getQueryParameters().getMerchantId(),
                     getQueryParameters().getShopId(),
-                    Instant.from(getQueryParameters().getFromTime()),
-                    Instant.from(getQueryParameters().getToTime()),
+                    TypeUtil.toLocalDateTime(getQueryParameters().getFromTime()),
+                    TypeUtil.toLocalDateTime(getQueryParameters().getToTime()),
                     getQueryParameters().getSplitInterval()
             );
             return new BaseQueryResult<>(() -> result.stream(), () -> new StatResponse(StatResponseData.records(result.stream().collect(Collectors.toList()))));

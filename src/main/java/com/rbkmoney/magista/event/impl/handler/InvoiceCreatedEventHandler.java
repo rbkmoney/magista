@@ -28,12 +28,9 @@ public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, StockE
 
     private final InvoiceService invoiceService;
 
-    private final PartyService partyService;
-
     @Autowired
-    public InvoiceCreatedEventHandler(InvoiceService invoiceService, PartyService partyService) {
+    public InvoiceCreatedEventHandler(InvoiceService invoiceService) {
         this.invoiceService = invoiceService;
-        this.partyService = partyService;
     }
 
     @Override
@@ -85,22 +82,6 @@ public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, StockE
         invoiceEvent.setInvoiceStatusDetails(
                 DamselUtil.getInvoiceStatusDetails(invoiceStatus)
         );
-
-        Shop shop;
-        if (invoiceData.getInvoicePartyRevision() != null) {
-            shop = partyService.getShop(
-                    invoiceData.getPartyId().toString(),
-                    invoiceData.getPartyShopId(),
-                    invoiceData.getInvoicePartyRevision()
-            );
-        } else {
-            shop = partyService.getShop(
-                    invoiceData.getPartyId().toString(),
-                    invoiceData.getPartyShopId(),
-                    invoiceData.getInvoiceCreatedAt().toInstant(ZoneOffset.UTC)
-            );
-        }
-        invoiceData.setPartyContractId(shop.getContractId());
 
         return () -> invoiceService.saveInvoice(invoiceData, invoiceEvent);
     }

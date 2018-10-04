@@ -17,17 +17,6 @@ import static org.junit.Assert.assertEquals;
 
 public class AccountingReportTest extends AbstractIntegrationTest {
 
-    private QueryProcessorImpl queryProcessor;
-
-    @Autowired
-    StatisticsDao statisticsDao;
-
-    @Before
-    public void before() {
-        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao);
-        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
-    }
-
     @Test
     @Sql("classpath:data/sql/invoices_and_payments_test_data.sql")
     public void testAccountingHappyCase() {

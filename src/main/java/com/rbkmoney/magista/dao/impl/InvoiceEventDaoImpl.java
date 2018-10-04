@@ -1,5 +1,8 @@
-package com.rbkmoney.magista.dao;
+package com.rbkmoney.magista.dao.impl;
 
+import com.rbkmoney.magista.dao.InvoiceEventDao;
+import com.rbkmoney.magista.dao.impl.AbstractDao;
+import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;
 import com.rbkmoney.magista.exception.DaoException;
@@ -7,6 +10,7 @@ import org.jooq.Condition;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 
@@ -17,6 +21,7 @@ import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
 /**
  * Created by tolkonepiu on 26/05/2017.
  */
+@Component
 public class InvoiceEventDaoImpl extends AbstractDao implements InvoiceEventDao {
 
     public static final RowMapper<InvoiceEventStat> ROW_MAPPER = new RecordRowMapper<>(INVOICE_EVENT_STAT, InvoiceEventStat.class);

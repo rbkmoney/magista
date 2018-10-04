@@ -44,7 +44,6 @@ public class PaymentRefundService {
                 InvoiceEventStat paymentEventStat = invoiceEventService.getInvoicePaymentEventByIds(refund.getInvoiceId(), refund.getPaymentId());
                 refund.setPartyId(paymentEventStat.getPartyId());
                 refund.setPartyShopId(paymentEventStat.getPartyShopId());
-                refund.setPartyContractId(paymentEventStat.getPartyContractId());
                 if (refund.getRefundAmount() == null) {
                     refund.setRefundAmount(paymentEventStat.getPaymentAmount());
                     refund.setRefundCurrencyCode(paymentEventStat.getPaymentCurrencyCode());
@@ -55,7 +54,6 @@ public class PaymentRefundService {
 
                 refund.setPartyId(previousRefundEvent.getPartyId());
                 refund.setPartyShopId(previousRefundEvent.getPartyShopId());
-                refund.setPartyContractId(previousRefundEvent.getPartyContractId());
                 refund.setRefundCreatedAt(previousRefundEvent.getRefundCreatedAt());
                 refund.setRefundCurrencyCode(previousRefundEvent.getRefundCurrencyCode());
                 refund.setRefundAmount(previousRefundEvent.getRefundAmount());
