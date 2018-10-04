@@ -1,12 +1,14 @@
-package com.rbkmoney.magista.dao;
+package com.rbkmoney.magista.dao.impl;
 
-import com.rbkmoney.magista.dao.field.CollectionConditionField;
-import com.rbkmoney.magista.dao.field.ConditionField;
+import com.rbkmoney.magista.dao.impl.field.CollectionConditionField;
+import com.rbkmoney.magista.dao.impl.field.ConditionField;
+import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.*;
 import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
@@ -22,10 +24,13 @@ import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Created by tolkonepiu on 29/05/2017.
  */
+@DependsOn("dbInitializer")
 public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
 
     private final DSLContext dslContext;
@@ -160,6 +165,20 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
                 field.getComparator(),
                 field.getValue()
         );
+    }
+
+    protected Condition appendDateTimeRangeConditions(Condition condition,
+                                                      Field<LocalDateTime> field,
+                                                      Optional<LocalDateTime> fromTime,
+                                                      Optional<LocalDateTime> toTime) {
+        if (fromTime.isPresent()) {
+            condition = condition.and(field.ge(fromTime.get()));
+        }
+
+        if (toTime.isPresent()) {
+            condition = condition.and(field.lt(toTime.get()));
+        }
+        return condition;
     }
 
     protected SqlParameterSource toSqlParameterSource(Map<String, Param<?>> params) {

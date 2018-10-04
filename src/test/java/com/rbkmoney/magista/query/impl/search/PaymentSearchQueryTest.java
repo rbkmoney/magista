@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.query.impl;
+package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
@@ -28,17 +28,6 @@ import static org.junit.Assert.assertNull;
 
 @Transactional
 public class PaymentSearchQueryTest extends AbstractIntegrationTest {
-
-    private QueryProcessorImpl queryProcessor;
-
-    @Autowired
-    StatisticsDao statisticsDao;
-
-    @Before
-    public void before() {
-        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao);
-        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
-    }
 
     @Test
     @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")

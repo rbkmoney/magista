@@ -202,7 +202,7 @@ public class PaymentsForReportFunction extends PagedBaseFunction<Map.Entry<Long,
             FunctionQueryContext functionContext = getContext(context);
             PaymentsForReportParameters parameters = new PaymentsForReportParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Collection<Map.Entry<Long, StatPayment>> result = functionContext.getDao().getPaymentsForReport(
+                Collection<Map.Entry<Long, StatPayment>> result = functionContext.getReportDao().getPaymentsForReport(
                         parameters.getMerchantId(),
                         parameters.getShopId(),
                         Optional.ofNullable(parameters.getInvoiceId()),

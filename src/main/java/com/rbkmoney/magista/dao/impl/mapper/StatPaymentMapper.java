@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.dao.mapper;
+package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.BankCardPaymentSystem;

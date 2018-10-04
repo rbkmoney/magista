@@ -263,7 +263,7 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             FunctionQueryContext functionContext = getContext(context);
             PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Collection<Map.Entry<Long, StatPayment>> result = functionContext.getDao().getPayments(
+                Collection<Map.Entry<Long, StatPayment>> result = functionContext.getSearchDao().getPayments(
                         parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),

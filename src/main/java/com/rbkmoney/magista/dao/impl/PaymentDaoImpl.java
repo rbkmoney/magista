@@ -1,5 +1,8 @@
-package com.rbkmoney.magista.dao;
+package com.rbkmoney.magista.dao.impl;
 
+import com.rbkmoney.magista.dao.PaymentDao;
+import com.rbkmoney.magista.dao.impl.AbstractDao;
+import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.exception.DaoException;

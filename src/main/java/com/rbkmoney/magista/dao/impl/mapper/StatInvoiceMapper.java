@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.dao.mapper;
+package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.InvoiceCart;
@@ -6,7 +6,6 @@ import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.util.DamselUtil;
-import org.jooq.TableField;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.nio.ByteBuffer;

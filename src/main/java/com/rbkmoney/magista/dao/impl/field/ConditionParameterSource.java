@@ -1,8 +1,5 @@
-package com.rbkmoney.magista.dao;
+package com.rbkmoney.magista.dao.impl.field;
 
-import com.rbkmoney.magista.dao.field.CollectionConditionField;
-import com.rbkmoney.magista.dao.field.ConditionField;
-import com.rbkmoney.magista.dao.field.SimpleConditionField;
 import org.jooq.Comparator;
 import org.jooq.Field;
 
