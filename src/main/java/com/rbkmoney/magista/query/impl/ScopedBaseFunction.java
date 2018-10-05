@@ -53,10 +53,6 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
             return getStringParameter(SHOP_ID_PARAM, false);
         }
 
-        public String getContractId() {
-            return getStringParameter(CONTRACT_ID_PARAM, false);
-        }
-
         public List<Integer> getShopCategoryIds() {
             return getArrayParameter(SHOP_CATEGORY_IDS_PARAM, false);
         }
@@ -71,10 +67,6 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
 
             if (!StringUtils.hasLength(scopedParameters.getMerchantId()) && StringUtils.hasLength(scopedParameters.getShopId())) {
                 checkParamsResult(true, SHOP_ID_PARAM, "when searching by shop_id, merchant_id must be set");
-            }
-
-            if (!StringUtils.hasLength(scopedParameters.getMerchantId()) && StringUtils.hasLength(scopedParameters.getContractId())) {
-                checkParamsResult(true, CONTRACT_ID_PARAM, "when searching by contract_id, merchant_id must be set");
             }
         }
 

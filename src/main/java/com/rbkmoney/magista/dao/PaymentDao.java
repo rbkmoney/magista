@@ -6,6 +6,8 @@ import com.rbkmoney.magista.exception.DaoException;
 
 public interface PaymentDao {
 
+    PaymentData getPaymentData(String invoiceId, String paymentId) throws DaoException;
+
     void savePaymentData(PaymentData invoiceData) throws DaoException;
 
     PaymentEvent getPaymentEvent(String invoiceId, String paymentId) throws DaoException;

@@ -5,6 +5,7 @@ import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.damsel.domain.PaymentTool;
 import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
@@ -20,6 +21,7 @@ import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.exception.NotFoundException;
+import com.rbkmoney.magista.provider.GeoProvider;
 import com.rbkmoney.magista.service.PaymentService;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
@@ -34,9 +36,12 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
 
     private final PaymentService paymentService;
 
+    private final GeoProvider geoProvider;
+
     @Autowired
-    public PaymentStartedEventHandler(PaymentService paymentService) {
+    public PaymentStartedEventHandler(PaymentService paymentService, GeoProvider geoProvider) {
         this.paymentService = paymentService;
+        this.geoProvider = geoProvider;
     }
 
     @Override
@@ -102,7 +107,14 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
                 if (paymentResource.isSetClientInfo()) {
                     ClientInfo clientInfo = paymentResource.getClientInfo();
                     paymentData.setPaymentFingerprint(clientInfo.getFingerprint());
-                    paymentData.setPaymentIp(clientInfo.getIpAddress());
+
+                    String paymentIpAddress = clientInfo.getIpAddress();
+                    if (paymentIpAddress != null) {
+                        paymentData.setPaymentIp(paymentIpAddress);
+                        LocationInfo locationInfo = geoProvider.getLocationInfo(paymentIpAddress);
+                        paymentData.setPaymentCountryId(locationInfo.getCountryGeoId());
+                        paymentData.setPaymentCityId(locationInfo.getCityGeoId());
+                    }
                 }
                 break;
             case customer:
@@ -119,8 +131,8 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
                 paymentData.setPaymentRecurrentPayerParentInvoiceId(recurrentParentPayment.getInvoiceId());
                 paymentData.setPaymentRecurrentPayerParentPaymentId(recurrentParentPayment.getPaymentId());
                 break;
-                default:
-                    throw new NotFoundException(String.format("Payment type '%s' not found", payerType));
+            default:
+                throw new NotFoundException(String.format("Payment type '%s' not found", payerType));
         }
 
         PaymentEvent paymentEvent = new PaymentEvent();

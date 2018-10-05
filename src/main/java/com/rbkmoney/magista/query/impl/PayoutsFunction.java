@@ -1,8 +1,10 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.damsel.merch_stat.StatPayout;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
-import com.rbkmoney.magista.dao.ConditionParameterSource;
+import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
@@ -28,7 +30,7 @@ import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_ST
 import static com.rbkmoney.magista.query.impl.Parameters.*;
 import static org.jooq.Comparator.*;
 
-public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResponse> implements CompositeQuery<PayoutEventStat, StatResponse> {
+public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayout>, StatResponse> implements CompositeQuery<Map.Entry<Long, StatPayout>, StatResponse> {
 
     public static final String FUNC_NAME = "payouts";
 
@@ -40,26 +42,26 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
     }
 
     @Override
-    public QueryResult<PayoutEventStat, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+    public QueryResult<Map.Entry<Long, StatPayout>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
         QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
 
         return execute(context, collectedResults.getCollectedStream());
     }
 
     @Override
-    public QueryResult<PayoutEventStat, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
+    public QueryResult<Map.Entry<Long, StatPayout>, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
         if (collectedResults.size() != 2) {
             throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
         }
 
-        QueryResult<PayoutEventStat, List<PayoutEventStat>> payoutsResult = (QueryResult<PayoutEventStat, List<PayoutEventStat>>) collectedResults.get(0);
+        QueryResult<Map.Entry<Long, StatPayout>, List<Map.Entry<Long, StatPayout>>> payoutsResult = (QueryResult<Map.Entry<Long, StatPayout>, List<Map.Entry<Long, StatPayout>>>) collectedResults.get(0);
         QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
                 () -> payoutsResult.getDataStream(),
                 () -> {
                     StatResponseData statResponseData = StatResponseData.payouts(payoutsResult.getDataStream()
-                            .map(payoutEvent -> DamselUtil.toStatPayout(payoutEvent))
+                            .map(payoutResponse -> payoutResponse.getValue())
                             .collect(Collectors.toList()));
 
                     StatResponse statResponse = new StatResponse(statResponseData);
@@ -196,7 +198,7 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
         return payoutsFunction;
     }
 
-    private static class GetDataFunction extends PagedBaseFunction<PayoutEventStat, Collection<PayoutEventStat>> {
+    private static class GetDataFunction extends PagedBaseFunction<Map.Entry<Long, StatPayout>, Collection<Map.Entry<Long, StatPayout>>> {
         private static final String FUNC_NAME = PayoutsFunction.FUNC_NAME + "_data";
 
         public GetDataFunction(Object descriptor, QueryParameters params, String continuationToken) {
@@ -204,14 +206,15 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
         }
 
         @Override
-        public QueryResult<PayoutEventStat, Collection<PayoutEventStat>> execute(QueryContext context) throws QueryExecutionException {
+        public QueryResult<Map.Entry<Long, StatPayout>, Collection<Map.Entry<Long, StatPayout>>> execute(QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
             PayoutsParameters parameters = new PayoutsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Collection<PayoutEventStat> result = functionContext.getDao().getPayouts(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        buildPayoutConditionParameterSource(parameters),
+                Collection<Map.Entry<Long, StatPayout>> result = functionContext.getSearchDao().getPayouts(
+                        parameters,
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
+                        Optional.empty(),
                         Optional.ofNullable(parameters.getFrom()),
                         parameters.getSize()
                 );
@@ -234,33 +237,16 @@ public class PayoutsFunction extends PagedBaseFunction<PayoutEventStat, StatResp
             FunctionQueryContext functionContext = getContext(context);
             PayoutsParameters parameters = new PayoutsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Integer result = functionContext.getDao().getPayoutsCount(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        buildPayoutConditionParameterSource(parameters)
+                Integer result = functionContext.getSearchDao().getPayoutsCount(
+                        parameters,
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
+                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime()))
                 );
                 return new BaseQueryResult<>(() -> Stream.of(result), () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }
         }
-    }
-
-    public static ConditionParameterSource buildPayoutConditionParameterSource(PayoutsParameters parameters) {
-        return new ConditionParameterSource()
-                .addValue(PAYOUT_EVENT_STAT.PARTY_ID, parameters.getMerchantId(), EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_ID, parameters.getPayoutId(), EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_STATUS,
-                        toEnumField(parameters.getPayoutStatus(), PayoutStatus.class),
-                        EQUALS)
-                .addInConditionValue(PAYOUT_EVENT_STAT.PAYOUT_STATUS,
-                        toEnumFields(parameters.getPayoutStatuses(), PayoutStatus.class))
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_TYPE,
-                        toEnumField(parameters.getPayoutType(), PayoutType.class),
-                        EQUALS)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT, toLocalDateTime(parameters.getFromTime()), GREATER_OR_EQUAL)
-                .addValue(PAYOUT_EVENT_STAT.PAYOUT_CREATED_AT, toLocalDateTime(parameters.getToTime()), LESS);
     }
 
 }

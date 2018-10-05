@@ -1,7 +1,16 @@
 package com.rbkmoney.magista;
 
+import com.rbkmoney.magista.dao.ReportDao;
+import com.rbkmoney.magista.dao.SearchDao;
+import com.rbkmoney.magista.dao.StatisticsDao;
+import com.rbkmoney.magista.query.impl.QueryContextFactoryImpl;
+import com.rbkmoney.magista.query.impl.QueryProcessorImpl;
+import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
+import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.EnvironmentTestUtils;
@@ -30,6 +39,27 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ContextConfiguration(classes = MagistaApplication.class, initializers = AbstractIntegrationTest.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class AbstractIntegrationTest {
+
+    protected QueryProcessorImpl queryProcessor;
+
+    @Autowired
+    private StatisticsDao statisticsDao;
+
+    @Autowired
+    private SearchDao searchDao;
+
+    @Autowired
+    private ReportDao reportDao;
+
+    @Value("${local.server.port}")
+    protected int port;
+
+    @Before
+    public void before() {
+        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao, searchDao, reportDao);
+        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
+    }
+
     @ClassRule
     public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:9.6")
             .withStartupTimeout(Duration.ofMinutes(5));
@@ -47,6 +77,4 @@ public class AbstractIntegrationTest {
             );
         }
     }
-    @Value("${local.server.port}")
-    protected int port;
 }

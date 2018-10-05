@@ -30,16 +30,6 @@ import static org.junit.Assert.assertTrue;
 @Sql("classpath:data/sql/invoices_and_payments_test_data.sql")
 @Transactional
 public class QueryProcessorImplTest extends AbstractIntegrationTest {
-    private QueryProcessorImpl queryProcessor;
-
-    @Autowired
-    StatisticsDao statisticsDao;
-
-    @Before
-    public void before() {
-        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao);
-        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
-    }
 
     @Test
     public void testPayouts() throws TException {
@@ -85,56 +75,6 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testPaymentsTurnover() {
-        String json = "{'query': {'payments_turnover': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60', 'from':'1', 'size':'2'}}}";
-        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(1, statResponse.getData().getRecords().size());
-        assertEquals(0, statResponse.getTotalCount());
-    }
-
-    @Test
-    public void testPaymentsGeoStat() {
-        String json = "{'query': {'payments_geo_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
-        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(1, statResponse.getData().getRecords().size());
-        assertEquals(0, statResponse.getTotalCount());
-    }
-
-    @Test
-    public void testPaymentsWithEmptyGeoStat() throws TException {
-        String json = "{'query': {'payments_geo_stat': {'merchant_id': '7e77621d-6f43-46b5-9e61-188363def06b','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
-        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(0, statResponse.getData().getRecords().size());
-        assertEquals(0, statResponse.getTotalCount());
-        assertEquals("{\"data\":{\"records\":[]}}", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse));
-    }
-
-    @Test
-    public void testPaymentsCardTypesStat() {
-        String json = "{'query': {'payments_pmt_cards_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
-        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(3, statResponse.getData().getRecords().size());
-        assertEquals(0, statResponse.getTotalCount());
-    }
-
-    @Test
-    public void testPaymentsCardTypeWithEmptyPaymentSystem() throws TException {
-        String json = "{'query': {'payments_pmt_cards_stat': {'merchant_id': '349d01f8-9349-4b50-b071-567c8204ff63','shop_id': '1','from_time': '2015-10-25T15:45:20Z','to_time': '2018-10-25T18:10:10Z', 'split_interval':'60'}}}";
-        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(0, statResponse.getData().getRecords().size());
-        assertEquals(0, statResponse.getTotalCount());
-        assertEquals("{\"data\":{\"records\":[]}}", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse));
-    }
-
-    @Test
-    public void testPaymentsConversionStat() {
-        String json = "{'query': {'payments_conversion_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
-        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(3, statResponse.getData().getRecords().size());
-        assertEquals(0, statResponse.getTotalCount());
-    }
-
-    @Test
     public void testRefunds() throws TException {
         String json = "{'query': {'refunds': {'from_time': '2015-10-25T15:45:20Z','to_time': '2017-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
@@ -149,23 +89,6 @@ public class QueryProcessorImplTest extends AbstractIntegrationTest {
         StatRefund statRefund = statResponse.getData().getRefunds().get(0);
         assertEquals("test_refund_2", statRefund.getId());
         new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse);
-    }
-
-    @Test
-    public void testCustomersRateStat() {
-        String json = "{'query': {'customers_rate_stat': {'merchant_id': '74480e4f-1a36-4edd-8175-7a9e984313b0','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
-        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(3, statResponse.getData().getRecords().size());
-        assertEquals(0, statResponse.getTotalCount());
-    }
-
-    @Test
-    public void testCustomersRateStatWithEmptyFingerprint() throws TException {
-        String json = "{'query': {'customers_rate_stat': {'merchant_id': '7e77621d-6f43-46b5-9e61-188363def06b','shop_id': '1','from_time': '2016-10-25T15:45:20Z','to_time': '2016-10-25T18:10:10Z', 'split_interval':'60'}}}";
-        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(1, statResponse.getData().getRecords().size());
-        assertEquals(0, statResponse.getTotalCount());
-        assertEquals("{\"data\":{\"records\":[{\"unic_count\":\"0\",\"offset\":\"180\"}]}}", new TSerializer(new TSimpleJSONProtocol.Factory()).toString(statResponse));
     }
 
 }

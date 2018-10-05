@@ -1,9 +1,10 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.damsel.merch_stat.StatRefund;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.dao.ConditionParameterSource;
+import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
 import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
@@ -26,7 +27,7 @@ import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
 import static org.jooq.Comparator.EQUALS;
 
-public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> implements CompositeQuery<Refund, StatResponse> {
+public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefund>, StatResponse> implements CompositeQuery<Map.Entry<Long, StatRefund>, StatResponse> {
 
     public static final String FUNC_NAME = "refunds";
 
@@ -38,26 +39,26 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
     }
 
     @Override
-    public QueryResult<Refund, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+    public QueryResult<Map.Entry<Long, StatRefund>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
         QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
 
         return execute(context, collectedResults.getCollectedStream());
     }
 
     @Override
-    public QueryResult<Refund, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
+    public QueryResult<Map.Entry<Long, StatRefund>, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
         if (collectedResults.size() != 2) {
             throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
         }
 
-        QueryResult<Refund, List<Refund>> refundsResult = (QueryResult<Refund, List<Refund>>) collectedResults.get(0);
+        QueryResult<Map.Entry<Long, StatRefund>, List<Map.Entry<Long, StatRefund>>> refundsResult = (QueryResult<Map.Entry<Long, StatRefund>, List<Map.Entry<Long, StatRefund>>>) collectedResults.get(0);
         QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
                 () -> refundsResult.getDataStream(),
                 () -> {
                     StatResponseData statResponseData = StatResponseData.refunds(refundsResult.getDataStream()
-                            .map(refundEvent -> DamselUtil.toStatRefund(refundEvent))
+                            .map(refundResponse -> refundResponse.getValue())
                             .collect(Collectors.toList()));
 
                     StatResponse statResponse = new StatResponse(statResponseData);
@@ -194,7 +195,7 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
         return refundsFunction;
     }
 
-    private static class GetDataFunction extends PagedBaseFunction<Refund, Collection<Refund>> {
+    private static class GetDataFunction extends PagedBaseFunction<Map.Entry<Long, StatRefund>, Collection<Map.Entry<Long, StatRefund>>> {
         private static final String FUNC_NAME = RefundsFunction.FUNC_NAME + "_data";
 
         public GetDataFunction(Object descriptor, QueryParameters params, String continuationToken) {
@@ -202,17 +203,15 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
         }
 
         @Override
-        public QueryResult<Refund, Collection<Refund>> execute(QueryContext context) throws QueryExecutionException {
+        public QueryResult<Map.Entry<Long, StatRefund>, Collection<Map.Entry<Long, StatRefund>>> execute(QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
             RefundsParameters parameters = new RefundsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Collection<Refund> result = functionContext.getDao().getRefunds(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        Optional.ofNullable(parameters.getContractId()),
-                        buildRefundConditionParameterSource(parameters),
+                Collection<Map.Entry<Long, StatRefund>> result = functionContext.getSearchDao().getRefunds(
+                        parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
+                        Optional.empty(),
                         Optional.ofNullable(parameters.getFrom()),
                         parameters.getSize()
                 );
@@ -235,11 +234,8 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
             FunctionQueryContext functionContext = getContext(context);
             RefundsParameters parameters = new RefundsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Integer result = functionContext.getDao().getRefundsCount(
-                        Optional.ofNullable(parameters.getMerchantId()),
-                        Optional.ofNullable(parameters.getShopId()),
-                        Optional.ofNullable(parameters.getContractId()),
-                        buildRefundConditionParameterSource(parameters),
+                Integer result = functionContext.getSearchDao().getRefundsCount(
+                        parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime()))
                 );
@@ -248,19 +244,6 @@ public class RefundsFunction extends PagedBaseFunction<Refund, StatResponse> imp
                 throw new QueryExecutionException(e);
             }
         }
-    }
-
-    public static ConditionParameterSource buildRefundConditionParameterSource(RefundsParameters parameters) {
-        return new ConditionParameterSource()
-                .addValue(REFUND.PARTY_ID, parameters.getMerchantId(), EQUALS)
-                .addValue(REFUND.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                .addValue(REFUND.PARTY_CONTRACT_ID, parameters.getContractId(), EQUALS)
-                .addValue(REFUND.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                .addValue(REFUND.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
-                .addValue(REFUND.REFUND_ID, parameters.getRefundId(), EQUALS)
-                .addValue(REFUND.REFUND_STATUS,
-                        toEnumField(parameters.getRefundStatus(), RefundStatus.class),
-                        EQUALS);
     }
 
 }
