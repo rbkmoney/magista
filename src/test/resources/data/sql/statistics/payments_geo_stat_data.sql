@@ -15,9 +15,9 @@ insert into mst.payment_data (id, invoice_id, payment_id, party_id, party_shop_i
 VALUES (1, 'INVOICE_ID_1', 'PAYMENT_ID_2', 'DB79AD6C-A507-43ED-9ECF-3BBD88475B32', 'SHOP_ID', 'RUB', 50000, 'payment_resource', 'bank_card', '4242', '424242', 'eriogmiorwgeiroameriovmerio', 'visa', 'hold', 'cancel', now(), 'payment_session_1', 'qweqweldasksldfmdslkfm', '34.23.44.33', 42, 43, '88005553535', 'qwe@mail.ru', now() + interval '2 seconds');
 
 insert into mst.payment_event (event_id, event_created_at, event_type, invoice_id, payment_id, payment_status, payment_fee, payment_provider_fee, payment_external_fee, payment_domain_revision)
-VALUES (2, now(), 'INVOICE_PAYMENT_STARTED', 'INVOICE_ID_1', 'PAYMENT_ID_2', 'pending', 35, 5, 0, 1);
+VALUES (4, now(), 'INVOICE_PAYMENT_STARTED', 'INVOICE_ID_1', 'PAYMENT_ID_2', 'pending', 35, 5, 0, 1);
 insert into mst.payment_event (event_id, event_created_at, event_type, invoice_id, payment_id, payment_status, payment_fee, payment_provider_fee, payment_external_fee, payment_domain_revision)
-VALUES (3, now(), 'INVOICE_PAYMENT_STATUS_CHANGED', 'INVOICE_ID_1', 'PAYMENT_ID_2', 'captured', 35, 5, 0, 1);
+VALUES (5, now(), 'INVOICE_PAYMENT_STATUS_CHANGED', 'INVOICE_ID_1', 'PAYMENT_ID_2', 'captured', 35, 5, 0, 1);
 
 
 insert into mst.invoice_event (event_id, event_created_at, event_type, invoice_id, invoice_status) VALUES (4, now() + interval '1 hour', 'INVOICE_STATUS_CHANGED', 'INVOICE_ID_1', 'paid');

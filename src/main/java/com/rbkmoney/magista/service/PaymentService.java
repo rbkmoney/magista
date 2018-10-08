@@ -31,6 +31,14 @@ public class PaymentService {
         this.paymentDao = paymentDao;
     }
 
+    public PaymentData getPaymentData(String invoiceId, String paymentId) throws StorageException {
+        try {
+            return paymentDao.getPaymentData(invoiceId, paymentId);
+        } catch (DaoException ex) {
+            throw new StorageException(String.format("Failed to get payment data, invoiceId='%s', paymentId='%s'", invoiceId, paymentId), ex);
+        }
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public void savePayment(PaymentData paymentData, PaymentEvent paymentEvent) throws NotFoundException, StorageException {
         log.info("Trying to save payment, paymentData='{}', paymentEvent='{}'", paymentData, paymentEvent);

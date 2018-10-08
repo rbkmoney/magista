@@ -5,7 +5,10 @@ import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.magista.dao.ReportDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.StatPaymentMapper;
-import com.rbkmoney.magista.domain.enums.*;
+import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
+import com.rbkmoney.magista.domain.enums.InvoiceEventType;
+import com.rbkmoney.magista.domain.enums.PayoutStatus;
+import com.rbkmoney.magista.domain.enums.RefundStatus;
 import com.rbkmoney.magista.domain.tables.PaymentEvent;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Field;
@@ -23,7 +26,6 @@ import java.util.UUID;
 
 import static com.rbkmoney.magista.domain.Tables.PAYMENT_EVENT;
 import static com.rbkmoney.magista.domain.tables.Adjustment.ADJUSTMENT;
-import static com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
@@ -43,28 +45,31 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
     @Override
     public Map<String, String> getPaymentAccountingData(String merchantId, String shopId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
         Query query = getDslContext().select(
-                INVOICE_EVENT_STAT.PARTY_ID.as("merchant_id"),
-                INVOICE_EVENT_STAT.PARTY_SHOP_ID.as("shop_id"),
-                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.as("currency_code"),
-                DSL.sum(INVOICE_EVENT_STAT.PAYMENT_AMOUNT).as("funds_acquired"),
-                DSL.sum(INVOICE_EVENT_STAT.PAYMENT_FEE).as("fee_charged")
-        ).from(INVOICE_EVENT_STAT).where(
-                appendDateTimeRangeConditions(
-                        INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT)
-                                .and(INVOICE_EVENT_STAT.PARTY_ID.eq(merchantId))
-                                .and(INVOICE_EVENT_STAT.PARTY_SHOP_ID.eq(shopId))
-                                .and(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.eq(currencyCode))
-                                .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured))
-                                .and(INVOICE_EVENT_STAT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED)),
-                        INVOICE_EVENT_STAT.EVENT_CREATED_AT,
-                        fromTime,
-                        Optional.of(toTime)
-                )
-        ).groupBy(
-                INVOICE_EVENT_STAT.PARTY_ID,
-                INVOICE_EVENT_STAT.PARTY_SHOP_ID,
-                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE
-        );
+                PAYMENT_DATA.PARTY_ID.as("merchant_id"),
+                PAYMENT_DATA.PARTY_SHOP_ID.as("shop_id"),
+                PAYMENT_DATA.PAYMENT_CURRENCY_CODE.as("currency_code"),
+                DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT).as("funds_acquired"),
+                DSL.sum(PAYMENT_EVENT.PAYMENT_FEE).as("fee_charged")
+        ).from(PAYMENT_DATA)
+                .join(PAYMENT_EVENT)
+                .on(
+                        appendDateTimeRangeConditions(
+                                PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(merchantId))
+                                        .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId))
+                                        .and(PAYMENT_DATA.INVOICE_ID.eq(PAYMENT_EVENT.INVOICE_ID))
+                                        .and(PAYMENT_DATA.PAYMENT_ID.eq(PAYMENT_EVENT.PAYMENT_ID))
+                                        .and(PAYMENT_DATA.PAYMENT_CURRENCY_CODE.eq(currencyCode))
+                                        .and(PAYMENT_EVENT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured))
+                                        .and(PAYMENT_EVENT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED)),
+                                PAYMENT_EVENT.EVENT_CREATED_AT,
+                                fromTime,
+                                Optional.of(toTime)
+                        )
+                ).groupBy(
+                        PAYMENT_DATA.PARTY_ID,
+                        PAYMENT_DATA.PARTY_SHOP_ID,
+                        PAYMENT_DATA.PAYMENT_CURRENCY_CODE
+                );
 
         return Optional.ofNullable(
                 fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
@@ -131,29 +136,32 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
         Query query = getDslContext().select(
                 ADJUSTMENT.PARTY_ID.as("merchant_id"),
                 ADJUSTMENT.PARTY_SHOP_ID.as("shop_id"),
-                INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.as("currency_code"),
-                DSL.sum(INVOICE_EVENT_STAT.PAYMENT_FEE.minus(ADJUSTMENT.ADJUSTMENT_FEE)).as("funds_adjusted")
+                PAYMENT_DATA.PAYMENT_CURRENCY_CODE.as("currency_code"),
+                DSL.sum(PAYMENT_EVENT.PAYMENT_FEE.minus(ADJUSTMENT.ADJUSTMENT_FEE)).as("funds_adjusted")
         ).from(ADJUSTMENT)
-                .join(INVOICE_EVENT_STAT)
+                .join(PAYMENT_DATA)
                 .on(
                         appendDateTimeRangeConditions(
                                 ADJUSTMENT.PARTY_ID.eq(merchantId)
                                         .and(ADJUSTMENT.PARTY_SHOP_ID.eq(shopId))
-                                        .and(ADJUSTMENT.INVOICE_ID.eq(INVOICE_EVENT_STAT.INVOICE_ID))
-                                        .and(ADJUSTMENT.PAYMENT_ID.eq(INVOICE_EVENT_STAT.PAYMENT_ID))
+                                        .and(ADJUSTMENT.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID))
+                                        .and(ADJUSTMENT.PAYMENT_ID.eq(PAYMENT_DATA.PAYMENT_ID))
                                         .and(ADJUSTMENT.ADJUSTMENT_STATUS.eq(AdjustmentStatus.captured))
-                                        .and(INVOICE_EVENT_STAT.EVENT_CATEGORY.eq(InvoiceEventCategory.PAYMENT))
-                                        .and(INVOICE_EVENT_STAT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
-                                        .and(INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE.eq(currencyCode))
-                                        .and(INVOICE_EVENT_STAT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
+                                        .and(PAYMENT_DATA.PAYMENT_CURRENCY_CODE.eq(currencyCode)),
                                 ADJUSTMENT.EVENT_CREATED_AT,
                                 fromTime,
                                 Optional.of(toTime)
                         )
+                ).join(PAYMENT_EVENT)
+                .on(
+                        PAYMENT_DATA.INVOICE_ID.eq(PAYMENT_EVENT.INVOICE_ID)
+                                .and(PAYMENT_DATA.PAYMENT_ID.eq(PAYMENT_EVENT.PAYMENT_ID))
+                                .and(PAYMENT_EVENT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
+                                .and(PAYMENT_EVENT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured))
                 ).groupBy(
                         ADJUSTMENT.PARTY_ID,
                         ADJUSTMENT.PARTY_SHOP_ID,
-                        INVOICE_EVENT_STAT.PAYMENT_CURRENCY_CODE
+                        PAYMENT_DATA.PAYMENT_CURRENCY_CODE
                 );
         return Optional.ofNullable(
                 fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()

@@ -24,14 +24,6 @@ public class PayoutEventService {
         this.payoutEventDao = payoutEventDao;
     }
 
-    public Optional<Long> getLastEventId() throws StorageException {
-        try {
-            return Optional.ofNullable(payoutEventDao.getLastEventId());
-        } catch (DaoException ex) {
-            throw new StorageException("Failed to get last event id", ex);
-        }
-    }
-
     public PayoutEventStat getPayoutEventById(String payoutId) throws NotFoundException {
         PayoutEventStat payoutEvent = payoutEventDao.findPayoutById(payoutId);
         if (payoutEvent == null) {

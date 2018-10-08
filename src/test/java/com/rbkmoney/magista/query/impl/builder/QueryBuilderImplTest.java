@@ -30,7 +30,7 @@ public class QueryBuilderImplTest {
     }
 
     @Test(expected = QueryBuilderException.class)
-    public void testNoFunctionParse() throws Exception {
+    public void testNoFunctionParse() {
         String json = "{'query': {'payments_geo_stat1': {}}}";
         Query query = buildQuery(json);
         fail("no functions in oot query, should not reach this point");

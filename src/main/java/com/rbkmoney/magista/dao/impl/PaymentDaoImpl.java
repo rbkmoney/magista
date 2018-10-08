@@ -1,7 +1,6 @@
 package com.rbkmoney.magista.dao.impl;
 
 import com.rbkmoney.magista.dao.PaymentDao;
-import com.rbkmoney.magista.dao.impl.AbstractDao;
 import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
@@ -19,12 +18,22 @@ import static com.rbkmoney.magista.domain.Tables.PAYMENT_EVENT;
 @Component
 public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
 
+    private final RowMapper<PaymentData> paymentDataRowMapper;
     private final RowMapper<PaymentEvent> paymentEventRowMapper;
 
     @Autowired
     public PaymentDaoImpl(DataSource dataSource) {
         super(dataSource);
+        this.paymentDataRowMapper = new RecordRowMapper<>(PAYMENT_DATA, PaymentData.class);
         this.paymentEventRowMapper = new RecordRowMapper<>(PAYMENT_EVENT, PaymentEvent.class);
+    }
+
+    @Override
+    public PaymentData getPaymentData(String invoiceId, String paymentId) throws DaoException {
+        Query query = getDslContext().selectFrom(PAYMENT_DATA)
+                .where(PAYMENT_DATA.INVOICE_ID.eq(invoiceId))
+                .and(PAYMENT_DATA.PAYMENT_ID.eq(paymentId));
+        return fetchOne(query, paymentDataRowMapper);
     }
 
     @Override
@@ -49,6 +58,9 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
     @Override
     public void savePaymentEvent(PaymentEvent paymentEvent) throws DaoException {
         Query query = getDslContext().insertInto(PAYMENT_EVENT)
+                .set(getDslContext().newRecord(PAYMENT_EVENT, paymentEvent))
+                .onConflict(PAYMENT_EVENT.EVENT_ID, PAYMENT_EVENT.EVENT_TYPE, PAYMENT_EVENT.PAYMENT_STATUS)
+                .doUpdate()
                 .set(getDslContext().newRecord(PAYMENT_EVENT, paymentEvent));
         executeOne(query);
     }

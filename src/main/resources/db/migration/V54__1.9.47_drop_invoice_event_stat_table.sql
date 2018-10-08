@@ -1,0 +1,1 @@
+drop table mst.invoice_event_stat;

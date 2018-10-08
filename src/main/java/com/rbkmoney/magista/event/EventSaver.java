@@ -1,18 +1,11 @@
 package com.rbkmoney.magista.event;
 
-import com.rbkmoney.magista.exception.AdjustmentException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Created by tolkonepiu on 31/10/2016.
@@ -22,13 +15,11 @@ public class EventSaver implements Runnable {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final BlockingQueue<Future<Processor>> queue;
-    private final TransactionTemplate transactionTemplate;
     private final long timeout;
     private volatile boolean isRun = true;
 
-    public EventSaver(BlockingQueue<Future<Processor>> queue, TransactionTemplate transactionTemplate, long timeout) {
+    public EventSaver(BlockingQueue<Future<Processor>> queue, long timeout) {
         this.queue = queue;
-        this.transactionTemplate = transactionTemplate;
         this.timeout = timeout;
     }
 
@@ -45,19 +36,17 @@ public class EventSaver implements Runnable {
                     Future<Processor> future = queue.peek();
                     if (future != null) {
                         Processor processor = future.get();
-                        transactionTemplate.execute(
-                                new TransactionCallbackWithoutResult() {
-                                    public void doInTransactionWithoutResult(TransactionStatus status) {
-                                        processor.execute();
-                                    }
-                                }
-                        );
+                        processor.execute();
                         queue.take();
                     } else {
                         TimeUnit.MILLISECONDS.sleep(timeout);
                     }
-                } catch (Exception ex) {
-                    log.error("Failed to save event after handling", ex);
+                } catch (ExecutionException | NotFoundException | StorageException ex) {
+                    if (ex instanceof ExecutionException) {
+                        log.error("The handler threw an error, event processing cannot continue", ex);
+                    } else {
+                        log.warn("Failed to save event after handling, retrying (timeout = {})...", timeout, ex);
+                    }
                     TimeUnit.MILLISECONDS.sleep(timeout);
                 }
             } catch (InterruptedException e) {

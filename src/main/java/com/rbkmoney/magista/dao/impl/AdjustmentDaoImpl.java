@@ -42,6 +42,9 @@ public class AdjustmentDaoImpl extends AbstractDao implements AdjustmentDao {
     @Override
     public void save(Adjustment adjustment) throws DaoException {
         Query query = getDslContext().insertInto(ADJUSTMENT)
+                .set(getDslContext().newRecord(ADJUSTMENT, adjustment))
+                .onConflict(ADJUSTMENT.EVENT_ID, ADJUSTMENT.EVENT_TYPE, ADJUSTMENT.ADJUSTMENT_STATUS)
+                .doUpdate()
                 .set(getDslContext().newRecord(ADJUSTMENT, adjustment));
 
         executeOne(query);

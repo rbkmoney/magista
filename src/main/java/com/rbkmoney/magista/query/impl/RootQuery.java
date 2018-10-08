@@ -71,7 +71,7 @@ public class RootQuery extends BaseQuery {
                 if (childQuery instanceof CompositeQuery) {
                     Optional<? extends Collection> childQueries = Optional.ofNullable(((CompositeQuery) childQuery).getChildQueries());
                     checkParamsResult(
-                            childQueries.isPresent() ? childQueries.get().isEmpty() : true,
+                            !childQueries.isPresent() || childQueries.get().isEmpty(),
                             "Request must contain at least one query"
                     );
                 }

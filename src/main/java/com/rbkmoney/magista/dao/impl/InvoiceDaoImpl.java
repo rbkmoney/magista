@@ -46,6 +46,9 @@ public class InvoiceDaoImpl extends AbstractDao implements InvoiceDao {
     @Override
     public void saveInvoiceEvent(InvoiceEvent invoiceEvent) throws DaoException {
         Query query = getDslContext().insertInto(INVOICE_EVENT)
+                .set(getDslContext().newRecord(INVOICE_EVENT, invoiceEvent))
+                .onConflict(INVOICE_EVENT.EVENT_ID, INVOICE_EVENT.EVENT_TYPE, INVOICE_EVENT.INVOICE_STATUS)
+                .doUpdate()
                 .set(getDslContext().newRecord(INVOICE_EVENT, invoiceEvent));
         executeOne(query);
     }

@@ -1,7 +1,9 @@
 package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.base.Content;
-import com.rbkmoney.damsel.domain.*;
+import com.rbkmoney.damsel.domain.Invoice;
+import com.rbkmoney.damsel.domain.InvoiceDetails;
+import com.rbkmoney.damsel.domain.InvoiceStatus;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
@@ -14,13 +16,10 @@ import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.service.InvoiceService;
-import com.rbkmoney.magista.service.PartyService;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.ZoneOffset;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component

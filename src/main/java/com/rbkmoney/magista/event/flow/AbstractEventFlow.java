@@ -1,18 +1,22 @@
 package com.rbkmoney.magista.event.flow;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.eventstock.client.*;
+import com.rbkmoney.eventstock.client.poll.DefaultPollingEventPublisherBuilder;
+import com.rbkmoney.eventstock.client.poll.EventFlowFilter;
+import com.rbkmoney.eventstock.client.poll.PollingEventPublisherBuilder;
 import com.rbkmoney.magista.event.EventSaver;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.support.TransactionTemplate;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public abstract class AbstractEventFlow {
 
@@ -20,6 +24,7 @@ public abstract class AbstractEventFlow {
 
     private final BlockingQueue queue;
     private final List<Handler> handlers;
+    private final EventPublisher<StockEvent> eventPublisher;
     private final ThreadGroup threadGroup;
     private final ExecutorService executorService;
     private final EventSaver eventSaver;
@@ -28,11 +33,16 @@ public abstract class AbstractEventFlow {
 
     private AtomicBoolean isRun = new AtomicBoolean(false);
 
-    public AbstractEventFlow(String name, List<Handler> handlers, TransactionTemplate transactionTemplate, int threadPoolSize, int queueLimit, long timeout) {
+    public AbstractEventFlow(String name, List<Handler> handlers, DefaultPollingEventPublisherBuilder defaultPollingEventPublisherBuilder, int threadPoolSize, int queueLimit, long timeout) {
         this.threadGroup = new ThreadGroup(name + "Flow");
         this.threadGroup.setDaemon(true);
         this.handlers = handlers;
         this.queue = new LinkedBlockingQueue<>(queueLimit);
+        this.eventPublisher = defaultPollingEventPublisherBuilder
+                .withEventHandler((EventHandler<StockEvent>) (stockEvent, s) -> {
+                    processEvent(stockEvent);
+                    return EventAction.CONTINUE;
+                }).build();
         this.executorService = Executors.newFixedThreadPool(threadPoolSize, new ThreadFactory() {
             AtomicInteger counter = new AtomicInteger();
 
@@ -43,24 +53,37 @@ public abstract class AbstractEventFlow {
                 return thread;
             }
         });
-        this.eventSaver = new EventSaver(queue, transactionTemplate, timeout);
+        this.eventSaver = new EventSaver(queue, timeout);
         this.eventSaverThread = new Thread(threadGroup, eventSaver, name + "Saver");
         this.timeout = timeout;
     }
 
-    public void start() {
+    public void start(Optional<Long> lastEventId) {
         if (isRun.compareAndSet(false, true)) {
             eventSaverThread.start();
+            eventPublisher.subscribe(buildSubscriberConfig(lastEventId));
             log.info("Event saver thread started");
         }
     }
 
+    private SubscriberConfig buildSubscriberConfig(Optional<Long> lastEventIdOptional) {
+        EventConstraint.EventIDRange eventIDRange = new EventConstraint.EventIDRange();
+        if (lastEventIdOptional.isPresent()) {
+            eventIDRange.setFromExclusive(lastEventIdOptional.get() - 1);
+        }
+        EventFlowFilter eventFlowFilter = new EventFlowFilter(new EventConstraint(eventIDRange));
+        return new DefaultSubscriberConfig(eventFlowFilter);
+    }
+
     public abstract void processEvent(StockEvent stockEvent);
 
-    protected <C> List<Handler> getHandlers(C change) {
-        return handlers.stream()
-                .filter(handler -> handler.accept(change))
-                .collect(Collectors.toList());
+    protected <C> Handler getHandler(C change) {
+        for (Handler handler : handlers) {
+            if (handler.accept(change)) {
+                return handler;
+            }
+        }
+        return null;
     }
 
     protected void submitAndPutInQueue(Callable<Processor> task) {
@@ -74,8 +97,9 @@ public abstract class AbstractEventFlow {
 
     public void stop() {
         if (isRun.compareAndSet(true, false)) {
-            eventSaver.stop(eventSaverThread);
+            eventPublisher.destroy();
             executorService.shutdownNow();
+            eventSaver.stop(eventSaverThread);
 
             try {
                 long startTime = System.currentTimeMillis();
@@ -98,6 +122,7 @@ public abstract class AbstractEventFlow {
 
             } catch (InterruptedException e) {
                 log.warn("Waiting for tasks shutdown is interrupted");
+                Thread.currentThread().interrupt();
             }
 
             if (!threadGroup.isDestroyed()) {

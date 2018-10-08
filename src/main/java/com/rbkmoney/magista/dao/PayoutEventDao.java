@@ -5,8 +5,6 @@ import com.rbkmoney.magista.exception.DaoException;
 
 public interface PayoutEventDao {
 
-    Long getLastEventId() throws DaoException;
-
     PayoutEventStat findPayoutById(String payoutId) throws DaoException;
 
     void insert(PayoutEventStat payoutEvent) throws DaoException;

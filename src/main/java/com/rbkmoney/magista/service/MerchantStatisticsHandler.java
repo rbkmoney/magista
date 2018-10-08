@@ -26,27 +26,27 @@ public class MerchantStatisticsHandler implements Iface {
     }
 
     @Override
-    public StatResponse getPayments(StatRequest statRequest) throws InvalidRequest, BadToken, TException {
+    public StatResponse getPayments(StatRequest statRequest) throws TException {
         return getStatResponse(statRequest);
     }
 
     @Override
-    public StatResponse getInvoices(StatRequest statRequest) throws InvalidRequest, BadToken, TException {
+    public StatResponse getInvoices(StatRequest statRequest) throws TException {
         return getStatResponse(statRequest);
     }
 
     @Override
-    public StatResponse getCustomers(StatRequest statRequest) throws InvalidRequest, BadToken, TException {
+    public StatResponse getCustomers(StatRequest statRequest) throws TException {
         return getStatResponse(statRequest);
     }
 
     @Override
-    public StatResponse getStatistics(StatRequest statRequest) throws InvalidRequest, BadToken, TException {
+    public StatResponse getStatistics(StatRequest statRequest) throws TException {
         return getStatResponse(statRequest);
     }
 
     @Override
-    public StatResponse getPayouts(StatRequest statRequest) throws InvalidRequest, BadToken, TException {
+    public StatResponse getPayouts(StatRequest statRequest) throws TException {
         return getStatResponse(statRequest);
     }
 
