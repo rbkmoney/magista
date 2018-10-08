@@ -58,6 +58,9 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
     @Override
     public void savePaymentEvent(PaymentEvent paymentEvent) throws DaoException {
         Query query = getDslContext().insertInto(PAYMENT_EVENT)
+                .set(getDslContext().newRecord(PAYMENT_EVENT, paymentEvent))
+                .onConflict(PAYMENT_EVENT.EVENT_ID, PAYMENT_EVENT.EVENT_TYPE, PAYMENT_EVENT.PAYMENT_STATUS)
+                .doUpdate()
                 .set(getDslContext().newRecord(PAYMENT_EVENT, paymentEvent));
         executeOne(query);
     }

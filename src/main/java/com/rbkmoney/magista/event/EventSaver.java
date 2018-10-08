@@ -56,6 +56,6 @@ public class EventSaver implements Runnable {
     }
 
     private boolean isRunning() {
-        return !queue.isEmpty() || (isRun && !Thread.currentThread().isInterrupted());
+        return isRun && !Thread.currentThread().isInterrupted();
     }
 }

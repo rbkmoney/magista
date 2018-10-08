@@ -1,7 +1,6 @@
 package com.rbkmoney.magista.dao.impl;
 
 import com.rbkmoney.magista.dao.PayoutEventDao;
-import com.rbkmoney.magista.dao.impl.AbstractDao;
 import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
@@ -43,6 +42,9 @@ public class PayoutEventDaoImpl extends AbstractDao implements PayoutEventDao {
     @Override
     public void insert(PayoutEventStat payoutEvent) throws DaoException {
         Query query = getDslContext().insertInto(PAYOUT_EVENT_STAT)
+                .set(getDslContext().newRecord(PAYOUT_EVENT_STAT, payoutEvent))
+                .onConflict(PAYOUT_EVENT_STAT.EVENT_ID, PAYOUT_EVENT_STAT.EVENT_TYPE, PAYOUT_EVENT_STAT.PAYOUT_STATUS)
+                .doUpdate()
                 .set(getDslContext().newRecord(PAYOUT_EVENT_STAT, payoutEvent));
 
         executeOne(query);

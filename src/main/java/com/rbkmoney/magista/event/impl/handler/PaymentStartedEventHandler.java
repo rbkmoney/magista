@@ -6,6 +6,7 @@ import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.damsel.domain.PaymentTool;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
+import com.rbkmoney.damsel.geo_ip.geo_ipConstants;
 import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
@@ -22,6 +23,7 @@ import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.provider.GeoProvider;
+import com.rbkmoney.magista.provider.ProviderException;
 import com.rbkmoney.magista.service.PaymentService;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
@@ -111,9 +113,7 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
                     String paymentIpAddress = clientInfo.getIpAddress();
                     if (paymentIpAddress != null) {
                         paymentData.setPaymentIp(paymentIpAddress);
-                        LocationInfo locationInfo = geoProvider.getLocationInfo(paymentIpAddress);
-                        paymentData.setPaymentCountryId(locationInfo.getCountryGeoId());
-                        paymentData.setPaymentCityId(locationInfo.getCityGeoId());
+                        mapLocationInfo(paymentData, paymentIpAddress);
                     }
                 }
                 break;
@@ -215,6 +215,17 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
     private void mapContactInfo(PaymentData paymentData, ContactInfo contactInfo) {
         paymentData.setPaymentEmail(contactInfo.getEmail());
         paymentData.setPaymentPhoneNumber(contactInfo.getPhoneNumber());
+    }
+
+    private void mapLocationInfo(PaymentData paymentData, String ipAddress) {
+        try {
+            LocationInfo locationInfo = geoProvider.getLocationInfo(ipAddress);
+            paymentData.setPaymentCityId(locationInfo.getCityGeoId());
+            paymentData.setPaymentCountryId(locationInfo.getCountryGeoId());
+        } catch (ProviderException ex) {
+            paymentData.setPaymentCityId(geo_ipConstants.GEO_ID_UNKNOWN);
+            paymentData.setPaymentCountryId(geo_ipConstants.GEO_ID_UNKNOWN);
+        }
     }
 
     @Override

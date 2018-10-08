@@ -18,6 +18,9 @@ public class EventStockPollerConfig {
     @Value("${bm.processing.pooling.url}")
     private Resource processingPoolingUrl;
 
+    @Value("${bm.processing.pooling.querySize}")
+    private int processingPoolingQuerySize;
+
     @Value("${bm.processing.pooling.maxPoolSize}")
     private int processingPoolingMaxPoolSize;
 
@@ -26,6 +29,9 @@ public class EventStockPollerConfig {
 
     @Value("${bm.payout.pooling.url}")
     private Resource payoutPoolingUrl;
+
+    @Value("${bm.payout.pooling.querySize}")
+    private int payoutPoolingQuerySize;
 
     @Value("${bm.payout.pooling.maxPoolSize}")
     private int payoutPoolingMaxPoolSize;
@@ -37,6 +43,7 @@ public class EventStockPollerConfig {
     public DefaultPollingEventPublisherBuilder processingEventPublisherBuilder() throws IOException {
         return new PollingEventPublisherBuilder()
                 .withURI(processingPoolingUrl.getURI())
+                .withMaxQuerySize(processingPoolingQuerySize)
                 .withMaxPoolSize(processingPoolingMaxPoolSize)
                 .withPollDelay(processingPoolingMaxDelay);
     }
@@ -45,6 +52,7 @@ public class EventStockPollerConfig {
     public DefaultPollingEventPublisherBuilder payoutEventPublisherBuilder() throws IOException {
         return new PollingEventPublisherBuilder()
                 .withURI(payoutPoolingUrl.getURI())
+                .withMaxQuerySize(payoutPoolingQuerySize)
                 .withMaxPoolSize(payoutPoolingMaxPoolSize)
                 .withPollDelay(payoutPoolingMaxDelay);
     }

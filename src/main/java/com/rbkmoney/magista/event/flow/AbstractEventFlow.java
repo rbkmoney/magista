@@ -69,7 +69,7 @@ public abstract class AbstractEventFlow {
     private SubscriberConfig buildSubscriberConfig(Optional<Long> lastEventIdOptional) {
         EventConstraint.EventIDRange eventIDRange = new EventConstraint.EventIDRange();
         if (lastEventIdOptional.isPresent()) {
-            eventIDRange.setFromExclusive(lastEventIdOptional.get());
+            eventIDRange.setFromExclusive(lastEventIdOptional.get() - 1);
         }
         EventFlowFilter eventFlowFilter = new EventFlowFilter(new EventConstraint(eventIDRange));
         return new DefaultSubscriberConfig(eventFlowFilter);
