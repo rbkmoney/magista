@@ -37,13 +37,7 @@ public class PaymentDaoTest extends AbstractIntegrationTest {
 
         paymentDao.savePaymentEvent(paymentEvent);
 
-        assertEquals(paymentEvent, paymentDao.getPaymentEvent(paymentData.getInvoiceId(), paymentData.getPaymentId()));
-    }
-
-    @Test(expected = DaoException.class)
-    public void testWhenSavePaymentEventWithoutInvoiceData() {
-        PaymentEvent paymentEvent = random(PaymentEvent.class);
-        paymentDao.savePaymentEvent(paymentEvent);
+        assertEquals(paymentEvent, paymentDao.getLastPaymentEvent(paymentData.getInvoiceId(), paymentData.getPaymentId()));
     }
 
 }

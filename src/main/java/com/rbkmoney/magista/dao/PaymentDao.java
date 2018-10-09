@@ -10,7 +10,7 @@ public interface PaymentDao {
 
     void savePaymentData(PaymentData invoiceData) throws DaoException;
 
-    PaymentEvent getPaymentEvent(String invoiceId, String paymentId) throws DaoException;
+    PaymentEvent getLastPaymentEvent(String invoiceId, String paymentId) throws DaoException;
 
     void savePaymentEvent(PaymentEvent paymentEvent) throws DaoException;
 

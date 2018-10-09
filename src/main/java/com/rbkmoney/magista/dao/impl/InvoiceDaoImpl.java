@@ -31,9 +31,9 @@ public class InvoiceDaoImpl extends AbstractDao implements InvoiceDao {
     public void saveInvoiceData(InvoiceData invoiceData) throws DaoException {
         Query query = getDslContext().insertInto(INVOICE_DATA)
                 .set(getDslContext().newRecord(INVOICE_DATA, invoiceData))
-                .onDuplicateKeyUpdate()
-                .set(getDslContext().newRecord(INVOICE_DATA, invoiceData));
-        executeOne(query);
+                .onConflict(INVOICE_DATA.INVOICE_ID)
+                .doNothing();
+        execute(query);
     }
 
     @Override

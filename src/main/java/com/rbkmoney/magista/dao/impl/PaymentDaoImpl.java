@@ -40,13 +40,13 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
     public void savePaymentData(PaymentData paymentData) throws DaoException {
         Query query = getDslContext().insertInto(PAYMENT_DATA)
                 .set(getDslContext().newRecord(PAYMENT_DATA, paymentData))
-                .onDuplicateKeyUpdate()
-                .set(getDslContext().newRecord(PAYMENT_DATA, paymentData));
-        executeOne(query);
+                .onConflict(PAYMENT_DATA.INVOICE_ID, PAYMENT_DATA.PAYMENT_ID)
+                .doNothing();
+        execute(query);
     }
 
     @Override
-    public PaymentEvent getPaymentEvent(String invoiceId, String paymentId) throws DaoException {
+    public PaymentEvent getLastPaymentEvent(String invoiceId, String paymentId) throws DaoException {
         Query query = getDslContext().selectFrom(PAYMENT_EVENT)
                 .where(PAYMENT_EVENT.INVOICE_ID.eq(invoiceId))
                 .and(PAYMENT_EVENT.PAYMENT_ID.eq(paymentId))

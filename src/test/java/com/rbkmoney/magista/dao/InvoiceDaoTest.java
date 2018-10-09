@@ -29,10 +29,4 @@ public class InvoiceDaoTest extends AbstractIntegrationTest {
         invoiceDao.saveInvoiceEvent(invoiceEvent);
     }
 
-    @Test(expected = DaoException.class)
-    public void testWhenSaveInvoiceEventWithoutInvoiceData() {
-        InvoiceEvent invoiceEvent = random(InvoiceEvent.class);
-        invoiceDao.saveInvoiceEvent(invoiceEvent);
-    }
-
 }
