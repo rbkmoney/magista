@@ -192,6 +192,18 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
         statRequest = new StatRequest(json);
         statResponse = queryProcessor.processQuery(statRequest);
         assertEquals(0, statResponse.getData().getPayments().size());
+        json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z', 'from_payment_domain_revision': 1, 'size': 1}}}";
+        statRequest = new StatRequest(json);
+        statResponse = queryProcessor.processQuery(statRequest);
+        assertEquals(1, statResponse.getData().getPayments().size());
+        json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z', 'to_payment_domain_revision': 1, 'size': 1}}}";
+        statRequest = new StatRequest(json);
+        statResponse = queryProcessor.processQuery(statRequest);
+        assertEquals(0, statResponse.getData().getPayments().size());
+        json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z', 'from_payment_domain_revision': 1, 'to_payment_domain_revision': 2, 'size': 1}}}";
+        statRequest = new StatRequest(json);
+        statResponse = queryProcessor.processQuery(statRequest);
+        assertEquals(1, statResponse.getData().getPayments().size());
     }
 
     @Sql("classpath:data/sql/search/recurrent_payments_search_data.sql")
