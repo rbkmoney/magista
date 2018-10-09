@@ -130,7 +130,9 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(paymentEvent.PAYMENT_STATUS,
                         TypeUtil.toEnumField(parameters.getPaymentStatus(), com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
                         EQUALS)
-                .addValue(paymentEvent.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS);
+                .addValue(paymentEvent.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
+                .addValue(paymentEvent.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
+                .addValue(paymentEvent.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL);
 
         if (!paymentParameterSource.getConditionFields().isEmpty() || !paymentEventParameterSource.getConditionFields().isEmpty()) {
             selectOnConditionStep = selectOnConditionStep.join(
@@ -218,7 +220,9 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_BIN, parameters.getPaymentBankCardBin(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_MASKED_PAN, parameters.getPaymentBankCardLastDigits(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
-                .addValue(paymentEvent.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS);
+                .addValue(paymentEvent.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
+                .addValue(paymentEvent.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
+                .addValue(paymentEvent.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL);
 
         Query query = getDslContext()
                 .select()
