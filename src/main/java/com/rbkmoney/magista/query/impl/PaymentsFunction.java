@@ -144,6 +144,14 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             return getLongParameter(PAYMENT_DOMAIN_REVISION_PARAM, false);
         }
 
+        public Long getFromPaymentDomainRevision() {
+            return getLongParameter(FROM_PAYMENT_DOMAIN_REVISION_PARAM, false);
+        }
+
+        public Long getToPaymentDomainRevision() {
+            return getLongParameter(TO_PAYMENT_DOMAIN_REVISION_PARAM, false);
+        }
+
         public String getPaymentCustomerId() {
             return getStringParameter(PAYMENT_CUSTOMER_ID_PARAM, false);
         }
