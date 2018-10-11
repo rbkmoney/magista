@@ -40,7 +40,7 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
                         rs.getObject(PAYMENT_DATA.PAYMENT_CREATED_AT.getName(), LocalDateTime.class)
                 )
         );
-
+        statPayment.setDomainRevision(rs.getLong(PAYMENT_EVENT.PAYMENT_DOMAIN_REVISION.getName()));
 
         String eventCreatedAtString = TypeUtil.temporalToString(
                 rs.getObject(PAYMENT_EVENT.EVENT_CREATED_AT.getName(), LocalDateTime.class)
