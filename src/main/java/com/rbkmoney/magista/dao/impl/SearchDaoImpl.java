@@ -171,7 +171,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         }
 
         Query query = selectOnConditionStep
-                .orderBy(INVOICE_DATA.INVOICE_CREATED_AT.desc())
+                .orderBy(INVOICE_DATA.ID.desc())
                 .limit(limit);
         return fetch(query, statInvoiceMapper);
     }
@@ -244,7 +244,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                 fromTime,
                                 toTime
                         )
-                ).orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
+                ).orderBy(PAYMENT_DATA.ID.desc())
                 .limit(limit);
 
         return fetch(query, statPaymentMapper);

@@ -360,7 +360,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                         .addValue(PAYMENT_DATA.PAYMENT_ID, paymentId.orElse(null), EQUALS)
                         )
                 )
-                .orderBy(paymentEvent.EVENT_CREATED_AT)
+                .orderBy(paymentEvent.ID)
                 .limit(limit);
 
         return fetch(query, statPaymentMapper);
