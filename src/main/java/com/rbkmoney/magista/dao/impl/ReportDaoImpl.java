@@ -9,7 +9,6 @@ import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
-import com.rbkmoney.magista.domain.tables.PaymentEvent;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Field;
 import org.jooq.Operator;
@@ -278,8 +277,6 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
             Optional<Long> fromId,
             int limit
     ) throws DaoException {
-        PaymentEvent paymentEvent = PAYMENT_EVENT.as("payment_event");
-
         Query query = getDslContext()
                 .select(
                         PAYMENT_DATA.INVOICE_ID,
@@ -314,53 +311,47 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                         PAYMENT_DATA.PAYMENT_PARTY_REVISION,
                         PAYMENT_DATA.PAYMENT_CONTEXT_TYPE,
                         PAYMENT_DATA.PAYMENT_CONTEXT,
-                        paymentEvent.ID,
-                        paymentEvent.EVENT_ID,
-                        paymentEvent.EVENT_CREATED_AT,
-                        paymentEvent.EVENT_TYPE,
-                        paymentEvent.INVOICE_ID,
-                        paymentEvent.PAYMENT_ID,
-                        paymentEvent.PAYMENT_STATUS,
-                        paymentEvent.PAYMENT_OPERATION_FAILURE_CLASS,
-                        paymentEvent.PAYMENT_EXTERNAL_FAILURE,
-                        paymentEvent.PAYMENT_EXTERNAL_FAILURE_REASON,
-                        paymentEvent.PAYMENT_FEE,
-                        paymentEvent.PAYMENT_PROVIDER_FEE,
-                        paymentEvent.PAYMENT_EXTERNAL_FEE,
-                        paymentEvent.PAYMENT_DOMAIN_REVISION,
-                        paymentEvent.PAYMENT_SHORT_ID,
-                        paymentEvent.PAYMENT_PROVIDER_ID,
-                        paymentEvent.PAYMENT_TERMINAL_ID
+                        PAYMENT_EVENT.ID,
+                        PAYMENT_EVENT.EVENT_ID,
+                        PAYMENT_EVENT.EVENT_CREATED_AT,
+                        PAYMENT_EVENT.EVENT_TYPE,
+                        PAYMENT_EVENT.INVOICE_ID,
+                        PAYMENT_EVENT.PAYMENT_ID,
+                        PAYMENT_EVENT.PAYMENT_STATUS,
+                        PAYMENT_EVENT.PAYMENT_OPERATION_FAILURE_CLASS,
+                        PAYMENT_EVENT.PAYMENT_EXTERNAL_FAILURE,
+                        PAYMENT_EVENT.PAYMENT_EXTERNAL_FAILURE_REASON,
+                        PAYMENT_EVENT.PAYMENT_FEE,
+                        PAYMENT_EVENT.PAYMENT_PROVIDER_FEE,
+                        PAYMENT_EVENT.PAYMENT_EXTERNAL_FEE,
+                        PAYMENT_EVENT.PAYMENT_DOMAIN_REVISION,
+                        PAYMENT_EVENT.PAYMENT_SHORT_ID,
+                        PAYMENT_EVENT.PAYMENT_PROVIDER_ID,
+                        PAYMENT_EVENT.PAYMENT_TERMINAL_ID
                 )
                 .from(PAYMENT_DATA)
-                .join(
-                        DSL.lateral(
-                                getDslContext()
-                                        .selectFrom(PAYMENT_EVENT)
-                                        .where(
-                                                appendDateTimeRangeConditions(
-                                                        PAYMENT_DATA.INVOICE_ID.eq(PAYMENT_EVENT.INVOICE_ID)
-                                                                .and(PAYMENT_DATA.PAYMENT_ID.eq(PAYMENT_EVENT.PAYMENT_ID))
-                                                                .and(PAYMENT_EVENT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
-                                                        PAYMENT_EVENT.EVENT_CREATED_AT,
-                                                        fromTime,
-                                                        toTime
-                                                )
-                                        ).orderBy(PAYMENT_EVENT.ID.desc())
-                                        .limit(1)
-                        ).as(paymentEvent)
-                ).on(
-                        appendConditions(
-                                PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(partyId))
-                                        .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId)),
-                                Operator.AND,
-                                new ConditionParameterSource()
-                                        .addValue(paymentEvent.ID, fromId.orElse(null), GREATER)
-                                        .addValue(PAYMENT_DATA.INVOICE_ID, invoiceId.orElse(null), EQUALS)
-                                        .addValue(PAYMENT_DATA.PAYMENT_ID, paymentId.orElse(null), EQUALS)
+                .join(PAYMENT_EVENT)
+                .on(
+                        appendDateTimeRangeConditions(
+                                appendConditions(
+                                        PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(partyId))
+                                                .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId))
+                                                .and(PAYMENT_DATA.INVOICE_ID.eq(PAYMENT_EVENT.INVOICE_ID))
+                                                .and(PAYMENT_DATA.PAYMENT_ID.eq(PAYMENT_EVENT.PAYMENT_ID))
+                                                .and(PAYMENT_EVENT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
+                                                .and(PAYMENT_EVENT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
+                                        Operator.AND,
+                                        new ConditionParameterSource()
+                                                .addValue(PAYMENT_EVENT.ID, fromId.orElse(null), GREATER)
+                                                .addValue(PAYMENT_DATA.INVOICE_ID, invoiceId.orElse(null), EQUALS)
+                                                .addValue(PAYMENT_DATA.PAYMENT_ID, paymentId.orElse(null), EQUALS)
+                                ),
+                                PAYMENT_EVENT.EVENT_CREATED_AT,
+                                fromTime,
+                                toTime
                         )
                 )
-                .orderBy(paymentEvent.EVENT_CREATED_AT)
+                .orderBy(PAYMENT_EVENT.ID)
                 .limit(limit);
 
         return fetch(query, statPaymentMapper);
