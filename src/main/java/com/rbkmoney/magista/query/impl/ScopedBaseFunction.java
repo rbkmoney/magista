@@ -3,6 +3,7 @@ package com.rbkmoney.magista.query.impl;
 import com.rbkmoney.magista.dsl.BaseFunction;
 import com.rbkmoney.magista.dsl.BaseQueryValidator;
 import com.rbkmoney.magista.dsl.QueryParameters;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -59,15 +60,11 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
             super.validateParameters(parameters);
             ScopedBaseParameters scopedParameters = super.checkParamsType(parameters, ScopedBaseParameters.class);
 
-            if (!hasLength(scopedParameters.getMerchantId()) && hasLength(scopedParameters.getShopId())) {
+            if (!StringUtils.hasLength(scopedParameters.getMerchantId()) && StringUtils.hasLength(scopedParameters.getShopId())) {
                 checkParamsResult(true, SHOP_ID_PARAM, "when searching by shop_id, merchant_id must be set");
             }
         }
 
-    }
-
-    public static boolean hasLength(String str) {
-        return str != null && !str.isEmpty();
     }
 
 }
