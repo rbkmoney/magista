@@ -1,15 +1,15 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.magista.exception.BadTokenException;
-import com.rbkmoney.magista.query.Query;
-import com.rbkmoney.magista.query.QueryParameters;
-import com.rbkmoney.magista.util.TokenUtil;
+import com.rbkmoney.magista.dsl.BadTokenException;
+import com.rbkmoney.magista.dsl.Query;
+import com.rbkmoney.magista.dsl.QueryParameters;
+import com.rbkmoney.magista.dsl.TokenUtil;
 
 import java.util.Map;
 import java.util.Optional;
 
-import static com.rbkmoney.magista.query.impl.Parameters.FROM_PARAMETER;
-import static com.rbkmoney.magista.query.impl.Parameters.SIZE_PARAMETER;
+import static com.rbkmoney.magista.dsl.Parameters.FROM_PARAMETER;
+import static com.rbkmoney.magista.dsl.Parameters.SIZE_PARAMETER;
 
 /**
  * Created by vpankrashkin on 23.08.16.
@@ -55,6 +55,7 @@ public abstract class PagedBaseFunction<T, CT> extends ScopedBaseFunction<T, CT>
     }
 
     public static class PagedBaseValidator extends ScopedBaseValidator {
+
         @Override
         public void validateQuery(Query query) throws IllegalArgumentException {
             super.validateQuery(query);

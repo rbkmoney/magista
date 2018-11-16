@@ -4,10 +4,9 @@ import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.query.*;
-import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.magista.dsl.*;
+import com.rbkmoney.magista.dsl.parser.QueryPart;
 
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,10 @@ public class PaymentsCardTypesStatFunction extends StatBaseFunction {
 
     private PaymentsCardTypesStatFunction(Object descriptor, QueryParameters params) {
         super(descriptor, params, FUNC_NAME);
+    }
+
+    protected FunctionQueryContext getContext(QueryContext context) {
+        return super.getContext(context, FunctionQueryContext.class);
     }
 
     @Override

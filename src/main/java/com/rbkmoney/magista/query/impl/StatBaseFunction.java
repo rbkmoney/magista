@@ -2,13 +2,15 @@ package com.rbkmoney.magista.query.impl;
 
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.query.*;
-import com.rbkmoney.magista.query.builder.QueryBuilder;
-import com.rbkmoney.magista.query.builder.QueryBuilderException;
-import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
-import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
-import com.rbkmoney.magista.query.parser.QueryParserException;
-import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.magista.dsl.Query;
+import com.rbkmoney.magista.dsl.QueryParameters;
+import com.rbkmoney.magista.dsl.RootQuery;
+import com.rbkmoney.magista.dsl.builder.AbstractQueryBuilder;
+import com.rbkmoney.magista.dsl.builder.QueryBuilder;
+import com.rbkmoney.magista.dsl.builder.QueryBuilderException;
+import com.rbkmoney.magista.dsl.parser.AbstractQueryParser;
+import com.rbkmoney.magista.dsl.parser.QueryParserException;
+import com.rbkmoney.magista.dsl.parser.QueryPart;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.rbkmoney.magista.query.impl.Parameters.*;
+
 
 /**
  * Created by vpankrashkin on 08.08.16.

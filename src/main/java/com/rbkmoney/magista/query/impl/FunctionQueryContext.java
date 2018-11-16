@@ -2,8 +2,8 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.magista.dao.ReportDao;
 import com.rbkmoney.magista.dao.SearchDao;
-import com.rbkmoney.magista.query.QueryContext;
 import com.rbkmoney.magista.dao.StatisticsDao;
+import com.rbkmoney.magista.dsl.QueryContext;
 
 /**
  * Created by vpankrashkin on 09.08.16.

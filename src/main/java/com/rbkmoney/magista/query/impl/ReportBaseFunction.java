@@ -1,13 +1,13 @@
 package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.query.*;
-import com.rbkmoney.magista.query.builder.QueryBuilder;
-import com.rbkmoney.magista.query.builder.QueryBuilderException;
-import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
-import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
-import com.rbkmoney.magista.query.parser.QueryParserException;
-import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.magista.dsl.*;
+import com.rbkmoney.magista.dsl.builder.AbstractQueryBuilder;
+import com.rbkmoney.magista.dsl.builder.QueryBuilder;
+import com.rbkmoney.magista.dsl.builder.QueryBuilderException;
+import com.rbkmoney.magista.dsl.parser.AbstractQueryParser;
+import com.rbkmoney.magista.dsl.parser.QueryParserException;
+import com.rbkmoney.magista.dsl.parser.QueryPart;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
@@ -34,10 +34,6 @@ public abstract class ReportBaseFunction extends BaseFunction<Map<String, String
     @Override
     protected QueryParameters createQueryParameters(QueryParameters parameters, QueryParameters derivedParameters) {
         return new ReportBaseParameters(parameters, derivedParameters);
-    }
-
-    protected FunctionQueryContext getContext(QueryContext context) {
-        return this.getContext(context, FunctionQueryContext.class);
     }
 
     public static class ReportBaseParameters extends QueryParameters {

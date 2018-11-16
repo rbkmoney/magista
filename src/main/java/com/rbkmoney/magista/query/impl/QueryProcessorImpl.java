@@ -2,13 +2,10 @@ package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.exception.BadTokenException;
-import com.rbkmoney.magista.query.*;
-import com.rbkmoney.magista.query.builder.QueryBuilder;
-import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
-import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
-import com.rbkmoney.magista.query.parser.QueryParser;
-import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.magista.dsl.*;
+import com.rbkmoney.magista.dsl.builder.QueryBuilder;
+import com.rbkmoney.magista.dsl.parser.QueryParser;
+import com.rbkmoney.magista.dsl.parser.QueryPart;
 
 import java.util.List;
 
@@ -19,10 +16,6 @@ public class QueryProcessorImpl implements QueryProcessor<StatRequest, StatRespo
     private QueryParser<String> sourceParser;
     private QueryBuilder queryBuilder;
     private QueryContextFactory queryContextFactory;
-
-    public QueryProcessorImpl(QueryContextFactory queryContextFactory) {
-        this(new JsonQueryParser(), new QueryBuilderImpl(), queryContextFactory);
-    }
 
     public QueryProcessorImpl(QueryParser<String> sourceParser, QueryBuilder queryBuilder, QueryContextFactory queryContextFactory) {
         this.sourceParser = sourceParser;

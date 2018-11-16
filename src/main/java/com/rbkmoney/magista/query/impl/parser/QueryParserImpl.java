@@ -1,9 +1,10 @@
 package com.rbkmoney.magista.query.impl.parser;
 
 import com.rbkmoney.magista.query.impl.*;
-import com.rbkmoney.magista.query.parser.BaseQueryParser;
-import com.rbkmoney.magista.query.parser.QueryParser;
-import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.magista.dsl.parser.BaseQueryParser;
+import com.rbkmoney.magista.dsl.parser.QueryParser;
+import com.rbkmoney.magista.dsl.parser.QueryPart;
+import com.rbkmoney.magista.dsl.RootQuery;
 
 import java.util.Arrays;
 import java.util.List;

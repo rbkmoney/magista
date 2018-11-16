@@ -1,12 +1,15 @@
 package com.rbkmoney.magista;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.magista.dao.ReportDao;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.query.impl.QueryContextFactoryImpl;
 import com.rbkmoney.magista.query.impl.QueryProcessorImpl;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
-import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
+import com.rbkmoney.magista.query.impl.parser.QueryParserImpl;
+import com.rbkmoney.magista.dsl.parser.JsonQueryParser;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
@@ -23,9 +26,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.concurrent.TimeUnit;
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -57,7 +57,14 @@ public class AbstractIntegrationTest {
     @Before
     public void before() {
         QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao, searchDao, reportDao);
-        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
+        queryProcessor = new QueryProcessorImpl(new JsonQueryParser() {
+            @Override
+            protected ObjectMapper getMapper() {
+                ObjectMapper mapper = super.getMapper();
+                mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+                return mapper;
+            }
+        }.withQueryParser(new QueryParserImpl()), new QueryBuilderImpl(), contextFactory);
     }
 
     @ClassRule

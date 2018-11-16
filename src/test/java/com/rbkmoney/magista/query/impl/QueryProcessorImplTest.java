@@ -5,7 +5,6 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
-import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;

@@ -8,9 +8,10 @@ import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.query.impl.QueryContextFactoryImpl;
 import com.rbkmoney.magista.query.impl.QueryProcessorImpl;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
-import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
 import com.rbkmoney.magista.dao.StatisticsDao;
+import com.rbkmoney.magista.query.impl.parser.QueryParserImpl;
 import com.rbkmoney.magista.service.MerchantStatisticsHandler;
+import com.rbkmoney.magista.dsl.parser.JsonQueryParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,6 +34,6 @@ public class HandlerConfig {
                 mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
                 return mapper;
             }
-        }, new QueryBuilderImpl(), new QueryContextFactoryImpl(statisticsDao, searchDao, reportDao)));
+        }.withQueryParser(new QueryParserImpl()), new QueryBuilderImpl(), new QueryContextFactoryImpl(statisticsDao, searchDao, reportDao)));
     }
 }

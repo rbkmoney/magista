@@ -4,31 +4,21 @@ import com.rbkmoney.damsel.merch_stat.StatPayout;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
-import com.rbkmoney.magista.domain.enums.PayoutStatus;
-import com.rbkmoney.magista.domain.enums.PayoutType;
-import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.query.*;
-import com.rbkmoney.magista.query.builder.QueryBuilder;
-import com.rbkmoney.magista.query.builder.QueryBuilderException;
-import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
-import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
-import com.rbkmoney.magista.query.parser.QueryParserException;
-import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.util.DamselUtil;
+import com.rbkmoney.magista.dsl.*;
+import com.rbkmoney.magista.dsl.builder.AbstractQueryBuilder;
+import com.rbkmoney.magista.dsl.builder.QueryBuilder;
+import com.rbkmoney.magista.dsl.builder.QueryBuilderException;
+import com.rbkmoney.magista.dsl.parser.AbstractQueryParser;
+import com.rbkmoney.magista.dsl.parser.QueryParserException;
+import com.rbkmoney.magista.dsl.parser.QueryPart;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;
-import static com.rbkmoney.geck.common.util.TypeUtil.toEnumFields;
-import static com.rbkmoney.geck.common.util.TypeUtil.toLocalDateTime;
-import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
-import static org.jooq.Comparator.*;
 
 public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayout>, StatResponse> implements CompositeQuery<Map.Entry<Long, StatPayout>, StatResponse> {
 
@@ -205,6 +195,10 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
             super(descriptor, params, FUNC_NAME, continuationToken);
         }
 
+        protected FunctionQueryContext getContext(QueryContext context) {
+            return super.getContext(context, FunctionQueryContext.class);
+        }
+
         @Override
         public QueryResult<Map.Entry<Long, StatPayout>, Collection<Map.Entry<Long, StatPayout>>> execute(QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
@@ -230,6 +224,10 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
 
         public GetCountFunction(Object descriptor, QueryParameters params) {
             super(descriptor, params, FUNC_NAME);
+        }
+
+        protected FunctionQueryContext getContext(QueryContext context) {
+            return super.getContext(context, FunctionQueryContext.class);
         }
 
         @Override

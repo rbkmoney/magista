@@ -3,9 +3,10 @@ package com.rbkmoney.magista.query.impl;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.query.*;
-import com.rbkmoney.magista.query.parser.QueryPart;
+
 import com.rbkmoney.magista.exception.DaoException;
+import com.rbkmoney.magista.dsl.*;
+import com.rbkmoney.magista.dsl.parser.QueryPart;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -49,6 +50,10 @@ public class CustomersRateStatFunction extends StatBaseFunction {
         public static String getMainDescriptor() {
             return FUNC_NAME;
         }
+    }
+
+    protected FunctionQueryContext getContext(QueryContext context) {
+        return super.getContext(context, FunctionQueryContext.class);
     }
 
     public static class CustomersRateStatBuilder extends StatBaseBuilder {

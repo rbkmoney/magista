@@ -1,10 +1,8 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.magista.query.BaseFunction;
-import com.rbkmoney.magista.query.BaseQueryValidator;
-import com.rbkmoney.magista.query.QueryContext;
-import com.rbkmoney.magista.query.QueryParameters;
-import org.springframework.util.StringUtils;
+import com.rbkmoney.magista.dsl.BaseFunction;
+import com.rbkmoney.magista.dsl.BaseQueryValidator;
+import com.rbkmoney.magista.dsl.QueryParameters;
 
 import java.util.List;
 import java.util.Map;
@@ -29,10 +27,6 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
     @Override
     protected QueryParameters createQueryParameters(QueryParameters parameters, QueryParameters derivedParameters) {
         return new ScopedBaseParameters(parameters, derivedParameters);
-    }
-
-    protected FunctionQueryContext getContext(QueryContext context) {
-        return this.getContext(context, FunctionQueryContext.class);
     }
 
     public static class ScopedBaseParameters extends QueryParameters {
@@ -65,11 +59,15 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
             super.validateParameters(parameters);
             ScopedBaseParameters scopedParameters = super.checkParamsType(parameters, ScopedBaseParameters.class);
 
-            if (!StringUtils.hasLength(scopedParameters.getMerchantId()) && StringUtils.hasLength(scopedParameters.getShopId())) {
+            if (!hasLength(scopedParameters.getMerchantId()) && hasLength(scopedParameters.getShopId())) {
                 checkParamsResult(true, SHOP_ID_PARAM, "when searching by shop_id, merchant_id must be set");
             }
         }
 
+    }
+
+    public static boolean hasLength(String str) {
+        return str != null && !str.isEmpty();
     }
 
 }

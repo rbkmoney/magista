@@ -5,14 +5,13 @@ import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.query.*;
-import com.rbkmoney.magista.query.builder.QueryBuilder;
-import com.rbkmoney.magista.query.builder.QueryBuilderException;
-import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
-import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
-import com.rbkmoney.magista.query.parser.QueryParserException;
-import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.util.TokenUtil;
+import com.rbkmoney.magista.dsl.*;
+import com.rbkmoney.magista.dsl.builder.AbstractQueryBuilder;
+import com.rbkmoney.magista.dsl.builder.QueryBuilder;
+import com.rbkmoney.magista.dsl.builder.QueryBuilderException;
+import com.rbkmoney.magista.dsl.parser.AbstractQueryParser;
+import com.rbkmoney.magista.dsl.parser.QueryParserException;
+import com.rbkmoney.magista.dsl.parser.QueryPart;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
@@ -195,6 +194,10 @@ public class PaymentsForReportFunction extends PagedBaseFunction<Map.Entry<Long,
 
         public GetDataFunction(Object descriptor, QueryParameters params, String continuationToken) {
             super(descriptor, params, FUNC_NAME, continuationToken);
+        }
+
+        protected FunctionQueryContext getContext(QueryContext context) {
+            return super.getContext(context, FunctionQueryContext.class);
         }
 
         @Override
