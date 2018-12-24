@@ -45,7 +45,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Refund extends TableImpl<RefundRecord> {
 
-    private static final long serialVersionUID = 1396095723;
+    private static final long serialVersionUID = 1557343835;
 
     /**
      * The reference instance of <code>mst.refund</code>
@@ -211,7 +211,7 @@ public class Refund extends TableImpl<RefundRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.REFUND_PKEY);
+        return Arrays.<Index>asList(Indexes.REFUND_PKEY, Indexes.REFUND_UKEY);
     }
 
     /**
@@ -235,7 +235,7 @@ public class Refund extends TableImpl<RefundRecord> {
      */
     @Override
     public List<UniqueKey<RefundRecord>> getKeys() {
-        return Arrays.<UniqueKey<RefundRecord>>asList(Keys.REFUND_PKEY);
+        return Arrays.<UniqueKey<RefundRecord>>asList(Keys.REFUND_PKEY, Keys.REFUND_UKEY);
     }
 
     /**

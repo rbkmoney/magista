@@ -29,7 +29,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat implements Serializable {
 
-    private static final long serialVersionUID = 66240976;
+    private static final long serialVersionUID = 1903125982;
 
     private Long                id;
     private Long                eventId;
@@ -79,6 +79,7 @@ public class PayoutEventStat implements Serializable {
     private String              payoutInternationalCorrespondentAccountBankIban;
     private String              payoutInternationalCorrespondentAccountBankAbaRtn;
     private String              payoutInternationalCorrespondentAccountBankCountryCode;
+    private String              payoutWalletId;
 
     public PayoutEventStat() {}
 
@@ -131,6 +132,7 @@ public class PayoutEventStat implements Serializable {
         this.payoutInternationalCorrespondentAccountBankIban = value.payoutInternationalCorrespondentAccountBankIban;
         this.payoutInternationalCorrespondentAccountBankAbaRtn = value.payoutInternationalCorrespondentAccountBankAbaRtn;
         this.payoutInternationalCorrespondentAccountBankCountryCode = value.payoutInternationalCorrespondentAccountBankCountryCode;
+        this.payoutWalletId = value.payoutWalletId;
     }
 
     public PayoutEventStat(
@@ -181,7 +183,8 @@ public class PayoutEventStat implements Serializable {
         String              payoutInternationalCorrespondentAccountBankBic,
         String              payoutInternationalCorrespondentAccountBankIban,
         String              payoutInternationalCorrespondentAccountBankAbaRtn,
-        String              payoutInternationalCorrespondentAccountBankCountryCode
+        String              payoutInternationalCorrespondentAccountBankCountryCode,
+        String              payoutWalletId
     ) {
         this.id = id;
         this.eventId = eventId;
@@ -231,6 +234,7 @@ public class PayoutEventStat implements Serializable {
         this.payoutInternationalCorrespondentAccountBankIban = payoutInternationalCorrespondentAccountBankIban;
         this.payoutInternationalCorrespondentAccountBankAbaRtn = payoutInternationalCorrespondentAccountBankAbaRtn;
         this.payoutInternationalCorrespondentAccountBankCountryCode = payoutInternationalCorrespondentAccountBankCountryCode;
+        this.payoutWalletId = payoutWalletId;
     }
 
     public Long getId() {
@@ -617,6 +621,14 @@ public class PayoutEventStat implements Serializable {
         this.payoutInternationalCorrespondentAccountBankCountryCode = payoutInternationalCorrespondentAccountBankCountryCode;
     }
 
+    public String getPayoutWalletId() {
+        return this.payoutWalletId;
+    }
+
+    public void setPayoutWalletId(String payoutWalletId) {
+        this.payoutWalletId = payoutWalletId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -914,6 +926,12 @@ public class PayoutEventStat implements Serializable {
         }
         else if (!payoutInternationalCorrespondentAccountBankCountryCode.equals(other.payoutInternationalCorrespondentAccountBankCountryCode))
             return false;
+        if (payoutWalletId == null) {
+            if (other.payoutWalletId != null)
+                return false;
+        }
+        else if (!payoutWalletId.equals(other.payoutWalletId))
+            return false;
         return true;
     }
 
@@ -969,6 +987,7 @@ public class PayoutEventStat implements Serializable {
         result = prime * result + ((this.payoutInternationalCorrespondentAccountBankIban == null) ? 0 : this.payoutInternationalCorrespondentAccountBankIban.hashCode());
         result = prime * result + ((this.payoutInternationalCorrespondentAccountBankAbaRtn == null) ? 0 : this.payoutInternationalCorrespondentAccountBankAbaRtn.hashCode());
         result = prime * result + ((this.payoutInternationalCorrespondentAccountBankCountryCode == null) ? 0 : this.payoutInternationalCorrespondentAccountBankCountryCode.hashCode());
+        result = prime * result + ((this.payoutWalletId == null) ? 0 : this.payoutWalletId.hashCode());
         return result;
     }
 
@@ -1024,6 +1043,7 @@ public class PayoutEventStat implements Serializable {
         sb.append(", ").append(payoutInternationalCorrespondentAccountBankIban);
         sb.append(", ").append(payoutInternationalCorrespondentAccountBankAbaRtn);
         sb.append(", ").append(payoutInternationalCorrespondentAccountBankCountryCode);
+        sb.append(", ").append(payoutWalletId);
 
         sb.append(")");
         return sb.toString();

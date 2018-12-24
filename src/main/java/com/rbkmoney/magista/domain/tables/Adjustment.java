@@ -44,7 +44,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Adjustment extends TableImpl<AdjustmentRecord> {
 
-    private static final long serialVersionUID = 1922563900;
+    private static final long serialVersionUID = 914096660;
 
     /**
      * The reference instance of <code>mst.adjustment</code>
@@ -190,7 +190,7 @@ public class Adjustment extends TableImpl<AdjustmentRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.ADJUSTMENT_PKEY);
+        return Arrays.<Index>asList(Indexes.ADJUSTMENT_PKEY, Indexes.ADJUSTMENT_UKEY);
     }
 
     /**
@@ -214,7 +214,7 @@ public class Adjustment extends TableImpl<AdjustmentRecord> {
      */
     @Override
     public List<UniqueKey<AdjustmentRecord>> getKeys() {
-        return Arrays.<UniqueKey<AdjustmentRecord>>asList(Keys.ADJUSTMENT_PKEY);
+        return Arrays.<UniqueKey<AdjustmentRecord>>asList(Keys.ADJUSTMENT_PKEY, Keys.ADJUSTMENT_UKEY);
     }
 
     /**

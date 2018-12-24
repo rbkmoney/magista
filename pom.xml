@@ -13,11 +13,11 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>1.9.50-SNAPSHOT</version>
+    <version>1.9.51-SNAPSHOT</version>
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
-        <damsel.version>1.267-5711f53</damsel.version>
+        <damsel.version>1.277-c771e79-epic</damsel.version>
         <shared.resources.version>0.2.1</shared.resources.version>
         <server.port>8022</server.port>
         <dockerfile.base.service.tag>22c57470c4fc47161894f036b7cf9d70f42b75f5</dockerfile.base.service.tag>
@@ -29,6 +29,7 @@
         <db.password>postgres</db.password>
         <db.schema>mst</db.schema>
         <postgresql.jdbc.version>42.2.5</postgresql.jdbc.version>
+        <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
     </properties>
 
     <dependencies>
@@ -231,6 +232,23 @@
                         <location>filesystem:${project.basedir}/src/main/resources/db/migration</location>
                     </locations>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.2</version>
+                <configuration>
+                    <destFile>${sonar.jacoco.reportPath}</destFile>
+                    <append>true</append>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jooq</groupId>

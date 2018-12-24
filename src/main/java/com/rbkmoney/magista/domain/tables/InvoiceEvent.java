@@ -44,7 +44,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceEvent extends TableImpl<InvoiceEventRecord> {
 
-    private static final long serialVersionUID = 488186502;
+    private static final long serialVersionUID = -977361326;
 
     /**
      * The reference instance of <code>mst.invoice_event</code>
@@ -140,7 +140,7 @@ public class InvoiceEvent extends TableImpl<InvoiceEventRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.INVOICE_EVENT_INVOICE_ID_EVENT_CREATED_AT_IDX, Indexes.INVOICE_EVENT_PKEY);
+        return Arrays.<Index>asList(Indexes.INVOICE_EVENT_INVOICE_ID_EVENT_CREATED_AT_IDX, Indexes.INVOICE_EVENT_PKEY, Indexes.INVOICE_EVENT_UKEY);
     }
 
     /**
@@ -164,19 +164,7 @@ public class InvoiceEvent extends TableImpl<InvoiceEventRecord> {
      */
     @Override
     public List<UniqueKey<InvoiceEventRecord>> getKeys() {
-        return Arrays.<UniqueKey<InvoiceEventRecord>>asList(Keys.INVOICE_EVENT_PKEY);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<ForeignKey<InvoiceEventRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<InvoiceEventRecord, ?>>asList(Keys.INVOICE_EVENT__INVOICE_EVENT_INVOICE_ID_FKEY);
-    }
-
-    public InvoiceData invoiceData() {
-        return new InvoiceData(this, Keys.INVOICE_EVENT__INVOICE_EVENT_INVOICE_ID_FKEY);
+        return Arrays.<UniqueKey<InvoiceEventRecord>>asList(Keys.INVOICE_EVENT_PKEY, Keys.INVOICE_EVENT_UKEY);
     }
 
     /**
