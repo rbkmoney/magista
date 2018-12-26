@@ -31,7 +31,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceDataRecord extends UpdatableRecordImpl<InvoiceDataRecord> implements Record15<Long, UUID, String, String, String, String, Long, String, LocalDateTime, LocalDateTime, Long, String, String, String, byte[]> {
 
-    private static final long serialVersionUID = 700471793;
+    private static final long serialVersionUID = 1091177638;
 
     /**
      * Setter for <code>mst.invoice_data.id</code>.
@@ -251,7 +251,7 @@ public class InvoiceDataRecord extends UpdatableRecordImpl<InvoiceDataRecord> im
      * {@inheritDoc}
      */
     @Override
-    public Record1<String> key() {
+    public Record1<Long> key() {
         return (Record1) super.key();
     }
 

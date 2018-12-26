@@ -45,7 +45,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentEvent extends TableImpl<PaymentEventRecord> {
 
-    private static final long serialVersionUID = -1611722913;
+    private static final long serialVersionUID = -1540119356;
 
     /**
      * The reference instance of <code>mst.payment_event</code>
@@ -191,7 +191,7 @@ public class PaymentEvent extends TableImpl<PaymentEventRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.PAYMENT_EVENT_INVOICE_ID_PAYMENT_ID_EVENT_CREATED_AT_IDX, Indexes.PAYMENT_EVENT_PKEY);
+        return Arrays.<Index>asList(Indexes.PAYMENT_EVENT_INVOICE_ID_PAYMENT_ID_EVENT_CREATED_AT_IDX, Indexes.PAYMENT_EVENT_PKEY, Indexes.PAYMENT_EVENT_UKEY);
     }
 
     /**
@@ -215,19 +215,7 @@ public class PaymentEvent extends TableImpl<PaymentEventRecord> {
      */
     @Override
     public List<UniqueKey<PaymentEventRecord>> getKeys() {
-        return Arrays.<UniqueKey<PaymentEventRecord>>asList(Keys.PAYMENT_EVENT_PKEY);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<ForeignKey<PaymentEventRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<PaymentEventRecord, ?>>asList(Keys.PAYMENT_EVENT__PAYMENT_EVENT_INVOICE_ID_FKEY);
-    }
-
-    public PaymentData paymentData() {
-        return new PaymentData(this, Keys.PAYMENT_EVENT__PAYMENT_EVENT_INVOICE_ID_FKEY);
+        return Arrays.<UniqueKey<PaymentEventRecord>>asList(Keys.PAYMENT_EVENT_PKEY, Keys.PAYMENT_EVENT_UKEY);
     }
 
     /**

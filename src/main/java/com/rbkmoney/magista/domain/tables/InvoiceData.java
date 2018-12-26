@@ -43,7 +43,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class InvoiceData extends TableImpl<InvoiceDataRecord> {
 
-    private static final long serialVersionUID = -238703423;
+    private static final long serialVersionUID = -1097155983;
 
     /**
      * The reference instance of <code>mst.invoice_data</code>
@@ -179,7 +179,7 @@ public class InvoiceData extends TableImpl<InvoiceDataRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.INVOICE_DATA_INVOICE_CREATED_AT_IDX, Indexes.INVOICE_DATA_PKEY);
+        return Arrays.<Index>asList(Indexes.INVOICE_DATA_INVOICE_CREATED_AT_IDX, Indexes.INVOICE_DATA_PKEY, Indexes.INVOICE_DATA_UKEY);
     }
 
     /**
@@ -203,7 +203,7 @@ public class InvoiceData extends TableImpl<InvoiceDataRecord> {
      */
     @Override
     public List<UniqueKey<InvoiceDataRecord>> getKeys() {
-        return Arrays.<UniqueKey<InvoiceDataRecord>>asList(Keys.INVOICE_DATA_PKEY);
+        return Arrays.<UniqueKey<InvoiceDataRecord>>asList(Keys.INVOICE_DATA_PKEY, Keys.INVOICE_DATA_UKEY);
     }
 
     /**

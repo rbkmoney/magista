@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import javax.annotation.Generated;
 
-import org.jooq.Record2;
+import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -33,7 +33,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
 
-    private static final long serialVersionUID = -1609679954;
+    private static final long serialVersionUID = -1272956217;
 
     /**
      * Setter for <code>mst.payment_data.id</code>.
@@ -533,8 +533,8 @@ public class PaymentDataRecord extends UpdatableRecordImpl<PaymentDataRecord> {
      * {@inheritDoc}
      */
     @Override
-    public Record2<String, String> key() {
-        return (Record2) super.key();
+    public Record1<Long> key() {
+        return (Record1) super.key();
     }
 
     // -------------------------------------------------------------------------

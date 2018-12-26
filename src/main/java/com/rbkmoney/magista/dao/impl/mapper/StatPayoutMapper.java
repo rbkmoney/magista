@@ -50,6 +50,8 @@ public class StatPayoutMapper implements RowMapper<Map.Entry<Long, StatPayout>> 
         switch (payoutType) {
             case bank_account:
                 return PayoutType.bank_account(toPayoutAccount(rs));
+            case wallet:
+                return PayoutType.wallet(new Wallet(rs.getString(PAYOUT_EVENT_STAT.PAYOUT_WALLET_ID.getName())));
             default:
                 throw new NotFoundException(String.format("Payout type '%s' not found", payoutType));
         }

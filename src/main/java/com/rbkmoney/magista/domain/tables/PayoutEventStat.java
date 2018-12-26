@@ -47,7 +47,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = -2106945521;
+    private static final long serialVersionUID = -1576406557;
 
     /**
      * The reference instance of <code>mst.payout_event_stat</code>
@@ -303,6 +303,11 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
     public final TableField<PayoutEventStatRecord, String> PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_COUNTRY_CODE = createField("payout_international_correspondent_account_bank_country_code", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
+     * The column <code>mst.payout_event_stat.payout_wallet_id</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_WALLET_ID = createField("payout_wallet_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
      * Create a <code>mst.payout_event_stat</code> table reference
      */
     public PayoutEventStat() {
@@ -348,7 +353,7 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.PAYOUT_EVENT_PKEY);
+        return Arrays.<Index>asList(Indexes.PAYOUT_EVENT_PKEY, Indexes.PAYOUT_EVENT_STAT_UKEY);
     }
 
     /**
@@ -372,7 +377,7 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
      */
     @Override
     public List<UniqueKey<PayoutEventStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<PayoutEventStatRecord>>asList(Keys.PAYOUT_EVENT_PKEY);
+        return Arrays.<UniqueKey<PayoutEventStatRecord>>asList(Keys.PAYOUT_EVENT_PKEY, Keys.PAYOUT_EVENT_STAT_UKEY);
     }
 
     /**
