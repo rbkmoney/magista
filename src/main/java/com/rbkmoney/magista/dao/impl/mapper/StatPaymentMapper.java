@@ -35,6 +35,7 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
         statPayment.setAmount(rs.getLong(PAYMENT_DATA.PAYMENT_AMOUNT.getName()));
         statPayment.setFee(rs.getLong(PAYMENT_EVENT.PAYMENT_FEE.getName()));
         statPayment.setCurrencySymbolicCode(rs.getString(PAYMENT_DATA.PAYMENT_CURRENCY_CODE.getName()));
+        statPayment.setDomainRevision(rs.getLong(PAYMENT_EVENT.PAYMENT_DOMAIN_REVISION.getName()));
         statPayment.setCreatedAt(
                 TypeUtil.temporalToString(
                         rs.getObject(PAYMENT_DATA.PAYMENT_CREATED_AT.getName(), LocalDateTime.class)
