@@ -28,7 +28,9 @@ public enum PayoutType implements EnumType {
 
     bank_card("bank_card"),
 
-    bank_account("bank_account");
+    bank_account("bank_account"),
+
+    wallet("wallet");
 
     private final String literal;
 

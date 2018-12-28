@@ -47,7 +47,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
 
-    private static final long serialVersionUID = -2106945521;
+    private static final long serialVersionUID = -1351216339;
 
     /**
      * The reference instance of <code>mst.payout_event_stat</code>
@@ -301,6 +301,11 @@ public class PayoutEventStat extends TableImpl<PayoutEventStatRecord> {
      * The column <code>mst.payout_event_stat.payout_international_correspondent_account_bank_country_code</code>.
      */
     public final TableField<PayoutEventStatRecord, String> PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_COUNTRY_CODE = createField("payout_international_correspondent_account_bank_country_code", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>mst.payout_event_stat.payout_wallet_id</code>.
+     */
+    public final TableField<PayoutEventStatRecord, String> PAYOUT_WALLET_ID = createField("payout_wallet_id", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * Create a <code>mst.payout_event_stat</code> table reference
