@@ -30,7 +30,6 @@ import java.util.UUID;
 /**
  * Created by tolkonepiu on 29/05/2017.
  */
-@DependsOn("dbInitializer")
 public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
 
     private final DSLContext dslContext;
