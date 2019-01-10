@@ -10,10 +10,7 @@ import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
 import com.rbkmoney.magista.exception.DaoException;
-import org.jooq.Field;
-import org.jooq.Name;
-import org.jooq.Operator;
-import org.jooq.Query;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
@@ -267,6 +264,15 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
         );
     }
 
+    /**
+     * In this implementation, instead of the usual JOIN, the data is formed recursively.
+     * This avoids unnecessary loading to disk when there is too much data to filter out.
+     * Should be aware that this approach will work only in the case of a small data selection.
+     *
+     * before UNION - the starting part of the recursion, after UNION - recursive part.
+     * First comes the search for the first payment, and then the recursion is searched
+     * for a next payment whose ID is larger than the previous one.
+     */
     @Override
     public Collection<Map.Entry<Long, StatPayment>> getPaymentsForReport(
             String partyId,
@@ -278,74 +284,59 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
             Optional<Long> fromId,
             int limit
     ) throws DaoException {
-        Name invoiceDataIdFieldName = DSL.name("_payment_data_id");
-        Name invoiceEventIdFieldName = DSL.name("_payment_event_id");
+        Name recursiveAliasName = DSL.name("recursive_payment_query");
+        Name paymentDataIdFieldName = DSL.name("_payment_data_id");
+        Name paymentEventIdFieldName = DSL.name("_payment_event_id");
+
+        Condition paymentDataCondition = PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(partyId))
+                .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId));
+
+        Condition paymentEventJoinCondition = appendDateTimeRangeConditions(
+                PAYMENT_DATA.INVOICE_ID.eq(PAYMENT_EVENT.INVOICE_ID)
+                        .and(PAYMENT_DATA.PAYMENT_ID.eq(PAYMENT_EVENT.PAYMENT_ID))
+                        .and(PAYMENT_EVENT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
+                        .and(PAYMENT_EVENT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
+                PAYMENT_EVENT.EVENT_CREATED_AT,
+                fromTime,
+                toTime);
 
         Query query = getDslContext()
-                .withRecursive("t")
+                .withRecursive(recursiveAliasName)
                 .as(getDslContext().select(
-                        PAYMENT_DATA.ID.as(invoiceDataIdFieldName),
-                        PAYMENT_EVENT.ID.as(invoiceEventIdFieldName)
+                        PAYMENT_DATA.ID.as(paymentDataIdFieldName),
+                        PAYMENT_EVENT.ID.as(paymentEventIdFieldName)
                         ).from(PAYMENT_DATA)
                                 .join(PAYMENT_EVENT)
                                 .on(
-                                        appendDateTimeRangeConditions(
-                                                appendConditions(
-                                                        PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(partyId))
-                                                                .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId))
-                                                                .and(PAYMENT_DATA.INVOICE_ID.eq(PAYMENT_EVENT.INVOICE_ID))
-                                                                .and(PAYMENT_DATA.PAYMENT_ID.eq(PAYMENT_EVENT.PAYMENT_ID))
-                                                                .and(PAYMENT_EVENT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
-                                                                .and(PAYMENT_EVENT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
-                                                        Operator.AND,
-                                                        new ConditionParameterSource()
-                                                                .addValue(PAYMENT_EVENT.ID, fromId.orElse(null), GREATER)
-                                                                .addValue(PAYMENT_DATA.INVOICE_ID, invoiceId.orElse(null), EQUALS)
-                                                                .addValue(PAYMENT_DATA.PAYMENT_ID, paymentId.orElse(null), EQUALS)
-                                                ),
-                                                PAYMENT_EVENT.EVENT_CREATED_AT,
-                                                fromTime,
-                                                toTime
+                                        appendConditions(
+                                                paymentDataCondition.and(paymentEventJoinCondition),
+                                                Operator.AND,
+                                                new ConditionParameterSource()
+                                                        .addValue(PAYMENT_EVENT.ID, fromId.orElse(null), GREATER)
+                                                        .addValue(PAYMENT_DATA.INVOICE_ID, invoiceId.orElse(null), EQUALS)
+                                                        .addValue(PAYMENT_DATA.PAYMENT_ID, paymentId.orElse(null), EQUALS)
                                         )
                                 )
                                 .orderBy(PAYMENT_EVENT.ID)
                                 .limit(1)
                                 .unionAll(
                                         getDslContext().select(
-                                                DSL.field(DSL.name("payment_data_id"), Long.class).as(invoiceDataIdFieldName),
-                                                DSL.field(DSL.name("payment_event_id"), Long.class).as(invoiceEventIdFieldName)
-                                        ).from("t")
-                                        .join(
-                                                DSL.lateral(
-                                        getDslContext().select(
-                                                PAYMENT_DATA.ID.as("payment_data_id"),
-                                                PAYMENT_EVENT.ID.as("payment_event_id")
-                                        ).from(PAYMENT_DATA)
+                                                PAYMENT_DATA.ID.as(paymentDataIdFieldName),
+                                                PAYMENT_EVENT.ID.as(paymentEventIdFieldName)
+                                        ).from(recursiveAliasName)
+                                                .join(PAYMENT_DATA)
+                                                .on(paymentDataCondition)
                                                 .join(PAYMENT_EVENT)
                                                 .on(
-                                                        appendDateTimeRangeConditions(
-                                                                appendConditions(
-                                                                        PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(partyId))
-                                                                                .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId))
-                                                                                .and(PAYMENT_DATA.INVOICE_ID.eq(PAYMENT_EVENT.INVOICE_ID))
-                                                                                .and(PAYMENT_DATA.PAYMENT_ID.eq(PAYMENT_EVENT.PAYMENT_ID))
-                                                                                .and(PAYMENT_EVENT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
-                                                                                .and(PAYMENT_EVENT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured))
-                                                                                .and(PAYMENT_EVENT.ID.gt(DSL.field(invoiceEventIdFieldName, Long.class))),
-                                                                        Operator.AND,
-                                                                        new ConditionParameterSource()
-                                                                                .addValue(PAYMENT_DATA.INVOICE_ID, invoiceId.orElse(null), EQUALS)
-                                                                                .addValue(PAYMENT_DATA.PAYMENT_ID, paymentId.orElse(null), EQUALS)
-                                                                ),
-                                                                PAYMENT_EVENT.EVENT_CREATED_AT,
-                                                                fromTime,
-                                                                toTime
-                                                        )
+                                                        paymentEventJoinCondition
+                                                                .and(
+                                                                        PAYMENT_EVENT.ID.gt(
+                                                                                DSL.field(paymentEventIdFieldName, Long.class)
+                                                                        )
+                                                                )
                                                 )
                                                 .orderBy(PAYMENT_EVENT.ID)
                                                 .limit(1)
-                                                )
-                                        ).on(true)
                                 )
                 )
                 .select(
@@ -399,11 +390,11 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                         PAYMENT_EVENT.PAYMENT_PROVIDER_ID,
                         PAYMENT_EVENT.PAYMENT_TERMINAL_ID
                 )
-                .from("t")
+                .from(recursiveAliasName)
                 .join(PAYMENT_DATA)
-                .on(PAYMENT_DATA.ID.eq(DSL.field(invoiceDataIdFieldName, Long.class)))
+                .on(PAYMENT_DATA.ID.eq(DSL.field(paymentDataIdFieldName, Long.class)))
                 .join(PAYMENT_EVENT)
-                .on(PAYMENT_EVENT.ID.eq(DSL.field(invoiceEventIdFieldName, Long.class)))
+                .on(PAYMENT_EVENT.ID.eq(DSL.field(paymentEventIdFieldName, Long.class)))
                 .limit(limit);
 
         return fetch(query, statPaymentMapper);
