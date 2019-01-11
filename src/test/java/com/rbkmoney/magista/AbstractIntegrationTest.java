@@ -35,7 +35,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @TestPropertySource(properties = {"bm.pooling.enabled=false"})
 @ContextConfiguration(classes = MagistaApplication.class, initializers = AbstractIntegrationTest.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest {
 
     protected QueryProcessorImpl queryProcessor;
 
