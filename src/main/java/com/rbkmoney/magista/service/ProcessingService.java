@@ -46,7 +46,6 @@ public class ProcessingService {
     private final EventDao eventDao;
 
     private final DefaultPollingEventPublisherBuilder processingEventPublisherBuilder;
-    private final DefaultPollingEventPublisherBuilder payoutEventPublisherBuilder;
 
     private final AtomicReference<InvoiceEventFlow> invoiceEventFlow = new AtomicReference<>();
     private final AtomicReference<PayoutEventFlow> payoutEventFlow = new AtomicReference<>();
@@ -55,13 +54,11 @@ public class ProcessingService {
     public ProcessingService(
             List<Handler> handlers,
             EventDao eventDao,
-            @Qualifier("processingEventPublisherBuilder") DefaultPollingEventPublisherBuilder processingEventPublisherBuilder,
-            @Qualifier("payoutEventPublisherBuilder") DefaultPollingEventPublisherBuilder payoutEventPublisherBuilder
+            @Qualifier("processingEventPublisherBuilder") DefaultPollingEventPublisherBuilder processingEventPublisherBuilder
     ) {
         this.handlers = handlers;
         this.eventDao = eventDao;
         this.processingEventPublisherBuilder = processingEventPublisherBuilder;
-        this.payoutEventPublisherBuilder = payoutEventPublisherBuilder;
     }
 
     public void start() {
@@ -69,12 +66,6 @@ public class ProcessingService {
         if (invoiceEventFlow.compareAndSet(null, newInvoiceEventFlow)) {
             Optional<Long> lastEventId = getLastInvoiceEventId();
             newInvoiceEventFlow.start(lastEventId);
-        }
-
-        PayoutEventFlow newPayoutEventFlow = new PayoutEventFlow(handlers, payoutEventPublisherBuilder, payoutHandlerThreadPoolSize, payoutHandlerQueueLimit, payoutHandlerTimeout);
-        if (payoutEventFlow.compareAndSet(null, newPayoutEventFlow)) {
-            Optional<Long> lastEventId = getLastPayoutEventId();
-            newPayoutEventFlow.start(lastEventId);
         }
     }
 

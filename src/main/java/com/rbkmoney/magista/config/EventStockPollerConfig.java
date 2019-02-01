@@ -48,13 +48,4 @@ public class EventStockPollerConfig {
                 .withPollDelay(processingPoolingMaxDelay);
     }
 
-    @Bean
-    public DefaultPollingEventPublisherBuilder payoutEventPublisherBuilder() throws IOException {
-        return new PollingEventPublisherBuilder()
-                .withURI(payoutPoolingUrl.getURI())
-                .withMaxQuerySize(payoutPoolingQuerySize)
-                .withMaxPoolSize(payoutPoolingMaxPoolSize)
-                .withPollDelay(payoutPoolingMaxDelay);
-    }
-
 }
