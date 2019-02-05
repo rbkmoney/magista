@@ -27,18 +27,6 @@ public class EventStockPollerConfig {
     @Value("${bm.processing.pooling.delay}")
     private int processingPoolingMaxDelay;
 
-    @Value("${bm.payout.pooling.url}")
-    private Resource payoutPoolingUrl;
-
-    @Value("${bm.payout.pooling.querySize}")
-    private int payoutPoolingQuerySize;
-
-    @Value("${bm.payout.pooling.maxPoolSize}")
-    private int payoutPoolingMaxPoolSize;
-
-    @Value("${bm.payout.pooling.delay}")
-    private int payoutPoolingMaxDelay;
-
     @Bean
     public DefaultPollingEventPublisherBuilder processingEventPublisherBuilder() throws IOException {
         return new PollingEventPublisherBuilder()

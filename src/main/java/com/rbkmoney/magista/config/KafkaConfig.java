@@ -18,7 +18,7 @@ import java.util.Map;
 @Configuration
 public class KafkaConfig {
 
-    private static final String GROUP_ID = "PayoutZListener";
+    private static final String GROUP_ID = "MagistaListener";
     private static final String EARLIEST = "earliest";
 
     @Value("${kafka.bootstrap.servers}")
