@@ -28,11 +28,11 @@ VALUES ('qWIOyeV7h3', '1', 'db79ad6c-a507-43ed-9ecf-3bbd88475b32', 'test_shop_1'
 
 -- payment event
 INSERT INTO mst.payment_event (event_id, event_created_at, event_type, invoice_id, payment_id, payment_status, payment_currency_code, payment_amount, payment_fee, payment_provider_fee, payment_external_fee, payment_domain_revision)
-VALUES (2475599, '2017-08-23 08:30:56.000000', 'INVOICE_PAYMENT_STATUS_CHANGED', 'uWIbtnV7h2', '1', 'captured', 'RUB', 2000, 25, 18, 20, 1);
+VALUES (2475599, '2017-08-23 08:30:56.000000', 'INVOICE_PAYMENT_STATUS_CHANGED', 'uWIbtnV7h2', '1', 'captured', 'RUB', 1000, 25, 18, 20, 1);
 INSERT INTO mst.payment_event (event_id, event_created_at, event_type, invoice_id, payment_id, payment_status, payment_currency_code, payment_amount, payment_fee, payment_provider_fee, payment_external_fee, payment_domain_revision)
-VALUES (2226237, '2017-08-24 16:13:24.000000', 'INVOICE_PAYMENT_STATUS_CHANGED', 'uAykKfsktM', '1', 'captured', 'RUB', 2000, 25, 18, 20, 1);
+VALUES (2226237, '2017-08-24 16:13:24.000000', 'INVOICE_PAYMENT_STATUS_CHANGED', 'uAykKfsktM', '1', 'captured', 'RUB', 1000, 25, 18, 20, 1);
 INSERT INTO mst.payment_event (event_id, event_created_at, event_type, invoice_id, payment_id, payment_status, payment_currency_code, payment_amount, payment_fee, payment_provider_fee, payment_external_fee, payment_domain_revision)
-VALUES (2485599, '2017-08-30 08:30:56.000000', 'INVOICE_PAYMENT_STATUS_CHANGED', 'uWIOyeV7h3', '1', 'captured', 'RUB', 2000, 25, 18, 20, 1);
+VALUES (2485599, '2017-08-30 08:30:56.000000', 'INVOICE_PAYMENT_STATUS_CHANGED', 'uWIOyeV7h3', '1', 'captured', 'RUB', 1000, 25, 18, 20, 1);
 INSERT INTO mst.payment_event (event_id, event_created_at, event_type, invoice_id, payment_id, payment_status, payment_currency_code, payment_amount, payment_fee, payment_provider_fee, payment_external_fee, payment_domain_revision)
 VALUES (3475599, '2017-09-23 08:30:56.000000', 'INVOICE_PAYMENT_STATUS_CHANGED', 'qWIbtnV7h2', '1', 'captured', 'RUB', 2000, 50, 36, 20, 1);
 INSERT INTO mst.payment_event (event_id, event_created_at, event_type, invoice_id, payment_id, payment_status, payment_currency_code, payment_amount, payment_fee, payment_provider_fee, payment_external_fee, payment_domain_revision)
