@@ -95,7 +95,7 @@ public class PaymentService {
         }
     }
 
-    private PaymentEvent getLastPaymentChange(String invoiceId, String paymentId) throws NotFoundException, StorageException {
+    public PaymentEvent getLastPaymentChange(String invoiceId, String paymentId) throws NotFoundException, StorageException {
         return paymentEventCache.get(
                 new AbstractMap.SimpleEntry<>(invoiceId, paymentId),
                 key -> {

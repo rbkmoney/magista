@@ -32,7 +32,7 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
         statPayment.setInvoiceId(rs.getString(PAYMENT_DATA.INVOICE_ID.getName()));
         statPayment.setOwnerId(rs.getString(PAYMENT_DATA.PARTY_ID.getName()));
         statPayment.setShopId(rs.getString(PAYMENT_DATA.PARTY_SHOP_ID.getName()));
-        statPayment.setAmount(rs.getLong(PAYMENT_DATA.PAYMENT_AMOUNT.getName()));
+        statPayment.setAmount(rs.getLong(PAYMENT_EVENT.PAYMENT_AMOUNT.getName()));
         statPayment.setFee(rs.getLong(PAYMENT_EVENT.PAYMENT_FEE.getName()));
         statPayment.setCurrencySymbolicCode(rs.getString(PAYMENT_DATA.PAYMENT_CURRENCY_CODE.getName()));
         statPayment.setCreatedAt(
