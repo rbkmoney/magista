@@ -5,25 +5,18 @@ package com.rbkmoney.magista.domain;
 
 
 import com.rbkmoney.magista.domain.tables.Adjustment;
-import com.rbkmoney.magista.domain.tables.InvoiceData;
-import com.rbkmoney.magista.domain.tables.InvoiceEvent;
+import com.rbkmoney.magista.domain.tables.FlywaySchemaHistory;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
-import com.rbkmoney.magista.domain.tables.PaymentData;
-import com.rbkmoney.magista.domain.tables.PaymentEvent;
 import com.rbkmoney.magista.domain.tables.PayoutEventStat;
 import com.rbkmoney.magista.domain.tables.Refund;
 import com.rbkmoney.magista.domain.tables.records.AdjustmentRecord;
-import com.rbkmoney.magista.domain.tables.records.InvoiceDataRecord;
-import com.rbkmoney.magista.domain.tables.records.InvoiceEventRecord;
+import com.rbkmoney.magista.domain.tables.records.FlywaySchemaHistoryRecord;
 import com.rbkmoney.magista.domain.tables.records.InvoiceEventStatRecord;
-import com.rbkmoney.magista.domain.tables.records.PaymentDataRecord;
-import com.rbkmoney.magista.domain.tables.records.PaymentEventRecord;
 import com.rbkmoney.magista.domain.tables.records.PayoutEventStatRecord;
 import com.rbkmoney.magista.domain.tables.records.RefundRecord;
 
 import javax.annotation.Generated;
 
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.Internal;
@@ -48,11 +41,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final Identity<AdjustmentRecord, Long> IDENTITY_ADJUSTMENT = Identities0.IDENTITY_ADJUSTMENT;
-    public static final Identity<InvoiceDataRecord, Long> IDENTITY_INVOICE_DATA = Identities0.IDENTITY_INVOICE_DATA;
-    public static final Identity<InvoiceEventRecord, Long> IDENTITY_INVOICE_EVENT = Identities0.IDENTITY_INVOICE_EVENT;
     public static final Identity<InvoiceEventStatRecord, Long> IDENTITY_INVOICE_EVENT_STAT = Identities0.IDENTITY_INVOICE_EVENT_STAT;
-    public static final Identity<PaymentDataRecord, Long> IDENTITY_PAYMENT_DATA = Identities0.IDENTITY_PAYMENT_DATA;
-    public static final Identity<PaymentEventRecord, Long> IDENTITY_PAYMENT_EVENT = Identities0.IDENTITY_PAYMENT_EVENT;
     public static final Identity<PayoutEventStatRecord, Long> IDENTITY_PAYOUT_EVENT_STAT = Identities0.IDENTITY_PAYOUT_EVENT_STAT;
     public static final Identity<RefundRecord, Long> IDENTITY_REFUND = Identities0.IDENTITY_REFUND;
 
@@ -61,11 +50,8 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<AdjustmentRecord> ADJUSTMENT_PKEY = UniqueKeys0.ADJUSTMENT_PKEY;
-    public static final UniqueKey<InvoiceDataRecord> INVOICE_DATA_PKEY = UniqueKeys0.INVOICE_DATA_PKEY;
-    public static final UniqueKey<InvoiceEventRecord> INVOICE_EVENT_PKEY = UniqueKeys0.INVOICE_EVENT_PKEY;
+    public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = UniqueKeys0.FLYWAY_SCHEMA_HISTORY_PK;
     public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_STAT_PKEY = UniqueKeys0.INVOICE_EVENT_STAT_PKEY;
-    public static final UniqueKey<PaymentDataRecord> PAYMENT_DATA_PKEY = UniqueKeys0.PAYMENT_DATA_PKEY;
-    public static final UniqueKey<PaymentEventRecord> PAYMENT_EVENT_PKEY = UniqueKeys0.PAYMENT_EVENT_PKEY;
     public static final UniqueKey<PayoutEventStatRecord> PAYOUT_EVENT_PKEY = UniqueKeys0.PAYOUT_EVENT_PKEY;
     public static final UniqueKey<RefundRecord> REFUND_PKEY = UniqueKeys0.REFUND_PKEY;
 
@@ -73,9 +59,6 @@ public class Keys {
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final ForeignKey<InvoiceEventRecord, InvoiceDataRecord> INVOICE_EVENT__INVOICE_EVENT_INVOICE_ID_FKEY = ForeignKeys0.INVOICE_EVENT__INVOICE_EVENT_INVOICE_ID_FKEY;
-    public static final ForeignKey<PaymentDataRecord, InvoiceDataRecord> PAYMENT_DATA__PAYMENT_DATA_INVOICE_ID_FKEY = ForeignKeys0.PAYMENT_DATA__PAYMENT_DATA_INVOICE_ID_FKEY;
-    public static final ForeignKey<PaymentEventRecord, PaymentDataRecord> PAYMENT_EVENT__PAYMENT_EVENT_INVOICE_ID_FKEY = ForeignKeys0.PAYMENT_EVENT__PAYMENT_EVENT_INVOICE_ID_FKEY;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
@@ -83,29 +66,16 @@ public class Keys {
 
     private static class Identities0 {
         public static Identity<AdjustmentRecord, Long> IDENTITY_ADJUSTMENT = Internal.createIdentity(Adjustment.ADJUSTMENT, Adjustment.ADJUSTMENT.ID);
-        public static Identity<InvoiceDataRecord, Long> IDENTITY_INVOICE_DATA = Internal.createIdentity(InvoiceData.INVOICE_DATA, InvoiceData.INVOICE_DATA.ID);
-        public static Identity<InvoiceEventRecord, Long> IDENTITY_INVOICE_EVENT = Internal.createIdentity(InvoiceEvent.INVOICE_EVENT, InvoiceEvent.INVOICE_EVENT.ID);
         public static Identity<InvoiceEventStatRecord, Long> IDENTITY_INVOICE_EVENT_STAT = Internal.createIdentity(InvoiceEventStat.INVOICE_EVENT_STAT, InvoiceEventStat.INVOICE_EVENT_STAT.ID);
-        public static Identity<PaymentDataRecord, Long> IDENTITY_PAYMENT_DATA = Internal.createIdentity(PaymentData.PAYMENT_DATA, PaymentData.PAYMENT_DATA.ID);
-        public static Identity<PaymentEventRecord, Long> IDENTITY_PAYMENT_EVENT = Internal.createIdentity(PaymentEvent.PAYMENT_EVENT, PaymentEvent.PAYMENT_EVENT.ID);
         public static Identity<PayoutEventStatRecord, Long> IDENTITY_PAYOUT_EVENT_STAT = Internal.createIdentity(PayoutEventStat.PAYOUT_EVENT_STAT, PayoutEventStat.PAYOUT_EVENT_STAT.ID);
         public static Identity<RefundRecord, Long> IDENTITY_REFUND = Internal.createIdentity(Refund.REFUND, Refund.REFUND.ID);
     }
 
     private static class UniqueKeys0 {
         public static final UniqueKey<AdjustmentRecord> ADJUSTMENT_PKEY = Internal.createUniqueKey(Adjustment.ADJUSTMENT, "adjustment_pkey", Adjustment.ADJUSTMENT.ID);
-        public static final UniqueKey<InvoiceDataRecord> INVOICE_DATA_PKEY = Internal.createUniqueKey(InvoiceData.INVOICE_DATA, "invoice_data_pkey", InvoiceData.INVOICE_DATA.INVOICE_ID);
-        public static final UniqueKey<InvoiceEventRecord> INVOICE_EVENT_PKEY = Internal.createUniqueKey(InvoiceEvent.INVOICE_EVENT, "invoice_event_pkey", InvoiceEvent.INVOICE_EVENT.ID);
+        public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, "flyway_schema_history_pk", FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK);
         public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_STAT_PKEY = Internal.createUniqueKey(InvoiceEventStat.INVOICE_EVENT_STAT, "invoice_event_stat_pkey", InvoiceEventStat.INVOICE_EVENT_STAT.ID);
-        public static final UniqueKey<PaymentDataRecord> PAYMENT_DATA_PKEY = Internal.createUniqueKey(PaymentData.PAYMENT_DATA, "payment_data_pkey", PaymentData.PAYMENT_DATA.INVOICE_ID, PaymentData.PAYMENT_DATA.PAYMENT_ID);
-        public static final UniqueKey<PaymentEventRecord> PAYMENT_EVENT_PKEY = Internal.createUniqueKey(PaymentEvent.PAYMENT_EVENT, "payment_event_pkey", PaymentEvent.PAYMENT_EVENT.ID);
         public static final UniqueKey<PayoutEventStatRecord> PAYOUT_EVENT_PKEY = Internal.createUniqueKey(PayoutEventStat.PAYOUT_EVENT_STAT, "payout_event_pkey", PayoutEventStat.PAYOUT_EVENT_STAT.ID);
         public static final UniqueKey<RefundRecord> REFUND_PKEY = Internal.createUniqueKey(Refund.REFUND, "refund_pkey", Refund.REFUND.ID);
-    }
-
-    private static class ForeignKeys0 {
-        public static final ForeignKey<InvoiceEventRecord, InvoiceDataRecord> INVOICE_EVENT__INVOICE_EVENT_INVOICE_ID_FKEY = Internal.createForeignKey(com.rbkmoney.magista.domain.Keys.INVOICE_DATA_PKEY, InvoiceEvent.INVOICE_EVENT, "invoice_event__invoice_event_invoice_id_fkey", InvoiceEvent.INVOICE_EVENT.INVOICE_ID);
-        public static final ForeignKey<PaymentDataRecord, InvoiceDataRecord> PAYMENT_DATA__PAYMENT_DATA_INVOICE_ID_FKEY = Internal.createForeignKey(com.rbkmoney.magista.domain.Keys.INVOICE_DATA_PKEY, PaymentData.PAYMENT_DATA, "payment_data__payment_data_invoice_id_fkey", PaymentData.PAYMENT_DATA.INVOICE_ID);
-        public static final ForeignKey<PaymentEventRecord, PaymentDataRecord> PAYMENT_EVENT__PAYMENT_EVENT_INVOICE_ID_FKEY = Internal.createForeignKey(com.rbkmoney.magista.domain.Keys.PAYMENT_DATA_PKEY, PaymentEvent.PAYMENT_EVENT, "payment_event__payment_event_invoice_id_fkey", PaymentEvent.PAYMENT_EVENT.INVOICE_ID, PaymentEvent.PAYMENT_EVENT.PAYMENT_ID);
     }
 }

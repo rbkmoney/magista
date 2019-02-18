@@ -5,11 +5,8 @@ package com.rbkmoney.magista.domain;
 
 
 import com.rbkmoney.magista.domain.tables.Adjustment;
-import com.rbkmoney.magista.domain.tables.InvoiceData;
-import com.rbkmoney.magista.domain.tables.InvoiceEvent;
+import com.rbkmoney.magista.domain.tables.FlywaySchemaHistory;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
-import com.rbkmoney.magista.domain.tables.PaymentData;
-import com.rbkmoney.magista.domain.tables.PaymentEvent;
 import com.rbkmoney.magista.domain.tables.PayoutEventStat;
 import com.rbkmoney.magista.domain.tables.Refund;
 
@@ -35,29 +32,14 @@ public class Tables {
     public static final Adjustment ADJUSTMENT = com.rbkmoney.magista.domain.tables.Adjustment.ADJUSTMENT;
 
     /**
-     * The table <code>mst.invoice_data</code>.
+     * The table <code>mst.flyway_schema_history</code>.
      */
-    public static final InvoiceData INVOICE_DATA = com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
-
-    /**
-     * The table <code>mst.invoice_event</code>.
-     */
-    public static final InvoiceEvent INVOICE_EVENT = com.rbkmoney.magista.domain.tables.InvoiceEvent.INVOICE_EVENT;
+    public static final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = com.rbkmoney.magista.domain.tables.FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
 
     /**
      * The table <code>mst.invoice_event_stat</code>.
      */
     public static final InvoiceEventStat INVOICE_EVENT_STAT = com.rbkmoney.magista.domain.tables.InvoiceEventStat.INVOICE_EVENT_STAT;
-
-    /**
-     * The table <code>mst.payment_data</code>.
-     */
-    public static final PaymentData PAYMENT_DATA = com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
-
-    /**
-     * The table <code>mst.payment_event</code>.
-     */
-    public static final PaymentEvent PAYMENT_EVENT = com.rbkmoney.magista.domain.tables.PaymentEvent.PAYMENT_EVENT;
 
     /**
      * The table <code>mst.payout_event_stat</code>.
