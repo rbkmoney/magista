@@ -1,6 +1,8 @@
 package com.rbkmoney.magista.event.impl.mapper;
 
+import com.rbkmoney.damsel.domain.Cash;
 import com.rbkmoney.damsel.domain.Failure;
+import com.rbkmoney.damsel.domain.InvoicePaymentCaptured;
 import com.rbkmoney.damsel.domain.OperationFailure;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStatusChanged;
@@ -37,6 +39,15 @@ public class PaymentStatusMapper implements Mapper<InvoiceEventContext> {
         invoiceEventStat.setPaymentStatus(
                 TBaseUtil.unionFieldToEnum(invoicePaymentStatusChanged.getStatus(), InvoicePaymentStatus.class)
         );
+
+        if (invoicePaymentStatusChanged.getStatus().isSetCaptured()) {
+            InvoicePaymentCaptured invoicePaymentCaptured = invoicePaymentStatusChanged.getStatus().getCaptured();
+            if (invoicePaymentCaptured.isSetCost()) {
+                Cash cost = invoicePaymentCaptured.getCost();
+                invoiceEventStat.setPaymentAmount(cost.getAmount());
+                invoiceEventStat.setPaymentCurrencyCode(cost.getCurrency().getSymbolicCode());
+            }
+        }
 
         if (invoicePaymentStatusChanged.getStatus().isSetFailed()) {
             OperationFailure operationFailure = invoicePaymentStatusChanged.getStatus().getFailed().getFailure();

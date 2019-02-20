@@ -37,6 +37,7 @@ public class PaymentCommissionMapper implements Mapper<InvoiceEventContext> {
         }
 
         Map<FeeType, Long> fees = DamselUtil.getFees(finalCashFlowPostings);
+        invoiceEventStat.setPaymentAmount(fees.get(FeeType.AMOUNT));
         invoiceEventStat.setPaymentFee(fees.get(FeeType.FEE));
         invoiceEventStat.setPaymentExternalFee(fees.get(FeeType.EXTERNAL_FEE));
         invoiceEventStat.setPaymentProviderFee(fees.get(FeeType.PROVIDER_FEE));

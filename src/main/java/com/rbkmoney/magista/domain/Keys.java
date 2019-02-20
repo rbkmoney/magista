@@ -5,12 +5,10 @@ package com.rbkmoney.magista.domain;
 
 
 import com.rbkmoney.magista.domain.tables.Adjustment;
-import com.rbkmoney.magista.domain.tables.FlywaySchemaHistory;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.PayoutEventStat;
 import com.rbkmoney.magista.domain.tables.Refund;
 import com.rbkmoney.magista.domain.tables.records.AdjustmentRecord;
-import com.rbkmoney.magista.domain.tables.records.FlywaySchemaHistoryRecord;
 import com.rbkmoney.magista.domain.tables.records.InvoiceEventStatRecord;
 import com.rbkmoney.magista.domain.tables.records.PayoutEventStatRecord;
 import com.rbkmoney.magista.domain.tables.records.RefundRecord;
@@ -50,7 +48,6 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<AdjustmentRecord> ADJUSTMENT_PKEY = UniqueKeys0.ADJUSTMENT_PKEY;
-    public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = UniqueKeys0.FLYWAY_SCHEMA_HISTORY_PK;
     public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_STAT_PKEY = UniqueKeys0.INVOICE_EVENT_STAT_PKEY;
     public static final UniqueKey<PayoutEventStatRecord> PAYOUT_EVENT_PKEY = UniqueKeys0.PAYOUT_EVENT_PKEY;
     public static final UniqueKey<RefundRecord> REFUND_PKEY = UniqueKeys0.REFUND_PKEY;
@@ -73,7 +70,6 @@ public class Keys {
 
     private static class UniqueKeys0 {
         public static final UniqueKey<AdjustmentRecord> ADJUSTMENT_PKEY = Internal.createUniqueKey(Adjustment.ADJUSTMENT, "adjustment_pkey", Adjustment.ADJUSTMENT.ID);
-        public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, "flyway_schema_history_pk", FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK);
         public static final UniqueKey<InvoiceEventStatRecord> INVOICE_EVENT_STAT_PKEY = Internal.createUniqueKey(InvoiceEventStat.INVOICE_EVENT_STAT, "invoice_event_stat_pkey", InvoiceEventStat.INVOICE_EVENT_STAT.ID);
         public static final UniqueKey<PayoutEventStatRecord> PAYOUT_EVENT_PKEY = Internal.createUniqueKey(PayoutEventStat.PAYOUT_EVENT_STAT, "payout_event_pkey", PayoutEventStat.PAYOUT_EVENT_STAT.ID);
         public static final UniqueKey<RefundRecord> REFUND_PKEY = Internal.createUniqueKey(Refund.REFUND, "refund_pkey", Refund.REFUND.ID);

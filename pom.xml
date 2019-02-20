@@ -17,7 +17,7 @@
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
-        <damsel.version>1.272-1c28959</damsel.version>
+        <damsel.version>1.278-3abdcb4</damsel.version>
         <shared.resources.version>0.2.1</shared.resources.version>
         <server.port>8022</server.port>
         <dockerfile.base.service.tag>22c57470c4fc47161894f036b7cf9d70f42b75f5</dockerfile.base.service.tag>
@@ -253,7 +253,7 @@
                         <database>
                             <name>org.jooq.meta.postgres.PostgresDatabase</name>
                             <includes>.*</includes>
-                            <excludes>schema_version</excludes>
+                            <excludes>schema_version|flyway_schema_history</excludes>
                             <inputSchema>${db.schema}</inputSchema>
                         </database>
                         <target>

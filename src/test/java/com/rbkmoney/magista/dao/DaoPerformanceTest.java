@@ -1,7 +1,6 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.AbstractIntegrationTest;
-import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventCategory;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEventStat;

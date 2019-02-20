@@ -5,7 +5,6 @@ package com.rbkmoney.magista.domain;
 
 
 import com.rbkmoney.magista.domain.tables.Adjustment;
-import com.rbkmoney.magista.domain.tables.FlywaySchemaHistory;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.PayoutEventStat;
 import com.rbkmoney.magista.domain.tables.Refund;
@@ -35,8 +34,6 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     public static final Index ADJUSTMENT_PKEY = Indexes0.ADJUSTMENT_PKEY;
-    public static final Index FLYWAY_SCHEMA_HISTORY_PK = Indexes0.FLYWAY_SCHEMA_HISTORY_PK;
-    public static final Index FLYWAY_SCHEMA_HISTORY_S_IDX = Indexes0.FLYWAY_SCHEMA_HISTORY_S_IDX;
     public static final Index EVENT_INVOICE_MS_KEY = Indexes0.EVENT_INVOICE_MS_KEY;
     public static final Index INVOICE_EVENT_STAT_PKEY = Indexes0.INVOICE_EVENT_STAT_PKEY;
     public static final Index INVOICE_STAT_EVENT_CATEGORY_EVENT_CREATED_AT_IDX = Indexes0.INVOICE_STAT_EVENT_CATEGORY_EVENT_CREATED_AT_IDX;
@@ -52,8 +49,6 @@ public class Indexes {
 
     private static class Indexes0 {
         public static Index ADJUSTMENT_PKEY = Internal.createIndex("adjustment_pkey", Adjustment.ADJUSTMENT, new OrderField[] { Adjustment.ADJUSTMENT.ID }, true);
-        public static Index FLYWAY_SCHEMA_HISTORY_PK = Internal.createIndex("flyway_schema_history_pk", FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, new OrderField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK }, true);
-        public static Index FLYWAY_SCHEMA_HISTORY_S_IDX = Internal.createIndex("flyway_schema_history_s_idx", FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, new OrderField[] { FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.SUCCESS }, false);
         public static Index EVENT_INVOICE_MS_KEY = Internal.createIndex("event_invoice_ms_key", InvoiceEventStat.INVOICE_EVENT_STAT, new OrderField[] { InvoiceEventStat.INVOICE_EVENT_STAT.INVOICE_ID, InvoiceEventStat.INVOICE_EVENT_STAT.PAYMENT_ID }, false);
         public static Index INVOICE_EVENT_STAT_PKEY = Internal.createIndex("invoice_event_stat_pkey", InvoiceEventStat.INVOICE_EVENT_STAT, new OrderField[] { InvoiceEventStat.INVOICE_EVENT_STAT.ID }, true);
         public static Index INVOICE_STAT_EVENT_CATEGORY_EVENT_CREATED_AT_IDX = Internal.createIndex("invoice_stat_event_category_event_created_at_idx", InvoiceEventStat.INVOICE_EVENT_STAT, new OrderField[] { InvoiceEventStat.INVOICE_EVENT_STAT.EVENT_CATEGORY, InvoiceEventStat.INVOICE_EVENT_STAT.EVENT_CREATED_AT }, false);

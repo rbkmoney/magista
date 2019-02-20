@@ -5,7 +5,6 @@ package com.rbkmoney.magista.domain;
 
 
 import com.rbkmoney.magista.domain.tables.Adjustment;
-import com.rbkmoney.magista.domain.tables.FlywaySchemaHistory;
 import com.rbkmoney.magista.domain.tables.InvoiceEventStat;
 import com.rbkmoney.magista.domain.tables.PayoutEventStat;
 import com.rbkmoney.magista.domain.tables.Refund;
@@ -30,11 +29,6 @@ public class Tables {
      * The table <code>mst.adjustment</code>.
      */
     public static final Adjustment ADJUSTMENT = com.rbkmoney.magista.domain.tables.Adjustment.ADJUSTMENT;
-
-    /**
-     * The table <code>mst.flyway_schema_history</code>.
-     */
-    public static final FlywaySchemaHistory FLYWAY_SCHEMA_HISTORY = com.rbkmoney.magista.domain.tables.FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
 
     /**
      * The table <code>mst.invoice_event_stat</code>.
