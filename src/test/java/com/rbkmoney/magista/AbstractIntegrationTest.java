@@ -65,9 +65,12 @@ public abstract class AbstractIntegrationTest {
         @Override
         public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
             TestPropertyValues.of(
-                    "spring.datasource.url=" + postgres.getJdbcUrl(),
-                    "spring.datasource.username=" + postgres.getUsername(),
-                    "spring.datasource.password=" + postgres.getPassword(),
+                    "datasource.master.url=" + postgres.getJdbcUrl(),
+                    "datasource.master.username=" + postgres.getUsername(),
+                    "datasource.master.password=" + postgres.getPassword(),
+                    "datasource.slave.url=" + postgres.getJdbcUrl(),
+                    "datasource.slave.username=" + postgres.getUsername(),
+                    "datasource.slave.password=" + postgres.getPassword(),
                     "flyway.url=" + postgres.getJdbcUrl(),
                     "flyway.user=" + postgres.getUsername(),
                     "flyway.password=" + postgres.getPassword()
