@@ -14,6 +14,7 @@ import org.jooq.Field;
 import org.jooq.Operator;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -36,7 +37,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
 
     private final StatPaymentMapper statPaymentMapper;
 
-    public ReportDaoImpl(DataSource ds) {
+    public ReportDaoImpl(@Qualifier("slaveDataSource") DataSource ds) {
         super(ds);
         statPaymentMapper = new StatPaymentMapper();
     }
