@@ -2,6 +2,7 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.dao.RefundDao;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
+import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
@@ -43,11 +44,12 @@ public class PaymentRefundService {
         switch (refund.getEventType()) {
             case INVOICE_PAYMENT_REFUND_CREATED:
                 PaymentData paymentData = paymentService.getPaymentData(refund.getInvoiceId(), refund.getPaymentId());
+                PaymentEvent paymentEvent = paymentService.getLastPaymentChange(refund.getInvoiceId(), refund.getPaymentId());
                 refund.setPartyId(paymentData.getPartyId().toString());
                 refund.setPartyShopId(paymentData.getPartyShopId());
                 if (refund.getRefundAmount() == null) {
-                    refund.setRefundAmount(paymentData.getPaymentAmount());
-                    refund.setRefundCurrencyCode(paymentData.getPaymentCurrencyCode());
+                    refund.setRefundAmount(paymentEvent.getPaymentAmount());
+                    refund.setRefundCurrencyCode(paymentEvent.getPaymentCurrencyCode());
                 }
                 break;
             case INVOICE_PAYMENT_REFUND_STATUS_CHANGED:
