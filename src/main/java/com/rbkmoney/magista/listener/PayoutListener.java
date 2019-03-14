@@ -1,38 +1,42 @@
 package com.rbkmoney.magista.listener;
 
-import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.event_stock.SourceEvent;
 import com.rbkmoney.damsel.payout_processing.EventPayload;
 import com.rbkmoney.damsel.payout_processing.PayoutChange;
-import com.rbkmoney.geck.serializer.Geck;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
+import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.service.HandlerManager;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Slf4j
 @Component
-public class PayoutListener extends AbstractListener {
+@RequiredArgsConstructor
+public class PayoutListener implements MessageListener {
 
-    public PayoutListener(List<Handler> handlers) {
-        super(handlers);
-    }
+    private final HandlerManager handlerManager;
+    private final SafeMessageConsumer safeMessageConsumer;
+    private final SourceEventParser eventParser;
 
     @KafkaListener(topics = "${kafka.payout.topic}", containerFactory = "kafkaListenerContainerFactory")
-    public void listen(@Payload byte[] message, @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) Long key) {
-        StockEvent stockEvent = Geck.msgPackToTBase(message, StockEvent.class);
-        EventPayload payload = stockEvent.getSourceEvent().getPayoutEvent().getPayload();
+    public void listen(@Payload MachineEvent message, Acknowledgment ack) {
+        safeMessageConsumer.safeMessageHandler(this::handle, message, ack);
+    }
+
+    @Override
+    public void handle(MachineEvent message, Acknowledgment ack) {
+        SourceEvent stockEvent = eventParser.parseEvent(message);
+        EventPayload payload = stockEvent.getPayoutEvent().getPayload();
         if (payload.isSetPayoutChanges()) {
             for (PayoutChange payoutChange : payload.getPayoutChanges()) {
-                Handler handler = getHandler(payoutChange);
+                Handler handler = handlerManager.getHandler(payoutChange);
                 if (handler != null) {
-                    log.info("Start payout event handling, id='{}', eventType='{}', handlerType='{}'",
-                            key, handler.getChangeType(), handler.getClass().getSimpleName());
-                    handler.handle(payoutChange, stockEvent);
+                    handler.handle(payoutChange, stockEvent).execute();
                 }
             }
         }

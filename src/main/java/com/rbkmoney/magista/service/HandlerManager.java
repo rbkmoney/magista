@@ -1,17 +1,18 @@
-package com.rbkmoney.magista.listener;
+package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.event.Handler;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor
-public abstract class AbstractListener {
+public class HandlerManager {
 
     private final List<Handler> handlers;
 
-    protected  <C> Handler getHandler(C change) {
+    public <C> Handler getHandler(C change) {
         for (Handler handler : handlers) {
             if (handler.accept(change)) {
                 return handler;
