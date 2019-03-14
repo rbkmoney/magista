@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.AbstractIntegrationTest;
+import com.rbkmoney.magista.dao.impl.PayoutEventDaoImpl;
 import com.rbkmoney.magista.domain.enums.PayoutEventCategory;
 import com.rbkmoney.magista.domain.enums.PayoutEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
@@ -9,6 +9,7 @@ import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,7 +17,8 @@ import java.util.UUID;
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static org.junit.Assert.assertEquals;
 
-public class PayoutEventStatDaoTest extends AbstractIntegrationTest {
+@ContextConfiguration(classes = {PayoutEventDaoImpl.class})
+public class PayoutEventStatDaoTest extends AbstractDaoTest {
 
     @Autowired
     PayoutEventDao payoutEventDao;

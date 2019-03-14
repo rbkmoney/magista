@@ -20,8 +20,8 @@ public class DaoConfig {
     @Bean
     @Primary
     @ConfigurationProperties("datasource.master.configuration")
-    public HikariDataSource dataSource() {
-        return dataSourceProperties().initializeDataSourceBuilder()
+    public HikariDataSource dataSource(DataSourceProperties dataSourceProperties) {
+        return dataSourceProperties.initializeDataSourceBuilder()
                 .type(HikariDataSource.class).build();
     }
 
@@ -33,8 +33,8 @@ public class DaoConfig {
 
     @Bean
     @ConfigurationProperties("datasource.slave.configuration")
-    public HikariDataSource slaveDataSource() {
-        return slaveDataSourceProperties().initializeDataSourceBuilder()
+    public HikariDataSource slaveDataSource(DataSourceProperties slaveDataSourceProperties) {
+        return slaveDataSourceProperties.initializeDataSourceBuilder()
                 .type(HikariDataSource.class).build();
     }
 

@@ -1,17 +1,19 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.AbstractIntegrationTest;
+import com.rbkmoney.magista.dao.impl.InvoiceDaoImpl;
+import com.rbkmoney.magista.dao.impl.PaymentDaoImpl;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
-import com.rbkmoney.magista.exception.DaoException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static org.junit.Assert.assertEquals;
 
-public class PaymentDaoTest extends AbstractIntegrationTest {
+@ContextConfiguration(classes = {InvoiceDaoImpl.class, PaymentDaoImpl.class})
+public class PaymentDaoTest extends AbstractDaoTest {
 
     @Autowired
     private InvoiceDao invoiceDao;
