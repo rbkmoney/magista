@@ -1,25 +1,19 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.damsel.merch_stat.*;
-import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.AbstractIntegrationTest;
-import com.rbkmoney.magista.dao.StatisticsDao;
-import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
-import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
+import com.rbkmoney.damsel.merch_stat.StatRefund;
+import com.rbkmoney.damsel.merch_stat.StatRequest;
+import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.magista.query.AbstractQueryTest;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.util.Map;
-
 import static com.rbkmoney.damsel.merch_stat.PayoutStatus._Fields.*;
-import static com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider.euroset;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -27,9 +21,9 @@ import static org.junit.Assert.assertTrue;
  * Created by vpankrashkin on 29.08.16.
  */
 
-@Sql("classpath:data/sql/invoices_and_payments_test_data.sql")
 @Transactional
-public class QueryProcessorImplTest extends AbstractIntegrationTest {
+@Sql(value = "classpath:data/sql/invoices_and_payments_test_data.sql")
+public class QueryProcessorImplTest extends AbstractQueryTest {
 
     @Test
     public void testPayouts() throws TException {

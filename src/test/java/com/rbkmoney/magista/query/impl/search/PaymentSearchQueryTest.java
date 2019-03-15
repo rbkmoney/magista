@@ -5,6 +5,7 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.exception.BadTokenException;
+import com.rbkmoney.magista.query.AbstractQueryTest;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
@@ -27,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @Transactional
-public class PaymentSearchQueryTest extends AbstractIntegrationTest {
+public class PaymentSearchQueryTest extends AbstractQueryTest {
 
     @Test
     @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")

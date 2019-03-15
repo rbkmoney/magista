@@ -6,6 +6,7 @@ import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.exception.BadTokenException;
+import com.rbkmoney.magista.query.AbstractQueryTest;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.TokenUtil;
@@ -20,7 +21,7 @@ import static org.junit.Assert.*;
 
 @Transactional
 @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
-public class InvoiceSearchQueryTest extends AbstractIntegrationTest {
+public class InvoiceSearchQueryTest extends AbstractQueryTest {
 
     @Test
     public void testInvoices() {

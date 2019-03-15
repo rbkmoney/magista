@@ -3,6 +3,7 @@ package com.rbkmoney.magista.query.impl.report;
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.magista.AbstractIntegrationTest;
+import com.rbkmoney.magista.query.AbstractQueryTest;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.context.jdbc.Sql;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class AccountingReportTest extends AbstractIntegrationTest {
+public class AccountingReportTest extends AbstractQueryTest {
 
     @Test
     @Sql("classpath:data/sql/report/case1_report_data.sql")

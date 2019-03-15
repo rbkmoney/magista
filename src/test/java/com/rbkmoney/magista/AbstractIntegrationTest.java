@@ -1,8 +1,15 @@
 package com.rbkmoney.magista;
 
+import com.rbkmoney.magista.config.ColumbusConfig;
+import com.rbkmoney.magista.config.EventStockPollerConfig;
+import com.rbkmoney.magista.config.KafkaConfig;
+import com.rbkmoney.magista.converter.BinaryConverter;
+import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.dao.ReportDao;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.StatisticsDao;
+import com.rbkmoney.magista.listener.InvoiceListener;
+import com.rbkmoney.magista.listener.PayoutListener;
 import com.rbkmoney.magista.query.impl.QueryContextFactoryImpl;
 import com.rbkmoney.magista.query.impl.QueryProcessorImpl;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
@@ -16,10 +23,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.Duration;
@@ -31,7 +40,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = {"bm.pooling.enabled=false"})
 @ContextConfiguration(classes = MagistaApplication.class, initializers = AbstractIntegrationTest.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -47,9 +55,6 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     private ReportDao reportDao;
-
-    @Value("${local.server.port}")
-    protected int port;
 
     @Before
     public void before() {
@@ -77,4 +82,5 @@ public abstract class AbstractIntegrationTest {
             ).applyTo(configurableApplicationContext);
         }
     }
+
 }

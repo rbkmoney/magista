@@ -4,6 +4,7 @@ import com.rbkmoney.magista.config.DaoConfig;
 import org.flywaydb.core.Flyway;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
+import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -24,7 +25,7 @@ import java.time.Duration;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @EnableConfigurationProperties
-@ContextConfiguration(classes = {DaoConfig.class},
+@ContextConfiguration(classes = {DaoConfig.class, TransactionAutoConfiguration.class},
         loader = AnnotationConfigContextLoader.class,
         initializers = AbstractDaoTest.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -41,21 +42,18 @@ public abstract class AbstractDaoTest {
                     "datasource.master.url=" + postgres.getJdbcUrl(),
                     "datasource.master.username=" + postgres.getUsername(),
                     "datasource.master.password=" + postgres.getPassword(),
-                    "datasource.master.configuration=" + postgres.getPassword(),
-                    "datasource.master.configuration.maximum-pool-size=" + 3,
-                    "datasource.master.configuration.idle-timeout=" + 10000,
                     "datasource.slave.url=" + postgres.getJdbcUrl(),
                     "datasource.slave.username=" + postgres.getUsername(),
-                    "datasource.slave.password=" + postgres.getPassword(),
-                    "datasource.slave.configuration.maximum-pool-size=" + 3,
-                    "datasource.slave.configuration.idle-timeout=" + 10000
+                    "datasource.slave.password=" + postgres.getPassword()
             ).applyTo(configurableApplicationContext);
-
-            Flyway flyway = new Flyway();
-            flyway.setDataSource(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword());
-            flyway.setSchemas("mst");
+            Flyway flyway = Flyway.configure()
+                    .dataSource(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())
+                    .schemas("mst")
+                    .load();
             flyway.migrate();
         }
     }
+
+
 
 }
