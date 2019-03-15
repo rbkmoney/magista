@@ -3,8 +3,6 @@ package com.rbkmoney.magista.dao;
 import com.rbkmoney.magista.dao.impl.AdjustmentDaoImpl;
 import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
 import com.rbkmoney.magista.exception.DaoException;
-import org.flywaydb.test.annotation.FlywayTest;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
