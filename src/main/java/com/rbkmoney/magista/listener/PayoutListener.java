@@ -30,13 +30,13 @@ public class PayoutListener implements MessageListener {
 
     @Override
     public void handle(MachineEvent message, Acknowledgment ack) {
-        SourceEvent stockEvent = eventParser.parseEvent(message);
-        EventPayload payload = stockEvent.getPayoutEvent().getPayload();
+        SourceEvent sourceEvent = eventParser.parseEvent(message);
+        EventPayload payload = sourceEvent.getPayoutEvent().getPayload();
         if (payload.isSetPayoutChanges()) {
             for (PayoutChange payoutChange : payload.getPayoutChanges()) {
                 Handler handler = handlerManager.getHandler(payoutChange);
                 if (handler != null) {
-                    handler.handle(payoutChange, stockEvent).execute();
+                    handler.handle(payoutChange, sourceEvent).execute();
                 }
             }
         }

@@ -1,9 +1,9 @@
 package com.rbkmoney.magista.listener;
 
 import com.rbkmoney.damsel.event_stock.SourceEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
-import com.rbkmoney.damsel.payment_processing.EventPayload;
-import com.rbkmoney.damsel.payment_processing.InvoiceChange;
+import com.rbkmoney.damsel.payout_processing.Event;
+import com.rbkmoney.damsel.payout_processing.EventPayload;
+import com.rbkmoney.damsel.payout_processing.PayoutChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.event.Handler;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
 
-public class InvoiceListenerTest {
+public class PayoutListenerTest {
 
     @Mock
     private HandlerManager handlerManager;
@@ -37,12 +37,12 @@ public class InvoiceListenerTest {
     @Mock
     private Acknowledgment ack;
 
-    private InvoiceListener invoiceListener;
+    private PayoutListener payoutListener;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
-        invoiceListener = new InvoiceListener(handlerManager, new SafeMessageConsumer(1000L, 1.5, sleepService), eventParser);
+        payoutListener = new PayoutListener(handlerManager, new SafeMessageConsumer(1000L, 1.5, sleepService), eventParser);
     }
 
     @Test
@@ -51,12 +51,12 @@ public class InvoiceListenerTest {
         SourceEvent sourceEvent = new SourceEvent();
         Event event = new Event();
         EventPayload payload = new EventPayload();
-        payload.setInvoiceChanges(new ArrayList<>());
+        payload.setPayoutChanges(new ArrayList<>());
         event.setPayload(payload);
-        sourceEvent.setProcessingEvent(event);
+        sourceEvent.setPayoutEvent(event);
         Mockito.when(eventParser.parseEvent(message)).thenReturn(sourceEvent);
 
-        invoiceListener.handle(message, ack);
+        payoutListener.handle(message, ack);
 
         Mockito.verify(processor, Mockito.times(0)).execute();
     }
@@ -65,7 +65,7 @@ public class InvoiceListenerTest {
     public void listenEmptyException() {
         MachineEvent message = new MachineEvent();
         Mockito.when(eventParser.parseEvent(message)).thenThrow(new ParseException());
-        invoiceListener.handle(message, ack);
+        payoutListener.handle(message, ack);
     }
 
     @Test
@@ -74,18 +74,17 @@ public class InvoiceListenerTest {
         SourceEvent sourceEvent = new SourceEvent();
         Event event = new Event();
         EventPayload payload = new EventPayload();
-        ArrayList<InvoiceChange> invoiceChanges = new ArrayList<>();
-        invoiceChanges.add(new InvoiceChange());
-        payload.setInvoiceChanges(invoiceChanges);
+        ArrayList<PayoutChange> payoutChanges = new ArrayList<>();
+        payoutChanges.add(new PayoutChange());
+        payload.setPayoutChanges(payoutChanges);
         event.setPayload(payload);
-        sourceEvent.setProcessingEvent(event);
+        sourceEvent.setPayoutEvent(event);
         Mockito.when(eventParser.parseEvent(message)).thenReturn(sourceEvent);
         Mockito.when(handler.handle(any(), any())).thenReturn(processor);
         Mockito.when(handlerManager.getHandler(any())).thenReturn(handler);
 
-        invoiceListener.handle(message, ack);
+        payoutListener.handle(message, ack);
 
         Mockito.verify(processor, Mockito.times(1)).execute();
     }
-
 }

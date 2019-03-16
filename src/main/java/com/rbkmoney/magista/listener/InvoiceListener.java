@@ -24,7 +24,7 @@ public class InvoiceListener implements MessageListener {
     private final SourceEventParser eventParser;
 
     @KafkaListener(topics = "${kafka.invoice.topic}", containerFactory = "kafkaListenerContainerFactory")
-    public void listen(@Payload MachineEvent message, Acknowledgment ack) {
+    public void listen(MachineEvent message, Acknowledgment ack) {
         safeMessageConsumer.safeMessageHandler(this::handle, message, ack);
     }
 
