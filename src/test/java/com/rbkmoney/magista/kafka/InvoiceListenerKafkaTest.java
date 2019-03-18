@@ -1,9 +1,5 @@
 package com.rbkmoney.magista.kafka;
 
-import com.rbkmoney.damsel.event_stock.SourceEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
-import com.rbkmoney.damsel.payment_processing.EventPayload;
-import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.msgpack.Value;
 import com.rbkmoney.magista.config.KafkaConfig;
@@ -20,7 +16,8 @@ import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.mockito.ArgumentMatchers.any;
 
@@ -39,16 +36,12 @@ public class InvoiceListenerKafkaTest extends KafkaAbstractTest {
     public void listenEmptyChanges() throws InterruptedException {
         Producer<String, MachineEvent> producer = createProducer();
         MachineEvent message = new MachineEvent();
-        SourceEvent sourceEvent = new SourceEvent();
-        Event event = new Event();
-        EventPayload payload = new EventPayload();
-        ArrayList<InvoiceChange> invoiceChanges = new ArrayList<>();
-        invoiceChanges.add(new InvoiceChange());
-        payload.setInvoiceChanges(invoiceChanges);
-        event.setPayload(payload);
-        sourceEvent.setProcessingEvent(event);
         Value data = new Value();
         data.setBin(new byte[0]);
+        message.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        message.setEventId(1L);
+        message.setSourceNs(SOURCE_NS);
+        message.setSourceId(SOURCE_ID);
         message.setData(data);
 
         ProducerRecord<String, MachineEvent> producerRecord = new ProducerRecord<>(topic,
@@ -60,7 +53,7 @@ public class InvoiceListenerKafkaTest extends KafkaAbstractTest {
         }
         producer.close();
 
-        Thread.sleep(10000L);
+        Thread.sleep(1000L);
         Mockito.verify(safeMessageConsumer, Mockito.times(1)).safeMessageHandler(any(), any(), any());
     }
 

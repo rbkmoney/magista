@@ -1,13 +1,11 @@
 package com.rbkmoney.magista.kafka;
 
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.config.KafkaConfig;
 import com.rbkmoney.magista.serde.MachineEventSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
@@ -30,6 +28,8 @@ import java.util.Properties;
 @ContextConfiguration(initializers = KafkaAbstractTest.Initializer.class)
 public abstract class KafkaAbstractTest {
     public static final String EVENT_SINK_INVOICE_TOPIC = "event_sink_invoice_topic";
+    public static final String SOURCE_ID = "source_id";
+    public static final String SOURCE_NS = "source_ns";
 
     private static final String CONFLUENT_PLATFORM_VERSION = "5.0.1";
 
@@ -51,28 +51,11 @@ public abstract class KafkaAbstractTest {
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-
         @Override
         public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
             TestPropertyValues values = TestPropertyValues
                     .of("kafka.bootstrap.servers=" + kafka.getBootstrapServers());
             values.applyTo(configurableApplicationContext);
-
-            Producer<String, MachineEvent> producer = createProducer();
-            MachineEvent machineEvent = new MachineEvent();
-            com.rbkmoney.machinegun.msgpack.Value data = new com.rbkmoney.machinegun.msgpack.Value();
-            data.setBin(new byte[0]);
-            machineEvent.setData(data);
-            ProducerRecord<String, MachineEvent> producerRecord = new ProducerRecord<>(EVENT_SINK_INVOICE_TOPIC,
-                    null, machineEvent);
-            try {
-                producer.send(producerRecord).get();
-            } catch (Exception e) {
-                log.error("KafkaAbstractTest initialize e: ", e);
-            }
-            producer.close();
         }
-
-
     }
 }

@@ -1,16 +1,17 @@
 package com.rbkmoney.magista.serde;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.thrift.TDeserializer;
+import org.apache.thrift.protocol.TCompactProtocol;
 
 import java.util.Map;
 
 @Slf4j
 public class MachineEventDeserializer implements Deserializer<MachineEvent> {
 
-    private final ObjectMapper om = new ObjectMapper();
+    private final TDeserializer deserializer = new TDeserializer(new TCompactProtocol.Factory());
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
@@ -19,13 +20,13 @@ public class MachineEventDeserializer implements Deserializer<MachineEvent> {
 
     @Override
     public MachineEvent deserialize(String topic, byte[] data) {
-        MachineEvent ruleTemplate = null;
+        MachineEvent machineEvent = new MachineEvent();
         try {
-            ruleTemplate = om.readValue(data, MachineEvent.class);
+            deserializer.deserialize(machineEvent, data);
         } catch (Exception e) {
             log.error("Error when deserialize ruleTemplate data: {} ", data, e);
         }
-        return ruleTemplate;
+        return machineEvent;
     }
 
     @Override
