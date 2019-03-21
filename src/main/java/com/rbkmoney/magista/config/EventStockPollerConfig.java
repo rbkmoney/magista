@@ -15,25 +15,25 @@ import java.io.IOException;
 @Configuration
 public class EventStockPollerConfig {
 
-    @Value("${bm.processing.pooling.url}")
-    private Resource processingPoolingUrl;
+    @Value("${bm.payout.pooling.url}")
+    private Resource payoutPoolingUrl;
 
-    @Value("${bm.processing.pooling.querySize}")
-    private int processingPoolingQuerySize;
+    @Value("${bm.payout.pooling.querySize}")
+    private int payoutPoolingQuerySize;
 
-    @Value("${bm.processing.pooling.maxPoolSize}")
-    private int processingPoolingMaxPoolSize;
+    @Value("${bm.payout.pooling.maxPoolSize}")
+    private int payoutPoolingMaxPoolSize;
 
-    @Value("${bm.processing.pooling.delay}")
-    private int processingPoolingMaxDelay;
+    @Value("${bm.payout.pooling.delay}")
+    private int payoutPoolingMaxDelay;
 
     @Bean
-    public DefaultPollingEventPublisherBuilder processingEventPublisherBuilder() throws IOException {
+    public DefaultPollingEventPublisherBuilder payoutEventPublisherBuilder() throws IOException {
         return new PollingEventPublisherBuilder()
-                .withURI(processingPoolingUrl.getURI())
-                .withMaxQuerySize(processingPoolingQuerySize)
-                .withMaxPoolSize(processingPoolingMaxPoolSize)
-                .withPollDelay(processingPoolingMaxDelay);
+                .withURI(payoutPoolingUrl.getURI())
+                .withMaxQuerySize(payoutPoolingQuerySize)
+                .withMaxPoolSize(payoutPoolingMaxPoolSize)
+                .withPollDelay(payoutPoolingMaxDelay);
     }
 
 }
