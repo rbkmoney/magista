@@ -13,8 +13,11 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import static org.mockito.ArgumentMatchers.any;
 
 @Slf4j
+@TestPropertySource(properties = "kafka.ssl.enable=false")
 @ContextConfiguration(classes = {KafkaConfig.class, KafkaAutoConfiguration.class,  InvoiceListener.class})
 public class InvoiceListenerKafkaTest extends KafkaAbstractTest {
 
