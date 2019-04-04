@@ -13,6 +13,7 @@ import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
@@ -34,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockEvent> {
+public class PaymentStartedEventHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final PaymentService paymentService;
 
@@ -47,10 +48,9 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
-        Event event = parent.getSourceEvent().getProcessingEvent();
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
 
-        String invoiceId = event.getSource().getInvoiceId();
+        String invoiceId = machineEvent.getSourceId();
 
         InvoicePaymentStarted invoicePaymentStarted = change
                 .getInvoicePaymentChange()
@@ -137,8 +137,11 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
 
         PaymentEvent paymentEvent = new PaymentEvent();
         paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
-        paymentEvent.setEventId(event.getId());
-        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+
+        //TODO add sequence
+//        paymentEvent.setEventId();
+
+        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         paymentEvent.setInvoiceId(invoiceId);
         paymentEvent.setPaymentId(paymentId);
 

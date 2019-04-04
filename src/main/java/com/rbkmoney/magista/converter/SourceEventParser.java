@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.converter;
 
 import com.rbkmoney.damsel.event_stock.SourceEvent;
+import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.exception.ParseException;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +13,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SourceEventParser {
 
-    private final BinaryConverter<SourceEvent> converter;
+    private final BinaryConverter<EventPayload> converter;
 
-    public SourceEvent parseEvent(MachineEvent message) {
+    public EventPayload parseEvent(MachineEvent message) {
         try {
             byte[] bin = message.getData().getBin();
-            return converter.convert(bin, SourceEvent.class);
+            return converter.convert(bin, EventPayload.class);
         } catch (Exception e) {
             log.error("Exception when parse message e: ", e);
             throw new ParseException();

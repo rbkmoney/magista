@@ -1,11 +1,10 @@
 package com.rbkmoney.magista.event.impl.handler;
 
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.user_interaction.PaymentTerminalReceipt;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.event.ChangeType;
@@ -16,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PaymentTerminalRecieptEventHandler implements Handler<InvoiceChange, StockEvent> {
+public class PaymentTerminalRecieptEventHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final PaymentService paymentService;
 
@@ -26,14 +25,14 @@ public class PaymentTerminalRecieptEventHandler implements Handler<InvoiceChange
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
-        Event event = parent.getSourceEvent().getProcessingEvent();
+    public Processor handle(InvoiceChange change, MachineEvent parent) {
 
         PaymentEvent paymentEvent = new PaymentEvent();
-        paymentEvent.setEventId(event.getId());
+        //TODO add sequence
+//        paymentEvent.setEventId(event.getId());
         paymentEvent.setEventType(InvoiceEventType.PAYMENT_TERMINAL_RECIEPT);
-        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-        paymentEvent.setInvoiceId(event.getSource().getInvoiceId());
+        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(parent.getCreatedAt()));
+        paymentEvent.setInvoiceId(parent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
 

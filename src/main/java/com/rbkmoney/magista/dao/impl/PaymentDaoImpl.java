@@ -5,6 +5,7 @@ import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.exception.DaoException;
+import org.jooq.Field;
 import org.jooq.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 
+import static com.rbkmoney.magista.domain.Sequences.S_PAYMENT_ID;
 import static com.rbkmoney.magista.domain.Tables.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.Tables.PAYMENT_EVENT;
 

@@ -4,11 +4,10 @@ import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.Invoice;
 import com.rbkmoney.damsel.domain.InvoiceDetails;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEvent;
@@ -23,7 +22,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, StockEvent> {
+public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final InvoiceService invoiceService;
 
@@ -33,14 +32,14 @@ public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, StockE
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
-        Event event = parent.getSourceEvent().getProcessingEvent();
-
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
         InvoiceEvent invoiceEvent = new InvoiceEvent();
         invoiceEvent.setEventType(InvoiceEventType.INVOICE_CREATED);
-        invoiceEvent.setEventId(event.getId());
-        invoiceEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-        invoiceEvent.setInvoiceId(event.getSource().getInvoiceId());
+        //TODO add sequence
+        invoiceEvent.setEventId(machineEvent.getEventId());
+        invoiceEvent.setInvoiceId(machineEvent.getSourceId());
+
+        invoiceEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
 
         Invoice invoice = change.getInvoiceCreated().getInvoice();
 

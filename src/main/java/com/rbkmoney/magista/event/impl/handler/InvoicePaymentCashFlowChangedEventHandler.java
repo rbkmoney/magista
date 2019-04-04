@@ -1,11 +1,10 @@
 package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.domain.FinalCashFlowPosting;
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.event.ChangeType;
@@ -21,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class InvoicePaymentCashFlowChangedEventHandler implements Handler<InvoiceChange, StockEvent> {
+public class InvoicePaymentCashFlowChangedEventHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final PaymentService paymentService;
 
@@ -31,14 +30,14 @@ public class InvoicePaymentCashFlowChangedEventHandler implements Handler<Invoic
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
-        Event event = parent.getSourceEvent().getProcessingEvent();
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
 
         PaymentEvent paymentEvent = new PaymentEvent();
         paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_CASH_FLOW_CHANGED);
-        paymentEvent.setEventId(event.getId());
-        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-        paymentEvent.setInvoiceId(event.getSource().getInvoiceId());
+        //TODO add sequence
+//        paymentEvent.setEventId(event.getId());
+        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        paymentEvent.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
         paymentEvent.setPaymentId(invoicePaymentChange.getId());

@@ -1,11 +1,10 @@
 package com.rbkmoney.magista.event.impl.handler;
 
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoiceStatusChanged;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEvent;
@@ -18,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InvoiceStatusChangedEventHandler implements Handler<InvoiceChange, StockEvent> {
+public class InvoiceStatusChangedEventHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final InvoiceService invoiceService;
 
@@ -28,14 +27,13 @@ public class InvoiceStatusChangedEventHandler implements Handler<InvoiceChange, 
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
-        Event event = parent.getSourceEvent().getProcessingEvent();
-
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
         InvoiceEvent invoiceEvent = new InvoiceEvent();
         invoiceEvent.setEventType(InvoiceEventType.INVOICE_STATUS_CHANGED);
-        invoiceEvent.setEventId(event.getId());
-        invoiceEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-        invoiceEvent.setInvoiceId(event.getSource().getInvoiceId());
+        //TODO add sequence
+//        invoiceEvent.setEventId(event.getId());
+        invoiceEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        invoiceEvent.setInvoiceId(machineEvent.getSourceId());
 
         InvoiceStatusChanged invoiceStatusChanged = change.getInvoiceStatusChanged();
         invoiceEvent.setInvoiceStatus(

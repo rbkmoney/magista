@@ -54,7 +54,7 @@ public class InvoiceListenerTest {
         payload.setInvoiceChanges(new ArrayList<>());
         event.setPayload(payload);
         sourceEvent.setProcessingEvent(event);
-        Mockito.when(eventParser.parseEvent(message)).thenReturn(sourceEvent);
+//        Mockito.when(eventParser.parseEvent(message)).thenReturn(sourceEvent);
 
         invoiceListener.handle(message, ack);
 
@@ -79,7 +79,7 @@ public class InvoiceListenerTest {
         payload.setInvoiceChanges(invoiceChanges);
         event.setPayload(payload);
         sourceEvent.setProcessingEvent(event);
-        Mockito.when(eventParser.parseEvent(message)).thenReturn(sourceEvent);
+//        Mockito.when(eventParser.parseEvent(message)).thenReturn(sourceEvent);
         Mockito.when(handler.handle(any(), any())).thenReturn(processor);
         Mockito.when(handlerManager.getHandler(any())).thenReturn(handler);
 

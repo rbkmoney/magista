@@ -32,7 +32,7 @@ public class KafkaConfig {
     private String bootstrapServers;
     @Value("${kafka.ssl.server-password}")
     private String serverStorePassword;
-    @Value("${kafka.ssl.erver-keystore-location}")
+    @Value("${kafka.ssl.server-keystore-location}")
     private String serverStoreCertPath;
     @Value("${kafka.ssl.keystore-password}")
     private String keyStorePassword;
@@ -53,7 +53,7 @@ public class KafkaConfig {
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST);
         if (kafkaSslEnable) {
-            props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, null);
+            props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
             props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, new File(serverStoreCertPath).getAbsolutePath());
             props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, serverStorePassword);
             props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, PKCS_12);

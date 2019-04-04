@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.listener;
 
-import com.rbkmoney.damsel.event_stock.SourceEvent;
 import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
@@ -11,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -29,14 +27,14 @@ public class InvoiceListener implements MessageListener {
     }
 
     @Override
-    public void handle(MachineEvent message, Acknowledgment ack) {
-        SourceEvent sourceEvent = eventParser.parseEvent(message);
-        EventPayload payload = sourceEvent.getProcessingEvent().getPayload();
+    public void handle(MachineEvent machineEvent, Acknowledgment ack) {
+        EventPayload payload = eventParser.parseEvent(machineEvent);
+        log.info("EventPayload payload: {}", payload);
         if (payload.isSetInvoiceChanges()) {
             for (InvoiceChange invoiceChange : payload.getInvoiceChanges()) {
                 Handler handler = handlerManager.getHandler(invoiceChange);
                 if (handler != null) {
-                    handler.handle(invoiceChange, sourceEvent)
+                    handler.handle(invoiceChange, machineEvent)
                             .execute();
                 }
             }
