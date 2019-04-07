@@ -5,6 +5,7 @@ import com.rbkmoney.magista.dao.impl.AbstractDao;
 import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceEvent;
+import com.rbkmoney.magista.domain.tables.records.InvoiceEventRecord;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Field;
 import org.jooq.Query;
@@ -48,11 +49,12 @@ public class InvoiceDaoImpl extends AbstractDao implements InvoiceDao {
 
     @Override
     public void saveInvoiceEvent(InvoiceEvent invoiceEvent) throws DaoException {
+        InvoiceEventRecord invoiceEventRecord = getDslContext().newRecord(INVOICE_EVENT, invoiceEvent);
         Query query = getDslContext().insertInto(INVOICE_EVENT)
-                .set(getDslContext().newRecord(INVOICE_EVENT, invoiceEvent))
-                .onConflict(INVOICE_EVENT.EVENT_ID, INVOICE_EVENT.EVENT_TYPE, INVOICE_EVENT.INVOICE_STATUS)
+                .set(invoiceEventRecord)
+                .onConflict(INVOICE_EVENT.INVOICE_ID)
                 .doUpdate()
-                .set(getDslContext().newRecord(INVOICE_EVENT, invoiceEvent));
+                .set(invoiceEventRecord);
         executeOne(query);
     }
 }

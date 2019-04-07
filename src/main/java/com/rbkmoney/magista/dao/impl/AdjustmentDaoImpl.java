@@ -4,6 +4,7 @@ import com.rbkmoney.magista.dao.AdjustmentDao;
 import com.rbkmoney.magista.dao.impl.AbstractDao;
 import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
+import com.rbkmoney.magista.domain.tables.records.AdjustmentRecord;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
@@ -41,11 +42,12 @@ public class AdjustmentDaoImpl extends AbstractDao implements AdjustmentDao {
 
     @Override
     public void save(Adjustment adjustment) throws DaoException {
+        AdjustmentRecord adjustmentRecord = getDslContext().newRecord(ADJUSTMENT, adjustment);
         Query query = getDslContext().insertInto(ADJUSTMENT)
-                .set(getDslContext().newRecord(ADJUSTMENT, adjustment))
-                .onConflict(ADJUSTMENT.EVENT_ID, ADJUSTMENT.EVENT_TYPE, ADJUSTMENT.ADJUSTMENT_STATUS)
+                .set(adjustmentRecord)
+                .onConflict(ADJUSTMENT.INVOICE_ID, ADJUSTMENT.PAYMENT_ID, ADJUSTMENT.ADJUSTMENT_ID)
                 .doUpdate()
-                .set(getDslContext().newRecord(ADJUSTMENT, adjustment));
+                .set(adjustmentRecord);
 
         executeOne(query);
     }

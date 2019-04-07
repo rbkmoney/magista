@@ -33,15 +33,14 @@ public class PaymentStatusChangedEventHandler implements Handler<InvoiceChange, 
     }
 
     @Override
-    public Processor handle(InvoiceChange change, MachineEvent parent) {
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
 
         PaymentEvent paymentEvent = new PaymentEvent();
         paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED);
-        //TODO add sequense
-//        paymentEvent.setEventId(event.getId());
+        paymentEvent.setEventId(machineEvent.getEventId());
 
-        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(parent.getCreatedAt()));
-        paymentEvent.setInvoiceId(parent.getSourceId());
+        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        paymentEvent.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
         paymentEvent.setPaymentId(invoicePaymentChange.getId());

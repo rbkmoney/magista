@@ -25,14 +25,13 @@ public class PaymentTerminalRecieptEventHandler implements Handler<InvoiceChange
     }
 
     @Override
-    public Processor handle(InvoiceChange change, MachineEvent parent) {
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
 
         PaymentEvent paymentEvent = new PaymentEvent();
-        //TODO add sequence
-//        paymentEvent.setEventId(event.getId());
+        paymentEvent.setEventId(machineEvent.getEventId());
         paymentEvent.setEventType(InvoiceEventType.PAYMENT_TERMINAL_RECIEPT);
-        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(parent.getCreatedAt()));
-        paymentEvent.setInvoiceId(parent.getSourceId());
+        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        paymentEvent.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
 

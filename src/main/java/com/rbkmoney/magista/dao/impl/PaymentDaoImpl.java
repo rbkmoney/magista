@@ -4,8 +4,8 @@ import com.rbkmoney.magista.dao.PaymentDao;
 import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
+import com.rbkmoney.magista.domain.tables.records.PaymentEventRecord;
 import com.rbkmoney.magista.exception.DaoException;
-import org.jooq.Field;
 import org.jooq.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 
-import static com.rbkmoney.magista.domain.Sequences.S_PAYMENT_ID;
 import static com.rbkmoney.magista.domain.Tables.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.Tables.PAYMENT_EVENT;
 
@@ -51,19 +50,18 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
     public PaymentEvent getLastPaymentEvent(String invoiceId, String paymentId) throws DaoException {
         Query query = getDslContext().selectFrom(PAYMENT_EVENT)
                 .where(PAYMENT_EVENT.INVOICE_ID.eq(invoiceId))
-                .and(PAYMENT_EVENT.PAYMENT_ID.eq(paymentId))
-                .orderBy(PAYMENT_EVENT.ID.desc())
-                .limit(1);
+                .and(PAYMENT_EVENT.PAYMENT_ID.eq(paymentId));
         return fetchOne(query, paymentEventRowMapper);
     }
 
     @Override
     public void savePaymentEvent(PaymentEvent paymentEvent) throws DaoException {
+        PaymentEventRecord paymentEventRecord = getDslContext().newRecord(PAYMENT_EVENT, paymentEvent);
         Query query = getDslContext().insertInto(PAYMENT_EVENT)
-                .set(getDslContext().newRecord(PAYMENT_EVENT, paymentEvent))
-                .onConflict(PAYMENT_EVENT.EVENT_ID, PAYMENT_EVENT.EVENT_TYPE, PAYMENT_EVENT.PAYMENT_STATUS)
+                .set(paymentEventRecord)
+                .onConflict(PAYMENT_DATA.INVOICE_ID, PAYMENT_DATA.PAYMENT_ID)
                 .doUpdate()
-                .set(getDslContext().newRecord(PAYMENT_EVENT, paymentEvent));
+                .set(paymentEventRecord);
         executeOne(query);
     }
 }

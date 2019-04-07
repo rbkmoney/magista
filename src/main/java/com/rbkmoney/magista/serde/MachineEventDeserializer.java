@@ -21,7 +21,7 @@ public class MachineEventDeserializer implements Deserializer<MachineEvent> {
 
     @Override
     public MachineEvent deserialize(String topic, byte[] data) {
-        log.info("Message byte: {}", data);
+        log.debug("Message byte: {}", data);
         SinkEvent machineEvent = new SinkEvent();
         try {
             deserializer.deserialize(machineEvent, data);

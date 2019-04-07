@@ -35,7 +35,6 @@ public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, Machin
     public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
         InvoiceEvent invoiceEvent = new InvoiceEvent();
         invoiceEvent.setEventType(InvoiceEventType.INVOICE_CREATED);
-        //TODO add sequence
         invoiceEvent.setEventId(machineEvent.getEventId());
         invoiceEvent.setInvoiceId(machineEvent.getSourceId());
 

@@ -30,8 +30,7 @@ public class InvoiceStatusChangedEventHandler implements Handler<InvoiceChange, 
     public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
         InvoiceEvent invoiceEvent = new InvoiceEvent();
         invoiceEvent.setEventType(InvoiceEventType.INVOICE_STATUS_CHANGED);
-        //TODO add sequence
-//        invoiceEvent.setEventId(event.getId());
+        invoiceEvent.setEventId(machineEvent.getEventId());
         invoiceEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         invoiceEvent.setInvoiceId(machineEvent.getSourceId());
 

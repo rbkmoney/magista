@@ -9,6 +9,7 @@ import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentRefundCreated;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
 import com.rbkmoney.magista.domain.tables.pojos.Refund;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class RefundCreatedHandler implements Handler<InvoiceChange, StockEvent> {
+public class RefundCreatedHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final PaymentRefundService paymentRefundService;
 
@@ -34,14 +35,13 @@ public class RefundCreatedHandler implements Handler<InvoiceChange, StockEvent> 
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
         Refund refund = new Refund();
 
-        Event event = parent.getSourceEvent().getProcessingEvent();
-        refund.setEventId(event.getId());
-        refund.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        refund.setEventId(machineEvent.getEventId());
+        refund.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         refund.setEventType(InvoiceEventType.INVOICE_PAYMENT_REFUND_CREATED);
-        refund.setInvoiceId(event.getSource().getInvoiceId());
+        refund.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
 

@@ -11,6 +11,7 @@ import com.rbkmoney.damsel.payment_processing.InvoicePaymentRefundChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
@@ -23,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RefundStatusChangedHandler implements Handler<InvoiceChange, StockEvent> {
+public class RefundStatusChangedHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final PaymentRefundService paymentRefundService;
 
@@ -33,15 +34,14 @@ public class RefundStatusChangedHandler implements Handler<InvoiceChange, StockE
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
         Refund refund = new Refund();
 
-        Event event = parent.getSourceEvent().getProcessingEvent();
-        refund.setEventId(event.getId());
+        refund.setEventId(machineEvent.getEventId());
         refund.setEventType(InvoiceEventType.INVOICE_PAYMENT_REFUND_STATUS_CHANGED);
-        refund.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        refund.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
 
-        String invoiceId = event.getSource().getInvoiceId();
+        String invoiceId = machineEvent.getSourceId();
         refund.setInvoiceId(invoiceId);
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();

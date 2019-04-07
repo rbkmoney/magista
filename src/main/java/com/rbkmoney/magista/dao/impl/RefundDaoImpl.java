@@ -4,6 +4,7 @@ import com.rbkmoney.magista.dao.RefundDao;
 import com.rbkmoney.magista.dao.impl.AbstractDao;
 import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.Refund;
+import com.rbkmoney.magista.domain.tables.records.RefundRecord;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
@@ -41,11 +42,12 @@ public class RefundDaoImpl extends AbstractDao implements RefundDao {
 
     @Override
     public void save(Refund refund) throws DaoException {
+        RefundRecord refundRecord = getDslContext().newRecord(REFUND, refund);
         Query query = getDslContext().insertInto(REFUND)
-                .set(getDslContext().newRecord(REFUND, refund))
-                .onConflict(REFUND.EVENT_ID, REFUND.EVENT_TYPE, REFUND.REFUND_STATUS)
+                .set(refundRecord)
+                .onConflict(REFUND.INVOICE_ID, REFUND.PAYMENT_ID, REFUND.REFUND_ID)
                 .doUpdate()
-                .set(getDslContext().newRecord(REFUND, refund));
+                .set(refundRecord);
 
         executeOne(query);
     }

@@ -5,6 +5,7 @@ import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Component;
  * Created by tolkonepiu on 21/06/2017.
  */
 @Component
-public class AdjustmentStatusChangedHandler implements Handler<InvoiceChange, StockEvent> {
+public class AdjustmentStatusChangedHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final PaymentAdjustmentService paymentAdjustmentService;
 
@@ -30,14 +31,13 @@ public class AdjustmentStatusChangedHandler implements Handler<InvoiceChange, St
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
         Adjustment adjustment = new Adjustment();
 
-        Event event = parent.getSourceEvent().getProcessingEvent();
-        adjustment.setEventId(event.getId());
-        adjustment.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        adjustment.setEventId(machineEvent.getEventId());
+        adjustment.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         adjustment.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED);
-        adjustment.setInvoiceId(event.getSource().getInvoiceId());
+        adjustment.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
 

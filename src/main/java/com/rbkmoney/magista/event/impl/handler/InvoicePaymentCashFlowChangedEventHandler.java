@@ -34,8 +34,7 @@ public class InvoicePaymentCashFlowChangedEventHandler implements Handler<Invoic
 
         PaymentEvent paymentEvent = new PaymentEvent();
         paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_CASH_FLOW_CHANGED);
-        //TODO add sequence
-//        paymentEvent.setEventId(event.getId());
+        paymentEvent.setEventId(machineEvent.getEventId());
         paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         paymentEvent.setInvoiceId(machineEvent.getSourceId());
 

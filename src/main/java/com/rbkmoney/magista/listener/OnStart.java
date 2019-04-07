@@ -23,7 +23,7 @@ public class OnStart implements ApplicationListener<ApplicationReadyEvent> {
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         if (poolingEnabled) {
-            processingService.start();
+//            processingService.start();
         }
     }
 

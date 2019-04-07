@@ -137,9 +137,7 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, Machin
 
         PaymentEvent paymentEvent = new PaymentEvent();
         paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
-
-        //TODO add sequence
-//        paymentEvent.setEventId();
+        paymentEvent.setEventId(machineEvent.getEventId());
 
         paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         paymentEvent.setInvoiceId(invoiceId);
