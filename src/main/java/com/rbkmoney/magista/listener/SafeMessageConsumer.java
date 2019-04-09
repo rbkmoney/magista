@@ -39,6 +39,7 @@ public class SafeMessageConsumer {
             long timeout = backOffExecution.get().nextBackOff();
             log.warn("Failed to save event after handling, retrying (timeout = {})...", timeout, ex);
             sleepService.safeSleep(timeout);
+            throw ex;
         }
     }
 

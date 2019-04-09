@@ -12,18 +12,18 @@ import java.util.List;
 public class ListenKafkaHandler implements ErrorHandler {
     @Override
     public void handle(Exception thrownException, ConsumerRecord<?, ?> data) {
-        log.error("ListenKafkaHandler exception topic: {} offset: {} headers: {}  e: ", data.topic(), data.offset(), data.headers(), thrownException);
+        log.error("ListenKafkaHandler exception topic: {} offset: {} headers: {}", data.topic(), data.offset(), data.headers(), thrownException);
     }
 
     @Override
     public void handle(Exception thrownException, ConsumerRecord<?, ?> data, Consumer<?, ?> consumer) {
-        log.error("ListenKafkaHandler exception topic: {} offset: {} headers: {}  e: ", data.topic(), data.offset(), data.headers(), thrownException);
+        log.error("ListenKafkaHandler exception topic: {} offset: {} headers: {}", data.topic(), data.offset(), data.headers(), thrownException);
 
     }
 
     @Override
     public void handle(Exception thrownException, List<ConsumerRecord<?, ?>> records, Consumer<?, ?> consumer, MessageListenerContainer container) {
         ConsumerRecord<?, ?> data = records.get(0);
-        log.error("ListenKafkaHandler exception topic: {} offset: {} headers: {}  e: ", data.topic(), data.offset(), data.headers(), thrownException);
+        log.error("ListenKafkaHandler exception topic: {} offset: {} headers: {}", data.topic(), data.offset(), data.headers(), thrownException);
     }
 }

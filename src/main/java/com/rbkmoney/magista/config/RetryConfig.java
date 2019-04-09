@@ -20,7 +20,7 @@ public class RetryConfig {
     RetryTemplate retryTemplate() {
         RetryTemplate retryTemplate = new RetryTemplate();
         retryTemplate.setRetryPolicy(
-                new SimpleRetryPolicy(maxAttempts, Collections.singletonMap(WRuntimeException.class, true))
+                new SimpleRetryPolicy(maxAttempts, Collections.singletonMap(RuntimeException.class, true))
         );
         retryTemplate.setBackOffPolicy(new ExponentialBackOffPolicy());
 

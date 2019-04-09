@@ -18,12 +18,12 @@ import org.springframework.stereotype.Component;
 public class InvoiceListener implements MessageListener {
 
     private final HandlerManager handlerManager;
-    private final SafeMessageConsumer safeMessageConsumer;
     private final SourceEventParser eventParser;
 
     @KafkaListener(topics = "${kafka.invoice.topic}", containerFactory = "kafkaListenerContainerFactory")
     public void listen(MachineEvent message, Acknowledgment ack) {
-        safeMessageConsumer.safeMessageHandler(this::handle, message, ack);
+        handle(message, ack);
+        ack.acknowledge();
     }
 
     @Override
@@ -32,10 +32,15 @@ public class InvoiceListener implements MessageListener {
         log.info("EventPayload payload: {}", payload);
         if (payload.isSetInvoiceChanges()) {
             for (InvoiceChange invoiceChange : payload.getInvoiceChanges()) {
-                Handler handler = handlerManager.getHandler(invoiceChange);
-                if (handler != null) {
-                    handler.handle(invoiceChange, machineEvent)
-                            .execute();
+                try {
+                    Handler handler = handlerManager.getHandler(invoiceChange);
+                    if (handler != null) {
+                        handler.handle(invoiceChange, machineEvent)
+                                .execute();
+                    }
+                } catch (Exception ex) {
+                    log.error("Failed to handle invoice change, invoiceChange='{}'", invoiceChange, ex);
+                    throw ex;
                 }
             }
         }

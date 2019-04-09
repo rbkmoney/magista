@@ -31,8 +31,6 @@ public class InvoiceListenerTest {
     @Mock
     private Processor processor;
     @Mock
-    private SleepService sleepService;
-    @Mock
     private SourceEventParser eventParser;
     @Mock
     private Acknowledgment ack;
@@ -42,7 +40,7 @@ public class InvoiceListenerTest {
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
-        invoiceListener = new InvoiceListener(handlerManager, new SafeMessageConsumer(1000L, 1.5, sleepService), eventParser);
+        invoiceListener = new InvoiceListener(handlerManager, eventParser);
     }
 
     @Test
