@@ -1,7 +1,6 @@
 package com.rbkmoney.magista.config;
 
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.exception.kafka.ListenKafkaHandler;
 import com.rbkmoney.magista.serde.MachineEventDeserializer;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -17,7 +16,7 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.kafka.listener.SeekToCurrentErrorHandler;
+import org.springframework.kafka.listener.LoggingErrorHandler;
 import org.springframework.retry.support.RetryTemplate;
 
 import java.io.File;
@@ -33,6 +32,8 @@ public class KafkaConfig {
 
     @Value("${kafka.bootstrap.servers}")
     private String bootstrapServers;
+    @Value("${kafka.concurrency}")
+    private int concurrency;
     @Value("${kafka.ssl.server-password}")
     private String serverStorePassword;
     @Value("${kafka.ssl.server-keystore-location}")
@@ -82,8 +83,8 @@ public class KafkaConfig {
         factory.setConsumerFactory(consumerFactory);
         factory.getContainerProperties().setAckOnError(false);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
-        factory.setErrorHandler(new ListenKafkaHandler());
-        factory.setConcurrency(5);
+        factory.setErrorHandler(new LoggingErrorHandler());
+        factory.setConcurrency(concurrency);
         factory.setRetryTemplate(retryTemplate);
         return factory;
     }

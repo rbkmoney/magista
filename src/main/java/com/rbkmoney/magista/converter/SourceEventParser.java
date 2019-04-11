@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.converter;
 
-import com.rbkmoney.damsel.event_stock.SourceEvent;
 import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.exception.ParseException;

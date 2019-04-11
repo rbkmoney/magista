@@ -11,7 +11,7 @@ import java.util.Map;
 @Slf4j
 public class MachineEventSerializer implements Serializer<MachineEvent> {
 
-    private final TSerializer serializer = new TSerializer(new TCompactProtocol.Factory());
+    ThreadLocal<TSerializer> tSerializerThreadLocal = ThreadLocal.withInitial(() -> new TSerializer(new TCompactProtocol.Factory()));;
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
@@ -22,7 +22,7 @@ public class MachineEventSerializer implements Serializer<MachineEvent> {
     public byte[] serialize(String topic, MachineEvent data) {
         byte[] retVal = null;
         try {
-            retVal = serializer.serialize(data);
+            retVal = tSerializerThreadLocal.get().serialize(data);
         } catch (Exception e) {
             log.error("Error when serialize RuleTemplate data: {} ", data, e);
         }

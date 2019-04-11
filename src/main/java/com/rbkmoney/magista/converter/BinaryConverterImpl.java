@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class BinaryConverterImpl implements BinaryConverter<EventPayload> {
 
-    private final TDeserializer deserializer = new TDeserializer(new TBinaryProtocol.Factory());
+    ThreadLocal<TDeserializer> tDeserializerThreadLocal = ThreadLocal.withInitial(() -> new TDeserializer(new TBinaryProtocol.Factory()));
 
     @Override
     public EventPayload convert(byte[] bin, Class<EventPayload> clazz) {
         EventPayload event = new EventPayload();
         try {
-            deserializer.deserialize(event, bin);
+            tDeserializerThreadLocal.get().deserialize(event, bin);
         } catch (TException e) {
             log.error("BinaryConverterImpl e: ", e);
         }
