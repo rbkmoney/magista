@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.kafka;
 
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
+import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import com.rbkmoney.magista.serde.MachineEventSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -39,7 +40,7 @@ public abstract class KafkaAbstractTest {
     @Value("${kafka.invoice.topic}")
     public String topic;
 
-    public static Producer<String, MachineEvent> createProducer() {
+    public static Producer<String, SinkEvent> createProducer() {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "client_id");

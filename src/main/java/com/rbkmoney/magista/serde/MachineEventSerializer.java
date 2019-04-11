@@ -1,17 +1,19 @@
 package com.rbkmoney.magista.serde;
 
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
+import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serializer;
 import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
 
 import java.util.Map;
 
 @Slf4j
-public class MachineEventSerializer implements Serializer<MachineEvent> {
+public class MachineEventSerializer implements Serializer<SinkEvent> {
 
-    ThreadLocal<TSerializer> tSerializerThreadLocal = ThreadLocal.withInitial(() -> new TSerializer(new TCompactProtocol.Factory()));;
+    ThreadLocal<TSerializer> tSerializerThreadLocal = ThreadLocal.withInitial(() -> new TSerializer(new TBinaryProtocol.Factory()));
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
@@ -19,7 +21,7 @@ public class MachineEventSerializer implements Serializer<MachineEvent> {
     }
 
     @Override
-    public byte[] serialize(String topic, MachineEvent data) {
+    public byte[] serialize(String topic, SinkEvent data) {
         byte[] retVal = null;
         try {
             retVal = tSerializerThreadLocal.get().serialize(data);

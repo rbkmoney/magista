@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.listener;
 
-import com.rbkmoney.damsel.event_stock.SourceEvent;
 import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
@@ -10,7 +9,6 @@ import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.exception.ParseException;
 import com.rbkmoney.magista.service.HandlerManager;
-import com.rbkmoney.magista.service.SleepService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -46,13 +44,11 @@ public class InvoiceListenerTest {
     @Test
     public void listenEmptyChanges() {
         MachineEvent message = new MachineEvent();
-        SourceEvent sourceEvent = new SourceEvent();
         Event event = new Event();
         EventPayload payload = new EventPayload();
         payload.setInvoiceChanges(new ArrayList<>());
         event.setPayload(payload);
-        sourceEvent.setProcessingEvent(event);
-//        Mockito.when(eventParser.parseEvent(message)).thenReturn(sourceEvent);
+        Mockito.when(eventParser.parseEvent(message)).thenReturn(payload);
 
         invoiceListener.handle(message, ack);
 
@@ -69,15 +65,13 @@ public class InvoiceListenerTest {
     @Test
     public void listenChanges() {
         MachineEvent message = new MachineEvent();
-        SourceEvent sourceEvent = new SourceEvent();
         Event event = new Event();
         EventPayload payload = new EventPayload();
         ArrayList<InvoiceChange> invoiceChanges = new ArrayList<>();
         invoiceChanges.add(new InvoiceChange());
         payload.setInvoiceChanges(invoiceChanges);
         event.setPayload(payload);
-        sourceEvent.setProcessingEvent(event);
-//        Mockito.when(eventParser.parseEvent(message)).thenReturn(sourceEvent);
+        Mockito.when(eventParser.parseEvent(message)).thenReturn(payload);
         Mockito.when(handler.handle(any(), any())).thenReturn(processor);
         Mockito.when(handlerManager.getHandler(any())).thenReturn(handler);
 
