@@ -5,6 +5,7 @@ package com.rbkmoney.magista.query.impl;
  */
 public class Parameters {
 
+    public static final String FROM_PARAMETER = "from";
     public static final String MERCHANT_ID_PARAM = "merchant_id";
     public static final String SHOP_ID_PARAM = "shop_id";
     public static final String SHOP_CATEGORY_IDS_PARAM = "shop_category_ids";
