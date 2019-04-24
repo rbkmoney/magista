@@ -8,7 +8,6 @@ import com.rbkmoney.magista.dsl.TokenUtil;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.rbkmoney.magista.dsl.Parameters.FROM_PARAMETER;
 import static com.rbkmoney.magista.dsl.Parameters.SIZE_PARAMETER;
 
 /**
@@ -17,6 +16,7 @@ import static com.rbkmoney.magista.dsl.Parameters.SIZE_PARAMETER;
 public abstract class PagedBaseFunction<T, CT> extends ScopedBaseFunction<T, CT> {
 
     public static final int MAX_SIZE_VALUE = 1000;
+    public static final String FROM_PARAMETER = "from";
 
     private String continuationToken;
 
