@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.EnvironmentTestUtils;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
@@ -38,7 +38,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @TestPropertySource(properties = {"bm.pooling.enabled=false"})
 @ContextConfiguration(classes = MagistaApplication.class, initializers = AbstractIntegrationTest.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest {
 
     protected QueryProcessorImpl queryProcessor;
 
@@ -74,14 +74,17 @@ public class AbstractIntegrationTest {
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override
         public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
-            EnvironmentTestUtils.addEnvironment("testcontainers", configurableApplicationContext.getEnvironment(),
-                    "spring.datasource.url=" + postgres.getJdbcUrl(),
-                    "spring.datasource.username=" + postgres.getUsername(),
-                    "spring.datasource.password=" + postgres.getPassword(),
+            TestPropertyValues.of(
+                    "datasource.master.url=" + postgres.getJdbcUrl(),
+                    "datasource.master.username=" + postgres.getUsername(),
+                    "datasource.master.password=" + postgres.getPassword(),
+                    "datasource.slave.url=" + postgres.getJdbcUrl(),
+                    "datasource.slave.username=" + postgres.getUsername(),
+                    "datasource.slave.password=" + postgres.getPassword(),
                     "flyway.url=" + postgres.getJdbcUrl(),
                     "flyway.user=" + postgres.getUsername(),
                     "flyway.password=" + postgres.getPassword()
-            );
+            ).applyTo(configurableApplicationContext);
         }
     }
 }

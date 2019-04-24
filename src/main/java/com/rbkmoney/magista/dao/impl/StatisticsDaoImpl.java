@@ -32,8 +32,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     @Override
     public Collection<Map<String, String>> getPaymentsTurnoverStat(String merchantId, String shopId, LocalDateTime fromTime, LocalDateTime toTime, int splitInterval) throws DaoException {
         Field currencyCodeField = PAYMENT_DATA.PAYMENT_CURRENCY_CODE.as("currency_symbolic_code");
-        Field amountWithFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT.minus(PAYMENT_EVENT.PAYMENT_FEE)).as("amount_with_fee");
-        Field amountWithoutFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT).as("amount_without_fee");
+        Field amountWithFeeField = DSL.sum(PAYMENT_EVENT.PAYMENT_AMOUNT.minus(PAYMENT_EVENT.PAYMENT_FEE)).as("amount_with_fee");
+        Field amountWithoutFeeField = DSL.sum(PAYMENT_EVENT.PAYMENT_AMOUNT).as("amount_without_fee");
         Field spValField = buildSpValField(PAYMENT_DATA.PAYMENT_CREATED_AT, fromTime, splitInterval);
 
         Query query = getDslContext().select(
@@ -75,8 +75,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
         Field countryIdField = PAYMENT_DATA.PAYMENT_COUNTRY_ID.as("country_id");
         Field cityIdField = PAYMENT_DATA.PAYMENT_CITY_ID.as("city_id");
         Field currencyCodeField = PAYMENT_DATA.PAYMENT_CURRENCY_CODE.as("currency_symbolic_code");
-        Field amountWithFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT.minus(PAYMENT_EVENT.PAYMENT_FEE)).as("amount_with_fee");
-        Field amountWithoutFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT).as("amount_without_fee");
+        Field amountWithFeeField = DSL.sum(PAYMENT_EVENT.PAYMENT_AMOUNT.minus(PAYMENT_EVENT.PAYMENT_FEE)).as("amount_with_fee");
+        Field amountWithoutFeeField = DSL.sum(PAYMENT_EVENT.PAYMENT_AMOUNT).as("amount_without_fee");
         Field spValField = buildSpValField(PAYMENT_DATA.PAYMENT_CREATED_AT, fromTime, splitInterval);
 
         Query query = getDslContext().select(
@@ -206,8 +206,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     public Collection<Map<String, String>> getPaymentsCardTypesStat(String merchantId, String shopId, LocalDateTime fromTime, LocalDateTime toTime, int splitInterval) throws DaoException {
         Field totalCountField = DSL.count(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM).as("total_count");
         Field paymentSystemField = PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.as("payment_system");
-        Field amountWithFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT.minus(PAYMENT_EVENT.PAYMENT_FEE)).as("amount_with_fee");
-        Field amountWithoutFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT).as("amount_without_fee");
+        Field amountWithFeeField = DSL.sum(PAYMENT_EVENT.PAYMENT_AMOUNT.minus(PAYMENT_EVENT.PAYMENT_FEE)).as("amount_with_fee");
+        Field amountWithoutFeeField = DSL.sum(PAYMENT_EVENT.PAYMENT_AMOUNT).as("amount_without_fee");
         Field spValField = buildSpValField(PAYMENT_DATA.PAYMENT_CREATED_AT, fromTime, splitInterval);
 
         Query query = getDslContext().select(

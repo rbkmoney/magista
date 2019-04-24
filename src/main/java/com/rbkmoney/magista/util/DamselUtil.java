@@ -94,6 +94,11 @@ public class DamselUtil {
         CashFlowAccount source = cashFlowPosting.getSource().getAccountType();
         CashFlowAccount destination = cashFlowPosting.getDestination().getAccountType();
 
+        if (source.isSetProvider() && source.getProvider() == ProviderCashFlowAccount.settlement
+                && destination.isSetMerchant() && destination.getMerchant() == MerchantCashFlowAccount.settlement) {
+            return FeeType.AMOUNT;
+        }
+
         if (source.isSetMerchant()
                 && source.getMerchant() == MerchantCashFlowAccount.settlement
                 && destination.isSetSystem()) {

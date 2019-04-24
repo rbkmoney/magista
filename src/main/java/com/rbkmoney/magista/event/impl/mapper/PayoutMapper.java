@@ -41,6 +41,10 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
                     TBaseUtil.unionFieldToEnum(payout.getType(), PayoutType.class)
             );
 
+            if (payout.getType().isSetWallet()) {
+                payoutEventStat.setPayoutWalletId(payout.getType().getWallet().getWalletId());
+            }
+
             if (payout.getType().isSetBankAccount()) {
                 PayoutAccount payoutAccount = payout.getType().getBankAccount();
 
@@ -108,15 +112,6 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
                 }
             }
 
-            if (payout.getType().isSetBankCard()) {
-                PayoutCard payoutCard = payout.getType().getBankCard();
-                BankCard bankCard = payoutCard.getCard();
-                payoutEventStat.setPayoutCardToken(bankCard.getToken());
-                payoutEventStat.setPayoutCardMaskedPan(bankCard.getMaskedPan());
-                payoutEventStat.setPayoutCardBin(bankCard.getBin());
-                payoutEventStat.setPayoutCardPaymentSystem(bankCard.getPaymentSystem().name());
-            }
-
             payoutEventStat.setPayoutStatus(
                     TBaseUtil.unionFieldToEnum(payout.getStatus(), PayoutStatus.class)
             );
@@ -124,16 +119,10 @@ public class PayoutMapper implements Mapper<PayoutEventContext> {
                     TypeUtil.stringToLocalDateTime(payout.getCreatedAt())
             );
 
-            payoutEventStat.setPayoutAmount(DamselUtil.getAmount(payout.getPayoutFlow(),
-                    posting -> posting.getSource().getAccountType().isSetMerchant()
-                            && posting.getSource().getAccountType().getMerchant() == MerchantCashFlowAccount.settlement
-                            && posting.getDestination().getAccountType().isSetMerchant()
-                            && posting.getDestination().getAccountType().getMerchant() == MerchantCashFlowAccount.payout));
+            payoutEventStat.setPayoutAmount(payout.getAmount());
+            payoutEventStat.setPayoutFee(payout.getFee());
+            payoutEventStat.setPayoutCurrencyCode(payout.getCurrency().getSymbolicCode());
 
-            Map<FeeType, Long> commissions = DamselUtil.getFees(payout.getPayoutFlow());
-            payoutEventStat.setPayoutFee(commissions.get(FeeType.FEE));
-
-            payoutEventStat.setPayoutCurrencyCode(payout.getPayoutFlow().get(0).getVolume().getCurrency().getSymbolicCode());
             payoutEventStat.setPartyId(payout.getPartyId());
             payoutEventStat.setPartyShopId(payout.getShopId());
 

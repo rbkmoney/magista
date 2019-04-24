@@ -1,6 +1,8 @@
 package com.rbkmoney.magista.event.impl.handler;
 
+import com.rbkmoney.damsel.domain.Cash;
 import com.rbkmoney.damsel.domain.Failure;
+import com.rbkmoney.damsel.domain.InvoicePaymentCaptured;
 import com.rbkmoney.damsel.domain.OperationFailure;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payment_processing.Event;
@@ -51,6 +53,15 @@ public class PaymentStatusChangedEventHandler implements Handler<InvoiceChange, 
         paymentEvent.setPaymentStatus(
                 TBaseUtil.unionFieldToEnum(invoicePaymentStatusChanged.getStatus(), InvoicePaymentStatus.class)
         );
+
+        if (invoicePaymentStatusChanged.getStatus().isSetCaptured()) {
+            InvoicePaymentCaptured invoicePaymentCaptured = invoicePaymentStatusChanged.getStatus().getCaptured();
+            if (invoicePaymentCaptured.isSetCost()) {
+                Cash cost = invoicePaymentCaptured.getCost();
+                paymentEvent.setPaymentAmount(cost.getAmount());
+                paymentEvent.setPaymentCurrencyCode(cost.getCurrency().getSymbolicCode());
+            }
+        }
 
         if (invoicePaymentStatusChanged.getStatus().isSetFailed()) {
             OperationFailure operationFailure = invoicePaymentStatusChanged.getStatus().getFailed().getFailure();

@@ -65,7 +65,7 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
         paymentData.setPaymentId(paymentId);
 
         Cash cost = invoicePayment.getCost();
-        paymentData.setPaymentAmount(cost.getAmount());
+        paymentData.setPaymentOriginAmount(cost.getAmount());
         paymentData.setPaymentCurrencyCode(cost.getCurrency().getSymbolicCode());
 
         paymentData.setPaymentCreatedAt(TypeUtil.stringToLocalDateTime(invoicePayment.getCreatedAt()));
@@ -161,6 +161,9 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
             }
         }
         paymentEvent.setPaymentDomainRevision(invoicePayment.getDomainRevision());
+
+        paymentEvent.setPaymentAmount(cost.getAmount());
+        paymentEvent.setPaymentCurrencyCode(cost.getCurrency().getSymbolicCode());
 
         if (invoicePaymentStarted.isSetRoute()) {
             PaymentRoute paymentRoute = invoicePaymentStarted.getRoute();

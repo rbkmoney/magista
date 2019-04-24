@@ -14,6 +14,7 @@ import org.jooq.Field;
 import org.jooq.Operator;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -36,7 +37,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
 
     private final StatPaymentMapper statPaymentMapper;
 
-    public ReportDaoImpl(DataSource ds) {
+    public ReportDaoImpl(@Qualifier("slaveDataSource") DataSource ds) {
         super(ds);
         statPaymentMapper = new StatPaymentMapper();
     }
@@ -47,7 +48,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                 PAYMENT_DATA.PARTY_ID.as("merchant_id"),
                 PAYMENT_DATA.PARTY_SHOP_ID.as("shop_id"),
                 PAYMENT_DATA.PAYMENT_CURRENCY_CODE.as("currency_code"),
-                DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT).as("funds_acquired"),
+                DSL.sum(PAYMENT_EVENT.PAYMENT_AMOUNT).as("funds_acquired"),
                 DSL.sum(PAYMENT_EVENT.PAYMENT_FEE).as("fee_charged")
         ).from(PAYMENT_DATA)
                 .join(PAYMENT_EVENT)
@@ -284,7 +285,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                         PAYMENT_DATA.PARTY_ID,
                         PAYMENT_DATA.PARTY_SHOP_ID,
                         PAYMENT_DATA.PAYMENT_CURRENCY_CODE,
-                        PAYMENT_DATA.PAYMENT_AMOUNT,
+                        PAYMENT_DATA.PAYMENT_ORIGIN_AMOUNT,
                         PAYMENT_DATA.PAYMENT_CUSTOMER_ID,
                         PAYMENT_DATA.PAYMENT_TOOL,
                         PAYMENT_DATA.PAYMENT_BANK_CARD_MASKED_PAN,
@@ -321,6 +322,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                         PAYMENT_EVENT.PAYMENT_OPERATION_FAILURE_CLASS,
                         PAYMENT_EVENT.PAYMENT_EXTERNAL_FAILURE,
                         PAYMENT_EVENT.PAYMENT_EXTERNAL_FAILURE_REASON,
+                        PAYMENT_EVENT.PAYMENT_AMOUNT,
                         PAYMENT_EVENT.PAYMENT_FEE,
                         PAYMENT_EVENT.PAYMENT_PROVIDER_FEE,
                         PAYMENT_EVENT.PAYMENT_EXTERNAL_FEE,
