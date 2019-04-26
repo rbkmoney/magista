@@ -41,13 +41,16 @@ public class EventSaver implements Runnable {
                     } else {
                         TimeUnit.MILLISECONDS.sleep(timeout);
                     }
-                } catch (ExecutionException | NotFoundException | StorageException ex) {
+                } catch (ExecutionException | StorageException ex) {
                     if (ex instanceof ExecutionException) {
                         log.error("The handler threw an error, event processing cannot continue", ex);
                     } else {
                         log.warn("Failed to save event after handling, retrying (timeout = {})...", timeout, ex);
                     }
                     TimeUnit.MILLISECONDS.sleep(timeout);
+                } catch (NotFoundException ex) {
+                    queue.take();
+                    log.warn("Failed to save event after handling, skipped...", ex);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
