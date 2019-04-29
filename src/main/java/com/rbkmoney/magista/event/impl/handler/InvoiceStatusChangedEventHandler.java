@@ -7,7 +7,7 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceEvent;
+import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -28,21 +28,21 @@ public class InvoiceStatusChangedEventHandler implements Handler<InvoiceChange, 
 
     @Override
     public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
-        InvoiceEvent invoiceEvent = new InvoiceEvent();
-        invoiceEvent.setEventType(InvoiceEventType.INVOICE_STATUS_CHANGED);
-        invoiceEvent.setEventId(machineEvent.getEventId());
-        invoiceEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
-        invoiceEvent.setInvoiceId(machineEvent.getSourceId());
+        InvoiceData invoiceData = new InvoiceData();
+        invoiceData.setEventType(InvoiceEventType.INVOICE_STATUS_CHANGED);
+        invoiceData.setEventId(machineEvent.getEventId());
+        invoiceData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        invoiceData.setInvoiceId(machineEvent.getSourceId());
 
         InvoiceStatusChanged invoiceStatusChanged = change.getInvoiceStatusChanged();
-        invoiceEvent.setInvoiceStatus(
+        invoiceData.setInvoiceStatus(
                 TBaseUtil.unionFieldToEnum(invoiceStatusChanged.getStatus(), InvoiceStatus.class)
         );
-        invoiceEvent.setInvoiceStatusDetails(
+        invoiceData.setInvoiceStatusDetails(
                 DamselUtil.getInvoiceStatusDetails(invoiceStatusChanged.getStatus())
         );
 
-        return () -> invoiceService.saveInvoiceChange(invoiceEvent);
+        return () -> invoiceService.saveInvoice(invoiceData);
     }
 
     @Override

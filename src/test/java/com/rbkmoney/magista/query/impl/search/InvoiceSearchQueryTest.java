@@ -45,14 +45,14 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
         StatResponse statResponse = queryProcessor.processQuery(statRequest);
         assertEquals(1, statResponse.getData().getInvoices().size());
         assertNotNull(statResponse.getContinuationToken());
-        assertEquals((Long) 2L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
+        assertEquals((Long) 9L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
         DamselUtil.toJson(statResponse);
 
         statRequest.setContinuationToken(statResponse.getContinuationToken());
         statResponse = queryProcessor.processQuery(statRequest);
         assertEquals(1, statResponse.getData().getInvoices().size());
         assertNotNull(statResponse.getContinuationToken());
-        assertEquals((Long) 1L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
+        assertEquals((Long) 8L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
 
         statRequest.setContinuationToken(statResponse.getContinuationToken());
         statResponse = queryProcessor.processQuery(statRequest);
@@ -122,6 +122,7 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
         assertEquals(1, statResponse.getData().getInvoices().size());
     }
 
+    @Test
     @Sql("classpath:data/sql/search/recurrent_payments_search_data.sql")
     public void testRecurrentPayments() {
         String json = "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";

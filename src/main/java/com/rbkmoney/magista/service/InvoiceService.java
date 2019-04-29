@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.magista.dao.InvoiceDao;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceEvent;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
@@ -13,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InvoiceService {
@@ -38,7 +35,7 @@ public class InvoiceService {
                 invoiceId,
                 key -> {
                     try {
-                        InvoiceData invoiceData = invoiceDao.getInvoiceData(key);
+                        InvoiceData invoiceData = invoiceDao.get(key);
                         if (invoiceData == null) {
                             throw new NotFoundException(String.format("Invoice data not found, invoiceId='%s'", key));
                         }
@@ -50,26 +47,14 @@ public class InvoiceService {
         );
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void saveInvoice(InvoiceData invoiceData, InvoiceEvent invoiceEvent) throws NotFoundException, StorageException {
-        log.info("Trying to save invoice, invoiceData='{}', invoiceEvent='{}'", invoiceData, invoiceEvent);
+    public void saveInvoice(InvoiceData invoiceData) throws NotFoundException, StorageException {
+        log.info("Trying to save invoice, invoiceData='{}'", invoiceData);
         try {
-            invoiceDao.saveInvoiceData(invoiceData);
+            invoiceDao.save(invoiceData);
             invoiceDataCache.put(invoiceData.getInvoiceId(), invoiceData);
-            invoiceDao.saveInvoiceEvent(invoiceEvent);
-            log.info("Invoice have been saved, invoiceData='{}', invoiceEvent='{}'", invoiceData, invoiceEvent);
+            log.info("Invoice have been saved, invoiceData='{}'", invoiceData);
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save invoice, invoiceData='%s', invoiceEvent='%s'", invoiceData, invoiceEvent), ex);
-        }
-    }
-
-    public void saveInvoiceChange(InvoiceEvent invoiceEvent) throws StorageException {
-        log.info("Trying to save invoice change, invoiceEvent='{}'", invoiceEvent);
-        try {
-            invoiceDao.saveInvoiceEvent(invoiceEvent);
-            log.info("Invoice change have been saved, invoiceEvent='{}'", invoiceEvent);
-        } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save invoice change, invoiceEvent='%s'", invoiceEvent), ex);
+            throw new StorageException(String.format("Failed to save invoice, invoiceData='%s'", invoiceData), ex);
         }
     }
 

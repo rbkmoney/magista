@@ -3,8 +3,6 @@ package com.rbkmoney.magista.event.impl.handler;
 import com.rbkmoney.damsel.domain.Failure;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefundStatus;
 import com.rbkmoney.damsel.domain.OperationFailure;
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentRefundChange;
@@ -15,7 +13,7 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
-import com.rbkmoney.magista.domain.tables.pojos.Refund;
+import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -35,45 +33,48 @@ public class RefundStatusChangedHandler implements Handler<InvoiceChange, Machin
 
     @Override
     public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
-        Refund refund = new Refund();
+        RefundData refundData = new RefundData();
 
-        refund.setEventId(machineEvent.getEventId());
-        refund.setEventType(InvoiceEventType.INVOICE_PAYMENT_REFUND_STATUS_CHANGED);
-        refund.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        refundData.setEventId(machineEvent.getEventId());
+        refundData.setEventType(InvoiceEventType.INVOICE_PAYMENT_REFUND_STATUS_CHANGED);
+        refundData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
 
         String invoiceId = machineEvent.getSourceId();
-        refund.setInvoiceId(invoiceId);
+        refundData.setInvoiceId(invoiceId);
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
 
         String paymentId = invoicePaymentChange.getId();
-        refund.setPaymentId(paymentId);
+        refundData.setPaymentId(paymentId);
 
         InvoicePaymentRefundChange refundChange = invoicePaymentChange
                 .getPayload()
                 .getInvoicePaymentRefundChange();
 
         String refundId = refundChange.getId();
-        refund.setRefundId(refundId);
+        refundData.setRefundId(refundId);
 
-        InvoicePaymentRefundStatus status = refundChange.getPayload().getInvoicePaymentRefundStatusChanged().getStatus();
-        refund.setRefundStatus(TBaseUtil.unionFieldToEnum(
+        InvoicePaymentRefundStatus status = refundChange.getPayload()
+                .getInvoicePaymentRefundStatusChanged()
+                .getStatus();
+
+        refundData.setRefundStatus(TBaseUtil.unionFieldToEnum(
                 status,
                 RefundStatus.class
         ));
         if (status.isSetFailed()) {
             OperationFailure operationFailure = status.getFailed().getFailure();
-            refund.setRefundOperationFailureClass(
+            refundData.setRefundOperationFailureClass(
                     TBaseUtil.unionFieldToEnum(operationFailure, FailureClass.class)
             );
             if (operationFailure.isSetFailure()) {
                 Failure failure = operationFailure.getFailure();
-                refund.setRefundExternalFailure(TErrorUtil.toStringVal(failure));
-                refund.setRefundExternalFailureReason(failure.getReason());
+                refundData.setRefundExternalFailure(TErrorUtil.toStringVal(failure));
+                refundData.setRefundExternalFailureReason(failure.getReason());
             }
         }
 
-        return () -> paymentRefundService.savePaymentRefund(refund);
+        return () -> paymentRefundService.savePaymentRefund(refundData);
     }
 
     @Override

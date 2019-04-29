@@ -4,7 +4,6 @@ import com.rbkmoney.magista.dao.impl.InvoiceDaoImpl;
 import com.rbkmoney.magista.dao.impl.PaymentDaoImpl;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
-import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,23 +22,17 @@ public class PaymentDaoTest extends AbstractDaoTest {
 
     @Test
     public void insertAndFindPaymentDataTest() {
-        InvoiceData invoiceData = random(InvoiceData.class, "id");
-        invoiceDao.saveInvoiceData(invoiceData);
-        invoiceDao.saveInvoiceData(invoiceData);
+        InvoiceData invoiceData = random(InvoiceData.class);
+        invoiceDao.save(invoiceData);
+        invoiceDao.save(invoiceData);
 
-        PaymentData paymentData = random(PaymentData.class, "id", "invoiceId");
+        PaymentData paymentData = random(PaymentData.class, "invoiceId");
         paymentData.setInvoiceId(invoiceData.getInvoiceId());
 
-        paymentDao.savePaymentData(paymentData);
-        paymentDao.savePaymentData(paymentData);
+        paymentDao.save(paymentData);
+        paymentDao.save(paymentData);
 
-        PaymentEvent paymentEvent = random(PaymentEvent.class, "invoiceId", "paymentId");
-        paymentEvent.setInvoiceId(paymentData.getInvoiceId());
-        paymentEvent.setPaymentId(paymentData.getPaymentId());
-
-        paymentDao.savePaymentEvent(paymentEvent);
-
-        assertEquals(paymentEvent, paymentDao.getLastPaymentEvent(paymentData.getInvoiceId(), paymentData.getPaymentId()));
+        assertEquals(paymentData, paymentDao.get(paymentData.getInvoiceId(), paymentData.getPaymentId()));
     }
 
 }

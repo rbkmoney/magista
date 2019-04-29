@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.dao.impl.AdjustmentDaoImpl;
-import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
+import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.exception.DaoException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class AdjustmentDaoTest extends AbstractDaoTest {
 
     @Test
     public void insertAndFindAdjustmentEventTest() throws DaoException {
-        Adjustment adjustment = random(Adjustment.class);
+        AdjustmentData adjustment = random(AdjustmentData.class);
 
         adjustmentDao.save(adjustment);
 

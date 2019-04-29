@@ -1,44 +1,61 @@
 package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.payout_processing.Event;
 import com.rbkmoney.damsel.payout_processing.PayoutChange;
+import com.rbkmoney.damsel.payout_processing.PayoutStatusChanged;
+import com.rbkmoney.geck.common.util.TBaseUtil;
+import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.domain.enums.PayoutEventType;
+import com.rbkmoney.magista.domain.enums.PayoutStatus;
+import com.rbkmoney.magista.domain.tables.pojos.PayoutData;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.Mapper;
+import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
-import com.rbkmoney.magista.event.impl.context.PayoutEventContext;
-import com.rbkmoney.magista.event.impl.mapper.PayoutStatusMapper;
-import com.rbkmoney.magista.service.PayoutEventService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.rbkmoney.magista.service.PayoutService;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
-
 @Component
-public class PayoutStatusChangedHandler extends AbstractPayoutEventHandler {
+public class PayoutStatusChangedHandler implements Handler<PayoutChange, StockEvent> {
 
-    private final PayoutEventService payoutEventService;
+    private final PayoutService payoutEventService;
 
-    @Autowired
-    public PayoutStatusChangedHandler(PayoutEventService payoutEventService) {
+    public PayoutStatusChangedHandler(PayoutService payoutEventService) {
         this.payoutEventService = payoutEventService;
     }
 
     @Override
-    List<Mapper> getMappers() {
-        return Arrays.asList(
-                new PayoutStatusMapper()
-        );
-    }
-
-    @Override
     public Processor handle(PayoutChange change, StockEvent parent) {
-        PayoutEventContext context = generateContext(change, parent);
-        return () -> payoutEventService.changePayoutEventStatus(context.getPayoutEventStat());
+        Event event = parent.getSourceEvent().getPayoutEvent();
+        PayoutData payoutData = new PayoutData();
+
+        payoutData.setEventId(event.getId());
+        payoutData.setEventCreatedAt(
+                TypeUtil.stringToLocalDateTime(event.getCreatedAt())
+        );
+        payoutData.setPayoutId(event.getSource().getPayoutId());
+
+        if (change.isSetPayoutStatusChanged()) {
+            payoutData.setEventType(PayoutEventType.PAYOUT_STATUS_CHANGED);
+
+            PayoutStatusChanged statusChanged = change.getPayoutStatusChanged();
+
+            payoutData.setPayoutStatus(
+                    TBaseUtil.unionFieldToEnum(statusChanged.getStatus(), PayoutStatus.class)
+            );
+
+            if (statusChanged.getStatus().isSetCancelled()) {
+                payoutData.setPayoutCancelDetails(
+                        statusChanged.getStatus().getCancelled().getDetails()
+                );
+            }
+        }
+        return () -> payoutEventService.savePayout(payoutData);
     }
 
     @Override
     public ChangeType getChangeType() {
         return ChangeType.PAYOUT_STATUS_CHANGED;
     }
+
 }

@@ -16,7 +16,6 @@ import java.util.AbstractMap;
 import java.util.Map;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
-import static com.rbkmoney.magista.domain.tables.InvoiceEvent.INVOICE_EVENT;
 
 public class StatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>> {
 
@@ -42,19 +41,19 @@ public class StatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>
         );
 
         com.rbkmoney.magista.domain.enums.InvoiceStatus invoiceStatusType = TypeUtil.toEnumField(
-                rs.getString(INVOICE_EVENT.INVOICE_STATUS.getName()),
+                rs.getString(INVOICE_DATA.INVOICE_STATUS.getName()),
                 com.rbkmoney.magista.domain.enums.InvoiceStatus.class
         );
 
         String eventCreatedAtString = TypeUtil.temporalToString(
-                rs.getObject(INVOICE_EVENT.EVENT_CREATED_AT.getName(), LocalDateTime.class)
+                rs.getObject(INVOICE_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class)
         );
 
         InvoiceStatus invoiceStatus;
         switch (invoiceStatusType) {
             case cancelled:
                 InvoiceCancelled invoiceCancelled = new InvoiceCancelled();
-                invoiceCancelled.setDetails(rs.getString(INVOICE_EVENT.INVOICE_STATUS_DETAILS.getName()));
+                invoiceCancelled.setDetails(rs.getString(INVOICE_DATA.INVOICE_STATUS_DETAILS.getName()));
                 invoiceCancelled.setAt(eventCreatedAtString);
                 invoiceStatus = InvoiceStatus.cancelled(invoiceCancelled);
                 break;
@@ -69,7 +68,7 @@ public class StatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>
             case fulfilled:
                 InvoiceFulfilled invoiceFulfilled = new InvoiceFulfilled();
                 invoiceFulfilled.setAt(eventCreatedAtString);
-                invoiceFulfilled.setDetails(rs.getString(INVOICE_EVENT.INVOICE_STATUS_DETAILS.getName()));
+                invoiceFulfilled.setDetails(rs.getString(INVOICE_DATA.INVOICE_STATUS_DETAILS.getName()));
                 invoiceStatus = InvoiceStatus.fulfilled(invoiceFulfilled);
                 break;
             default:

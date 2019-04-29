@@ -1,8 +1,6 @@
 package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentAdjustment;
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentAdjustmentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
@@ -11,7 +9,7 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
-import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
+import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -23,9 +21,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-/**
- * Created by tolkonepiu on 21/06/2017.
- */
 @Component
 public class AdjustmentCreatedHandler implements Handler<InvoiceChange, MachineEvent> {
 
@@ -38,46 +33,46 @@ public class AdjustmentCreatedHandler implements Handler<InvoiceChange, MachineE
 
     @Override
     public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
-        Adjustment adjustment = new Adjustment();
+        AdjustmentData adjustmentData = new AdjustmentData();
 
-        adjustment.setEventId(machineEvent.getEventId());
-        adjustment.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
-        adjustment.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_CREATED);
-        adjustment.setInvoiceId(machineEvent.getSourceId());
+        adjustmentData.setEventId(machineEvent.getEventId());
+        adjustmentData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        adjustmentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_CREATED);
+        adjustmentData.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
 
         String paymentId = invoicePaymentChange.getId();
-        adjustment.setPaymentId(paymentId);
+        adjustmentData.setPaymentId(paymentId);
 
         InvoicePaymentAdjustmentChange adjustmentChange = invoicePaymentChange
                 .getPayload()
                 .getInvoicePaymentAdjustmentChange();
-        adjustment.setAdjustmentId(adjustmentChange.getId());
+        adjustmentData.setAdjustmentId(adjustmentChange.getId());
 
         InvoicePaymentAdjustment invoicePaymentAdjustment = adjustmentChange
                 .getPayload()
                 .getInvoicePaymentAdjustmentCreated()
                 .getAdjustment();
 
-        adjustment.setAdjustmentCreatedAt(
+        adjustmentData.setAdjustmentCreatedAt(
                 TypeUtil.stringToLocalDateTime(invoicePaymentAdjustment.getCreatedAt())
         );
 
-        adjustment.setAdjustmentReason(invoicePaymentAdjustment.getReason());
+        adjustmentData.setAdjustmentReason(invoicePaymentAdjustment.getReason());
 
-        adjustment.setAdjustmentStatus(TBaseUtil.unionFieldToEnum(invoicePaymentAdjustment.getStatus(), AdjustmentStatus.class));
-        adjustment.setAdjustmentStatusCreatedAt(
+        adjustmentData.setAdjustmentStatus(TBaseUtil.unionFieldToEnum(invoicePaymentAdjustment.getStatus(), AdjustmentStatus.class));
+        adjustmentData.setAdjustmentStatusCreatedAt(
                 DamselUtil.getAdjustmentStatusCreatedAt(invoicePaymentAdjustment.getStatus())
         );
-        adjustment.setAdjustmentDomainRevision(invoicePaymentAdjustment.getDomainRevision());
+        adjustmentData.setAdjustmentDomainRevision(invoicePaymentAdjustment.getDomainRevision());
 
         Map<FeeType, Long> fees = DamselUtil.getFees(invoicePaymentAdjustment.getNewCashFlow());
-        adjustment.setAdjustmentFee(fees.getOrDefault(FeeType.FEE, 0L));
-        adjustment.setAdjustmentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
-        adjustment.setAdjustmentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
+        adjustmentData.setAdjustmentFee(fees.getOrDefault(FeeType.FEE, 0L));
+        adjustmentData.setAdjustmentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
+        adjustmentData.setAdjustmentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
 
-        return () -> paymentAdjustmentService.savePaymentAdjustment(adjustment);
+        return () -> paymentAdjustmentService.savePaymentAdjustment(adjustmentData);
     }
 
     @Override

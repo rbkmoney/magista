@@ -42,12 +42,6 @@ public interface SearchDao {
             int limit
     ) throws DaoException;
 
-    Integer getRefundsCount(
-            RefundsFunction.RefundsParameters parameters,
-            Optional<LocalDateTime> fromTime,
-            Optional<LocalDateTime> toTime
-    ) throws DaoException;
-
     Collection<Map.Entry<Long, StatPayout>> getPayouts(
             PayoutsFunction.PayoutsParameters parameters,
             Optional<LocalDateTime> fromTime,
@@ -55,12 +49,6 @@ public interface SearchDao {
             Optional<Long> fromId,
             Optional<Integer> offset,
             int limit
-    ) throws DaoException;
-
-    Integer getPayoutsCount(
-            PayoutsFunction.PayoutsParameters parameters,
-            Optional<LocalDateTime> fromTime,
-            Optional<LocalDateTime> toTime
     ) throws DaoException;
 
 }

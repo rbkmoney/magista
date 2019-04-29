@@ -1,12 +1,10 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.damsel.merch_stat.StatPayout;
 import com.rbkmoney.damsel.merch_stat.StatRefund;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
-import com.rbkmoney.magista.domain.enums.RefundStatus;
-import com.rbkmoney.magista.domain.tables.pojos.Refund;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
@@ -15,17 +13,14 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.util.DamselUtil;
+import com.rbkmoney.magista.util.TokenUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;
-import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
-import static org.jooq.Comparator.EQUALS;
 
 public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefund>, StatResponse> implements CompositeQuery<Map.Entry<Long, StatRefund>, StatResponse> {
 
@@ -47,12 +42,7 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
 
     @Override
     public QueryResult<Map.Entry<Long, StatRefund>, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
-        if (collectedResults.size() != 2) {
-            throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
-        }
-
         QueryResult<Map.Entry<Long, StatRefund>, List<Map.Entry<Long, StatRefund>>> refundsResult = (QueryResult<Map.Entry<Long, StatRefund>, List<Map.Entry<Long, StatRefund>>>) collectedResults.get(0);
-        QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
                 () -> refundsResult.getDataStream(),
@@ -62,7 +52,15 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
                             .collect(Collectors.toList()));
 
                     StatResponse statResponse = new StatResponse(statResponseData);
-                    statResponse.setTotalCount(countResult.getCollectedStream());
+                    List<Map.Entry<Long, StatRefund>> refunds = refundsResult.getCollectedStream();
+                    if (!refunds.isEmpty() && getQueryParameters().getSize() == refunds.size()) {
+                        statResponse.setContinuationToken(
+                                TokenUtil.buildToken(
+                                        getQueryParameters(),
+                                        refunds.get(refunds.size() - 1).getKey()
+                                )
+                        );
+                    }
                     return statResponse;
                 });
     }
@@ -172,8 +170,7 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
 
         private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken),
-                    new GetCountFunction(queryPart.getDescriptor() + ":" + GetCountFunction.FUNC_NAME, queryPart.getParameters())
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken)
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
                     queryPart.getDescriptor(),
@@ -216,30 +213,6 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
                         parameters.getSize()
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);
-            } catch (DaoException e) {
-                throw new QueryExecutionException(e);
-            }
-        }
-    }
-
-    private static class GetCountFunction extends ScopedBaseFunction<Integer, Integer> {
-        private static final String FUNC_NAME = RefundsFunction.FUNC_NAME + "_count";
-
-        public GetCountFunction(Object descriptor, QueryParameters params) {
-            super(descriptor, params, FUNC_NAME);
-        }
-
-        @Override
-        public QueryResult<Integer, Integer> execute(QueryContext context) throws QueryExecutionException {
-            FunctionQueryContext functionContext = getContext(context);
-            RefundsParameters parameters = new RefundsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
-            try {
-                Integer result = functionContext.getSearchDao().getRefundsCount(
-                        parameters,
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime()))
-                );
-                return new BaseQueryResult<>(() -> Stream.of(result), () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }
