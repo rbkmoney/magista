@@ -19,7 +19,6 @@ public class QueryParserImpl extends BaseQueryParser {
                 Arrays.asList(
                         new RootQuery.RootParser(),
                         new PaymentsFunction.PaymentsParser(),
-                        new PaymentsForReportFunction.PaymentsForReportParser(),
                         new InvoicesFunction.InvoicesParser(),
                         new RefundsFunction.RefundsParser(),
                         new PayoutsFunction.PayoutsParser(),
@@ -27,8 +26,7 @@ public class QueryParserImpl extends BaseQueryParser {
                         new PaymentsConversionStatFunction.PaymentsConversionStatParser(),
                         new PaymentsGeoStatFunction.PaymentsGeoStatParser(),
                         new PaymentsCardTypesStatFunction.PaymentsCardTypesStatParser(),
-                        new PaymentsTurnoverStatFunction.PaymentsTurnoverStatParser(),
-                        new AccountingReportFunction.AccountingReportParser()
+                        new PaymentsTurnoverStatFunction.PaymentsTurnoverStatParser()
                 )
         );
     }

@@ -10,7 +10,6 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceEvent;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -33,16 +32,15 @@ public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, Machin
 
     @Override
     public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
-        InvoiceEvent invoiceEvent = new InvoiceEvent();
-        invoiceEvent.setEventType(InvoiceEventType.INVOICE_CREATED);
-        invoiceEvent.setEventId(machineEvent.getEventId());
-        invoiceEvent.setInvoiceId(machineEvent.getSourceId());
+        InvoiceData invoiceData = new InvoiceData();
+        invoiceData.setEventType(InvoiceEventType.INVOICE_CREATED);
+        invoiceData.setEventId(machineEvent.getEventId());
+        invoiceData.setInvoiceId(machineEvent.getSourceId());
 
-        invoiceEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        invoiceData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
 
         Invoice invoice = change.getInvoiceCreated().getInvoice();
 
-        InvoiceData invoiceData = new InvoiceData();
         invoiceData.setInvoiceId(invoice.getId());
         invoiceData.setPartyId(UUID.fromString(invoice.getOwnerId()));
         invoiceData.setPartyShopId(invoice.getShopId());
@@ -70,17 +68,17 @@ public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, Machin
         }
 
         InvoiceStatus invoiceStatus = invoice.getStatus();
-        invoiceEvent.setInvoiceStatus(
+        invoiceData.setInvoiceStatus(
                 TBaseUtil.unionFieldToEnum(
                         invoiceStatus,
                         com.rbkmoney.magista.domain.enums.InvoiceStatus.class
                 )
         );
-        invoiceEvent.setInvoiceStatusDetails(
+        invoiceData.setInvoiceStatusDetails(
                 DamselUtil.getInvoiceStatusDetails(invoiceStatus)
         );
 
-        return () -> invoiceService.saveInvoice(invoiceData, invoiceEvent);
+        return () -> invoiceService.saveInvoice(invoiceData);
     }
 
     @Override

@@ -17,7 +17,6 @@ public class QueryBuilderImpl extends BaseQueryBuilder {
                 Arrays.asList(
                         new RootQuery.RootBuilder(),
                         new PaymentsFunction.PaymentsBuilder(),
-                        new PaymentsForReportFunction.PaymentsForReportBuilder(),
                         new InvoicesFunction.InvoicesBuilder(),
                         new RefundsFunction.RefundsBuilder(),
                         new PayoutsFunction.PayoutsBuilder(),
@@ -25,8 +24,7 @@ public class QueryBuilderImpl extends BaseQueryBuilder {
                         new PaymentsCardTypesStatFunction.PaymentsCardTypesStatBuilder(),
                         new CustomersRateStatFunction.CustomersRateStatBuilder(),
                         new PaymentsTurnoverStatFunction.PaymentsTurnoverStatBuilder(),
-                        new PaymentsConversionStatFunction.PaymentsConversionStatBuilder(),
-                        new AccountingReportFunction.AccountingReportBuilder()
+                        new PaymentsConversionStatFunction.PaymentsConversionStatBuilder()
                 )
         );
     }

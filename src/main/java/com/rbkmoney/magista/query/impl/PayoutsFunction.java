@@ -4,10 +4,6 @@ import com.rbkmoney.damsel.merch_stat.StatPayout;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
-import com.rbkmoney.magista.domain.enums.PayoutStatus;
-import com.rbkmoney.magista.domain.enums.PayoutType;
-import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
@@ -16,19 +12,14 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.util.DamselUtil;
+import com.rbkmoney.magista.util.TokenUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;
-import static com.rbkmoney.geck.common.util.TypeUtil.toEnumFields;
-import static com.rbkmoney.geck.common.util.TypeUtil.toLocalDateTime;
-import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 import static com.rbkmoney.magista.query.impl.Parameters.*;
-import static org.jooq.Comparator.*;
 
 public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayout>, StatResponse> implements CompositeQuery<Map.Entry<Long, StatPayout>, StatResponse> {
 
@@ -50,12 +41,7 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
 
     @Override
     public QueryResult<Map.Entry<Long, StatPayout>, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
-        if (collectedResults.size() != 2) {
-            throw new QueryExecutionException("Wrong query results count:" + collectedResults.size());
-        }
-
         QueryResult<Map.Entry<Long, StatPayout>, List<Map.Entry<Long, StatPayout>>> payoutsResult = (QueryResult<Map.Entry<Long, StatPayout>, List<Map.Entry<Long, StatPayout>>>) collectedResults.get(0);
-        QueryResult<Integer, Integer> countResult = (QueryResult<Integer, Integer>) collectedResults.get(1);
 
         return new BaseQueryResult<>(
                 () -> payoutsResult.getDataStream(),
@@ -65,7 +51,15 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
                             .collect(Collectors.toList()));
 
                     StatResponse statResponse = new StatResponse(statResponseData);
-                    statResponse.setTotalCount(countResult.getCollectedStream());
+                    List<Map.Entry<Long, StatPayout>> payouts = payoutsResult.getCollectedStream();
+                    if (!payouts.isEmpty() && getQueryParameters().getSize() == payouts.size()) {
+                        statResponse.setContinuationToken(
+                                TokenUtil.buildToken(
+                                        getQueryParameters(),
+                                        payouts.get(payouts.size() - 1).getKey()
+                                )
+                        );
+                    }
                     return statResponse;
                 });
     }
@@ -175,8 +169,7 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
 
         private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken),
-                    new GetCountFunction(queryPart.getDescriptor() + ":" + GetCountFunction.FUNC_NAME, queryPart.getParameters())
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken)
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
                     queryPart.getDescriptor(),
@@ -219,30 +212,6 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
                         parameters.getSize()
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);
-            } catch (DaoException e) {
-                throw new QueryExecutionException(e);
-            }
-        }
-    }
-
-    private static class GetCountFunction extends ScopedBaseFunction<Integer, Integer> {
-        private static final String FUNC_NAME = PayoutsFunction.FUNC_NAME + "_count";
-
-        public GetCountFunction(Object descriptor, QueryParameters params) {
-            super(descriptor, params, FUNC_NAME);
-        }
-
-        @Override
-        public QueryResult<Integer, Integer> execute(QueryContext context) throws QueryExecutionException {
-            FunctionQueryContext functionContext = getContext(context);
-            PayoutsParameters parameters = new PayoutsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
-            try {
-                Integer result = functionContext.getSearchDao().getPayoutsCount(
-                        parameters,
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime()))
-                );
-                return new BaseQueryResult<>(() -> Stream.of(result), () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }

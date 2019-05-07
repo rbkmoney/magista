@@ -2,8 +2,6 @@ package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.domain.Cash;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentRefundCreated;
@@ -12,7 +10,7 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
-import com.rbkmoney.magista.domain.tables.pojos.Refund;
+import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -36,7 +34,7 @@ public class RefundCreatedHandler implements Handler<InvoiceChange, MachineEvent
 
     @Override
     public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
-        Refund refund = new Refund();
+        RefundData refund = new RefundData();
 
         refund.setEventId(machineEvent.getEventId());
         refund.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));

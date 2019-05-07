@@ -1,51 +1,45 @@
 package com.rbkmoney.magista.dao.impl;
 
 import com.rbkmoney.magista.dao.RefundDao;
-import com.rbkmoney.magista.dao.impl.AbstractDao;
 import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
-import com.rbkmoney.magista.domain.tables.pojos.Refund;
-import com.rbkmoney.magista.domain.tables.records.RefundRecord;
+import com.rbkmoney.magista.domain.tables.pojos.RefundData;
+import com.rbkmoney.magista.domain.tables.records.RefundDataRecord;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Query;
-import org.jooq.impl.DSL;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 
-import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
+import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 
 @Component
 public class RefundDaoImpl extends AbstractDao implements RefundDao {
 
-    private final RowMapper<Refund> refundRowMapper;
+    private final RowMapper<RefundData> refundRowMapper;
 
     public RefundDaoImpl(DataSource dataSource) {
         super(dataSource);
-        refundRowMapper = new RecordRowMapper<>(REFUND, Refund.class);
+        refundRowMapper = new RecordRowMapper<>(REFUND_DATA, RefundData.class);
     }
 
     @Override
-    public Refund get(String invoiceId, String paymentId, String refundId) throws DaoException {
-        Query query = getDslContext().selectFrom(REFUND)
+    public RefundData get(String invoiceId, String paymentId, String refundId) throws DaoException {
+        Query query = getDslContext().selectFrom(REFUND_DATA)
                 .where(
-                        REFUND.ID.eq(
-                                getDslContext().select(DSL.max(REFUND.ID))
-                                        .from(REFUND).where(
-                                        REFUND.INVOICE_ID.eq(invoiceId)
-                                                .and(REFUND.PAYMENT_ID.eq(paymentId))
-                                                .and(REFUND.REFUND_ID.eq(refundId)))
-                        )
+                        REFUND_DATA.INVOICE_ID.eq(invoiceId)
+                                .and(REFUND_DATA.PAYMENT_ID.eq(paymentId))
+                                .and(REFUND_DATA.REFUND_ID.eq(refundId))
                 );
         return fetchOne(query, refundRowMapper);
     }
 
     @Override
-    public void save(Refund refund) throws DaoException {
-        RefundRecord refundRecord = getDslContext().newRecord(REFUND, refund);
-        Query query = getDslContext().insertInto(REFUND)
+    public void save(RefundData refund) throws DaoException {
+        RefundDataRecord refundRecord = getDslContext().newRecord(REFUND_DATA, refund);
+        Query query = getDslContext().insertInto(REFUND_DATA)
                 .set(refundRecord)
-                .onConflict(REFUND.INVOICE_ID, REFUND.PAYMENT_ID, REFUND.REFUND_ID)
+                .onConflict(REFUND_DATA.INVOICE_ID, REFUND_DATA.PAYMENT_ID, REFUND_DATA.REFUND_ID)
                 .doUpdate()
                 .set(refundRecord);
 

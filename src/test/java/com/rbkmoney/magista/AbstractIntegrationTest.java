@@ -1,6 +1,5 @@
 package com.rbkmoney.magista;
 
-import com.rbkmoney.magista.dao.ReportDao;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.query.impl.QueryContextFactoryImpl;
@@ -40,12 +39,9 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     private SearchDao searchDao;
 
-    @Autowired
-    private ReportDao reportDao;
-
     @Before
     public void before() {
-        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao, searchDao, reportDao);
+        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao, searchDao);
         queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
     }
 

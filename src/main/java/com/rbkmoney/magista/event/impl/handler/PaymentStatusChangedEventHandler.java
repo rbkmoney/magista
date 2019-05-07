@@ -14,7 +14,7 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
-import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
+import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -35,21 +35,21 @@ public class PaymentStatusChangedEventHandler implements Handler<InvoiceChange, 
     @Override
     public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
 
-        PaymentEvent paymentEvent = new PaymentEvent();
-        paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED);
-        paymentEvent.setEventId(machineEvent.getEventId());
+        PaymentData paymentData = new PaymentData();
+        paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED);
+        paymentData.setEventId(machineEvent.getEventId());
 
-        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
-        paymentEvent.setInvoiceId(machineEvent.getSourceId());
+        paymentData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        paymentData.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
-        paymentEvent.setPaymentId(invoicePaymentChange.getId());
+        paymentData.setPaymentId(invoicePaymentChange.getId());
 
         InvoicePaymentStatusChanged invoicePaymentStatusChanged = invoicePaymentChange
                 .getPayload()
                 .getInvoicePaymentStatusChanged();
 
-        paymentEvent.setPaymentStatus(
+        paymentData.setPaymentStatus(
                 TBaseUtil.unionFieldToEnum(invoicePaymentStatusChanged.getStatus(), InvoicePaymentStatus.class)
         );
 
@@ -57,24 +57,24 @@ public class PaymentStatusChangedEventHandler implements Handler<InvoiceChange, 
             InvoicePaymentCaptured invoicePaymentCaptured = invoicePaymentStatusChanged.getStatus().getCaptured();
             if (invoicePaymentCaptured.isSetCost()) {
                 Cash cost = invoicePaymentCaptured.getCost();
-                paymentEvent.setPaymentAmount(cost.getAmount());
-                paymentEvent.setPaymentCurrencyCode(cost.getCurrency().getSymbolicCode());
+                paymentData.setPaymentAmount(cost.getAmount());
+                paymentData.setPaymentCurrencyCode(cost.getCurrency().getSymbolicCode());
             }
         }
 
         if (invoicePaymentStatusChanged.getStatus().isSetFailed()) {
             OperationFailure operationFailure = invoicePaymentStatusChanged.getStatus().getFailed().getFailure();
-            paymentEvent.setPaymentOperationFailureClass(
+            paymentData.setPaymentOperationFailureClass(
                     TBaseUtil.unionFieldToEnum(operationFailure, FailureClass.class)
             );
             if (operationFailure.isSetFailure()) {
                 Failure failure = operationFailure.getFailure();
-                paymentEvent.setPaymentExternalFailure(TErrorUtil.toStringVal(failure));
-                paymentEvent.setPaymentExternalFailureReason(failure.getReason());
+                paymentData.setPaymentExternalFailure(TErrorUtil.toStringVal(failure));
+                paymentData.setPaymentExternalFailureReason(failure.getReason());
             }
         }
 
-        return () -> paymentService.savePaymentChange(paymentEvent);
+        return () -> paymentService.savePayment(paymentData);
     }
 
     @Override

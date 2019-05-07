@@ -1,14 +1,16 @@
 package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentAdjustmentStatus;
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.*;
+import com.rbkmoney.damsel.payment_processing.InvoiceChange;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentAdjustmentChange;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentAdjustmentStatusChanged;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
-import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
+import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -32,7 +34,7 @@ public class AdjustmentStatusChangedHandler implements Handler<InvoiceChange, Ma
 
     @Override
     public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
-        Adjustment adjustment = new Adjustment();
+        AdjustmentData adjustment = new AdjustmentData();
 
         adjustment.setEventId(machineEvent.getEventId());
         adjustment.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));

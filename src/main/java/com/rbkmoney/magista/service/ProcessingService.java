@@ -8,6 +8,8 @@ import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.StorageException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +44,7 @@ public class ProcessingService {
 
     private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
+    @EventListener(ApplicationReadyEvent.class)
     public void start() {
         PayoutEventFlow newPayoutEventFlow = new PayoutEventFlow(handlers, payoutEventPublisherBuilder, payoutHandlerThreadPoolSize, payoutHandlerQueueLimit, payoutHandlerTimeout);
         if (payoutEventFlow.compareAndSet(null, newPayoutEventFlow)) {

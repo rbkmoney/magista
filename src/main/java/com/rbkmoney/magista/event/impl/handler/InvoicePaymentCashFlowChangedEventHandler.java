@@ -6,7 +6,7 @@ import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
-import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
+import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -32,14 +32,14 @@ public class InvoicePaymentCashFlowChangedEventHandler implements Handler<Invoic
     @Override
     public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
 
-        PaymentEvent paymentEvent = new PaymentEvent();
-        paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_CASH_FLOW_CHANGED);
-        paymentEvent.setEventId(machineEvent.getEventId());
-        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
-        paymentEvent.setInvoiceId(machineEvent.getSourceId());
+        PaymentData paymentData = new PaymentData();
+        paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_CASH_FLOW_CHANGED);
+        paymentData.setEventId(machineEvent.getEventId());
+        paymentData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        paymentData.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
-        paymentEvent.setPaymentId(invoicePaymentChange.getId());
+        paymentData.setPaymentId(invoicePaymentChange.getId());
 
         List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentChange
                 .getPayload()
@@ -47,12 +47,12 @@ public class InvoicePaymentCashFlowChangedEventHandler implements Handler<Invoic
                 .getCashFlow();
 
         Map<FeeType, Long> fees = DamselUtil.getFees(finalCashFlowPostings);
-        paymentEvent.setPaymentAmount(fees.getOrDefault(FeeType.AMOUNT, 0L));
-        paymentEvent.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
-        paymentEvent.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
-        paymentEvent.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
+        paymentData.setPaymentAmount(fees.getOrDefault(FeeType.AMOUNT, 0L));
+        paymentData.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
+        paymentData.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
+        paymentData.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
 
-        return () -> paymentService.savePaymentChange(paymentEvent);
+        return () -> paymentService.savePayment(paymentData);
     }
 
     @Override

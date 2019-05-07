@@ -1,10 +1,7 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.dao.impl.InvoiceDaoImpl;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceEvent;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
-import com.rbkmoney.magista.exception.DaoException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,14 +19,10 @@ public class InvoiceDaoTest extends AbstractDaoTest {
     public void testInsertAndFindInvoiceData() {
         InvoiceData invoiceData = random(InvoiceData.class);
 
-        invoiceDao.saveInvoiceData(invoiceData);
+        invoiceDao.save(invoiceData);
+        invoiceDao.save(invoiceData);
 
-        assertEquals(invoiceData, invoiceDao.getInvoiceData(invoiceData.getInvoiceId()));
-
-        InvoiceEvent invoiceEvent = random(InvoiceEvent.class, "invoiceId");
-        invoiceEvent.setInvoiceId(invoiceData.getInvoiceId());
-
-        invoiceDao.saveInvoiceEvent(invoiceEvent);
+        assertEquals(invoiceData, invoiceDao.get(invoiceData.getInvoiceId()));
     }
 
 }

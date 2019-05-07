@@ -1,1 +1,0 @@
-UPDATE mst.invoice_event_stat SET payment_failure_class = 'failure' WHERE payment_failure_class = 'external_failure';

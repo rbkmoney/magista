@@ -1,1 +1,0 @@
-ALTER TABLE mst.payout_event_stat ADD COLUMN payout_summary CHARACTER VARYING;

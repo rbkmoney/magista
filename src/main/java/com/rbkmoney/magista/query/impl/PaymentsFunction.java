@@ -52,12 +52,12 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
                     StatResponseData statResponseData = StatResponseData.payments(paymentsResult.getDataStream()
                             .map(paymentResponse -> paymentResponse.getValue()).collect(Collectors.toList()));
                     StatResponse statResponse = new StatResponse(statResponseData);
-                    List<Map.Entry<Long, StatPayment>> paymentStats = paymentsResult.getCollectedStream();
-                    if (!paymentsResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == paymentStats.size()) {
+                    List<Map.Entry<Long, StatPayment>> payments = paymentsResult.getCollectedStream();
+                    if (!payments.isEmpty() && getQueryParameters().getSize() == payments.size()) {
                         statResponse.setContinuationToken(
                                 TokenUtil.buildToken(
                                         getQueryParameters(),
-                                        paymentStats.get(paymentStats.size() - 1).getKey()
+                                        payments.get(payments.size() - 1).getKey()
                                 )
                         );
                     }

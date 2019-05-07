@@ -1,2 +1,0 @@
-CREATE INDEX CONCURRENTLY invoice_stat_invoice_created_at_idx ON "mst"."invoice_event_stat" USING BTREE (invoice_created_at);
-CREATE INDEX CONCURRENTLY invoice_stat_payment_created_at_idx ON "mst"."invoice_event_stat" USING BTREE (payment_created_at);

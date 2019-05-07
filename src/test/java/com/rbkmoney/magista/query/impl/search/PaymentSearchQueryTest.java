@@ -53,14 +53,12 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
         StatResponse statResponse = queryProcessor.processQuery(statRequest);
         assertEquals(1, statResponse.getData().getPayments().size());
         assertNotNull(statResponse.getContinuationToken());
-        assertEquals((Long) 2L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
         DamselUtil.toJson(statResponse);
 
         statRequest.setContinuationToken(statResponse.getContinuationToken());
         statResponse = queryProcessor.processQuery(statRequest);
         assertEquals(1, statResponse.getData().getPayments().size());
         assertNotNull(statResponse.getContinuationToken());
-        assertEquals((Long) 1L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
 
         statRequest.setContinuationToken(statResponse.getContinuationToken());
         statResponse = queryProcessor.processQuery(statRequest);
@@ -207,6 +205,7 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
         assertEquals(1, statResponse.getData().getPayments().size());
     }
 
+    @Test
     @Sql("classpath:data/sql/search/recurrent_payments_search_data.sql")
     public void testRecurrentPayments() {
         String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'invoice_id': 'INVOICE_ID_1', 'payment_id': 'PAYMENT_ID_1'}}}";

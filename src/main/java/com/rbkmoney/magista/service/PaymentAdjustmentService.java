@@ -3,9 +3,8 @@ package com.rbkmoney.magista.service;
 import com.rbkmoney.magista.dao.AdjustmentDao;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
+import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
-import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
-import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
@@ -32,9 +31,9 @@ public class PaymentAdjustmentService {
         this.paymentService = paymentService;
     }
 
-    public Adjustment getAdjustment(String invoiceId, String paymentId, String adjustmentId) throws StorageException {
+    public AdjustmentData getAdjustment(String invoiceId, String paymentId, String adjustmentId) throws StorageException {
         try {
-            Adjustment adjustment = adjustmentDao.get(invoiceId, paymentId, adjustmentId);
+            AdjustmentData adjustment = adjustmentDao.get(invoiceId, paymentId, adjustmentId);
             if (adjustment == null) {
                 throw new NotFoundException(String.format("Adjustment not found, invoiceId='%s', paymentId='%s', adjustmentId='%s'", invoiceId, paymentId, adjustmentId));
             }
@@ -45,7 +44,7 @@ public class PaymentAdjustmentService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void savePaymentAdjustment(Adjustment adjustment) throws NotFoundException, StorageException {
+    public void savePaymentAdjustment(AdjustmentData adjustment) throws NotFoundException, StorageException {
         log.info("Trying to save adjustment event, eventType='{}', invoiceId='{}', paymentId='{}', adjustmentId='{}'",
                 adjustment.getEventType(), adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId());
         switch (adjustment.getEventType()) {
@@ -55,23 +54,23 @@ public class PaymentAdjustmentService {
                 adjustment.setPartyShopId(paymentData.getPartyShopId());
                 break;
             case INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED:
-                Adjustment previousAdjustmentEvent = getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId());
+                AdjustmentData previousAdjustmentEvent = getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId());
                 BeanUtil.merge(previousAdjustmentEvent, adjustment, "id");
                 break;
         }
 
         if (adjustment.getAdjustmentStatus() == AdjustmentStatus.captured) {
-            PaymentEvent paymentEvent = new PaymentEvent();
-            paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
-            paymentEvent.setEventId(adjustment.getEventId());
-            paymentEvent.setEventCreatedAt(adjustment.getEventCreatedAt());
-            paymentEvent.setInvoiceId(adjustment.getInvoiceId());
-            paymentEvent.setPaymentId(adjustment.getPaymentId());
-            paymentEvent.setPaymentFee(adjustment.getAdjustmentFee());
-            paymentEvent.setPaymentProviderFee(adjustment.getAdjustmentProviderFee());
-            paymentEvent.setPaymentExternalFee(adjustment.getAdjustmentExternalFee());
-            paymentEvent.setPaymentDomainRevision(adjustment.getAdjustmentDomainRevision());
-            paymentService.savePaymentChange(paymentEvent);
+            PaymentData paymentData = new PaymentData();
+            paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
+            paymentData.setEventId(adjustment.getEventId());
+            paymentData.setEventCreatedAt(adjustment.getEventCreatedAt());
+            paymentData.setInvoiceId(adjustment.getInvoiceId());
+            paymentData.setPaymentId(adjustment.getPaymentId());
+            paymentData.setPaymentFee(adjustment.getAdjustmentFee());
+            paymentData.setPaymentProviderFee(adjustment.getAdjustmentProviderFee());
+            paymentData.setPaymentExternalFee(adjustment.getAdjustmentExternalFee());
+            paymentData.setPaymentDomainRevision(adjustment.getAdjustmentDomainRevision());
+            paymentService.savePayment(paymentData);
         }
 
         try {

@@ -1,10 +1,8 @@
 package com.rbkmoney.magista.query;
 
 import com.rbkmoney.magista.dao.AbstractDaoTest;
-import com.rbkmoney.magista.dao.ReportDao;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.StatisticsDao;
-import com.rbkmoney.magista.dao.impl.ReportDaoImpl;
 import com.rbkmoney.magista.dao.impl.SearchDaoImpl;
 import com.rbkmoney.magista.dao.impl.StatisticsDaoImpl;
 import com.rbkmoney.magista.query.impl.QueryContextFactoryImpl;
@@ -25,7 +23,7 @@ import javax.sql.DataSource;
  * Created by jeckep on 08.02.17.
  */
 
-@ContextConfiguration(classes = {AbstractQueryTest.TestConfiguration.class, StatisticsDaoImpl.class, SearchDaoImpl.class, ReportDaoImpl.class})
+@ContextConfiguration(classes = {AbstractQueryTest.TestConfiguration.class, StatisticsDaoImpl.class, SearchDaoImpl.class})
 public abstract class AbstractQueryTest extends AbstractDaoTest {
 
     protected QueryProcessorImpl queryProcessor;
@@ -36,12 +34,9 @@ public abstract class AbstractQueryTest extends AbstractDaoTest {
     @Autowired
     private SearchDao searchDao;
 
-    @Autowired
-    private ReportDao reportDao;
-
     @Before
     public void before() {
-        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao, searchDao, reportDao);
+        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao, searchDao);
         queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
     }
 
