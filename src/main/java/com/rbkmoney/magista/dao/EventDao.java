@@ -6,8 +6,6 @@ import java.util.Optional;
 
 public interface EventDao {
 
-    Optional<Long> getLastInvoiceEventId() throws DaoException;
-
     Optional<Long> getLastPayoutEventId() throws DaoException;
 
 }
