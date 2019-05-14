@@ -10,6 +10,7 @@ import org.jooq.Query;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -25,7 +26,7 @@ import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 @Component
 public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
 
-    public StatisticsDaoImpl(DataSource ds) {
+    public StatisticsDaoImpl(@Qualifier("slaveDataSource") DataSource ds) {
         super(ds);
     }
 

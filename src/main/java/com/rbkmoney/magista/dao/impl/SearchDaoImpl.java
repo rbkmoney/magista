@@ -23,6 +23,7 @@ import com.rbkmoney.magista.query.impl.PayoutsFunction;
 import com.rbkmoney.magista.query.impl.RefundsFunction;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -49,7 +50,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     private final StatRefundMapper statRefundMapper;
     private final StatPayoutMapper statPayoutMapper;
 
-    public SearchDaoImpl(DataSource ds) {
+    public SearchDaoImpl(@Qualifier("slaveDataSource") DataSource ds) {
         super(ds);
         statInvoiceMapper = new StatInvoiceMapper();
         statPaymentMapper = new StatPaymentMapper();
