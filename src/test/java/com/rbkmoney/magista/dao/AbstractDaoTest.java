@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.config.DaoConfig;
 import org.flywaydb.core.Flyway;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
@@ -25,7 +24,7 @@ import java.time.Duration;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @EnableConfigurationProperties
-@ContextConfiguration(classes = {DaoConfig.class, TransactionAutoConfiguration.class},
+@ContextConfiguration(classes = {TransactionAutoConfiguration.class},
         loader = AnnotationConfigContextLoader.class,
         initializers = AbstractDaoTest.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -39,12 +38,9 @@ public abstract class AbstractDaoTest {
         @Override
         public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
             TestPropertyValues.of(
-                    "datasource.master.url=" + postgres.getJdbcUrl(),
-                    "datasource.master.username=" + postgres.getUsername(),
-                    "datasource.master.password=" + postgres.getPassword(),
-                    "datasource.slave.url=" + postgres.getJdbcUrl(),
-                    "datasource.slave.username=" + postgres.getUsername(),
-                    "datasource.slave.password=" + postgres.getPassword()
+                    "spring.datasource.url=" + postgres.getJdbcUrl(),
+                    "spring.datasource.username=" + postgres.getUsername(),
+                    "spring.datasource.password=" + postgres.getPassword()
             ).applyTo(configurableApplicationContext);
             Flyway flyway = Flyway.configure()
                     .dataSource(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())
