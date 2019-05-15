@@ -3,6 +3,7 @@ package com.rbkmoney.magista.dao;
 import org.flywaydb.core.Flyway;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +25,10 @@ import java.time.Duration;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @EnableConfigurationProperties
-@ContextConfiguration(classes = {TransactionAutoConfiguration.class},
+@ContextConfiguration(classes = {
+        TransactionAutoConfiguration.class,
+        DataSourceAutoConfiguration.class
+},
         loader = AnnotationConfigContextLoader.class,
         initializers = AbstractDaoTest.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
