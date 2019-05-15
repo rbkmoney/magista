@@ -37,7 +37,7 @@ public abstract class KafkaAbstractTest {
     @ClassRule
     public static KafkaContainer kafka = new KafkaContainer(CONFLUENT_PLATFORM_VERSION).withEmbeddedZookeeper();
 
-    @Value("${kafka.invoice.topic}")
+    @Value("${kafka.topics.invoicing}")
     public String topic;
 
     public static Producer<String, SinkEvent> createProducer() {
@@ -55,7 +55,7 @@ public abstract class KafkaAbstractTest {
         @Override
         public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
             TestPropertyValues values = TestPropertyValues
-                    .of("kafka.bootstrap.servers=" + kafka.getBootstrapServers());
+                    .of("kafka.bootstrap-servers=" + kafka.getBootstrapServers());
             values.applyTo(configurableApplicationContext);
         }
     }

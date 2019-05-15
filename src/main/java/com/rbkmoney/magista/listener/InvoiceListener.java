@@ -20,7 +20,7 @@ public class InvoiceListener implements MessageListener {
     private final HandlerManager handlerManager;
     private final SourceEventParser eventParser;
 
-    @KafkaListener(topics = "${kafka.invoice.topic}", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "${kafka.topics.invoicing}", containerFactory = "kafkaListenerContainerFactory")
     public void listen(MachineEvent message, Acknowledgment ack) {
         handle(message, ack);
         ack.acknowledge();
