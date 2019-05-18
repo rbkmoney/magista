@@ -7,11 +7,14 @@ import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
+import com.rbkmoney.magista.util.BeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import static com.rbkmoney.magista.domain.enums.InvoiceEventType.INVOICE_STATUS_CHANGED;
 
 @Service
 public class InvoiceService {
@@ -50,6 +53,11 @@ public class InvoiceService {
     public void saveInvoice(InvoiceData invoiceData) throws NotFoundException, StorageException {
         log.info("Trying to save invoice, invoiceData='{}'", invoiceData);
         try {
+            if (invoiceData.getEventType() == INVOICE_STATUS_CHANGED) {
+                InvoiceData previousInvoiceData = invoiceDao.get(invoiceData.getInvoiceId());
+                BeanUtil.merge(previousInvoiceData, invoiceData);
+            }
+
             invoiceDao.save(invoiceData);
             invoiceDataCache.put(invoiceData.getInvoiceId(), invoiceData);
             log.info("Invoice have been saved, invoiceData='{}'", invoiceData);
