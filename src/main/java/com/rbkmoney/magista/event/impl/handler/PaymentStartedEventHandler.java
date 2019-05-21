@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -136,7 +137,10 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, Machin
         paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
         paymentData.setEventId(machineEvent.getEventId());
 
-        paymentData.setPartyId(UUID.fromString(invoicePayment.getOwnerId()));
+        Optional.ofNullable(invoicePayment.getOwnerId())
+                .map(UUID::fromString)
+                .ifPresent(paymentData::setPartyId);
+
         paymentData.setPartyShopId(invoicePayment.getShopId());
         paymentData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         paymentData.setInvoiceId(invoiceId);
