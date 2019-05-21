@@ -1,23 +1,21 @@
 package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.base.Content;
-import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.damsel.domain.PaymentTool;
-import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.geo_ip.geo_ipConstants;
-import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
-import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
-import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -32,9 +30,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component
-public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockEvent> {
+public class PaymentStartedEventHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final PaymentService paymentService;
 
@@ -47,10 +47,9 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
-        Event event = parent.getSourceEvent().getProcessingEvent();
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
 
-        String invoiceId = event.getSource().getInvoiceId();
+        String invoiceId = machineEvent.getSourceId();
 
         InvoicePaymentStarted invoicePaymentStarted = change
                 .getInvoicePaymentChange()
@@ -135,15 +134,20 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
                 throw new NotFoundException(String.format("Payment type '%s' not found", payerType));
         }
 
-        PaymentEvent paymentEvent = new PaymentEvent();
-        paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
-        paymentEvent.setEventId(event.getId());
-        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-        paymentEvent.setInvoiceId(invoiceId);
-        paymentEvent.setPaymentId(paymentId);
+        paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
+        paymentData.setEventId(machineEvent.getEventId());
+
+        Optional.ofNullable(invoicePayment.getOwnerId())
+                .map(UUID::fromString)
+                .ifPresent(paymentData::setPartyId);
+
+        paymentData.setPartyShopId(invoicePayment.getShopId());
+        paymentData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        paymentData.setInvoiceId(invoiceId);
+        paymentData.setPaymentId(paymentId);
 
         InvoicePaymentStatus status = invoicePayment.getStatus();
-        paymentEvent.setPaymentStatus(
+        paymentData.setPaymentStatus(
                 TBaseUtil.unionFieldToEnum(
                         status,
                         com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class
@@ -151,35 +155,35 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
         );
         if (status.isSetFailed()) {
             OperationFailure operationFailure = status.getFailed().getFailure();
-            paymentEvent.setPaymentOperationFailureClass(
+            paymentData.setPaymentOperationFailureClass(
                     TBaseUtil.unionFieldToEnum(operationFailure, FailureClass.class)
             );
             if (operationFailure.isSetFailure()) {
                 Failure failure = operationFailure.getFailure();
-                paymentEvent.setPaymentExternalFailure(TErrorUtil.toStringVal(failure));
-                paymentEvent.setPaymentExternalFailureReason(failure.getReason());
+                paymentData.setPaymentExternalFailure(TErrorUtil.toStringVal(failure));
+                paymentData.setPaymentExternalFailureReason(failure.getReason());
             }
         }
-        paymentEvent.setPaymentDomainRevision(invoicePayment.getDomainRevision());
+        paymentData.setPaymentDomainRevision(invoicePayment.getDomainRevision());
 
-        paymentEvent.setPaymentAmount(cost.getAmount());
-        paymentEvent.setPaymentCurrencyCode(cost.getCurrency().getSymbolicCode());
+        paymentData.setPaymentAmount(cost.getAmount());
+        paymentData.setPaymentCurrencyCode(cost.getCurrency().getSymbolicCode());
 
         if (invoicePaymentStarted.isSetRoute()) {
             PaymentRoute paymentRoute = invoicePaymentStarted.getRoute();
-            paymentEvent.setPaymentProviderId(paymentRoute.getProvider().getId());
-            paymentEvent.setPaymentTerminalId(paymentRoute.getTerminal().getId());
+            paymentData.setPaymentProviderId(paymentRoute.getProvider().getId());
+            paymentData.setPaymentTerminalId(paymentRoute.getTerminal().getId());
         }
 
         if (invoicePaymentStarted.isSetCashFlow()) {
             List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentStarted.getCashFlow();
             Map<FeeType, Long> fees = DamselUtil.getFees(finalCashFlowPostings);
-            paymentEvent.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
-            paymentEvent.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
-            paymentEvent.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
+            paymentData.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
+            paymentData.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
+            paymentData.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
         }
 
-        return () -> paymentService.savePayment(paymentData, paymentEvent);
+        return () -> paymentService.savePayment(paymentData);
     }
 
     private void mapPaymentTool(PaymentData paymentData, PaymentTool paymentTool) {

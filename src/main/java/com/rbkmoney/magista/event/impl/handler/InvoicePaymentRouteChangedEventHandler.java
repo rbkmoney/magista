@@ -1,13 +1,12 @@
 package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.domain.PaymentRoute;
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
-import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
+import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -16,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InvoicePaymentRouteChangedEventHandler implements Handler<InvoiceChange, StockEvent> {
+public class InvoicePaymentRouteChangedEventHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final PaymentService paymentService;
 
@@ -26,27 +25,24 @@ public class InvoicePaymentRouteChangedEventHandler implements Handler<InvoiceCh
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
-        Event event = parent.getSourceEvent().getProcessingEvent();
-
-        PaymentEvent paymentEvent = new PaymentEvent();
-        paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ROUTE_CHANGED);
-        paymentEvent.setEventId(event.getId());
-        paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-        paymentEvent.setInvoiceId(event.getSource().getInvoiceId());
-
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+        PaymentData paymentData = new PaymentData();
+        paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_ROUTE_CHANGED);
+        paymentData.setEventId(machineEvent.getEventId());
+        paymentData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        paymentData.setInvoiceId(machineEvent.getSourceId());
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
-        paymentEvent.setPaymentId(invoicePaymentChange.getId());
+        paymentData.setPaymentId(invoicePaymentChange.getId());
 
         PaymentRoute paymentRoute = invoicePaymentChange
                 .getPayload()
                 .getInvoicePaymentRouteChanged()
                 .getRoute();
 
-        paymentEvent.setPaymentProviderId(paymentRoute.getProvider().getId());
-        paymentEvent.setPaymentTerminalId(paymentRoute.getTerminal().getId());
+        paymentData.setPaymentProviderId(paymentRoute.getProvider().getId());
+        paymentData.setPaymentTerminalId(paymentRoute.getTerminal().getId());
 
-        return () -> paymentService.savePaymentChange(paymentEvent);
+        return () -> paymentService.savePayment(paymentData);
     }
 
     @Override

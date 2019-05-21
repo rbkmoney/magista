@@ -5,6 +5,7 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.exception.BadTokenException;
+import com.rbkmoney.magista.query.AbstractQueryTest;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
@@ -27,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @Transactional
-public class PaymentSearchQueryTest extends AbstractIntegrationTest {
+public class PaymentSearchQueryTest extends AbstractQueryTest {
 
     @Test
     @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
@@ -52,14 +53,12 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
         StatResponse statResponse = queryProcessor.processQuery(statRequest);
         assertEquals(1, statResponse.getData().getPayments().size());
         assertNotNull(statResponse.getContinuationToken());
-        assertEquals((Long) 2L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
         DamselUtil.toJson(statResponse);
 
         statRequest.setContinuationToken(statResponse.getContinuationToken());
         statResponse = queryProcessor.processQuery(statRequest);
         assertEquals(1, statResponse.getData().getPayments().size());
         assertNotNull(statResponse.getContinuationToken());
-        assertEquals((Long) 1L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
 
         statRequest.setContinuationToken(statResponse.getContinuationToken());
         statResponse = queryProcessor.processQuery(statRequest);
@@ -206,6 +205,7 @@ public class PaymentSearchQueryTest extends AbstractIntegrationTest {
         assertEquals(1, statResponse.getData().getPayments().size());
     }
 
+    @Test
     @Sql("classpath:data/sql/search/recurrent_payments_search_data.sql")
     public void testRecurrentPayments() {
         String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'invoice_id': 'INVOICE_ID_1', 'payment_id': 'PAYMENT_ID_1'}}}";

@@ -2,16 +2,15 @@ package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.domain.Cash;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentRefundCreated;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
-import com.rbkmoney.magista.domain.tables.pojos.Refund;
+import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -24,7 +23,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class RefundCreatedHandler implements Handler<InvoiceChange, StockEvent> {
+public class RefundCreatedHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final PaymentRefundService paymentRefundService;
 
@@ -34,14 +33,13 @@ public class RefundCreatedHandler implements Handler<InvoiceChange, StockEvent> 
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
-        Refund refund = new Refund();
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+        RefundData refund = new RefundData();
 
-        Event event = parent.getSourceEvent().getProcessingEvent();
-        refund.setEventId(event.getId());
-        refund.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        refund.setEventId(machineEvent.getEventId());
+        refund.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         refund.setEventType(InvoiceEventType.INVOICE_PAYMENT_REFUND_CREATED);
-        refund.setInvoiceId(event.getSource().getInvoiceId());
+        refund.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
 

@@ -9,11 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 import java.util.Optional;
 
-import static com.rbkmoney.magista.domain.tables.Adjustment.ADJUSTMENT;
-import static com.rbkmoney.magista.domain.tables.InvoiceEvent.INVOICE_EVENT;
-import static com.rbkmoney.magista.domain.tables.PaymentEvent.PAYMENT_EVENT;
-import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
-import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
+import static com.rbkmoney.magista.domain.tables.PayoutData.PAYOUT_DATA;
 
 @Component
 public class EventDaoImpl extends AbstractDao implements EventDao {
@@ -23,19 +19,8 @@ public class EventDaoImpl extends AbstractDao implements EventDao {
     }
 
     @Override
-    public Optional<Long> getLastInvoiceEventId() throws DaoException {
-        Query query = getDslContext().select(DSL.max(DSL.field("event_id"))).from(
-                getDslContext().select(DSL.max(INVOICE_EVENT.EVENT_ID).as("event_id")).from(INVOICE_EVENT)
-                        .unionAll(getDslContext().select(DSL.max(PAYMENT_EVENT.EVENT_ID).as("event_id")).from(PAYMENT_EVENT))
-                        .unionAll(getDslContext().select(DSL.max(REFUND.EVENT_ID).as("event_id")).from(REFUND))
-                        .unionAll(getDslContext().select(DSL.max(ADJUSTMENT.EVENT_ID).as("event_id")).from(ADJUSTMENT))
-        );
-        return Optional.ofNullable(fetchOne(query, Long.class));
-    }
-
-    @Override
     public Optional<Long> getLastPayoutEventId() throws DaoException {
-        Query query = getDslContext().select(DSL.max(PAYOUT_EVENT_STAT.EVENT_ID)).from(PAYOUT_EVENT_STAT);
+        Query query = getDslContext().select(DSL.max(PAYOUT_DATA.EVENT_ID)).from(PAYOUT_DATA);
         return Optional.ofNullable(fetchOne(query, Long.class));
     }
 }

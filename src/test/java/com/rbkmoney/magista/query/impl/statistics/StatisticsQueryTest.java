@@ -2,7 +2,7 @@ package com.rbkmoney.magista.query.impl.statistics;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.AbstractIntegrationTest;
+import com.rbkmoney.magista.query.AbstractQueryTest;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.Assert.assertEquals;
 
 @Transactional
-public class StatisticsQueryTest extends AbstractIntegrationTest {
+public class StatisticsQueryTest extends AbstractQueryTest {
 
     @Test
     @Sql("classpath:data/sql/statistics/payments_geo_stat_data.sql")

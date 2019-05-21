@@ -1,1 +1,0 @@
-CREATE INDEX CONCURRENTLY invoice_stat_party_id_party_shop_id_invoice_created_at_idx ON "mst"."invoice_event_stat" USING BTREE (party_id, party_shop_id, invoice_created_at);

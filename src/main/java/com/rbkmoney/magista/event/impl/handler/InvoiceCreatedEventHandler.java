@@ -4,14 +4,12 @@ import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.Invoice;
 import com.rbkmoney.damsel.domain.InvoiceDetails;
 import com.rbkmoney.damsel.domain.InvoiceStatus;
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.Event;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceEvent;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -23,7 +21,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, StockEvent> {
+public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final InvoiceService invoiceService;
 
@@ -33,18 +31,16 @@ public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, StockE
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
-        Event event = parent.getSourceEvent().getProcessingEvent();
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+        InvoiceData invoiceData = new InvoiceData();
+        invoiceData.setEventType(InvoiceEventType.INVOICE_CREATED);
+        invoiceData.setEventId(machineEvent.getEventId());
+        invoiceData.setInvoiceId(machineEvent.getSourceId());
 
-        InvoiceEvent invoiceEvent = new InvoiceEvent();
-        invoiceEvent.setEventType(InvoiceEventType.INVOICE_CREATED);
-        invoiceEvent.setEventId(event.getId());
-        invoiceEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-        invoiceEvent.setInvoiceId(event.getSource().getInvoiceId());
+        invoiceData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
 
         Invoice invoice = change.getInvoiceCreated().getInvoice();
 
-        InvoiceData invoiceData = new InvoiceData();
         invoiceData.setInvoiceId(invoice.getId());
         invoiceData.setPartyId(UUID.fromString(invoice.getOwnerId()));
         invoiceData.setPartyShopId(invoice.getShopId());
@@ -72,17 +68,17 @@ public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, StockE
         }
 
         InvoiceStatus invoiceStatus = invoice.getStatus();
-        invoiceEvent.setInvoiceStatus(
+        invoiceData.setInvoiceStatus(
                 TBaseUtil.unionFieldToEnum(
                         invoiceStatus,
                         com.rbkmoney.magista.domain.enums.InvoiceStatus.class
                 )
         );
-        invoiceEvent.setInvoiceStatusDetails(
+        invoiceData.setInvoiceStatusDetails(
                 DamselUtil.getInvoiceStatusDetails(invoiceStatus)
         );
 
-        return () -> invoiceService.saveInvoice(invoiceData, invoiceEvent);
+        return () -> invoiceService.saveInvoice(invoiceData);
     }
 
     @Override

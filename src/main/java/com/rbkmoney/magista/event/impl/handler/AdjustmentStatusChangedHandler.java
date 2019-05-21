@@ -1,13 +1,16 @@
 package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentAdjustmentStatus;
-import com.rbkmoney.damsel.event_stock.StockEvent;
-import com.rbkmoney.damsel.payment_processing.*;
+import com.rbkmoney.damsel.payment_processing.InvoiceChange;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentAdjustmentChange;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentAdjustmentStatusChanged;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
-import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
+import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -20,7 +23,7 @@ import org.springframework.stereotype.Component;
  * Created by tolkonepiu on 21/06/2017.
  */
 @Component
-public class AdjustmentStatusChangedHandler implements Handler<InvoiceChange, StockEvent> {
+public class AdjustmentStatusChangedHandler implements Handler<InvoiceChange, MachineEvent> {
 
     private final PaymentAdjustmentService paymentAdjustmentService;
 
@@ -30,14 +33,13 @@ public class AdjustmentStatusChangedHandler implements Handler<InvoiceChange, St
     }
 
     @Override
-    public Processor handle(InvoiceChange change, StockEvent parent) {
-        Adjustment adjustment = new Adjustment();
+    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+        AdjustmentData adjustment = new AdjustmentData();
 
-        Event event = parent.getSourceEvent().getProcessingEvent();
-        adjustment.setEventId(event.getId());
-        adjustment.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        adjustment.setEventId(machineEvent.getEventId());
+        adjustment.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         adjustment.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED);
-        adjustment.setInvoiceId(event.getSource().getInvoiceId());
+        adjustment.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
 

@@ -1,7 +1,6 @@
 package com.rbkmoney.magista.config;
 
-import com.rbkmoney.magista.retry.SimpleRetryPolicy;
-import com.rbkmoney.woody.api.flow.error.WRuntimeException;
+import com.rbkmoney.kafka.common.retry.ConfigurableRetryPolicy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +19,7 @@ public class RetryConfig {
     RetryTemplate retryTemplate() {
         RetryTemplate retryTemplate = new RetryTemplate();
         retryTemplate.setRetryPolicy(
-                new SimpleRetryPolicy(maxAttempts, Collections.singletonMap(WRuntimeException.class, true))
+                new ConfigurableRetryPolicy(maxAttempts, Collections.singletonMap(RuntimeException.class, true))
         );
         retryTemplate.setBackOffPolicy(new ExponentialBackOffPolicy());
 
