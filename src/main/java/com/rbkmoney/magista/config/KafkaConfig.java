@@ -3,7 +3,6 @@ package com.rbkmoney.magista.config;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.config.properties.KafkaSslProperties;
 import com.rbkmoney.magista.log.KafkaErrorHandler;
-import com.rbkmoney.magista.retry.SimpleRetryPolicy;
 import com.rbkmoney.magista.serde.MachineEventDeserializer;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -21,12 +20,9 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.ErrorHandler;
-import org.springframework.kafka.listener.LoggingErrorHandler;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -88,7 +84,7 @@ public class KafkaConfig {
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, MachineEvent>> kafkaListenerContainerFactory(
             ConsumerFactory<String, MachineEvent> consumerFactory,
-            RetryTemplate kafkaRetryTemplate
+            RetryTemplate retryTemplate
     ) {
         ConcurrentKafkaListenerContainerFactory<String, MachineEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
@@ -96,19 +92,8 @@ public class KafkaConfig {
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         factory.setErrorHandler(kafkaErrorHandler());
         factory.setConcurrency(concurrency);
-        factory.setRetryTemplate(kafkaRetryTemplate);
+        factory.setRetryTemplate(retryTemplate);
         return factory;
-    }
-
-    @Bean
-    public RetryTemplate kafkaRetryTemplate() {
-        RetryTemplate retryTemplate = new RetryTemplate();
-        retryTemplate.setRetryPolicy(
-                new SimpleRetryPolicy(maxAttempts, Collections.singletonMap(RuntimeException.class, true))
-        );
-        retryTemplate.setBackOffPolicy(new ExponentialBackOffPolicy());
-
-        return retryTemplate;
     }
 
     public ErrorHandler kafkaErrorHandler() {

@@ -66,5 +66,4 @@ public interface SearchDao {
             int limit
     ) throws DaoException;
 
-
 }
