@@ -24,7 +24,9 @@ public class QueryBuilderImpl extends BaseQueryBuilder {
                         new PaymentsCardTypesStatFunction.PaymentsCardTypesStatBuilder(),
                         new CustomersRateStatFunction.CustomersRateStatBuilder(),
                         new PaymentsTurnoverStatFunction.PaymentsTurnoverStatBuilder(),
-                        new PaymentsConversionStatFunction.PaymentsConversionStatBuilder()
+                        new PaymentsConversionStatFunction.PaymentsConversionStatBuilder(),
+                        new EnrichedPaymentsFunction.EnrichedPaymentsBuilder(),
+                        new EnrichedRefundsFunction.EnrichedRefundsBuilder()
                 )
         );
     }

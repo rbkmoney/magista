@@ -50,64 +50,14 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
         );
 
         InvoicePaymentStatus paymentStatus;
-        switch (invoicePaymentStatus) {
-            case pending:
-                paymentStatus = InvoicePaymentStatus.pending(new InvoicePaymentPending());
-                break;
-            case cancelled:
-                InvoicePaymentCancelled invoicePaymentCancelled = new InvoicePaymentCancelled();
-                invoicePaymentCancelled.setAt(eventCreatedAtString);
-                paymentStatus = InvoicePaymentStatus.cancelled(invoicePaymentCancelled);
-                break;
-            case failed:
-                InvoicePaymentFailed invoicePaymentFailed = new InvoicePaymentFailed();
-                invoicePaymentFailed.setAt(eventCreatedAtString);
-                OperationFailure operationFailure = DamselUtil.toOperationFailure(
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_OPERATION_FAILURE_CLASS.getName()), FailureClass.class),
-                        rs.getString(PAYMENT_DATA.PAYMENT_EXTERNAL_FAILURE.getName()),
-                        rs.getString(PAYMENT_DATA.PAYMENT_EXTERNAL_FAILURE_REASON.getName())
-                );
-                invoicePaymentFailed.setFailure(operationFailure);
-                paymentStatus = InvoicePaymentStatus.failed(invoicePaymentFailed);
-                break;
-            case captured:
-                InvoicePaymentCaptured invoicePaymentCaptured = new InvoicePaymentCaptured();
-                invoicePaymentCaptured.setAt(eventCreatedAtString);
-                paymentStatus = InvoicePaymentStatus.captured(invoicePaymentCaptured);
-                break;
-            case refunded:
-                InvoicePaymentRefunded invoicePaymentRefunded = new InvoicePaymentRefunded();
-                invoicePaymentRefunded.setAt(eventCreatedAtString);
-                paymentStatus = InvoicePaymentStatus.refunded(invoicePaymentRefunded);
-                break;
-            case processed:
-                InvoicePaymentProcessed invoicePaymentProcessed = new InvoicePaymentProcessed();
-                invoicePaymentProcessed.setAt(eventCreatedAtString);
-                paymentStatus = InvoicePaymentStatus.processed(invoicePaymentProcessed);
-                break;
-            default:
-                throw new NotFoundException(String.format("Payment status '%s' not found", invoicePaymentStatus.getLiteral()));
-        }
+        paymentStatus = MapperHelper.buildInvoicePaymentStatus(rs, eventCreatedAtString, invoicePaymentStatus);
         statPayment.setStatus(paymentStatus);
-        statPayment.setPayer(buildPayer(rs));
+        statPayment.setPayer(MapperHelper.buildPayer(rs));
 
         PaymentFlow paymentFlow = TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_FLOW.getName()), PaymentFlow.class);
-        switch (paymentFlow) {
-            case hold:
-                InvoicePaymentFlowHold invoicePaymentFlowHold = new InvoicePaymentFlowHold(
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_HOLD_ON_EXPIRATION.getName()), OnHoldExpiration.class),
-                        TypeUtil.temporalToString(
-                                rs.getObject(PAYMENT_DATA.PAYMENT_HOLD_UNTIL.getName(), LocalDateTime.class)
-                        )
-                );
-                statPayment.setFlow(InvoicePaymentFlow.hold(invoicePaymentFlowHold));
-                break;
-            case instant:
-                statPayment.setFlow(InvoicePaymentFlow.instant(new InvoicePaymentFlowInstant()));
-                break;
-            default:
-                throw new NotFoundException(String.format("Payment flow '%s' not found", paymentFlow.getLiteral()));
-        }
+
+        MapperHelper.buildStatPaymentFlow(rs, statPayment, paymentFlow);
+
         statPayment.setMakeRecurrent(rs.getBoolean(PAYMENT_DATA.PAYMENT_MAKE_RECURRENT_FLAG.getName()));
 
         statPayment.setShortId(rs.getString(PAYMENT_DATA.PAYMENT_SHORT_ID.getName()));
@@ -125,79 +75,5 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
         return new AbstractMap.SimpleEntry<>(rs.getLong(PAYMENT_DATA.ID.getName()), statPayment);
     }
 
-    private Payer buildPayer(ResultSet rs) throws SQLException {
-        PaymentPayerType paymentPayerType = TypeUtil.toEnumField(
-                rs.getString(PAYMENT_DATA.PAYMENT_PAYER_TYPE.getName()),
-                PaymentPayerType.class
-        );
 
-        switch (paymentPayerType) {
-            case payment_resource:
-                PaymentResourcePayer paymentResourcePayer = new PaymentResourcePayer();
-                paymentResourcePayer.setIpAddress(rs.getString(PAYMENT_DATA.PAYMENT_IP.getName()));
-                paymentResourcePayer.setFingerprint(rs.getString(PAYMENT_DATA.PAYMENT_FINGERPRINT.getName()));
-                paymentResourcePayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
-                paymentResourcePayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
-                paymentResourcePayer.setSessionId(rs.getString(PAYMENT_DATA.PAYMENT_SESSION_ID.getName()));
-
-                paymentResourcePayer.setPaymentTool(buildPaymentTool(rs));
-                return Payer.payment_resource(paymentResourcePayer);
-            case customer:
-                CustomerPayer customerPayer = new CustomerPayer();
-                customerPayer.setCustomerId(rs.getString(PAYMENT_DATA.PAYMENT_CUSTOMER_ID.getName()));
-                customerPayer.setPaymentTool(buildPaymentTool(rs));
-                customerPayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
-                customerPayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
-                return Payer.customer(customerPayer);
-            case recurrent:
-                RecurrentPayer recurrentPayer = new RecurrentPayer();
-                recurrentPayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
-                recurrentPayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
-
-                recurrentPayer.setPaymentTool(buildPaymentTool(rs));
-
-                RecurrentParentPayment recurrentParentPayment = new RecurrentParentPayment();
-                recurrentParentPayment.setInvoiceId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_INVOICE_ID.getName()));
-                recurrentParentPayment.setPaymentId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_PAYMENT_ID.getName()));
-                recurrentPayer.setRecurrentParent(recurrentParentPayment);
-
-                return Payer.recurrent(recurrentPayer);
-            default:
-                throw new NotFoundException(String.format("Payment type '%s' not found", paymentPayerType));
-        }
-    }
-
-    private PaymentTool buildPaymentTool(ResultSet rs) throws SQLException {
-        com.rbkmoney.magista.domain.enums.PaymentTool paymentToolType = TypeUtil.toEnumField(
-                rs.getString(PAYMENT_DATA.PAYMENT_TOOL.getName()),
-                com.rbkmoney.magista.domain.enums.PaymentTool.class
-        );
-
-        switch (paymentToolType) {
-            case bank_card:
-                BankCard bankCard = new BankCard(
-                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN.getName()),
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()), BankCardPaymentSystem.class),
-                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_BIN.getName()),
-                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_MASKED_PAN.getName())
-                );
-                bankCard.setTokenProvider(
-                        Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()))
-                                .map(bankCardTokenProvider -> TypeUtil.toEnumField(bankCardTokenProvider, BankCardTokenProvider.class))
-                                .orElse(null)
-                );
-                return PaymentTool.bank_card(bankCard);
-            case payment_terminal:
-                return PaymentTool.payment_terminal(new PaymentTerminal(
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER.getName()), TerminalPaymentProvider.class)
-                ));
-            case digital_wallet:
-                return PaymentTool.digital_wallet(new DigitalWallet(
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()), DigitalWalletProvider.class),
-                        rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_ID.getName())
-                ));
-            default:
-                throw new NotFoundException(String.format("Payment tool '%s' not found", paymentToolType));
-        }
-    }
 }
