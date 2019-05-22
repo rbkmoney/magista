@@ -36,6 +36,19 @@ public class QueryBuilderImplTest {
         fail("no functions in oot query, should not reach this point");
     }
 
+    @Test
+    public void testEnrichedFunctionsParse() {
+        String json = "{'query': {'enriched_payments': {'from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
+        Query query = buildQuery(json);
+        assertTrue(query instanceof RootQuery);
+        query.getDescriptor();
+
+        json = "{'query': {'enriched_refunds': {'from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
+        query = buildQuery(json);
+        assertTrue(query instanceof RootQuery);
+        query.getDescriptor();
+    }
+
     Query buildQuery(String json) {
         List<QueryPart> queryParts = parser.parseQuery(json);
         return builder.buildQuery(queryParts, null, null, null);
