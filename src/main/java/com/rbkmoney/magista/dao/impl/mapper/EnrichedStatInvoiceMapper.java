@@ -2,6 +2,7 @@ package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.merch_stat.EnrichedStatInvoice;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.util.StringUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,6 +10,8 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 
 public class EnrichedStatInvoiceMapper implements RowMapper<Map.Entry<Long, EnrichedStatInvoice>> {
 
@@ -27,8 +30,10 @@ public class EnrichedStatInvoiceMapper implements RowMapper<Map.Entry<Long, Enri
         return new AbstractMap.SimpleEntry<>(0L,
                 new EnrichedStatInvoice(
                         statInvoiceMapper.mapRow(resultSet, i).getValue(),
-                        new ArrayList<>(List.of(statPaymentMapper.mapRow(resultSet, i).getValue())),
-                        new ArrayList<>(List.of(statRefundMapper.mapRow(resultSet, i).getValue()))
+                        List.of(statPaymentMapper.mapRow(resultSet, i).getValue()),
+                        StringUtils.isEmpty(resultSet.getString(REFUND_DATA.REFUND_ID.getName())) ?
+                                List.of() :
+                                List.of(statRefundMapper.mapRow(resultSet, i).getValue())
                 ));
     }
 

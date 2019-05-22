@@ -267,7 +267,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         Query query = getDslContext()
                 .select()
                 .from(PAYMENT_DATA
-                        .join(REFUND_DATA).on(REFUND_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID))
+                        .leftJoin(REFUND_DATA).on(REFUND_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID))
                         .join(INVOICE_DATA).on(INVOICE_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID))
                 )
                 .where(
