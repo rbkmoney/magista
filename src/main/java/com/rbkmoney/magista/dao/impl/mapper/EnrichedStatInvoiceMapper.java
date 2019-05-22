@@ -1,13 +1,13 @@
 package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.merch_stat.EnrichedStatInvoice;
-import com.sun.tools.javac.util.List;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class EnrichedStatInvoiceMapper implements RowMapper<Map.Entry<Long, EnrichedStatInvoice>> {
