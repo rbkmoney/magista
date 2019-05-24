@@ -2,9 +2,9 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.damsel.base.InvalidRequest;
 import com.rbkmoney.damsel.merch_stat.BadToken;
-import com.rbkmoney.damsel.merch_stat.MerchantStatisticsSrv.Iface;
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.magista.endpoint.StatisticsServletIface;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.QueryProcessor;
 import org.apache.thrift.TException;
@@ -16,7 +16,7 @@ import java.util.Arrays;
 /**
  * Created by vpankrashkin on 09.08.16.
  */
-public class MerchantStatisticsHandler implements Iface {
+public class MerchantStatisticsHandler implements StatisticsServletIface {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private QueryProcessor<StatRequest, StatResponse> queryProcessor;
@@ -64,4 +64,8 @@ public class MerchantStatisticsHandler implements Iface {
         }
     }
 
+    @Override
+    public StatResponse getByQuery(StatRequest statRequest) throws TException {
+        return getStatResponse(statRequest);
+    }
 }

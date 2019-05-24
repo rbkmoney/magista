@@ -2,9 +2,9 @@ package com.rbkmoney.magista.config;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rbkmoney.damsel.merch_stat.MerchantStatisticsSrv;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.StatisticsDao;
+import com.rbkmoney.magista.endpoint.StatisticsServletIface;
 import com.rbkmoney.magista.query.impl.QueryContextFactoryImpl;
 import com.rbkmoney.magista.query.impl.QueryProcessorImpl;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
 public class HandlerConfig {
 
     @Bean
-    public MerchantStatisticsSrv.Iface merchantStatisticsHandler(
+    public StatisticsServletIface statisticsHandler(
             StatisticsDao statisticsDao,
             SearchDao searchDao
     ) {

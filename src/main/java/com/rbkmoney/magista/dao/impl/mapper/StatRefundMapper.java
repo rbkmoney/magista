@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Map;
 
+import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 
 public class StatRefundMapper implements RowMapper<Map.Entry<Long, StatRefund>> {
