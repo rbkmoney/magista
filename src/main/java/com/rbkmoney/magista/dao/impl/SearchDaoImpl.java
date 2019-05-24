@@ -244,18 +244,17 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     }
 
     @Override
-    public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(RefundsFunction.RefundsParameters parameters, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<Long> fromId, Optional<Integer> offset, int limit) throws DaoException {
+    public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(RefundsFunction.RefundsParameters parameters, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<Integer> fromId, int limit) throws DaoException {
         Condition conditions = prepareRefundCondition(parameters, fromTime, toTime);
 
         Query query = getDslContext()
                 .selectFrom(REFUND_DATA
-                        .join(PAYMENT_DATA).on(PAYMENT_DATA.INVOICE_ID.eq(REFUND_DATA.INVOICE_ID))
+                        .join(PAYMENT_DATA).on(PAYMENT_DATA.INVOICE_ID.eq(REFUND_DATA.INVOICE_ID), PAYMENT_DATA.PAYMENT_ID.eq(REFUND_DATA.PAYMENT_ID))
                         .join(INVOICE_DATA).on(INVOICE_DATA.INVOICE_ID.eq(REFUND_DATA.INVOICE_ID))
                 )
                 .where(conditions)
                 .orderBy(REFUND_DATA.REFUND_CREATED_AT.desc())
-                .limit(limit)
-                .offset(offset.orElse(0));
+                .limit(limit);
 
         return fetch(query, enrichedStatInvoiceMapper);
     }
@@ -267,7 +266,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         Query query = getDslContext()
                 .select()
                 .from(PAYMENT_DATA
-                        .leftJoin(REFUND_DATA).on(REFUND_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID))
+                        .leftJoin(REFUND_DATA).on(REFUND_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID), REFUND_DATA.PAYMENT_ID.eq(PAYMENT_DATA.PAYMENT_ID))
                         .join(INVOICE_DATA).on(INVOICE_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID))
                 )
                 .where(
@@ -277,7 +276,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                 fromTime,
                                 toTime
                         )
-                ).orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
+                )
+                .orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
                 .limit(limit);
 
         return fetch(query, enrichedStatInvoiceMapper);

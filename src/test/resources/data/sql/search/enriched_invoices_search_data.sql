@@ -39,4 +39,8 @@ insert into mst.refund_data (event_id, event_created_at, event_type, invoice_id,
 VALUES (12, now(), 'INVOICE_PAYMENT_REFUND_CREATED', 'INVOICE_NEW_ID_1', 'PAYMENT_ID_1', 'REFUND_ID_1', 'A25B27EE-BE91-4977-9DB5-CCF52CC83741', 'SHOP_ID', 'succeeded', null, null, null, now(), 'test', 'RUB', 50000, 50000,  55, 5, 0);
 
 insert into mst.refund_data (event_id, event_created_at, event_type, invoice_id, payment_id, refund_id, party_id, party_shop_id, refund_status, refund_operation_failure_class, refund_external_failure, refund_external_failure_reason, refund_created_at, refund_reason, refund_currency_code, refund_amount, refund_fee, refund_provider_fee, refund_external_fee, refund_domain_revision)
-VALUES (13, now(), 'INVOICE_PAYMENT_REFUND_CREATED', 'INVOICE_ID_1', 'PAYMENT_ID_1', 'REFUND_ID_1', 'A25B27EE-BE91-4977-9DB5-CCF52CC83741', 'SHOP_ID', 'succeeded', null, null, null, now(), 'test', 'RUB', 50000, 50000,  55, 5, 0);
+VALUES (13, now(), 'INVOICE_PAYMENT_REFUND_CREATED', 'INVOICE_ID_1', 'PAYMENT_ID_1', 'REFUND_ID_1', 'A25B27EE-BE91-4977-9DB5-CCF52CC83741', 'SHOP_ID', 'failed', 'failure', 'lol', 'kek', now(), 'test', 'RUB', 50000, 50000,  55, 5, 0);
+
+insert into mst.refund_data (event_id, event_created_at, event_type, invoice_id, payment_id, refund_id, party_id, party_shop_id, refund_status, refund_operation_failure_class, refund_external_failure, refund_external_failure_reason, refund_created_at, refund_reason, refund_currency_code, refund_amount, refund_fee, refund_provider_fee, refund_external_fee, refund_domain_revision)
+VALUES (14, now(), 'INVOICE_PAYMENT_REFUND_CREATED', 'INVOICE_ID_1', 'PAYMENT_ID_1', 'REFUND_ID_2', 'A25B27EE-BE91-4977-9DB5-CCF52CC83741', 'SHOP_ID', 'succeeded', null, null, null, now(), 'test', 'RUB', 50000, 50000,  55, 5, 0);
+

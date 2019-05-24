@@ -53,8 +53,7 @@ public interface SearchDao {
             RefundsFunction.RefundsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
-            Optional<Integer> offset,
+            Optional<Integer> fromId,
             int limit
     ) throws DaoException;
 

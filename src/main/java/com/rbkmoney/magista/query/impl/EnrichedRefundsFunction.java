@@ -144,7 +144,7 @@ public class EnrichedRefundsFunction extends PagedBaseFunction<Map.Entry<Long, E
         return refundsFunction;
     }
 
-    private static class GetDataFunction extends PagedBaseFunction<Map.Entry<Long, StatRefund>, Collection<Map.Entry<Long, StatRefund>>> {
+    private static class GetDataFunction extends PagedBaseFunction<Map.Entry<Long, EnrichedStatInvoice>, Collection<Map.Entry<Long, EnrichedStatInvoice>>> {
         private static final String FUNC_NAME = EnrichedRefundsFunction.FUNC_NAME + "_data";
 
         public GetDataFunction(Object descriptor, QueryParameters params, String continuationToken) {
@@ -152,15 +152,14 @@ public class EnrichedRefundsFunction extends PagedBaseFunction<Map.Entry<Long, E
         }
 
         @Override
-        public QueryResult<Map.Entry<Long, StatRefund>, Collection<Map.Entry<Long, StatRefund>>> execute(QueryContext context) throws QueryExecutionException {
+        public QueryResult<Map.Entry<Long, EnrichedStatInvoice>, Collection<Map.Entry<Long, EnrichedStatInvoice>>> execute(QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
             RefundsFunction.RefundsParameters parameters = new RefundsFunction.RefundsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
-                Collection<Map.Entry<Long, StatRefund>> result = functionContext.getSearchDao().getRefunds(
+                Collection<Map.Entry<Long, EnrichedStatInvoice>> result = functionContext.getSearchDao().getEnrichedInvoices(
                         parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
-                        Optional.empty(),
                         Optional.ofNullable(parameters.getFrom()),
                         parameters.getSize()
                 );
