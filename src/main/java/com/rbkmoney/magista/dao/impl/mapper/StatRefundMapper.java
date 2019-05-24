@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Map;
 
+import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 
 public class StatRefundMapper implements RowMapper<Map.Entry<Long, StatRefund>> {
@@ -27,35 +28,12 @@ public class StatRefundMapper implements RowMapper<Map.Entry<Long, StatRefund>> 
         statRefund.setOwnerId(rs.getString(REFUND_DATA.PARTY_ID.getName()));
         statRefund.setShopId(rs.getString(REFUND_DATA.PARTY_SHOP_ID.getName()));
         statRefund.setCurrencySymbolicCode(rs.getString(REFUND_DATA.REFUND_CURRENCY_CODE.getName()));
-        statRefund.setStatus(toRefundStatus(rs));
+        statRefund.setStatus(MapperHelper.toRefundStatus(rs));
         statRefund.setAmount(rs.getLong(REFUND_DATA.REFUND_AMOUNT.getName()));
         statRefund.setFee(rs.getLong(REFUND_DATA.REFUND_FEE.getName()));
         statRefund.setReason(rs.getString(REFUND_DATA.REFUND_REASON.getName()));
         statRefund.setCreatedAt(TypeUtil.temporalToString(rs.getObject(REFUND_DATA.REFUND_CREATED_AT.getName(), LocalDateTime.class)));
-        return new AbstractMap.SimpleEntry<>(0L, statRefund);
-    }
-
-    private InvoicePaymentRefundStatus toRefundStatus(ResultSet rs) throws SQLException {
-        RefundStatus refundStatus = TypeUtil.toEnumField(rs.getString(REFUND_DATA.REFUND_STATUS.getName()), RefundStatus.class);
-        switch (refundStatus) {
-            case pending:
-                return InvoicePaymentRefundStatus.pending(new InvoicePaymentRefundPending());
-            case succeeded:
-                return InvoicePaymentRefundStatus.succeeded(new InvoicePaymentRefundSucceeded(
-                        TypeUtil.temporalToString(rs.getObject(REFUND_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class))
-                ));
-            case failed:
-                return InvoicePaymentRefundStatus.failed(new InvoicePaymentRefundFailed(
-                        DamselUtil.toOperationFailure(
-                                TypeUtil.toEnumField(rs.getString(REFUND_DATA.REFUND_OPERATION_FAILURE_CLASS.getName()), FailureClass.class),
-                                rs.getString(REFUND_DATA.REFUND_EXTERNAL_FAILURE.getName()),
-                                rs.getString(REFUND_DATA.REFUND_EXTERNAL_FAILURE_REASON.getName())
-                        ),
-                        TypeUtil.temporalToString(rs.getObject(REFUND_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class))
-                ));
-            default:
-                throw new NotFoundException(String.format("Refund status '%s' not found", refundStatus));
-        }
+        return new AbstractMap.SimpleEntry<>(rs.getLong(REFUND_DATA.ID.getName()), statRefund);
     }
 
 }

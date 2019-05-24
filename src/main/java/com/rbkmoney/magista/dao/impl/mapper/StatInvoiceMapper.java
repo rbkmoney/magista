@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Map;
 
+import static com.rbkmoney.magista.dao.impl.mapper.MapperHelper.mapInvoiceStatus;
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 
 public class StatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>> {
@@ -49,31 +50,7 @@ public class StatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>
                 rs.getObject(INVOICE_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class)
         );
 
-        InvoiceStatus invoiceStatus;
-        switch (invoiceStatusType) {
-            case cancelled:
-                InvoiceCancelled invoiceCancelled = new InvoiceCancelled();
-                invoiceCancelled.setDetails(rs.getString(INVOICE_DATA.INVOICE_STATUS_DETAILS.getName()));
-                invoiceCancelled.setAt(eventCreatedAtString);
-                invoiceStatus = InvoiceStatus.cancelled(invoiceCancelled);
-                break;
-            case unpaid:
-                invoiceStatus = InvoiceStatus.unpaid(new InvoiceUnpaid());
-                break;
-            case paid:
-                InvoicePaid invoicePaid = new InvoicePaid();
-                invoicePaid.setAt(eventCreatedAtString);
-                invoiceStatus = InvoiceStatus.paid(invoicePaid);
-                break;
-            case fulfilled:
-                InvoiceFulfilled invoiceFulfilled = new InvoiceFulfilled();
-                invoiceFulfilled.setAt(eventCreatedAtString);
-                invoiceFulfilled.setDetails(rs.getString(INVOICE_DATA.INVOICE_STATUS_DETAILS.getName()));
-                invoiceStatus = InvoiceStatus.fulfilled(invoiceFulfilled);
-                break;
-            default:
-                throw new NotFoundException(String.format("Invoice status '%s' not found", invoiceStatusType.getLiteral()));
-        }
+        InvoiceStatus invoiceStatus = MapperHelper.mapInvoiceStatus(rs, invoiceStatusType, eventCreatedAtString);
         statInvoice.setStatus(invoiceStatus);
 
         String invoiceCartJson = rs.getString(INVOICE_DATA.INVOICE_CART_JSON.getName());

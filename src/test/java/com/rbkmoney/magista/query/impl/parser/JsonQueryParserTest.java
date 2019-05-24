@@ -111,6 +111,51 @@ public class JsonQueryParserTest {
     }
 
     @Test
+    public void testEnrichedPaymentsParseWithPagination() {
+        String json = "{'query': {'enriched_payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'payment_last_digits':'1212','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}, 'size':'2', 'from':'1'}}";
+        List<QueryPart> queryParts = parser.parseQuery(json);
+        assertEquals("root query", 1, queryParts.size());
+        assertEquals("root query has 3 parameters - function name, pagination", 3, queryParts.get(0).getParameters().getParametersMap().size());
+        assertEquals("child payments function", 1, queryParts.get(0).getChildren().size());
+        assertEquals("payments function has no children", 0, queryParts.get(0).getChildren().get(0).getChildren().size());
+        assertEquals("payments function has 7 parameters", 7, queryParts.get(0).getChildren().get(0).getParameters().getParametersMap().size());
+
+        assertEquals(RootQuery.RootParser.getMainDescriptor(), queryParts.get(0).getDescriptor());
+        assertEquals(queryParts.get(0).getChildren().get(0).getDescriptor(), EnrichedPaymentsFunction.EnrichedPaymentsParser.getMainDescriptor());
+
+        PaymentsFunction.PaymentsParameters parameters = (PaymentsFunction.PaymentsParameters) queryParts.get(0).getChildren().get(0).getParameters();
+        assertEquals("1", parameters.getMerchantId());
+        assertEquals("2", parameters.getShopId());
+        assertEquals("A", parameters.getInvoiceId());
+        assertEquals("B", parameters.getPaymentId());
+        assertEquals("1212", parameters.getPaymentBankCardLastDigits());
+        assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
+        assertEquals("2016-03-22T01:12:00Z", TypeUtil.temporalToString(parameters.getToTime()));
+        assertEquals(new Integer(2), parameters.getSize());
+        assertEquals(new Integer(1), parameters.getFrom());
+
+    }
+
+    @Test
+    public void testEnrichedRefundsParseWithPagination() {
+        String json = "{'query': {'enriched_refunds': {'from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
+        List<QueryPart> queryParts = parser.parseQuery(json);
+        assertEquals("root query", 1, queryParts.size());
+        assertEquals("root query has 1 parameters - function name", 1, queryParts.get(0).getParameters().getParametersMap().size());
+        assertEquals("child refunds function", 1, queryParts.get(0).getChildren().size());
+        assertEquals("refunds function has no children", 0, queryParts.get(0).getChildren().get(0).getChildren().size());
+        assertEquals("refunds function has 2 parameters", 2, queryParts.get(0).getChildren().get(0).getParameters().getParametersMap().size());
+
+        assertEquals(RootQuery.RootParser.getMainDescriptor(), queryParts.get(0).getDescriptor());
+        assertEquals(queryParts.get(0).getChildren().get(0).getDescriptor(), EnrichedRefundsFunction.EnrichedRefundsParser.getMainDescriptor());
+
+        RefundsFunction.RefundsParameters parameters = (RefundsFunction.RefundsParameters) queryParts.get(0).getChildren().get(0).getParameters();
+        assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
+        assertEquals("2016-03-22T01:12:00Z", TypeUtil.temporalToString(parameters.getToTime()));
+
+    }
+
+    @Test
     public void testInvoicesParse() {
         String json = "{'query': {'invoices': {'merchant_id': '1','shop_id': '2','invoice_id':'A','invoice_status':'paid','from_time': '2016-03-22T00:12:00Z'}}}";
         List<QueryPart> queryParts = parser.parseQuery(json);
