@@ -32,7 +32,7 @@ public class StatRefundMapper implements RowMapper<Map.Entry<Long, StatRefund>> 
         statRefund.setFee(rs.getLong(REFUND_DATA.REFUND_FEE.getName()));
         statRefund.setReason(rs.getString(REFUND_DATA.REFUND_REASON.getName()));
         statRefund.setCreatedAt(TypeUtil.temporalToString(rs.getObject(REFUND_DATA.REFUND_CREATED_AT.getName(), LocalDateTime.class)));
-        return new AbstractMap.SimpleEntry<>(0L, statRefund);
+        return new AbstractMap.SimpleEntry<>(rs.getLong(REFUND_DATA.ID.getName()), statRefund);
     }
 
 }

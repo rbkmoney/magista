@@ -33,7 +33,7 @@ public class StatPayoutMapper implements RowMapper<Map.Entry<Long, StatPayout>> 
         statPayout.setType(MapperHelper.toPayoutType(rs));
         statPayout.setSummary(MapperHelper.toPayoutSummary(rs, objectMapper));
 
-        return new AbstractMap.SimpleEntry<>(0L, statPayout);
+        return new AbstractMap.SimpleEntry<>(rs.getLong(PAYOUT_DATA.ID.getName()), statPayout);
     }
 
 }
