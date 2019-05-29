@@ -5,6 +5,7 @@ import com.rbkmoney.damsel.payout_processing.Event;
 import com.rbkmoney.damsel.payout_processing.PayoutChange;
 import com.rbkmoney.eventstock.client.poll.DefaultPollingEventPublisherBuilder;
 import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.event.PayoutHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,7 @@ public class PayoutEventFlow extends AbstractEventFlow {
         Event event = stockEvent.getSourceEvent().getPayoutEvent();
         if (event.getPayload().isSetPayoutChanges()) {
             for (PayoutChange payoutChange : event.getPayload().getPayoutChanges()) {
-                Handler handler = getHandler(payoutChange);
+                PayoutHandler handler = (PayoutHandler) getHandler(payoutChange);
                 if (handler != null) {
                     log.info("Start payout event handling, id='{}', eventType='{}', handlerType='{}'",
                             stockEvent.getSourceEvent().getPayoutEvent().getId(), handler.getChangeType(), handler.getClass().getSimpleName());

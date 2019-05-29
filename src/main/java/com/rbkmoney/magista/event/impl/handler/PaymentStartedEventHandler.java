@@ -15,9 +15,11 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
 import com.rbkmoney.magista.domain.enums.*;
+import com.rbkmoney.magista.domain.tables.InvoiceData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.event.PaymentHandler;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.provider.GeoProvider;
@@ -25,6 +27,7 @@ import com.rbkmoney.magista.provider.ProviderException;
 import com.rbkmoney.magista.service.PaymentService;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,20 +37,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-public class PaymentStartedEventHandler implements Handler<InvoiceChange, MachineEvent> {
-
-    private final PaymentService paymentService;
+@RequiredArgsConstructor
+public class PaymentStartedEventHandler implements PaymentHandler {
 
     private final GeoProvider geoProvider;
 
-    @Autowired
-    public PaymentStartedEventHandler(PaymentService paymentService, GeoProvider geoProvider) {
-        this.paymentService = paymentService;
-        this.geoProvider = geoProvider;
-    }
-
     @Override
-    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+    public PaymentData handle(InvoiceChange change, MachineEvent machineEvent) {
 
         String invoiceId = machineEvent.getSourceId();
 
@@ -183,7 +179,7 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, Machin
             paymentData.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
         }
 
-        return () -> paymentService.savePayment(paymentData);
+        return paymentData;
     }
 
     private void mapPaymentTool(PaymentData paymentData, PaymentTool paymentTool) {

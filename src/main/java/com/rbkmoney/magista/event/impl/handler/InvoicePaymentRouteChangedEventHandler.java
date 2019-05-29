@@ -8,24 +8,14 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.Handler;
-import com.rbkmoney.magista.event.Processor;
-import com.rbkmoney.magista.service.PaymentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.rbkmoney.magista.event.PaymentHandler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InvoicePaymentRouteChangedEventHandler implements Handler<InvoiceChange, MachineEvent> {
-
-    private final PaymentService paymentService;
-
-    @Autowired
-    public InvoicePaymentRouteChangedEventHandler(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
+public class InvoicePaymentRouteChangedEventHandler implements PaymentHandler {
 
     @Override
-    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+    public PaymentData handle(InvoiceChange change, MachineEvent machineEvent) {
         PaymentData paymentData = new PaymentData();
         paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_ROUTE_CHANGED);
         paymentData.setEventId(machineEvent.getEventId());
@@ -42,7 +32,7 @@ public class InvoicePaymentRouteChangedEventHandler implements Handler<InvoiceCh
         paymentData.setPaymentProviderId(paymentRoute.getProvider().getId());
         paymentData.setPaymentTerminalId(paymentRoute.getTerminal().getId());
 
-        return () -> paymentService.savePayment(paymentData);
+        return paymentData;
     }
 
     @Override

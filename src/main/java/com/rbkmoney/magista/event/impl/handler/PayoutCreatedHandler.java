@@ -5,6 +5,7 @@ import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payout_processing.*;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.PayoutAccountType;
 import com.rbkmoney.magista.domain.enums.PayoutEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
@@ -12,6 +13,7 @@ import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.event.PayoutHandler;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.service.PayoutService;
 import com.rbkmoney.magista.util.DamselUtil;
@@ -23,7 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-public class PayoutCreatedHandler implements Handler<PayoutChange, StockEvent> {
+public class PayoutCreatedHandler implements PayoutHandler {
 
     private final PayoutService payoutEventService;
 
@@ -135,7 +137,7 @@ public class PayoutCreatedHandler implements Handler<PayoutChange, StockEvent> {
             payoutData.setPayoutCurrencyCode(payout.getCurrency().getSymbolicCode());
 
             payoutData.setPartyId(payout.getPartyId());
-            payoutData.setPartyShopId(payout.getShopId());
+            payoutData.setPartyShopId (payout.getShopId());
 
             if (payout.isSetSummary()) {
                 List<PayoutSummaryItem> payoutSummaryItems = payout.getSummary().stream()

@@ -9,25 +9,15 @@ import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.Handler;
-import com.rbkmoney.magista.event.Processor;
-import com.rbkmoney.magista.service.InvoiceService;
+import com.rbkmoney.magista.event.InvoiceHandler;
 import com.rbkmoney.magista.util.DamselUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InvoiceStatusChangedEventHandler implements Handler<InvoiceChange, MachineEvent> {
-
-    private final InvoiceService invoiceService;
-
-    @Autowired
-    public InvoiceStatusChangedEventHandler(InvoiceService invoiceService) {
-        this.invoiceService = invoiceService;
-    }
+public class InvoiceStatusChangedEventHandler implements InvoiceHandler {
 
     @Override
-    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+    public InvoiceData handle(InvoiceChange change, MachineEvent machineEvent) {
         InvoiceData invoiceData = new InvoiceData();
         invoiceData.setEventType(InvoiceEventType.INVOICE_STATUS_CHANGED);
         invoiceData.setEventId(machineEvent.getEventId());
@@ -42,7 +32,7 @@ public class InvoiceStatusChangedEventHandler implements Handler<InvoiceChange, 
                 DamselUtil.getInvoiceStatusDetails(invoiceStatusChanged.getStatus())
         );
 
-        return () -> invoiceService.saveInvoice(invoiceData);
+        return invoiceData;
     }
 
     @Override

@@ -11,12 +11,13 @@ import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.event.PayoutHandler;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.service.PayoutService;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PayoutStatusChangedHandler implements Handler<PayoutChange, StockEvent> {
+public class PayoutStatusChangedHandler implements PayoutHandler {
 
     private final PayoutService payoutEventService;
 

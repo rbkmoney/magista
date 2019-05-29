@@ -10,29 +10,19 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
+import com.rbkmoney.magista.event.AdjustmentHandler;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.Handler;
-import com.rbkmoney.magista.event.Processor;
-import com.rbkmoney.magista.service.PaymentAdjustmentService;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
-public class AdjustmentCreatedHandler implements Handler<InvoiceChange, MachineEvent> {
-
-    private final PaymentAdjustmentService paymentAdjustmentService;
-
-    @Autowired
-    public AdjustmentCreatedHandler(PaymentAdjustmentService paymentAdjustmentService) {
-        this.paymentAdjustmentService = paymentAdjustmentService;
-    }
+public class AdjustmentCreatedHandler implements AdjustmentHandler {
 
     @Override
-    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+    public AdjustmentData handle(InvoiceChange change, MachineEvent machineEvent) {
         AdjustmentData adjustmentData = new AdjustmentData();
 
         adjustmentData.setEventId(machineEvent.getEventId());
@@ -72,7 +62,7 @@ public class AdjustmentCreatedHandler implements Handler<InvoiceChange, MachineE
         adjustmentData.setAdjustmentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
         adjustmentData.setAdjustmentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
 
-        return () -> paymentAdjustmentService.savePaymentAdjustment(adjustmentData);
+        return adjustmentData;
     }
 
     @Override

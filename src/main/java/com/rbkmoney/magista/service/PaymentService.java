@@ -9,6 +9,7 @@ import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.util.BeanUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +17,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class PaymentService {
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final InvoiceService invoiceService;
 
@@ -55,28 +57,32 @@ public class PaymentService {
         );
     }
 
-    public void savePayment(PaymentData paymentData) throws NotFoundException, StorageException {
-        log.info("Trying to save payment, paymentData='{}'", paymentData);
-        try {
-            switch (paymentData.getEventType()) {
-                case INVOICE_PAYMENT_STARTED:
-                    if (paymentData.getPartyId() == null) {
-                        InvoiceData invoiceData = invoiceService.getInvoiceData(paymentData.getInvoiceId());
-                        paymentData.setPartyId(invoiceData.getPartyId());
-                        paymentData.setPartyShopId(invoiceData.getPartyShopId());
-                    }
-                    break;
-                default:
-                    PaymentData previousPaymentData = getPaymentData(paymentData.getInvoiceId(), paymentData.getPaymentId());
-                    BeanUtil.merge(previousPaymentData, paymentData);
-                    break;
-            }
-            paymentDao.save(paymentData);
-            paymentDataCache.put(new AbstractMap.SimpleEntry<>(paymentData.getInvoiceId(), paymentData.getPaymentId()), paymentData);
+    public void savePayments(List<PaymentData> paymentEvents) throws NotFoundException, StorageException {
+        log.info("Trying to save payment events, size={}", paymentEvents.size());
 
-            log.info("Payment have been saved, paymentData='{}'", paymentData);
+        List<PaymentData> enrichedPaymentEvents = paymentEvents.stream()
+                .map(payment -> {
+                    switch (payment.getEventType()) {
+                        case INVOICE_PAYMENT_STARTED:
+                            if (payment.getPartyId() == null) {
+                                InvoiceData invoiceData = invoiceService.getInvoiceData(payment.getInvoiceId());
+                                payment.setPartyId(invoiceData.getPartyId());
+                                payment.setPartyShopId(invoiceData.getPartyShopId());
+                            }
+                            return payment;
+                        default:
+                            PaymentData previousPaymentData = getPaymentData(payment.getInvoiceId(), payment.getPaymentId());
+                            BeanUtil.merge(previousPaymentData, payment);
+                            return payment;
+                    }
+                })
+                .peek(payment -> paymentDataCache.put(new AbstractMap.SimpleEntry<>(payment.getInvoiceId(), payment.getPaymentId()), payment))
+                .collect(Collectors.toList());
+        try {
+            paymentDao.save(enrichedPaymentEvents);
+            log.info("Refund event have been saved, size='{}'", enrichedPaymentEvents.size());
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save payment, paymentData='%s'", paymentData), ex);
+            throw new StorageException(String.format("Failed to save payment events, size=%d", paymentEvents.size()), ex);
         }
     }
 

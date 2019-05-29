@@ -11,6 +11,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.rbkmoney.magista.domain.Tables.INVOICE_DATA;
 
@@ -33,14 +35,26 @@ public class InvoiceDaoImpl extends AbstractDao implements InvoiceDao {
     }
 
     @Override
-    public void save(InvoiceData invoiceData) throws DaoException {
-        InvoiceDataRecord invoiceDataRecord = getDslContext().newRecord(INVOICE_DATA, invoiceData);
-        Query query = getDslContext().insertInto(INVOICE_DATA)
-                .set(invoiceDataRecord)
-                .onConflict(INVOICE_DATA.INVOICE_ID)
-                .doUpdate()
-                .set(invoiceDataRecord);
-        executeOne(query);
+    public void save(List<InvoiceData> invoices) throws DaoException {
+        List<Query> queries = invoices.stream()
+                .map(
+                        paymentData -> {
+                            InvoiceDataRecord invoiceDataRecord = getDslContext().newRecord(INVOICE_DATA, paymentData);
+                            invoiceDataRecord.changed(true);
+                            invoiceDataRecord.changed(INVOICE_DATA.ID, invoiceDataRecord.getId() != null);
+                            return invoiceDataRecord;
+                        }
+                )
+                .map(
+                        invoiceDataRecord ->
+                                getDslContext().insertInto(INVOICE_DATA)
+                                        .set(invoiceDataRecord)
+                                        .onConflict(INVOICE_DATA.INVOICE_ID)
+                                        .doUpdate()
+                                        .set(invoiceDataRecord)
+                )
+                .collect(Collectors.toList());
+        batchExecute(queries, 1);
     }
 
 }

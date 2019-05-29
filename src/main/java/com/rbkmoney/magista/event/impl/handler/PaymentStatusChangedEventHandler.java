@@ -17,23 +17,17 @@ import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.event.PaymentHandler;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PaymentStatusChangedEventHandler implements Handler<InvoiceChange, MachineEvent> {
-
-    private final PaymentService paymentService;
-
-    @Autowired
-    public PaymentStatusChangedEventHandler(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
+public class PaymentStatusChangedEventHandler implements PaymentHandler {
 
     @Override
-    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+    public PaymentData handle(InvoiceChange change, MachineEvent machineEvent) {
 
         PaymentData paymentData = new PaymentData();
         paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED);
@@ -74,7 +68,7 @@ public class PaymentStatusChangedEventHandler implements Handler<InvoiceChange, 
             }
         }
 
-        return () -> paymentService.savePayment(paymentData);
+        return paymentData;
     }
 
     @Override

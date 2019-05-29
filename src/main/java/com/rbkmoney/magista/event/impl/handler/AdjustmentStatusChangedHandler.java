@@ -11,6 +11,7 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
+import com.rbkmoney.magista.event.AdjustmentHandler;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
@@ -23,17 +24,10 @@ import org.springframework.stereotype.Component;
  * Created by tolkonepiu on 21/06/2017.
  */
 @Component
-public class AdjustmentStatusChangedHandler implements Handler<InvoiceChange, MachineEvent> {
-
-    private final PaymentAdjustmentService paymentAdjustmentService;
-
-    @Autowired
-    public AdjustmentStatusChangedHandler(PaymentAdjustmentService paymentAdjustmentService) {
-        this.paymentAdjustmentService = paymentAdjustmentService;
-    }
+public class AdjustmentStatusChangedHandler implements AdjustmentHandler {
 
     @Override
-    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+    public AdjustmentData handle(InvoiceChange change, MachineEvent machineEvent) {
         AdjustmentData adjustment = new AdjustmentData();
 
         adjustment.setEventId(machineEvent.getEventId());
@@ -63,7 +57,7 @@ public class AdjustmentStatusChangedHandler implements Handler<InvoiceChange, Ma
                 DamselUtil.getAdjustmentStatusCreatedAt(invoicePaymentAdjustmentStatus)
         );
 
-        return () -> paymentAdjustmentService.savePaymentAdjustment(adjustment);
+        return adjustment;
     }
 
     @Override

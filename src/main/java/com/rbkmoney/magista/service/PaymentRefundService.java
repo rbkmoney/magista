@@ -7,23 +7,23 @@ import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.util.BeanUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-@Service
-public class PaymentRefundService {
+import java.util.List;
+import java.util.stream.Collectors;
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class PaymentRefundService {
 
     private final RefundDao refundDao;
 
     private final PaymentService paymentService;
-
-    public PaymentRefundService(RefundDao refundDao, PaymentService paymentService) {
-        this.refundDao = refundDao;
-        this.paymentService = paymentService;
-    }
 
     public RefundData getRefund(String invoiceId, String paymentId, String refundId) throws NotFoundException, StorageException {
         try {
@@ -37,30 +37,32 @@ public class PaymentRefundService {
         }
     }
 
-    public void savePaymentRefund(RefundData refund) throws NotFoundException, StorageException {
-        log.info("Trying to save refund event, eventType='{}', invoiceId='{}', paymentId='{}', refundId='{}'",
-                refund.getEventType(), refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId());
-        switch (refund.getEventType()) {
-            case INVOICE_PAYMENT_REFUND_CREATED:
-                PaymentData paymentData = paymentService.getPaymentData(refund.getInvoiceId(), refund.getPaymentId());
-                refund.setPartyId(paymentData.getPartyId().toString());
-                refund.setPartyShopId(paymentData.getPartyShopId());
-                if (refund.getRefundAmount() == null) {
-                    refund.setRefundAmount(paymentData.getPaymentAmount());
-                    refund.setRefundCurrencyCode(paymentData.getPaymentCurrencyCode());
-                }
-                break;
-            default:
-                RefundData previousRefund = getRefund(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId());
-                BeanUtil.merge(previousRefund, refund, "id");
-                break;
-        }
+    public void saveRefunds(List<RefundData> refundEvents) throws NotFoundException, StorageException {
+        List<RefundData> enrichedRefundEvents = refundEvents.stream()
+                .map(refund -> {
+                    switch (refund.getEventType()) {
+                        case INVOICE_PAYMENT_REFUND_CREATED:
+                            PaymentData paymentData = paymentService.getPaymentData(refund.getInvoiceId(), refund.getPaymentId());
+                            refund.setPartyId(paymentData.getPartyId().toString());
+                            refund.setPartyShopId(paymentData.getPartyShopId());
+                            if (refund.getRefundAmount() == null) {
+                                refund.setRefundAmount(paymentData.getPaymentAmount());
+                                refund.setRefundCurrencyCode(paymentData.getPaymentCurrencyCode());
+                            }
+                            return refund;
+                        default:
+                            RefundData previousRefund = getRefund(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId());
+                            BeanUtil.merge(previousRefund, refund);
+                            return refund;
+                    }
+                })
+                .collect(Collectors.toList());
 
         try {
-            refundDao.save(refund);
-            log.info("Refund event have been saved, refund='{}'", refund);
+            refundDao.save(enrichedRefundEvents);
+            log.info("Refund events have been saved, size='{}'", enrichedRefundEvents.size());
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save refund, refund='%s'", refund), ex);
+            throw new StorageException(String.format("Failed to save refund events, size=%d", refundEvents.size()), ex);
         }
     }
 

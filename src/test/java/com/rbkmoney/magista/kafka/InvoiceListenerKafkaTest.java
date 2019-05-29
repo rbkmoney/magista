@@ -9,7 +9,7 @@ import com.rbkmoney.magista.config.KafkaConfig;
 import com.rbkmoney.magista.config.RetryConfig;
 import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.listener.InvoiceListener;
-import com.rbkmoney.magista.service.HandlerManager;
+import com.rbkmoney.magista.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -39,6 +39,14 @@ public class InvoiceListenerKafkaTest extends KafkaAbstractTest {
     HandlerManager handlerManager;
     @MockBean
     SourceEventParser eventParser;
+    @MockBean
+    InvoiceService invoiceService;
+    @MockBean
+    PaymentService paymentService;
+    @MockBean
+    PaymentRefundService paymentRefundService;
+    @MockBean
+    PaymentAdjustmentService paymentAdjustmentService;
 
     @Test
     public void listenEmptyChanges() throws InterruptedException {
