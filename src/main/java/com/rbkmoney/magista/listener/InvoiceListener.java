@@ -27,7 +27,7 @@ public class InvoiceListener implements MessageListener {
 
     @KafkaListener(topics = "${kafka.topics.invoicing}", containerFactory = "kafkaListenerContainerFactory")
     public void listen(List<ConsumerRecord<String, MachineEvent>> messages, Acknowledgment ack) {
-        log.info("Handle consumer records, messages='{}'", LogUtil.toString(messages));
+        log.info("Handle consumer records, size={}, messages='{}'", messages.size(), LogUtil.toString(messages));
         List<MachineEvent> machineEvents = messages.stream()
                 .map(message -> message.value())
                 .collect(Collectors.toList());
