@@ -41,8 +41,8 @@ public class AdjustmentDaoImpl extends AbstractDao implements AdjustmentDao {
     public void save(List<AdjustmentData> adjustments) throws DaoException {
         List<Query> queries = adjustments.stream()
                 .map(
-                        refundData -> {
-                            AdjustmentDataRecord adjustmentDataRecord = getDslContext().newRecord(ADJUSTMENT_DATA, refundData);
+                        adjustmentData -> {
+                            AdjustmentDataRecord adjustmentDataRecord = getDslContext().newRecord(ADJUSTMENT_DATA, adjustmentData);
                             adjustmentDataRecord.changed(true);
                             adjustmentDataRecord.changed(ADJUSTMENT_DATA.ID, adjustmentDataRecord.getId() != null);
                             return adjustmentDataRecord;

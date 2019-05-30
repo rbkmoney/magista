@@ -160,11 +160,10 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
                                 Collectors.mapping(query -> toSqlParameterSource(query.getParams()), Collectors.toList())
                         )
                 )
-                .entrySet()
                 .forEach(
-                        query -> batchExecute(
-                                query.getKey(),
-                                query.getValue(),
+                        (namedSql, parameterSources) -> batchExecute(
+                                namedSql,
+                                parameterSources,
                                 expectedRowsPerQueryAffected,
                                 namedParameterJdbcTemplate
                         )
@@ -181,10 +180,7 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
 
     public void batchExecute(String namedSql, List<SqlParameterSource> parameterSources, int expectedRowsPerQueryAffected, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DaoException {
         try {
-            int[] rowsPerBatchAffected = namedParameterJdbcTemplate.batchUpdate(
-                    namedSql,
-                    parameterSources.toArray(new SqlParameterSource[parameterSources.size()])
-            );
+            int[] rowsPerBatchAffected = namedParameterJdbcTemplate.batchUpdate(namedSql, parameterSources.toArray(new SqlParameterSource[0]));
 
             if (rowsPerBatchAffected.length != parameterSources.size()) {
                 throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(namedSql, parameterSources.size(), rowsPerBatchAffected.length);

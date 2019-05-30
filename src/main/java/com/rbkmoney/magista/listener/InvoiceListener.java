@@ -3,7 +3,6 @@ package com.rbkmoney.magista.listener;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.converter.SourceEventParser;
-import com.rbkmoney.magista.event.handler.BatchHandler;
 import com.rbkmoney.magista.service.HandlerManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,12 +49,10 @@ public class InvoiceListener implements MessageListener {
                                 Collectors.toList()
                         )
                 )
-                .entrySet()
                 .forEach(
-                        entry -> {
-                            BatchHandler handler = entry.getKey();
+                        (handler, invoiceChangesWithMachineEvent) -> {
                             if (handler != null) {
-                                handler.handle(entry.getValue()).execute();
+                                handler.handle(invoiceChangesWithMachineEvent).execute();
                             }
                         }
                 );

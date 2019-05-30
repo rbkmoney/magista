@@ -38,8 +38,8 @@ public class InvoiceDaoImpl extends AbstractDao implements InvoiceDao {
     public void save(List<InvoiceData> invoices) throws DaoException {
         List<Query> queries = invoices.stream()
                 .map(
-                        paymentData -> {
-                            InvoiceDataRecord invoiceDataRecord = getDslContext().newRecord(INVOICE_DATA, paymentData);
+                        invoiceData -> {
+                            InvoiceDataRecord invoiceDataRecord = getDslContext().newRecord(INVOICE_DATA, invoiceData);
                             invoiceDataRecord.changed(true);
                             invoiceDataRecord.changed(INVOICE_DATA.ID, invoiceDataRecord.getId() != null);
                             return invoiceDataRecord;
