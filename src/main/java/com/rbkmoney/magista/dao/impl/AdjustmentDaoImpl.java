@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.rbkmoney.magista.domain.Tables.ADJUSTMENT_DATA;
 
 @Component
@@ -35,14 +38,26 @@ public class AdjustmentDaoImpl extends AbstractDao implements AdjustmentDao {
     }
 
     @Override
-    public void save(AdjustmentData adjustment) throws DaoException {
-        AdjustmentDataRecord adjustmentDataRecord = getDslContext().newRecord(ADJUSTMENT_DATA, adjustment);
-        Query query = getDslContext().insertInto(ADJUSTMENT_DATA)
-                .set(adjustmentDataRecord)
-                .onConflict(ADJUSTMENT_DATA.INVOICE_ID, ADJUSTMENT_DATA.PAYMENT_ID, ADJUSTMENT_DATA.ADJUSTMENT_ID)
-                .doUpdate()
-                .set(adjustmentDataRecord);
-
-        executeOne(query);
+    public void save(List<AdjustmentData> adjustments) throws DaoException {
+        List<Query> queries = adjustments.stream()
+                .map(
+                        adjustmentData -> {
+                            AdjustmentDataRecord adjustmentDataRecord = getDslContext().newRecord(ADJUSTMENT_DATA, adjustmentData);
+                            adjustmentDataRecord.changed(true);
+                            adjustmentDataRecord.changed(ADJUSTMENT_DATA.ID, adjustmentDataRecord.getId() != null);
+                            return adjustmentDataRecord;
+                        }
+                )
+                .map(
+                        adjustmentDataRecord ->
+                                getDslContext().insertInto(ADJUSTMENT_DATA)
+                                        .set(adjustmentDataRecord)
+                                        .onConflict(ADJUSTMENT_DATA.INVOICE_ID, ADJUSTMENT_DATA.PAYMENT_ID, ADJUSTMENT_DATA.ADJUSTMENT_ID)
+                                        .doUpdate()
+                                        .set(adjustmentDataRecord)
+                )
+                .collect(Collectors.toList());
+        batchExecute(queries, 1);
     }
+
 }

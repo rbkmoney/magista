@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.List;
+
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static org.junit.Assert.assertEquals;
 
@@ -20,7 +22,7 @@ public class RefundDaoTest extends AbstractDaoTest {
     public void insertAndFindRefundEventTest() throws DaoException {
         RefundData refund = random(RefundData.class);
 
-        refundDao.save(refund);
+        refundDao.save(List.of(refund));
 
         assertEquals(refund, refundDao.get(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId()));
     }

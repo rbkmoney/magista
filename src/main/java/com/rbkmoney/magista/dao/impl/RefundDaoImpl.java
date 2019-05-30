@@ -10,6 +10,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 
@@ -35,14 +37,25 @@ public class RefundDaoImpl extends AbstractDao implements RefundDao {
     }
 
     @Override
-    public void save(RefundData refund) throws DaoException {
-        RefundDataRecord refundRecord = getDslContext().newRecord(REFUND_DATA, refund);
-        Query query = getDslContext().insertInto(REFUND_DATA)
-                .set(refundRecord)
-                .onConflict(REFUND_DATA.INVOICE_ID, REFUND_DATA.PAYMENT_ID, REFUND_DATA.REFUND_ID)
-                .doUpdate()
-                .set(refundRecord);
-
-        executeOne(query);
+    public void save(List<RefundData> refunds) throws DaoException {
+        List<Query> queries = refunds.stream()
+                .map(
+                        refundData -> {
+                            RefundDataRecord refundDataRecord = getDslContext().newRecord(REFUND_DATA, refundData);
+                            refundDataRecord.changed(true);
+                            refundDataRecord.changed(REFUND_DATA.ID, refundDataRecord.getId() != null);
+                            return refundDataRecord;
+                        }
+                )
+                .map(
+                        refundDataRecord ->
+                                getDslContext().insertInto(REFUND_DATA)
+                                        .set(refundDataRecord)
+                                        .onConflict(REFUND_DATA.INVOICE_ID, REFUND_DATA.PAYMENT_ID, REFUND_DATA.REFUND_ID)
+                                        .doUpdate()
+                                        .set(refundDataRecord)
+                )
+                .collect(Collectors.toList());
+        batchExecute(queries, 1);
     }
 }

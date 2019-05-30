@@ -4,14 +4,12 @@ import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.eventstock.client.*;
 import com.rbkmoney.eventstock.client.poll.DefaultPollingEventPublisherBuilder;
 import com.rbkmoney.eventstock.client.poll.EventFlowFilter;
-import com.rbkmoney.eventstock.client.poll.PollingEventPublisherBuilder;
 import com.rbkmoney.magista.event.EventSaver;
-import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.event.mapper.Mapper;
 import com.rbkmoney.magista.event.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.*;
@@ -23,7 +21,7 @@ public abstract class AbstractEventFlow {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final BlockingQueue queue;
-    private final List<Handler> handlers;
+    private final List<? extends Mapper> mappers;
     private final EventPublisher<StockEvent> eventPublisher;
     private final ThreadGroup threadGroup;
     private final ExecutorService executorService;
@@ -33,10 +31,10 @@ public abstract class AbstractEventFlow {
 
     private AtomicBoolean isRun = new AtomicBoolean(false);
 
-    public AbstractEventFlow(String name, List<Handler> handlers, DefaultPollingEventPublisherBuilder defaultPollingEventPublisherBuilder, int threadPoolSize, int queueLimit, long timeout) {
+    public AbstractEventFlow(String name, List<? extends Mapper> mappers, DefaultPollingEventPublisherBuilder defaultPollingEventPublisherBuilder, int threadPoolSize, int queueLimit, long timeout) {
         this.threadGroup = new ThreadGroup(name + "Flow");
         this.threadGroup.setDaemon(true);
-        this.handlers = handlers;
+        this.mappers = mappers;
         this.queue = new LinkedBlockingQueue<>(queueLimit);
         this.eventPublisher = defaultPollingEventPublisherBuilder
                 .withEventHandler((EventHandler<StockEvent>) (stockEvent, s) -> {
@@ -77,8 +75,8 @@ public abstract class AbstractEventFlow {
 
     public abstract void processEvent(StockEvent stockEvent);
 
-    protected <C> Handler getHandler(C change) {
-        for (Handler handler : handlers) {
+    protected <C> Mapper getMapper(C change) {
+        for (Mapper handler : mappers) {
             if (handler.accept(change)) {
                 return handler;
             }

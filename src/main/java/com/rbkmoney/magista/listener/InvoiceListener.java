@@ -1,16 +1,21 @@
 package com.rbkmoney.magista.listener;
 
-import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
+import com.rbkmoney.kafka.common.util.LogUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.converter.SourceEventParser;
-import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.service.HandlerManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -21,28 +26,42 @@ public class InvoiceListener implements MessageListener {
     private final SourceEventParser eventParser;
 
     @KafkaListener(topics = "${kafka.topics.invoicing}", containerFactory = "kafkaListenerContainerFactory")
-    public void listen(MachineEvent message, Acknowledgment ack) {
-        handle(message, ack);
+    public void listen(List<ConsumerRecord<String, MachineEvent>> messages, Acknowledgment ack) {
+        log.info("Handle consumer records, messages='{}'", LogUtil.toString(messages));
+        List<MachineEvent> machineEvents = messages.stream()
+                .map(message -> message.value())
+                .collect(Collectors.toList());
+
+        handle(machineEvents, ack);
         ack.acknowledge();
     }
 
     @Override
-    public void handle(MachineEvent machineEvent, Acknowledgment ack) {
-        EventPayload payload = eventParser.parseEvent(machineEvent);
-        log.info("EventPayload payload: {}", payload);
-        if (payload.isSetInvoiceChanges()) {
-            for (InvoiceChange invoiceChange : payload.getInvoiceChanges()) {
-                try {
-                    Handler handler = handlerManager.getHandler(invoiceChange);
-                    if (handler != null) {
-                        handler.handle(invoiceChange, machineEvent)
-                                .execute();
-                    }
-                } catch (Exception ex) {
-                    log.error("Failed to handle invoice change, invoiceChange='{}'", invoiceChange, ex);
-                    throw ex;
-                }
-            }
-        }
+    public void handle(List<MachineEvent> machineEvents, Acknowledgment ack) {
+        machineEvents.stream()
+                .map(machineEvent -> Map.entry(machineEvent, eventParser.parseEvent(machineEvent)))
+                .filter(entry -> entry.getValue().isSetInvoiceChanges())
+                .map(entry -> {
+                            List<Map.Entry<MachineEvent, InvoiceChange>> invoiceChangesWithMachineEvent = new ArrayList<>();
+                            for (InvoiceChange invoiceChange : entry.getValue().getInvoiceChanges()) {
+                                invoiceChangesWithMachineEvent.add(Map.entry(entry.getKey(), invoiceChange));
+                            }
+                            return invoiceChangesWithMachineEvent;
+                        }
+                )
+                .flatMap(List::stream)
+                .collect(
+                        Collectors.groupingBy(
+                                entry -> handlerManager.getHandler(entry.getValue()),
+                                Collectors.toList()
+                        )
+                )
+                .forEach(
+                        (handler, invoiceChangesWithMachineEvent) -> {
+                            if (handler != null) {
+                                handler.handle(invoiceChangesWithMachineEvent).execute();
+                            }
+                        }
+                );
     }
 }

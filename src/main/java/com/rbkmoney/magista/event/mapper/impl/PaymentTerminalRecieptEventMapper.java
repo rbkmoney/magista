@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.event.impl.handler;
+package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
@@ -8,24 +8,14 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.Handler;
-import com.rbkmoney.magista.event.Processor;
-import com.rbkmoney.magista.service.PaymentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.rbkmoney.magista.event.mapper.PaymentMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PaymentTerminalRecieptEventHandler implements Handler<InvoiceChange, MachineEvent> {
-
-    private final PaymentService paymentService;
-
-    @Autowired
-    public PaymentTerminalRecieptEventHandler(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
+public class PaymentTerminalRecieptEventMapper implements PaymentMapper {
 
     @Override
-    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+    public PaymentData map(InvoiceChange change, MachineEvent machineEvent) {
 
         PaymentData paymentData = new PaymentData();
         paymentData.setEventId(machineEvent.getEventId());
@@ -48,7 +38,7 @@ public class PaymentTerminalRecieptEventHandler implements Handler<InvoiceChange
 
         paymentData.setPaymentShortId(paymentTerminalReceipt.getShortPaymentId());
 
-        return () -> paymentService.savePayment(paymentData);
+        return paymentData;
     }
 
     @Override

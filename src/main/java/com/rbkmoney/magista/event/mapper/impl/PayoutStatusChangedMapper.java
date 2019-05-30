@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.event.impl.handler;
+package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payout_processing.Event;
@@ -10,22 +10,22 @@ import com.rbkmoney.magista.domain.enums.PayoutEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutData;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.event.mapper.PayoutMapper;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.service.PayoutService;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PayoutStatusChangedHandler implements Handler<PayoutChange, StockEvent> {
+public class PayoutStatusChangedMapper implements PayoutMapper {
 
     private final PayoutService payoutEventService;
 
-    public PayoutStatusChangedHandler(PayoutService payoutEventService) {
+    public PayoutStatusChangedMapper(PayoutService payoutEventService) {
         this.payoutEventService = payoutEventService;
     }
 
     @Override
-    public Processor handle(PayoutChange change, StockEvent parent) {
+    public Processor map(PayoutChange change, StockEvent parent) {
         Event event = parent.getSourceEvent().getPayoutEvent();
         PayoutData payoutData = new PayoutData();
 

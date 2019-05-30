@@ -3,8 +3,10 @@ package com.rbkmoney.magista.listener;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import org.springframework.kafka.support.Acknowledgment;
 
+import java.util.List;
+
 public interface MessageListener {
 
-    void handle(MachineEvent message, Acknowledgment ack);
+    void handle(List<MachineEvent> messages, Acknowledgment ack);
 
 }

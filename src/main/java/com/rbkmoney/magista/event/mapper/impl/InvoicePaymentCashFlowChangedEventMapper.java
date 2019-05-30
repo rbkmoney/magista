@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.event.impl.handler;
+package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.domain.FinalCashFlowPosting;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
@@ -8,30 +8,19 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.Handler;
-import com.rbkmoney.magista.event.Processor;
-import com.rbkmoney.magista.service.PaymentService;
+import com.rbkmoney.magista.event.mapper.PaymentMapper;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 
 @Component
-public class InvoicePaymentCashFlowChangedEventHandler implements Handler<InvoiceChange, MachineEvent> {
-
-    private final PaymentService paymentService;
-
-    @Autowired
-    public InvoicePaymentCashFlowChangedEventHandler(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
+public class InvoicePaymentCashFlowChangedEventMapper implements PaymentMapper {
 
     @Override
-    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
-
+    public PaymentData map(InvoiceChange change, MachineEvent machineEvent) {
         PaymentData paymentData = new PaymentData();
         paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_CASH_FLOW_CHANGED);
         paymentData.setEventId(machineEvent.getEventId());
@@ -52,7 +41,7 @@ public class InvoicePaymentCashFlowChangedEventHandler implements Handler<Invoic
         paymentData.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
         paymentData.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
 
-        return () -> paymentService.savePayment(paymentData);
+        return paymentData;
     }
 
     @Override

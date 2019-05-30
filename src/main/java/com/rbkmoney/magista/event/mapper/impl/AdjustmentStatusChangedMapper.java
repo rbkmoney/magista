@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.event.impl.handler;
+package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentAdjustmentStatus;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
@@ -11,29 +11,16 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
+import com.rbkmoney.magista.event.mapper.AdjustmentMapper;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.Handler;
-import com.rbkmoney.magista.event.Processor;
-import com.rbkmoney.magista.service.PaymentAdjustmentService;
 import com.rbkmoney.magista.util.DamselUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by tolkonepiu on 21/06/2017.
- */
 @Component
-public class AdjustmentStatusChangedHandler implements Handler<InvoiceChange, MachineEvent> {
-
-    private final PaymentAdjustmentService paymentAdjustmentService;
-
-    @Autowired
-    public AdjustmentStatusChangedHandler(PaymentAdjustmentService paymentAdjustmentService) {
-        this.paymentAdjustmentService = paymentAdjustmentService;
-    }
+public class AdjustmentStatusChangedMapper implements AdjustmentMapper {
 
     @Override
-    public Processor handle(InvoiceChange change, MachineEvent machineEvent) {
+    public AdjustmentData map(InvoiceChange change, MachineEvent machineEvent) {
         AdjustmentData adjustment = new AdjustmentData();
 
         adjustment.setEventId(machineEvent.getEventId());
@@ -63,7 +50,7 @@ public class AdjustmentStatusChangedHandler implements Handler<InvoiceChange, Ma
                 DamselUtil.getAdjustmentStatusCreatedAt(invoicePaymentAdjustmentStatus)
         );
 
-        return () -> paymentAdjustmentService.savePaymentAdjustment(adjustment);
+        return adjustment;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.kafka;
 
-import com.rbkmoney.damsel.payment_processing.CustomerBinding;
 import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;
@@ -13,10 +12,6 @@ import com.rbkmoney.magista.service.HandlerManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.thrift.TDeserializer;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;

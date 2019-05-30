@@ -14,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.AbstractMap;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.rbkmoney.magista.domain.enums.InvoiceEventType.INVOICE_STATUS_CHANGED;
 
 @Service
@@ -50,19 +54,25 @@ public class InvoiceService {
         );
     }
 
-    public void saveInvoice(InvoiceData invoiceData) throws NotFoundException, StorageException {
-        log.info("Trying to save invoice, invoiceData='{}'", invoiceData);
-        try {
-            if (invoiceData.getEventType() == INVOICE_STATUS_CHANGED) {
-                InvoiceData previousInvoiceData = invoiceDao.get(invoiceData.getInvoiceId());
-                BeanUtil.merge(previousInvoiceData, invoiceData);
-            }
+    public void saveInvoices(List<InvoiceData> invoiceEvents) throws NotFoundException, StorageException {
+        log.info("Trying to save invoice events, size={}", invoiceEvents.size());
 
-            invoiceDao.save(invoiceData);
-            invoiceDataCache.put(invoiceData.getInvoiceId(), invoiceData);
-            log.info("Invoice have been saved, invoiceData='{}'", invoiceData);
+        List<InvoiceData> enrichedInvoiceEvents = invoiceEvents.stream()
+                .map(invoiceData -> {
+                    if (invoiceData.getEventType() == INVOICE_STATUS_CHANGED) {
+                        InvoiceData previousInvoiceData = invoiceDao.get(invoiceData.getInvoiceId());
+                        BeanUtil.merge(previousInvoiceData, invoiceData);
+                    }
+                    return invoiceData;
+                })
+                .peek(invoiceData -> invoiceDataCache.put(invoiceData.getInvoiceId(), invoiceData))
+                .collect(Collectors.toList());
+
+        try {
+            invoiceDao.save(enrichedInvoiceEvents);
+            log.info("Invoice have been saved, size={}", enrichedInvoiceEvents.size());
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save invoice, invoiceData='%s'", invoiceData), ex);
+            throw new StorageException(String.format("Failed to save invoice, size=%d", enrichedInvoiceEvents.size()), ex);
         }
     }
 
