@@ -5,12 +5,10 @@ import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.converter.SourceEventParser;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
-import com.rbkmoney.magista.event.Handler;
-import com.rbkmoney.magista.event.InvoiceHandler;
 import com.rbkmoney.magista.event.Processor;
+import com.rbkmoney.magista.event.handler.impl.InvoiceBatchHandler;
 import com.rbkmoney.magista.exception.ParseException;
-import com.rbkmoney.magista.service.*;
+import com.rbkmoney.magista.service.HandlerManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -28,19 +26,11 @@ public class InvoiceListenerTest {
     @Mock
     private HandlerManager handlerManager;
     @Mock
-    private InvoiceHandler handler;
+    private InvoiceBatchHandler invoiceHandler;
     @Mock
     private Processor processor;
     @Mock
     private SourceEventParser eventParser;
-    @Mock
-    private InvoiceService invoiceService;
-    @Mock
-    private PaymentService paymentService;
-    @Mock
-    private PaymentRefundService paymentRefundService;
-    @Mock
-    private PaymentAdjustmentService paymentAdjustmentService;
     @Mock
     private Acknowledgment ack;
 
@@ -49,14 +39,7 @@ public class InvoiceListenerTest {
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
-        invoiceListener = new InvoiceListener(
-                handlerManager,
-                eventParser,
-                invoiceService,
-                paymentService,
-                paymentRefundService,
-                paymentAdjustmentService
-        );
+        invoiceListener = new InvoiceListener(handlerManager, eventParser);
     }
 
     @Test
@@ -93,13 +76,13 @@ public class InvoiceListenerTest {
         payload.setInvoiceChanges(invoiceChanges);
         event.setPayload(payload);
         Mockito.when(eventParser.parseEvent(message)).thenReturn(payload);
-        Mockito.when(handler.handle(any(), any())).thenReturn(new InvoiceData());
-        Mockito.when(handlerManager.getHandler(any())).thenReturn(handler);
+        Mockito.when(invoiceHandler.handle(any())).thenReturn(processor);
+        Mockito.when(handlerManager.getHandler(any())).thenReturn(invoiceHandler);
 
         invoiceListener.handle(messages, ack);
 
-        Mockito.verify(handler, Mockito.times(1)).handle(any(), any());
-        Mockito.verify(invoiceService, Mockito.times(1)).saveInvoices(any());
+        Mockito.verify(invoiceHandler, Mockito.times(1)).handle(any());
+        Mockito.verify(processor, Mockito.times(1)).execute();
     }
 
 }

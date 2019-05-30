@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.event.impl.handler;
+package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.domain.Failure;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefundStatus;
@@ -15,14 +15,14 @@ import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
 import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.RefundHandler;
+import com.rbkmoney.magista.event.mapper.RefundMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RefundStatusChangedHandler implements RefundHandler {
+public class RefundStatusChangedMapper implements RefundMapper {
 
     @Override
-    public RefundData handle(InvoiceChange change, MachineEvent machineEvent) {
+    public RefundData map(InvoiceChange change, MachineEvent machineEvent) {
         RefundData refundData = new RefundData();
 
         refundData.setEventId(machineEvent.getEventId());

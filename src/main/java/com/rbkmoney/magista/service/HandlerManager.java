@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.event.handler.BatchHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,10 +10,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HandlerManager {
 
-    private final List<Handler> handlers;
+    private final List<BatchHandler> handlers;
 
-    public <C> Handler getHandler(C change) {
-        for (Handler handler : handlers) {
+    public <C> BatchHandler getHandler(C change) {
+        for (BatchHandler handler : handlers) {
             if (handler.accept(change)) {
                 return handler;
             }

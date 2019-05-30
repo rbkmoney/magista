@@ -57,20 +57,6 @@ public class PaymentAdjustmentService {
                 })
                 .collect(Collectors.toList());
 
-//        if (adjustment.getAdjustmentStatus() == AdjustmentStatus.captured) {
-//            PaymentData paymentData = new PaymentData();
-//            paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
-//            paymentData.setEventId(adjustment.getEventId());
-//            paymentData.setEventCreatedAt(adjustment.getEventCreatedAt());
-//            paymentData.setInvoiceId(adjustment.getInvoiceId());
-//            paymentData.setPaymentId(adjustment.getPaymentId());
-//            paymentData.setPaymentFee(adjustment.getAdjustmentFee());
-//            paymentData.setPaymentProviderFee(adjustment.getAdjustmentProviderFee());
-//            paymentData.setPaymentExternalFee(adjustment.getAdjustmentExternalFee());
-//            paymentData.setPaymentDomainRevision(adjustment.getAdjustmentDomainRevision());
-//            paymentService.savePayment(paymentData);
-//        }
-
         try {
             adjustmentDao.save(enrichedAdjustmentEvents);
             log.info("Adjustment events have been saved, size='{}'", enrichedAdjustmentEvents.size());

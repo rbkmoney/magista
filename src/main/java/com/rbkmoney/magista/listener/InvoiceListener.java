@@ -1,17 +1,10 @@
 package com.rbkmoney.magista.listener;
 
-import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.converter.SourceEventParser;
-import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
-import com.rbkmoney.magista.domain.enums.InvoiceEventType;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
-import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
-import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
-import com.rbkmoney.magista.domain.tables.pojos.RefundData;
-import com.rbkmoney.magista.event.*;
-import com.rbkmoney.magista.service.*;
+import com.rbkmoney.magista.event.handler.BatchHandler;
+import com.rbkmoney.magista.service.HandlerManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -20,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,11 +24,6 @@ public class InvoiceListener implements MessageListener {
     private final HandlerManager handlerManager;
     private final SourceEventParser eventParser;
 
-    private final InvoiceService invoiceService;
-    private final PaymentService paymentService;
-    private final PaymentRefundService paymentRefundService;
-    private final PaymentAdjustmentService paymentAdjustmentService;
-
     @KafkaListener(topics = "${kafka.topics.invoicing}", containerFactory = "kafkaListenerContainerFactory")
     public void listen(List<MachineEvent> messages, Acknowledgment ack) {
         handle(messages, ack);
@@ -43,62 +32,32 @@ public class InvoiceListener implements MessageListener {
 
     @Override
     public void handle(List<MachineEvent> machineEvents, Acknowledgment ack) {
-        List<InvoiceData> invoiceDataList = new ArrayList<>();
-        List<PaymentData> paymentDataList = new ArrayList<>();
-        List<RefundData> refundDataList = new ArrayList<>();
-        List<AdjustmentData> adjustmentDataList = new ArrayList<>();
-        for (MachineEvent machineEvent : machineEvents) {
-            EventPayload eventPayload = eventParser.parseEvent(machineEvent);
-            if (eventPayload.isSetInvoiceChanges()) {
-                List<InvoiceChange> invoiceChanges = eventPayload.getInvoiceChanges();
-                for (InvoiceChange invoiceChange : invoiceChanges) {
-                    Handler handler = handlerManager.getHandler(invoiceChange);
-                    if (handler instanceof InvoiceHandler) {
-                        InvoiceHandler invoiceHandler = (InvoiceHandler) handler;
-                        InvoiceData invoiceData = invoiceHandler.handle(invoiceChange, machineEvent);
-                        invoiceDataList.add(invoiceData);
-                    }
-                    if (handler instanceof PaymentHandler) {
-                        PaymentHandler paymentHandler = (PaymentHandler) handler;
-                        PaymentData paymentData = paymentHandler.handle(invoiceChange, machineEvent);
-                        paymentDataList.add(paymentData);
-                    }
-                    if (handler instanceof RefundHandler) {
-                        RefundHandler refundHandler = (RefundHandler) handler;
-                        RefundData refundData = refundHandler.handle(invoiceChange, machineEvent);
-                        refundDataList.add(refundData);
-                    }
-                    if (handler instanceof AdjustmentHandler) {
-                        AdjustmentHandler adjustmentHandler = (AdjustmentHandler) handler;
-                        AdjustmentData adjustmentData = adjustmentHandler.handle(invoiceChange, machineEvent);
-                        adjustmentDataList.add(adjustmentData);
-                    }
-                }
-            }
-        }
-
-        List<PaymentData> adjustedPaymentDataList = adjustmentDataList.stream()
-                .filter(adjustmentData -> adjustmentData.getAdjustmentStatus() == AdjustmentStatus.captured)
-                .map(adjustmentData -> {
-                            PaymentData paymentData = new PaymentData();
-                            paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
-                            paymentData.setEventId(adjustmentData.getEventId());
-                            paymentData.setEventCreatedAt(adjustmentData.getEventCreatedAt());
-                            paymentData.setInvoiceId(adjustmentData.getInvoiceId());
-                            paymentData.setPaymentId(adjustmentData.getPaymentId());
-                            paymentData.setPaymentFee(adjustmentData.getAdjustmentFee());
-                            paymentData.setPaymentProviderFee(adjustmentData.getAdjustmentProviderFee());
-                            paymentData.setPaymentExternalFee(adjustmentData.getAdjustmentExternalFee());
-                            paymentData.setPaymentDomainRevision(adjustmentData.getAdjustmentDomainRevision());
-                            return paymentData;
+        machineEvents.stream()
+                .map(machineEvent -> Map.entry(machineEvent, eventParser.parseEvent(machineEvent)))
+                .filter(entry -> entry.getValue().isSetInvoiceChanges())
+                .map(entry -> {
+                            List<Map.Entry<MachineEvent, InvoiceChange>> invoiceChangesWithMachineEvent = new ArrayList<>();
+                            for (InvoiceChange invoiceChange : entry.getValue().getInvoiceChanges()) {
+                                invoiceChangesWithMachineEvent.add(Map.entry(entry.getKey(), invoiceChange));
+                            }
+                            return invoiceChangesWithMachineEvent;
                         }
                 )
-                .collect(Collectors.toList());
-
-        invoiceService.saveInvoices(invoiceDataList);
-        paymentService.savePayments(paymentDataList);
-        paymentRefundService.saveRefunds(refundDataList);
-        paymentAdjustmentService.saveAdjustments(adjustmentDataList);
-        paymentService.savePayments(adjustedPaymentDataList);
+                .flatMap(List::stream)
+                .collect(
+                        Collectors.groupingBy(
+                                entry -> handlerManager.getHandler(entry.getValue()),
+                                Collectors.toList()
+                        )
+                )
+                .entrySet()
+                .forEach(
+                        entry -> {
+                            BatchHandler handler = entry.getKey();
+                            if (handler != null) {
+                                handler.handle(entry.getValue()).execute();
+                            }
+                        }
+                );
     }
 }

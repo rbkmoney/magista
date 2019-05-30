@@ -2,8 +2,9 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.eventstock.client.poll.DefaultPollingEventPublisherBuilder;
 import com.rbkmoney.magista.dao.EventDao;
-import com.rbkmoney.magista.event.Handler;
+import com.rbkmoney.magista.event.mapper.Mapper;
 import com.rbkmoney.magista.event.flow.PayoutEventFlow;
+import com.rbkmoney.magista.event.mapper.PayoutMapper;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.StorageException;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class ProcessingService {
     @Value("${bm.payout.handler.timeout}")
     private int payoutHandlerTimeout;
 
-    private final List<Handler> handlers;
+    private final List<PayoutMapper> mappers;
 
     private final EventDao eventDao;
 
@@ -46,7 +47,7 @@ public class ProcessingService {
 
     @EventListener(ApplicationReadyEvent.class)
     public void start() {
-        PayoutEventFlow newPayoutEventFlow = new PayoutEventFlow(handlers, payoutEventPublisherBuilder, payoutHandlerThreadPoolSize, payoutHandlerQueueLimit, payoutHandlerTimeout);
+        PayoutEventFlow newPayoutEventFlow = new PayoutEventFlow(mappers, payoutEventPublisherBuilder, payoutHandlerThreadPoolSize, payoutHandlerQueueLimit, payoutHandlerTimeout);
         if (payoutEventFlow.compareAndSet(null, newPayoutEventFlow)) {
             Optional<Long> lastEventId = getLastPayoutEventId();
             newPayoutEventFlow.start(lastEventId);

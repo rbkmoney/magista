@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.event.impl.handler;
+package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentAdjustment;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
@@ -10,7 +10,7 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
-import com.rbkmoney.magista.event.AdjustmentHandler;
+import com.rbkmoney.magista.event.mapper.AdjustmentMapper;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
@@ -19,10 +19,10 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class AdjustmentCreatedHandler implements AdjustmentHandler {
+public class AdjustmentCreatedMapper implements AdjustmentMapper {
 
     @Override
-    public AdjustmentData handle(InvoiceChange change, MachineEvent machineEvent) {
+    public AdjustmentData map(InvoiceChange change, MachineEvent machineEvent) {
         AdjustmentData adjustmentData = new AdjustmentData();
 
         adjustmentData.setEventId(machineEvent.getEventId());

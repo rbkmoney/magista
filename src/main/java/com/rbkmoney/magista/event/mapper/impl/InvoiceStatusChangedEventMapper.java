@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.event.impl.handler;
+package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoiceStatusChanged;
@@ -9,15 +9,15 @@ import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoiceStatus;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.InvoiceHandler;
+import com.rbkmoney.magista.event.mapper.InvoiceMapper;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InvoiceStatusChangedEventHandler implements InvoiceHandler {
+public class InvoiceStatusChangedEventMapper implements InvoiceMapper {
 
     @Override
-    public InvoiceData handle(InvoiceChange change, MachineEvent machineEvent) {
+    public InvoiceData map(InvoiceChange change, MachineEvent machineEvent) {
         InvoiceData invoiceData = new InvoiceData();
         invoiceData.setEventType(InvoiceEventType.INVOICE_STATUS_CHANGED);
         invoiceData.setEventId(machineEvent.getEventId());
