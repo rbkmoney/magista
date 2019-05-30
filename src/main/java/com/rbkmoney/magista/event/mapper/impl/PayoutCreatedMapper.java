@@ -135,7 +135,7 @@ public class PayoutCreatedMapper implements PayoutMapper {
             payoutData.setPayoutCurrencyCode(payout.getCurrency().getSymbolicCode());
 
             payoutData.setPartyId(payout.getPartyId());
-            payoutData.setPartyShopId (payout.getShopId());
+            payoutData.setPartyShopId(payout.getShopId());
 
             if (payout.isSetSummary()) {
                 List<PayoutSummaryItem> payoutSummaryItems = payout.getSummary().stream()
