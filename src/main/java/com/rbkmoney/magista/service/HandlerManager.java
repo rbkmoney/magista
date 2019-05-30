@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.event.handler.BatchHandler;
+import com.rbkmoney.magista.event.handler.impl.UnsuportedBatchHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,6 @@ public class HandlerManager {
                 return handler;
             }
         }
-        return null;
+        return new UnsuportedBatchHandler();
     }
 }
