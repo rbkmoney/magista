@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
-public class UnsuportedBatchHandler implements BatchHandler<InvoiceChange, MachineEvent> {
+public class UnsupportedBatchHandler implements BatchHandler<InvoiceChange, MachineEvent> {
 
     @Override
     public Processor handle(List<Map.Entry<InvoiceChange, MachineEvent>> changes) {
