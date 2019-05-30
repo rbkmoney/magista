@@ -1,11 +1,13 @@
 package com.rbkmoney.magista.listener;
 
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
+import com.rbkmoney.kafka.common.util.LogUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.service.HandlerManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
@@ -24,8 +26,13 @@ public class InvoiceListener implements MessageListener {
     private final SourceEventParser eventParser;
 
     @KafkaListener(topics = "${kafka.topics.invoicing}", containerFactory = "kafkaListenerContainerFactory")
-    public void listen(List<MachineEvent> messages, Acknowledgment ack) {
-        handle(messages, ack);
+    public void listen(List<ConsumerRecord<String, MachineEvent>> messages, Acknowledgment ack) {
+        log.info("Handle consumer records, messages='{}'", LogUtil.toString(messages));
+        List<MachineEvent> machineEvents = messages.stream()
+                .map(message -> message.value())
+                .collect(Collectors.toList());
+
+        handle(machineEvents, ack);
         ack.acknowledge();
     }
 
