@@ -9,6 +9,7 @@ import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.util.BeanUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
 
     private final InvoiceService invoiceService;
@@ -30,15 +32,6 @@ public class PaymentService {
     private final PaymentDao paymentDao;
 
     private final Cache<Map.Entry<String, String>, PaymentData> paymentDataCache;
-
-    @Autowired
-    public PaymentService(InvoiceService invoiceService, PaymentDao paymentDao, @Value("${cache.paymentData.size}") int cacheSize) {
-        this.invoiceService = invoiceService;
-        this.paymentDao = paymentDao;
-        this.paymentDataCache = Caffeine.newBuilder()
-                .maximumSize(cacheSize)
-                .build();
-    }
 
     public PaymentData getPaymentData(String invoiceId, String paymentId) throws NotFoundException, StorageException {
         return paymentDataCache.get(
