@@ -39,12 +39,12 @@ public class InvoiceListener implements MessageListener {
     @Override
     public void handle(List<MachineEvent> machineEvents, Acknowledgment ack) {
         machineEvents.stream()
-                .map(machineEvent -> Map.entry(machineEvent, eventParser.parseEvent(machineEvent)))
-                .filter(entry -> entry.getValue().isSetInvoiceChanges())
+                .map(machineEvent -> Map.entry(eventParser.parseEvent(machineEvent), machineEvent))
+                .filter(entry -> entry.getKey().isSetInvoiceChanges())
                 .map(entry -> {
-                            List<Map.Entry<MachineEvent, InvoiceChange>> invoiceChangesWithMachineEvent = new ArrayList<>();
-                            for (InvoiceChange invoiceChange : entry.getValue().getInvoiceChanges()) {
-                                invoiceChangesWithMachineEvent.add(Map.entry(entry.getKey(), invoiceChange));
+                            List<Map.Entry<InvoiceChange, MachineEvent>> invoiceChangesWithMachineEvent = new ArrayList<>();
+                            for (InvoiceChange invoiceChange : entry.getKey().getInvoiceChanges()) {
+                                invoiceChangesWithMachineEvent.add(Map.entry(invoiceChange, entry.getValue()));
                             }
                             return invoiceChangesWithMachineEvent;
                         }
@@ -52,7 +52,7 @@ public class InvoiceListener implements MessageListener {
                 .flatMap(List::stream)
                 .collect(
                         Collectors.groupingBy(
-                                entry -> handlerManager.getHandler(entry.getValue()),
+                                entry -> handlerManager.getHandler(entry.getKey()),
                                 Collectors.toList()
                         )
                 )

@@ -18,10 +18,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.Duration;
 
-/**
- * Created by jeckep on 08.02.17.
- */
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @EnableConfigurationProperties
