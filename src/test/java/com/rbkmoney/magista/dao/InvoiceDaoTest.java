@@ -25,8 +25,10 @@ public class InvoiceDaoTest extends AbstractDaoTest {
     public void testInsertAndFindInvoiceData() {
         InvoiceData invoiceData = random(InvoiceData.class);
 
-        invoiceDao.save(List.of(invoiceData));
-        invoiceDao.save(List.of(invoiceData));
+        invoiceDao.insert(List.of(invoiceData));
+        invoiceDao.insert(List.of(invoiceData));
+        invoiceDao.update(List.of(invoiceData));
+        invoiceDao.update(List.of(invoiceData));
 
         assertEquals(invoiceData, invoiceDao.get(invoiceData.getInvoiceId()));
     }
@@ -43,7 +45,10 @@ public class InvoiceDaoTest extends AbstractDaoTest {
                                 }
                         ).collect(Collectors.toList());
 
-        invoiceDao.save(invoices);
+        invoiceDao.insert(invoices);
+        invoiceDao.insert(invoices);
+        invoiceDao.update(invoices);
+        invoiceDao.update(invoices);
         assertEquals(invoices.get(invoices.size() - 1), invoiceDao.get(invoiceId));
     }
 

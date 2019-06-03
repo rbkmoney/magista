@@ -59,7 +59,7 @@ public class PaymentAdjustmentService {
 
         try {
             adjustmentDao.save(enrichedAdjustmentEvents);
-            log.info("Adjustment events have been saved, size='{}'", enrichedAdjustmentEvents.size());
+            log.info("Adjustment events have been saved, size={}", enrichedAdjustmentEvents.size());
         } catch (DaoException ex) {
             throw new StorageException(String.format("Failed to save adjustment events, size=%d", adjustments.size()), ex);
         }

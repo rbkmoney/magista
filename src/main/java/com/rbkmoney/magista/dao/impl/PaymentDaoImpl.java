@@ -36,7 +36,7 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
     }
 
     @Override
-    public void save(List<PaymentData> payments) throws DaoException {
+    public void insert(List<PaymentData> payments) throws DaoException {
         List<Query> queries = payments.stream()
                 .map(
                         paymentData -> {
@@ -47,15 +47,38 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
                         }
                 )
                 .map(
-                        paymentDataRecord ->
-                                getDslContext().insertInto(PAYMENT_DATA)
-                                        .set(paymentDataRecord)
-                                        .onConflict(PAYMENT_DATA.INVOICE_ID, PAYMENT_DATA.PAYMENT_ID)
-                                        .doUpdate()
-                                        .set(paymentDataRecord)
+                        paymentDataRecord -> getDslContext().insertInto(PAYMENT_DATA)
+                                .set(paymentDataRecord)
+                                .onConflict(PAYMENT_DATA.INVOICE_ID, PAYMENT_DATA.PAYMENT_ID)
+                                .doNothing()
                 )
                 .collect(Collectors.toList());
-        batchExecute(queries, 1);
+        batchExecute(queries);
+    }
+
+    @Override
+    public void update(List<PaymentData> payments) throws DaoException {
+        List<Query> queries = payments.stream()
+                .map(
+                        paymentData -> {
+                            PaymentDataRecord paymentDataRecord = getDslContext().newRecord(PAYMENT_DATA, paymentData);
+                            paymentDataRecord.changed(true);
+                            paymentDataRecord.changed(PAYMENT_DATA.ID, paymentDataRecord.getId() != null);
+                            return paymentDataRecord;
+                        }
+                )
+                .map(
+                        paymentDataRecord -> getDslContext().update(PAYMENT_DATA)
+                                .set(paymentDataRecord)
+                                .where(
+                                        PAYMENT_DATA.INVOICE_ID.eq(paymentDataRecord.getInvoiceId())
+                                                .and(
+                                                        PAYMENT_DATA.PAYMENT_ID.eq(paymentDataRecord.getPaymentId())
+                                                )
+                                )
+                )
+                .collect(Collectors.toList());
+        batchExecute(queries);
     }
 
 }
