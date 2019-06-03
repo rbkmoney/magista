@@ -21,6 +21,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import javax.sql.DataSource;
 import java.sql.Types;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -157,6 +158,7 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
                 .collect(
                         Collectors.groupingBy(
                                 query -> query.getSQL(ParamType.NAMED),
+                                LinkedHashMap::new,
                                 Collectors.mapping(query -> toSqlParameterSource(query.getParams()), Collectors.toList())
                         )
                 )

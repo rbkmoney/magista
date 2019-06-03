@@ -24,7 +24,7 @@ public class MachineEventSerializer implements Serializer<SinkEvent> {
         try {
             retVal = tSerializerThreadLocal.get().serialize(data);
         } catch (Exception e) {
-            log.error("Error when serialize RuleTemplate data: {} ", data, e);
+            log.error("Error when serialize machine event data: {} ", data, e);
         }
         return retVal;
     }

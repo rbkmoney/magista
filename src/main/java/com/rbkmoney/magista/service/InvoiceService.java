@@ -2,16 +2,19 @@ package com.rbkmoney.magista.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.rbkmoney.magista.dao.InvoiceDao;
+import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.util.BeanUtil;
+import com.rbkmoney.magista.util.StreamUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.rbkmoney.magista.domain.enums.InvoiceEventType.INVOICE_STATUS_CHANGED;
@@ -56,9 +59,20 @@ public class InvoiceService {
                 .peek(invoiceData -> invoiceDataCache.put(invoiceData.getInvoiceId(), invoiceData))
                 .collect(Collectors.toList());
 
+        List<InvoiceData> invoiceCreatedEvents = enrichedInvoiceEvents.stream()
+                .filter(invoiceData -> invoiceData.getEventType() == InvoiceEventType.INVOICE_CREATED)
+                .collect(Collectors.toList());
+        enrichedInvoiceEvents.removeAll(invoiceCreatedEvents);
+        List<InvoiceData> updatedInvoices = StreamUtil.groupAndReduce(
+                invoiceCreatedEvents,
+                invoiceData -> invoiceData.getInvoiceId(),
+                (o1, o2) -> o2
+        );
+
         try {
-            invoiceDao.save(enrichedInvoiceEvents);
-            log.info("Invoice have been saved, size={}", enrichedInvoiceEvents.size());
+            invoiceDao.insert(invoiceCreatedEvents);
+            invoiceDao.update(updatedInvoices);
+            log.info("Payment event have been saved, batchSize={}, insertsCount={}, updatesCount={}", invoiceEvents.size(), invoiceCreatedEvents.size(), updatedInvoices.size());
         } catch (DaoException ex) {
             throw new StorageException(String.format("Failed to save invoice, size=%d", enrichedInvoiceEvents.size()), ex);
         }

@@ -9,6 +9,8 @@ public interface PaymentDao {
 
     PaymentData get(String invoiceId, String paymentId) throws DaoException;
 
-    void save(List<PaymentData> payments) throws DaoException;
+    void insert(List<PaymentData> payments) throws DaoException;
+
+    void update(List<PaymentData> payments) throws DaoException;
 
 }

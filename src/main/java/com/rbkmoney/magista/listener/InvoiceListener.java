@@ -12,9 +12,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,9 +48,11 @@ public class InvoiceListener implements MessageListener {
                         }
                 )
                 .flatMap(List::stream)
+                .sorted(Comparator.comparingLong(o -> o.getValue().getEventId()))
                 .collect(
                         Collectors.groupingBy(
                                 entry -> handlerManager.getHandler(entry.getKey()),
+                                LinkedHashMap::new,
                                 Collectors.toList()
                         )
                 )

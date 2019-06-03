@@ -21,12 +21,11 @@ public class MachineEventDeserializer implements Deserializer<MachineEvent> {
 
     @Override
     public MachineEvent deserialize(String topic, byte[] data) {
-        log.debug("Message, topic: {}, byteLength: {}", topic, data.length);
         SinkEvent machineEvent = new SinkEvent();
         try {
             tDeserializerThreadLocal.get().deserialize(machineEvent, data);
         } catch (Exception e) {
-            log.error("Error when deserialize ruleTemplate data: {} ", data, e);
+            log.error("Error when deserialize machine event data: {} ", data, e);
         }
         return machineEvent.getEvent();
     }

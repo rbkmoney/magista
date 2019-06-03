@@ -38,6 +38,7 @@ public class PaymentRefundService {
     }
 
     public void saveRefunds(List<RefundData> refundEvents) throws NotFoundException, StorageException {
+        log.info("Trying to save refund events, size={}", refundEvents.size());
         List<RefundData> enrichedRefundEvents = refundEvents.stream()
                 .map(refund -> {
                     switch (refund.getEventType()) {
@@ -60,7 +61,7 @@ public class PaymentRefundService {
 
         try {
             refundDao.save(enrichedRefundEvents);
-            log.info("Refund events have been saved, size='{}'", enrichedRefundEvents.size());
+            log.info("Refund events have been saved, size={}", enrichedRefundEvents.size());
         } catch (DaoException ex) {
             throw new StorageException(String.format("Failed to save refund events, size=%d", refundEvents.size()), ex);
         }

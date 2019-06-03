@@ -9,6 +9,8 @@ public interface InvoiceDao {
 
     InvoiceData get(String invoiceId) throws DaoException;
 
-    void save(List<InvoiceData> invoices) throws DaoException;
+    void insert(List<InvoiceData> invoices) throws DaoException;
+
+    void update(List<InvoiceData> invoices) throws DaoException;
 
 }
