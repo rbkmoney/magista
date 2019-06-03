@@ -42,7 +42,7 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
                         paymentData -> {
                             PaymentDataRecord paymentDataRecord = getDslContext().newRecord(PAYMENT_DATA, paymentData);
                             paymentDataRecord.changed(true);
-                            paymentDataRecord.changed(PAYMENT_DATA.ID, false);
+                            paymentDataRecord.changed(PAYMENT_DATA.ID, paymentDataRecord.getId() != null);
                             return paymentDataRecord;
                         }
                 )
@@ -63,7 +63,7 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
                         paymentData -> {
                             PaymentDataRecord paymentDataRecord = getDslContext().newRecord(PAYMENT_DATA, paymentData);
                             paymentDataRecord.changed(true);
-                            paymentDataRecord.changed(PAYMENT_DATA.ID, false);
+                            paymentDataRecord.changed(PAYMENT_DATA.ID, paymentDataRecord.getId() != null);
                             return paymentDataRecord;
                         }
                 )
