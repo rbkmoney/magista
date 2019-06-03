@@ -64,7 +64,7 @@ public class InvoiceService {
                 .collect(Collectors.toList());
         enrichedInvoiceEvents.removeAll(invoiceCreatedEvents);
         List<InvoiceData> updatedInvoices = StreamUtil.groupAndReduce(
-                invoiceCreatedEvents,
+                enrichedInvoiceEvents,
                 invoiceData -> invoiceData.getInvoiceId(),
                 (o1, o2) -> o2
         );
