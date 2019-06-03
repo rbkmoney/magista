@@ -51,7 +51,7 @@ public class InvoiceService {
         List<InvoiceData> enrichedInvoiceEvents = invoiceEvents.stream()
                 .map(invoiceData -> {
                     if (invoiceData.getEventType() == INVOICE_STATUS_CHANGED) {
-                        InvoiceData previousInvoiceData = invoiceDao.get(invoiceData.getInvoiceId());
+                        InvoiceData previousInvoiceData = getInvoiceData(invoiceData.getInvoiceId());
                         BeanUtil.merge(previousInvoiceData, invoiceData);
                     }
                     return invoiceData;
