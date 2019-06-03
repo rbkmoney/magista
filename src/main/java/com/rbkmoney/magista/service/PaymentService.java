@@ -82,7 +82,7 @@ public class PaymentService {
             paymentDao.update(updatedPayments);
             log.info("Payment event have been saved, batchSize={}, insertsCount={}, updatesCount={}", paymentEvents.size(), paymentStartedEvents.size(), updatedPayments.size());
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save payment events, size=%d", paymentEvents.size()), ex);
+            throw new StorageException(String.format("Failed to save payment events, paymentEvents='%s'", enrichedPaymentEvents), ex);
         }
     }
 

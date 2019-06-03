@@ -74,7 +74,7 @@ public class InvoiceService {
             invoiceDao.update(updatedInvoices);
             log.info("Payment event have been saved, batchSize={}, insertsCount={}, updatesCount={}", invoiceEvents.size(), invoiceCreatedEvents.size(), updatedInvoices.size());
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save invoice, size=%d", enrichedInvoiceEvents.size()), ex);
+            throw new StorageException(String.format("Failed to save invoice, invoiceEvents='%s'", enrichedInvoiceEvents), ex);
         }
     }
 
