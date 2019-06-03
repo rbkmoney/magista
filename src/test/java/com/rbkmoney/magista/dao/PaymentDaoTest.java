@@ -26,6 +26,7 @@ public class PaymentDaoTest extends AbstractDaoTest {
     @Test
     public void insertAndFindPaymentDataTest() {
         PaymentData paymentData = random(PaymentData.class);
+        paymentData.setId(1L);
 
         paymentDao.insert(List.of(paymentData));
         paymentDao.insert(List.of(paymentData));
@@ -41,10 +42,11 @@ public class PaymentDaoTest extends AbstractDaoTest {
         String paymentId = "paymentId";
 
         List<PaymentData> payments = Stream.concat(
-                randomStreamOf(100, PaymentData.class),
-                randomStreamOf(100, PaymentData.class)
+                randomStreamOf(100, PaymentData.class, "id"),
+                randomStreamOf(100, PaymentData.class, "id")
                         .map(
                                 paymentData -> {
+                                    paymentData.setId(101L); //15 Crazy Things You Didn’t Know About Vault 101
                                     paymentData.setInvoiceId(invoiceId);
                                     paymentData.setPaymentId(paymentId);
                                     return paymentData;
