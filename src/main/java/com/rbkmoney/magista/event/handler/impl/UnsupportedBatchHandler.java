@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -18,7 +19,11 @@ public class UnsupportedBatchHandler implements BatchHandler<InvoiceChange, Mach
 
     @Override
     public Processor handle(List<Map.Entry<InvoiceChange, MachineEvent>> changes) {
-        return () -> log.debug("Unsupported events, events='{}'", changes);
+        return () -> {
+            if (log.isDebugEnabled()) {
+                log.debug("Unsupported changes, events='{}'", changes.stream().map(Map.Entry::getKey).collect(Collectors.toList()));
+            }
+        };
     }
 
     @Override

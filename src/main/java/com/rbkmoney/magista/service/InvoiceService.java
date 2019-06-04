@@ -46,8 +46,6 @@ public class InvoiceService {
     }
 
     public void saveInvoices(List<InvoiceData> invoiceEvents) throws NotFoundException, StorageException {
-        log.info("Trying to save invoice events, size={}", invoiceEvents.size());
-
         List<InvoiceData> enrichedInvoiceEvents = invoiceEvents.stream()
                 .map(invoiceData -> {
                     if (invoiceData.getEventType() == INVOICE_STATUS_CHANGED) {
@@ -74,7 +72,7 @@ public class InvoiceService {
             invoiceDao.update(updatedInvoices);
             log.info("Payment event have been saved, batchSize={}, insertsCount={}, updatesCount={}", invoiceEvents.size(), invoiceCreatedEvents.size(), updatedInvoices.size());
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save invoice events, invoiceEvents='%s'", enrichedInvoiceEvents), ex);
+            throw new StorageException(String.format("Failed to save invoice events, batchSize=%d, insertsCount=%d, updatesCount=%d", invoiceEvents.size(), invoiceCreatedEvents.size(), updatedInvoices.size()), ex);
         }
     }
 
