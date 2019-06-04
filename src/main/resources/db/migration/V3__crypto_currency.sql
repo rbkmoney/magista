@@ -1,0 +1,1 @@
+alter table mst.payment_data add column crypto_currency character varying;

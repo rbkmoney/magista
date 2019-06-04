@@ -9,14 +9,11 @@ import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.util.BeanUtil;
-import com.rbkmoney.magista.util.StreamUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.AbstractMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -48,6 +45,7 @@ public class PaymentService {
     }
 
     public void savePayments(List<PaymentData> paymentEvents) throws NotFoundException, StorageException {
+        Map<String, PaymentData> paymentDataCacheMap = new LinkedHashMap<>();
         List<PaymentData> enrichedPaymentEvents = paymentEvents.stream()
                 .map(payment -> {
                     switch (payment.getEventType()) {
@@ -59,28 +57,29 @@ public class PaymentService {
                             }
                             return payment;
                         default:
-                            PaymentData previousPaymentData = getPaymentData(payment.getInvoiceId(), payment.getPaymentId());
+                            PaymentData previousPaymentData = paymentDataCacheMap.computeIfAbsent(
+                                    payment.getInvoiceId() + payment.getPaymentId(),
+                                    key -> getPaymentData(payment.getInvoiceId(), payment.getPaymentId())
+                            );
+
                             BeanUtil.merge(previousPaymentData, payment);
                             return payment;
                     }
                 })
+                .peek(payment -> paymentDataCacheMap.put(payment.getInvoiceId() + payment.getPaymentId(), payment))
                 .peek(payment -> paymentDataCache.put(new AbstractMap.SimpleEntry<>(payment.getInvoiceId(), payment.getPaymentId()), payment))
                 .collect(Collectors.toList());
 
         List<PaymentData> paymentStartedEvents = enrichedPaymentEvents.stream()
                 .filter(paymentData -> paymentData.getEventType() == InvoiceEventType.INVOICE_PAYMENT_STARTED)
                 .collect(Collectors.toList());
-        enrichedPaymentEvents.removeAll(paymentStartedEvents);
-        List<PaymentData> updatedPayments = StreamUtil.groupAndReduce(
-                enrichedPaymentEvents,
-                paymentData -> Map.entry(paymentData.getInvoiceId(), paymentData.getPaymentId()),
-                (o1, o2) -> o2
-        );
+        List<PaymentData> updatedPayments = new ArrayList<>(paymentDataCacheMap.values());
+        updatedPayments.removeAll(paymentStartedEvents);
 
         try {
             paymentDao.insert(paymentStartedEvents);
             paymentDao.update(updatedPayments);
-            log.info("Payment event have been saved, batchSize={}, insertsCount={}, updatesCount={}", paymentEvents.size(), paymentStartedEvents.size(), updatedPayments.size());
+            log.info("Payment events have been saved, batchSize={}, insertsCount={}, updatesCount={}", paymentEvents.size(), paymentStartedEvents.size(), updatedPayments.size());
         } catch (DaoException ex) {
             throw new StorageException(String.format("Failed to save payment events, batchSize=%d, insertsCount=%d, updatesCount=%d", paymentEvents.size(), paymentStartedEvents.size(), updatedPayments.size()), ex);
         }
