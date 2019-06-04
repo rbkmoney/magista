@@ -4,8 +4,6 @@ import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.damsel.domain.PaymentTool;
 import com.rbkmoney.damsel.domain.*;
-import com.rbkmoney.damsel.geo_ip.LocationInfo;
-import com.rbkmoney.damsel.geo_ip.geo_ipConstants;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
 import com.rbkmoney.geck.common.util.TBaseUtil;
@@ -19,8 +17,6 @@ import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.mapper.PaymentMapper;
 import com.rbkmoney.magista.exception.NotFoundException;
-import com.rbkmoney.magista.provider.GeoProvider;
-import com.rbkmoney.magista.provider.ProviderException;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +30,6 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class PaymentStartedEventMapper implements PaymentMapper {
-
-    private final GeoProvider geoProvider;
 
     @Override
     public PaymentData map(InvoiceChange change, MachineEvent machineEvent) {
@@ -99,12 +93,6 @@ public class PaymentStartedEventMapper implements PaymentMapper {
                 if (paymentResource.isSetClientInfo()) {
                     ClientInfo clientInfo = paymentResource.getClientInfo();
                     paymentData.setPaymentFingerprint(clientInfo.getFingerprint());
-
-                    String paymentIpAddress = clientInfo.getIpAddress();
-                    if (paymentIpAddress != null) {
-                        paymentData.setPaymentIp(paymentIpAddress);
-                        mapLocationInfo(paymentData, paymentIpAddress);
-                    }
                 }
                 break;
             case customer:
@@ -213,17 +201,6 @@ public class PaymentStartedEventMapper implements PaymentMapper {
     private void mapContactInfo(PaymentData paymentData, ContactInfo contactInfo) {
         paymentData.setPaymentEmail(contactInfo.getEmail());
         paymentData.setPaymentPhoneNumber(contactInfo.getPhoneNumber());
-    }
-
-    private void mapLocationInfo(PaymentData paymentData, String ipAddress) {
-        try {
-            LocationInfo locationInfo = geoProvider.getLocationInfo(ipAddress);
-            paymentData.setPaymentCityId(locationInfo.getCityGeoId());
-            paymentData.setPaymentCountryId(locationInfo.getCountryGeoId());
-        } catch (ProviderException ex) {
-            paymentData.setPaymentCityId(geo_ipConstants.GEO_ID_UNKNOWN);
-            paymentData.setPaymentCountryId(geo_ipConstants.GEO_ID_UNKNOWN);
-        }
     }
 
     @Override

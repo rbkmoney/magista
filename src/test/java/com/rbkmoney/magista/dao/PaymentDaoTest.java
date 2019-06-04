@@ -60,6 +60,43 @@ public class PaymentDaoTest extends AbstractDaoTest {
     }
 
     @Test
+    public void batchInsertWithDifferentValues() {
+        PaymentData paymentData = new PaymentData();
+        paymentData.setInvoiceId(random(String.class));
+        paymentData.setPaymentId(random(String.class));
+        paymentData.setPartyId(UUID.randomUUID());
+        paymentData.setPartyShopId(random(String.class));
+        paymentData.setEventId(1L);
+        paymentData.setEventCreatedAt(LocalDateTime.now());
+        paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
+        paymentData.setPaymentCurrencyCode("RUB");
+        paymentData.setPaymentOriginAmount(random(Long.class));
+        paymentData.setPaymentAmount(random(Long.class));
+        paymentData.setPaymentStatus(InvoicePaymentStatus.pending);
+        paymentData.setPaymentDomainRevision(1L);
+        paymentData.setPaymentTool(PaymentTool.payment_terminal);
+        paymentData.setPaymentTerminalProvider("");
+        paymentData.setPaymentFlow(PaymentFlow.instant);
+        paymentData.setPaymentCreatedAt(LocalDateTime.now());
+        paymentData.setPaymentPayerType(PaymentPayerType.payment_resource);
+
+
+        PaymentData secondPaymentData = new PaymentData(paymentData);
+        secondPaymentData.setPaymentFlow(PaymentFlow.hold);
+        secondPaymentData.setPaymentHoldOnExpiration(OnHoldExpiration.cancel);
+        secondPaymentData.setPaymentHoldUntil(LocalDateTime.now());
+        secondPaymentData.setPaymentContext(new byte[] {0, 1, 2});
+
+
+        List<PaymentData> payments = List.of(
+                paymentData,
+                secondPaymentData
+        );
+
+        paymentDao.insert(payments);
+    }
+
+    @Test
     public void batchEmptyListTest() {
         paymentDao.insert(List.of());
     }

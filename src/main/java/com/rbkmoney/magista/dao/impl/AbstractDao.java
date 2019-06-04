@@ -27,9 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Created by tolkonepiu on 29/05/2017.
- */
 public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
 
     private final DSLContext dslContext;
@@ -237,9 +234,8 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
         MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
         for (Map.Entry<String, Param<?>> entry : params.entrySet()) {
             Param<?> param = entry.getValue();
-            if (param.getValue() instanceof String) {
-                sqlParameterSource.addValue(entry.getKey(), ((String) param.getValue()).replace("\u0000", "\\u0000"));
-            } else if (param.getValue() instanceof LocalDateTime || param.getValue() instanceof EnumType) {
+            Class<?> type = param.getDataType().getType();
+            if (type.isInstance(LocalDateTime.class) || EnumType.class.isAssignableFrom(type)) {
                 sqlParameterSource.addValue(entry.getKey(), param.getValue(), Types.OTHER);
             } else {
                 sqlParameterSource.addValue(entry.getKey(), param.getValue());
