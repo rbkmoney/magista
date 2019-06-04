@@ -53,9 +53,9 @@ public class PaymentRefundService {
                             }
                             return refund;
                         default:
-                            RefundData previousRefund = refundDataCacheMap.getOrDefault(
+                            RefundData previousRefund = refundDataCacheMap.computeIfAbsent(
                                     refund.getInvoiceId() + refund.getPaymentId() + refund.getRefundId(),
-                                    getRefund(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId())
+                                    key -> getRefund(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId())
                             );
                             BeanUtil.merge(previousRefund, refund);
                             return refund;

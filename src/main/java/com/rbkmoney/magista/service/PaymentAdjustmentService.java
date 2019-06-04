@@ -50,9 +50,9 @@ public class PaymentAdjustmentService {
                             adjustment.setPartyShopId(paymentData.getPartyShopId());
                             return adjustment;
                         default:
-                            AdjustmentData previousAdjustmentEvent = adjustmentDataCacheMap.getOrDefault(
+                            AdjustmentData previousAdjustmentEvent = adjustmentDataCacheMap.computeIfAbsent(
                                     adjustment.getInvoiceId() + adjustment.getPaymentId() + adjustment.getAdjustmentId(),
-                                    getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId())
+                                    key -> getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId())
                             );
                             BeanUtil.merge(previousAdjustmentEvent, adjustment);
                             return adjustment;
