@@ -1,9 +1,9 @@
 package com.rbkmoney.magista.event.impl.handler;
 
 import com.rbkmoney.damsel.base.Content;
-import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.damsel.domain.PaymentTool;
+import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.geo_ip.geo_ipConstants;
@@ -14,8 +14,8 @@ import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
 import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
-import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.event.ChangeType;
@@ -212,6 +212,10 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
                         TypeUtil.toEnumField(bankCard.getTokenProvider().name(), BankCardTokenProvider.class)
                 );
             }
+        }
+
+        if (paymentTool.isSetCryptoCurrency()) {
+            paymentData.setCryptoCurrency(paymentTool.getCryptoCurrency().toString());
         }
     }
 

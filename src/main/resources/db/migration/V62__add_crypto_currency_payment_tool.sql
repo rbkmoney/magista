@@ -1,0 +1,1 @@
+alter type mst.payment_tool add value 'crypto_currency';
