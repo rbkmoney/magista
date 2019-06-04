@@ -44,9 +44,9 @@ public class PayoutDaoTest extends AbstractDaoTest {
         payoutData.setEventId(Long.MAX_VALUE);
         payoutData.setEventType(PayoutEventType.PAYOUT_CREATED);
         payoutData.setEventCreatedAt(LocalDateTime.now());
-        payoutData.setPartyId("\0");
-        payoutData.setPartyShopId("\000");
-        payoutData.setPayoutId("\\000\000\000");
+        payoutData.setPartyShopId(random(String.class));
+        payoutData.setPayoutId(random(String.class));
+        payoutData.setPartyId(random(String.class));
         payoutData.setPayoutCurrencyCode("RUB");
         payoutData.setPayoutCreatedAt(LocalDateTime.now());
         payoutData.setPayoutStatus(PayoutStatus.paid);
