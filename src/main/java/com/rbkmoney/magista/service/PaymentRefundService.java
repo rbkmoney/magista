@@ -9,11 +9,11 @@ import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.util.BeanUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,6 +39,7 @@ public class PaymentRefundService {
 
     public void saveRefunds(List<RefundData> refundEvents) throws NotFoundException, StorageException {
         log.info("Trying to save refund events, size={}", refundEvents.size());
+        Map<String, RefundData> refundDataCacheMap = new HashMap<>();
         List<RefundData> enrichedRefundEvents = refundEvents.stream()
                 .map(refund -> {
                     switch (refund.getEventType()) {
@@ -52,11 +53,15 @@ public class PaymentRefundService {
                             }
                             return refund;
                         default:
-                            RefundData previousRefund = getRefund(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId());
+                            RefundData previousRefund = refundDataCacheMap.getOrDefault(
+                                    refund.getInvoiceId() + refund.getPaymentId() + refund.getRefundId(),
+                                    getRefund(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId())
+                            );
                             BeanUtil.merge(previousRefund, refund);
                             return refund;
                     }
                 })
+                .peek(refundData -> refundDataCacheMap.put(refundData.getInvoiceId() + refundData.getPaymentId() + refundData.getRefundId(), refundData))
                 .collect(Collectors.toList());
 
         try {

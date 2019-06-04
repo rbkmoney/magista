@@ -9,12 +9,11 @@ import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.util.BeanUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,6 +40,7 @@ public class PaymentAdjustmentService {
     public void saveAdjustments(List<AdjustmentData> adjustments) throws NotFoundException, StorageException {
         log.info("Trying to save adjustment events, size={}", adjustments.size());
 
+        Map<String, AdjustmentData> adjustmentDataCacheMap = new HashMap<>();
         List<AdjustmentData> enrichedAdjustmentEvents = adjustments.stream()
                 .map(adjustment -> {
                     switch (adjustment.getEventType()) {
@@ -50,11 +50,15 @@ public class PaymentAdjustmentService {
                             adjustment.setPartyShopId(paymentData.getPartyShopId());
                             return adjustment;
                         default:
-                            AdjustmentData previousAdjustmentEvent = getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId());
+                            AdjustmentData previousAdjustmentEvent = adjustmentDataCacheMap.getOrDefault(
+                                    adjustment.getInvoiceId() + adjustment.getPaymentId() + adjustment.getAdjustmentId(),
+                                    getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId())
+                            );
                             BeanUtil.merge(previousAdjustmentEvent, adjustment);
                             return adjustment;
                     }
                 })
+                .peek(adjustmentData -> adjustmentDataCacheMap.put(adjustmentData.getInvoiceId() + adjustmentData.getPaymentId() + adjustmentData.getAdjustmentId(), adjustmentData))
                 .collect(Collectors.toList());
 
         try {
