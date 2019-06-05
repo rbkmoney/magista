@@ -196,6 +196,10 @@ public class PaymentStartedEventMapper implements PaymentMapper {
                 );
             }
         }
+
+        if (paymentTool.isSetCryptoCurrency()) {
+            paymentData.setCryptoCurrency(paymentTool.getCryptoCurrency().toString());
+        }
     }
 
     private void mapContactInfo(PaymentData paymentData, ContactInfo contactInfo) {

@@ -21,7 +21,12 @@ public class UnsupportedBatchHandler implements BatchHandler<InvoiceChange, Mach
     public Processor handle(List<Map.Entry<InvoiceChange, MachineEvent>> changes) {
         return () -> {
             if (log.isDebugEnabled()) {
-                log.debug("Unsupported changes, events='{}'", changes.stream().map(Map.Entry::getKey).collect(Collectors.toList()));
+                log.debug(
+                        "Unsupported changes, size={}, eventSize={}, changes='{}'",
+                        changes.size(),
+                        changes.stream().map(Map.Entry::getValue).distinct().count(),
+                        changes.stream().map(Map.Entry::getKey).collect(Collectors.toList())
+                );
             }
         };
     }
