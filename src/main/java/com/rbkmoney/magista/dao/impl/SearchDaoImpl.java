@@ -50,7 +50,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     private final StatRefundMapper statRefundMapper;
     private final StatPayoutMapper statPayoutMapper;
 
-    public SearchDaoImpl(@Qualifier("slaveDataSource") DataSource ds) {
+    public SearchDaoImpl(DataSource ds) {
         super(ds);
         statInvoiceMapper = new StatInvoiceMapper();
         statPaymentMapper = new StatPaymentMapper();
