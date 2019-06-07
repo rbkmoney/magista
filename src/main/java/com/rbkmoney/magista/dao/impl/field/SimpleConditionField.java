@@ -3,6 +3,8 @@ package com.rbkmoney.magista.dao.impl.field;
 import org.jooq.Comparator;
 import org.jooq.Field;
 
+import java.util.Objects;
+
 public class SimpleConditionField<T> implements ConditionField<T, T> {
 
     private final Field<T> field;
@@ -39,8 +41,8 @@ public class SimpleConditionField<T> implements ConditionField<T, T> {
 
         SimpleConditionField<?> that = (SimpleConditionField<?>) o;
 
-        if (field != null ? !field.equals(that.field) : that.field != null) return false;
-        if (value != null ? !value.equals(that.value) : that.value != null) return false;
+        if (!Objects.equals(field, that.field)) return false;
+        if (!Objects.equals(value, that.value)) return false;
         return comparator == that.comparator;
     }
 

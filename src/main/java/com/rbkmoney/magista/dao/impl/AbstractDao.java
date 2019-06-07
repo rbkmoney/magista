@@ -235,12 +235,12 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
         for (Map.Entry<String, Param<?>> entry : params.entrySet()) {
             Param<?> param = entry.getValue();
             Class<?> type = param.getDataType().getType();
-            if (String.class.isInstance(type)) {
+            if (String.class.isAssignableFrom(type)) {
                 String value = Optional.ofNullable(param.getValue())
                         .map(stringValue -> ((String) stringValue).replace("\u0000", "\\u0000"))
                         .orElse(null);
                 sqlParameterSource.addValue(entry.getKey(), value);
-            } else if (type.isInstance(LocalDateTime.class) || EnumType.class.isAssignableFrom(type)) {
+            } else if (EnumType.class.isAssignableFrom(type)) {
                 sqlParameterSource.addValue(entry.getKey(), param.getValue(), Types.OTHER);
             } else {
                 sqlParameterSource.addValue(entry.getKey(), param.getValue());
