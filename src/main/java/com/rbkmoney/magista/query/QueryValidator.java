@@ -6,7 +6,7 @@ package com.rbkmoney.magista.query;
 public interface QueryValidator {
     void validateParameters(QueryParameters parameters) throws IllegalArgumentException;
 
-    default void validateQuery(Query query) throws IllegalArgumentException {
+    default void validateQuery(Query query, QueryContext queryContext) throws IllegalArgumentException {
         validateParameters(query.getQueryParameters());
     }
 }

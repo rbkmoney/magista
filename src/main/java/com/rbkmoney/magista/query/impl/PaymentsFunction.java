@@ -12,7 +12,6 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.util.TokenUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
@@ -54,12 +53,11 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
                     StatResponse statResponse = new StatResponse(statResponseData);
                     List<Map.Entry<Long, StatPayment>> payments = paymentsResult.getCollectedStream();
                     if (!payments.isEmpty() && getQueryParameters().getSize() == payments.size()) {
-                        statResponse.setContinuationToken(
-                                TokenUtil.buildToken(
-                                        getQueryParameters(),
-                                        payments.get(payments.size() - 1).getKey()
-                                )
-                        );
+                        String createdAt = payments.get(payments.size() - 1).getValue().getCreatedAt();
+                        String token = getContext(context)
+                                .getTokenGenService()
+                                .generateToken(getQueryParameters(), TypeUtil.stringToLocalDateTime(createdAt));
+                        statResponse.setContinuationToken(token);
                     }
                     return statResponse;
                 }
@@ -229,9 +227,9 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
         private PaymentsValidator validator = new PaymentsValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
             Query resultQuery = buildSingleQuery(PaymentsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
-            validator.validateQuery(resultQuery);
+            validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 
@@ -275,7 +273,7 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
                         parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
-                        getFromId(),
+                        getTime(functionContext),
                         parameters.getSize()
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);

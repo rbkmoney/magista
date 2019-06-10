@@ -10,7 +10,6 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.util.TokenUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,12 +50,11 @@ public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, 
 
                     List<Map.Entry<Long, EnrichedStatInvoice>> enrichedInvoicesStats = enrichedInvoicesResult.getCollectedStream();
                     if (!enrichedInvoicesResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == enrichedInvoicesStats.size()) {
-                        statResponse.setContinuationToken(
-                                TokenUtil.buildToken(
-                                        getQueryParameters(),
-                                        enrichedInvoicesStats.get(enrichedInvoicesStats.size() - 1).getKey()
-                                )
-                        );
+                        String createdAt = enrichedInvoicesStats.get(enrichedInvoicesStats.size() - 1).getValue().getInvoice().getCreatedAt();
+                        String token = getContext(context)
+                                .getTokenGenService()
+                                .generateToken(getQueryParameters(), TypeUtil.stringToLocalDateTime(createdAt));
+                        statResponse.setContinuationToken(token);
                     }
                     return statResponse;
                 });
@@ -87,9 +85,9 @@ public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, 
         private PaymentsFunction.PaymentsValidator validator = new PaymentsFunction.PaymentsValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
             Query resultQuery = buildSingleQuery(EnrichedPaymentsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
-            validator.validateQuery(resultQuery);
+            validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 
@@ -158,7 +156,7 @@ public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, 
                         parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
-                        getFromId(),
+                        getTime(functionContext),
                         parameters.getSize()
                 );
                 return new BaseQueryResult<>(result::stream, () -> result);
