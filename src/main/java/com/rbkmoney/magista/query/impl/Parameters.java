@@ -40,7 +40,7 @@ public class Parameters {
     public static final String PAYMENT_CUSTOMER_ID_PARAM = "payment_customer_id";
 
     public static final String PAYMENT_RRN_PARAM = "payment_rrn";
-    public static final String PAYMENT_APPROVAL_CODE = "payment_approval_code";
+    public static final String PAYMENT_APPROVAL_CODE_PARAM = "payment_approval_code";
 
     public static final String REFUND_ID_PARAM = "refund_id";
     public static final String REFUND_STATUS_PARAM = "refund_status";

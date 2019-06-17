@@ -182,7 +182,7 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
         }
 
         public String getPaymentApproveCode() {
-            return getStringParameter(PAYMENT_APPROVAL_CODE, false);
+            return getStringParameter(PAYMENT_APPROVAL_CODE_PARAM, false);
         }
     }
 
