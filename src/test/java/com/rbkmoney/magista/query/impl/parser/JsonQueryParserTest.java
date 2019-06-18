@@ -36,13 +36,13 @@ public class JsonQueryParserTest {
 
     @Test
     public void testPaymentsParse() {
-        String json = "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'payment_last_digits':'1212','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
+        String json = "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'payment_last_digits':'1212','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z', 'payment_rrn': '2144325', 'payment_approval_code': '3414'}}}";
         List<QueryPart> queryParts = parser.parseQuery(json);
         assertEquals("root query", 1, queryParts.size());
         assertEquals("root query has 1 parameter - function name", 1, queryParts.get(0).getParameters().getParametersMap().size());
         assertEquals("child payments function", 1, queryParts.get(0).getChildren().size());
         assertEquals("payments function has no children", 0, queryParts.get(0).getChildren().get(0).getChildren().size());
-        assertEquals("payments function has 7 parameters", 7, queryParts.get(0).getChildren().get(0).getParameters().getParametersMap().size());
+        assertEquals("payments function has 9 parameters", 9, queryParts.get(0).getChildren().get(0).getParameters().getParametersMap().size());
 
         assertEquals(RootQuery.RootParser.getMainDescriptor(), queryParts.get(0).getDescriptor());
         assertEquals(queryParts.get(0).getChildren().get(0).getDescriptor(), PaymentsFunction.PaymentsParser.getMainDescriptor());
@@ -56,7 +56,8 @@ public class JsonQueryParserTest {
         assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
         assertEquals("2016-03-22T01:12:00Z", TypeUtil.temporalToString(parameters.getToTime()));
         assertNull(parameters.getFrom());
-
+        assertEquals("2144325", parameters.getPaymentRrn());
+        assertEquals("3414", parameters.getPaymentApproveCode());
     }
 
     @Test
