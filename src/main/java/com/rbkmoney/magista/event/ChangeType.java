@@ -22,6 +22,7 @@ public enum ChangeType {
     INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED("invoice_payment_change.payload.invoice_payment_adjustment_change.payload.invoice_payment_adjustment_status_changed", new IsNullCondition().not()),
     INVOICE_PAYMENT_REFUND_CREATED("invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_created", new IsNullCondition().not()),
     INVOICE_PAYMENT_REFUND_STATUS_CHANGED("invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_status_changed", new IsNullCondition().not()),
+    INVOICE_PAYMENT_TRANSACTION_BOUND("invoice_payment_change.payload.invoice_payment_session_change.payload.session_transaction_bound", new IsNullCondition().not()),
     PAYOUT_CREATED("payout_created", new IsNullCondition().not()),
     PAYOUT_STATUS_CHANGED("payout_status_changed", new IsNullCondition().not());
 

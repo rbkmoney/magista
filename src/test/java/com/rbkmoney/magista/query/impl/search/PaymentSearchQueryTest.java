@@ -27,8 +27,16 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
     public void testPayments() {
         String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(2, statResponse.getData().getPayments().size());
+        assertEquals(3, statResponse.getData().getPayments().size());
         DamselUtil.toJson(statResponse);
+    }
+
+    @Test
+    @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
+    public void testPaymentAdditionalInfo() {
+        String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32', 'payment_rrn': '43253', 'payment_approval_code': '5324'}}}";
+        final StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(1, statResponse.getData().getPayments().size());
     }
 
     @Test(expected = QueryParserException.class)
@@ -54,6 +62,11 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
 
         statRequest.setContinuationToken(statResponse.getContinuationToken());
         statResponse = queryProcessor.processQuery(statRequest);
+        assertEquals(1, statResponse.getData().getPayments().size());
+
+        statRequest.setContinuationToken(statResponse.getContinuationToken());
+        statResponse = queryProcessor.processQuery(statRequest);
+
         assertNull(statResponse.getContinuationToken());
     }
 
@@ -70,7 +83,7 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
     public void testOrderByEventIdPayments() {
         String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(2, statResponse.getData().getPayments().size());
+        assertEquals(3, statResponse.getData().getPayments().size());
         Instant instant = Instant.MAX;
         for (StatPayment statPayment : statResponse.getData().getPayments()) {
             Instant statInstant = Instant.from(TypeUtil.stringToTemporal(statPayment.getCreatedAt()));
@@ -136,7 +149,7 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
     public void testPaymentsWithoutMerchantAndShopId() {
         String json = "{'query': {'payments': {'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(3, statResponse.getData().getPayments().size());
+        assertEquals(4, statResponse.getData().getPayments().size());
         DamselUtil.toJson(statResponse);
     }
 

@@ -40,6 +40,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -62,6 +63,7 @@ import static org.mockito.Mockito.verify;
         PaymentBatchHandler.class,
         PaymentStartedEventMapper.class,
         PaymentStatusChangedEventMapper.class,
+        PaymentTransactionBoundMapper.class,
         RefundBatchHandler.class,
         RefundCreatedMapper.class,
         RefundStatusChangedMapper.class,
@@ -139,6 +141,17 @@ public class InvoicingKafkaTest {
         InvoicePaymentAdjustment invoicePaymentAdjustment = new InvoicePaymentAdjustment()
                 .setCreatedAt(Instant.now().toString());
         invoicePaymentAdjustment = fillTBaseObject(invoicePaymentAdjustment, InvoicePaymentAdjustment.class);
+
+        TransactionInfo transactionInfo = new TransactionInfo();
+        transactionInfo.setId("3542543");
+        transactionInfo.setExtra(Collections.emptyMap());
+        AdditionalTransactionInfo additionalTransactionInfo = new AdditionalTransactionInfo();
+        additionalTransactionInfo.setRrn("5436");
+        additionalTransactionInfo.setApprovalCode("4326");
+        transactionInfo.setAdditionalInfo(additionalTransactionInfo);
+
+        SessionTransactionBound sessionTransactionBound = new SessionTransactionBound();
+        sessionTransactionBound.setTrx(transactionInfo);
 
         EventPayload eventPayload = EventPayload.invoice_changes(
                 Arrays.asList(
@@ -218,6 +231,16 @@ public class InvoicingKafkaTest {
                                                                         )
                                                                 )
                                                         )
+                                                )
+                                        )
+                                )
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_session_change(
+                                                new InvoicePaymentSessionChange(
+                                                        TargetInvoicePaymentStatus.processed(new InvoicePaymentProcessed()),
+                                                        SessionChangePayload.session_transaction_bound(sessionTransactionBound)
                                                 )
                                         )
                                 )

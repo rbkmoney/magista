@@ -174,6 +174,14 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
         public String getPaymentBankCardTokenProvider() {
             return getStringParameter(PAYMENT_BANK_CARD_TOKEN_PROVIDER_PARAM, false);
         }
+
+        public String getPaymentRrn() {
+            return getStringParameter(PAYMENT_RRN_PARAM, false);
+        }
+
+        public String getPaymentApproveCode() {
+            return getStringParameter(PAYMENT_APPROVAL_CODE_PARAM, false);
+        }
     }
 
     public static class PaymentsValidator extends PagedBaseValidator {
