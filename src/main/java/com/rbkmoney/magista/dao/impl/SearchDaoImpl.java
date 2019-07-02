@@ -59,7 +59,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
             InvoicesFunction.InvoicesParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             int limit
     ) throws DaoException {
 
@@ -115,7 +115,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                                 EQUALS)
                                         .addValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
                                         .addValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                                        .addValue(INVOICE_DATA.ID, fromId.orElse(null), LESS)
+                                        .addValue(INVOICE_DATA.INVOICE_CREATED_AT, whereTime.orElse(null), LESS)
                                         .addValue(INVOICE_DATA.INVOICE_STATUS,
                                                 toEnumField(
                                                         parameters.getInvoiceStatus(),
@@ -140,10 +140,10 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
             PaymentsFunction.PaymentsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             int limit
     ) throws DaoException {
-        ConditionParameterSource conditionParameterSource = preparePaymentsCondition(parameters, fromId);
+        ConditionParameterSource conditionParameterSource = preparePaymentsCondition(parameters, whereTime);
 
         Query query = getDslContext()
                 .select()
@@ -166,7 +166,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
             RefundsFunction.RefundsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             Optional<Integer> offset,
             int limit
     ) throws DaoException {
@@ -213,7 +213,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
             PayoutsFunction.PayoutsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             Optional<Integer> offset,
             int limit
     ) throws DaoException {
@@ -244,7 +244,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     }
 
     @Override
-    public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(RefundsFunction.RefundsParameters parameters, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<Integer> fromId, int limit) throws DaoException {
+    public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(RefundsFunction.RefundsParameters parameters, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<LocalDateTime> whereTime, int limit) throws DaoException {
         Condition conditions = prepareRefundCondition(parameters, fromTime, toTime);
 
         Query query = getDslContext()
@@ -260,8 +260,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     }
 
     @Override
-    public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(PaymentsFunction.PaymentsParameters parameters, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<Long> fromId, int limit) throws DaoException {
-        ConditionParameterSource conditionParameterSource = preparePaymentsCondition(parameters, fromId);
+    public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(PaymentsFunction.PaymentsParameters parameters, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<LocalDateTime> whereTime, int limit) throws DaoException {
+        ConditionParameterSource conditionParameterSource = preparePaymentsCondition(parameters, whereTime);
 
         Query query = getDslContext()
                 .select()
@@ -283,7 +283,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         return fetch(query, enrichedStatInvoiceMapper);
     }
 
-    private ConditionParameterSource preparePaymentsCondition(PaymentsFunction.PaymentsParameters parameters, Optional<Long> fromId) {
+    private ConditionParameterSource preparePaymentsCondition(PaymentsFunction.PaymentsParameters parameters, Optional<LocalDateTime> whereTime) {
         return new ConditionParameterSource()
                 .addValue(
                         PAYMENT_DATA.PARTY_ID,
@@ -295,7 +295,6 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
                 .addValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
-                .addValue(PAYMENT_DATA.ID, fromId.orElse(null), LESS)
                 .addValue(PAYMENT_DATA.PAYMENT_STATUS,
                         toEnumField(parameters.getPaymentStatus(), com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
                         EQUALS)
@@ -321,6 +320,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime.orElse(null), LESS)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS);
     }

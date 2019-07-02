@@ -1,7 +1,6 @@
 package com.rbkmoney.magista.query.impl;
 
 import com.rbkmoney.damsel.merch_stat.EnrichedStatInvoice;
-import com.rbkmoney.damsel.merch_stat.StatRefund;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
@@ -13,7 +12,6 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.util.TokenUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,12 +52,11 @@ public class EnrichedRefundsFunction extends PagedBaseFunction<Map.Entry<Long, E
 
                     List<Map.Entry<Long, EnrichedStatInvoice>> enrichedInvoicesStats = enrichedInvoicesResult.getCollectedStream();
                     if (!enrichedInvoicesResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == enrichedInvoicesStats.size()) {
-                        statResponse.setContinuationToken(
-                                TokenUtil.buildToken(
-                                        getQueryParameters(),
-                                        enrichedInvoicesStats.get(enrichedInvoicesStats.size() - 1).getKey()
-                                )
-                        );
+                        final String createdAt = enrichedInvoicesStats.get(enrichedInvoicesStats.size() - 1).getValue().getInvoice().getCreatedAt();
+                        final String token = getContext(context)
+                                .getTokenGenService()
+                                .generateToken(getQueryParameters(), TypeUtil.stringToLocalDateTime(createdAt));
+                        statResponse.setContinuationToken(token);
                     }
                     return statResponse;
                 });
@@ -114,9 +111,9 @@ public class EnrichedRefundsFunction extends PagedBaseFunction<Map.Entry<Long, E
         private RefundsFunction.RefundsValidator validator = new RefundsFunction.RefundsValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
             Query resultQuery = buildSingleQuery(EnrichedRefundsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
-            validator.validateQuery(resultQuery);
+            validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 
@@ -160,7 +157,7 @@ public class EnrichedRefundsFunction extends PagedBaseFunction<Map.Entry<Long, E
                         parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
-                        Optional.ofNullable(parameters.getFrom()),
+                        getTime(functionContext),
                         parameters.getSize()
                 );
                 return new BaseQueryResult<>(result::stream, () -> result);

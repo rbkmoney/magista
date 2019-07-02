@@ -113,9 +113,9 @@ public abstract class StatBaseFunction extends ScopedBaseFunction<Map<String, St
         private StatBaseValidator validator = new StatBaseValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
             Query resultQuery = buildSingleQuery(getDescriptor(queryParts), queryParts, queryPart -> createQuery(queryPart));
-            validator.validateQuery(resultQuery);
+            validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 

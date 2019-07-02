@@ -6,6 +6,7 @@ import com.rbkmoney.magista.query.impl.QueryContextFactoryImpl;
 import com.rbkmoney.magista.query.impl.QueryProcessorImpl;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
+import com.rbkmoney.magista.service.TokenGenService;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
@@ -39,9 +40,12 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     private SearchDao searchDao;
 
+    @Autowired
+    private TokenGenService tokenGenService;
+
     @Before
     public void before() {
-        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao, searchDao);
+        QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao, searchDao, tokenGenService);
         queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
     }
 

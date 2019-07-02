@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.query.builder;
 
 import com.rbkmoney.magista.query.Query;
+import com.rbkmoney.magista.query.QueryContext;
 import com.rbkmoney.magista.query.parser.QueryPart;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
  */
 public interface QueryBuilder {
 
-    Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException;
+    Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException;
 
     boolean apply(List<QueryPart> queryParts, QueryPart parent);
 }

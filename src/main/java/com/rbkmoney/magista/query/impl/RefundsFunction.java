@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.damsel.merch_stat.StatPayout;
 import com.rbkmoney.damsel.merch_stat.StatRefund;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
@@ -13,7 +12,6 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.util.TokenUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
@@ -54,12 +52,11 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
                     StatResponse statResponse = new StatResponse(statResponseData);
                     List<Map.Entry<Long, StatRefund>> refunds = refundsResult.getCollectedStream();
                     if (!refunds.isEmpty() && getQueryParameters().getSize() == refunds.size()) {
-                        statResponse.setContinuationToken(
-                                TokenUtil.buildToken(
-                                        getQueryParameters(),
-                                        refunds.get(refunds.size() - 1).getKey()
-                                )
-                        );
+                        final String createdAt = refunds.get(refunds.size() - 1).getValue().getCreatedAt();
+                        final String token = getContext(context)
+                                .getTokenGenService()
+                                .generateToken(getQueryParameters(), TypeUtil.stringToLocalDateTime(createdAt));
+                        statResponse.setContinuationToken(token);
                     }
                     return statResponse;
                 });
@@ -162,9 +159,9 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
         private RefundsValidator validator = new RefundsValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
             Query resultQuery = buildSingleQuery(RefundsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
-            validator.validateQuery(resultQuery);
+            validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 

@@ -12,7 +12,6 @@ import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;
 import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.util.TokenUtil;
 
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
@@ -53,12 +52,11 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
                     StatResponse statResponse = new StatResponse(statResponseData);
                     List<Map.Entry<Long, StatPayout>> payouts = payoutsResult.getCollectedStream();
                     if (!payouts.isEmpty() && getQueryParameters().getSize() == payouts.size()) {
-                        statResponse.setContinuationToken(
-                                TokenUtil.buildToken(
-                                        getQueryParameters(),
-                                        payouts.get(payouts.size() - 1).getKey()
-                                )
-                        );
+                        final String createdAt = payouts.get(payouts.size() - 1).getValue().getCreatedAt();
+                        final String token = getContext(context)
+                                .getTokenGenService()
+                                .generateToken(getQueryParameters(), TypeUtil.stringToLocalDateTime(createdAt));
+                        statResponse.setContinuationToken(token);
                     }
                     return statResponse;
                 });
@@ -161,9 +159,9 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
         private PayoutsValidator validator = new PayoutsValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
             Query resultQuery = buildSingleQuery(PayoutsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
-            validator.validateQuery(resultQuery);
+            validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 

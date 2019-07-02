@@ -10,6 +10,7 @@ import com.rbkmoney.magista.query.impl.QueryProcessorImpl;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
 import com.rbkmoney.magista.service.MerchantStatisticsHandler;
+import com.rbkmoney.magista.service.TokenGenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,7 +23,8 @@ public class HandlerConfig {
     @Bean
     public StatisticsServletIface statisticsHandler(
             StatisticsDao statisticsDao,
-            SearchDao searchDao
+            SearchDao searchDao,
+            TokenGenService tokenGenService
     ) {
         return new MerchantStatisticsHandler(new QueryProcessorImpl(new JsonQueryParser() {
             @Override
@@ -31,6 +33,6 @@ public class HandlerConfig {
                 mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
                 return mapper;
             }
-        }, new QueryBuilderImpl(), new QueryContextFactoryImpl(statisticsDao, searchDao)));
+        }, new QueryBuilderImpl(), new QueryContextFactoryImpl(statisticsDao, searchDao, tokenGenService)));
     }
 }

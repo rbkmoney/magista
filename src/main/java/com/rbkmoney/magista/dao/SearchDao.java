@@ -18,7 +18,7 @@ public interface SearchDao {
             InvoicesFunction.InvoicesParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             int limit
     ) throws DaoException;
 
@@ -26,7 +26,7 @@ public interface SearchDao {
             PaymentsFunction.PaymentsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             int limit
     ) throws DaoException;
 
@@ -34,7 +34,7 @@ public interface SearchDao {
             RefundsFunction.RefundsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             Optional<Integer> offset,
             int limit
     ) throws DaoException;
@@ -43,7 +43,7 @@ public interface SearchDao {
             PayoutsFunction.PayoutsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             Optional<Integer> offset,
             int limit
     ) throws DaoException;
@@ -53,7 +53,7 @@ public interface SearchDao {
             RefundsFunction.RefundsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Integer> fromId,
+            Optional<LocalDateTime> whereTime,
             int limit
     ) throws DaoException;
 
@@ -61,7 +61,7 @@ public interface SearchDao {
             PaymentsFunction.PaymentsParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             int limit
     ) throws DaoException;
 

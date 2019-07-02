@@ -1,0 +1,89 @@
+package com.rbkmoney.magista.service;
+
+import com.rbkmoney.magista.config.properties.TokenGenProperties;
+import com.rbkmoney.magista.exception.BadTokenException;
+import com.rbkmoney.magista.query.QueryParameters;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.*;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@EnableConfigurationProperties
+@ContextConfiguration(classes = {TokenGenProperties.class, TokenGenService.class})
+public class TokenGenServiceTest {
+
+    @Autowired
+    private TokenGenService tokenGenService;
+
+    @Test
+    public void generateTokenTest() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("test", 64);
+        final QueryParameters queryParameters = new QueryParameters(parameters, null);
+
+        final String token = tokenGenService.generateToken(queryParameters, LocalDateTime.now());
+        Assert.assertTrue(tokenGenService.validToken(queryParameters, token));
+    }
+
+    @Test
+    public void generateTokenNotValidTest() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("test", 64);
+        final Map<String, Object> derivedParameters = new HashMap<>();
+        derivedParameters.put("test_2", 64);
+        final QueryParameters queryParameters = new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
+        final String firstToken = tokenGenService.generateToken(queryParameters, LocalDateTime.now());
+        derivedParameters.put("test_3", 64);
+        final String secondToken = tokenGenService.generateToken(new QueryParameters(parameters, new QueryParameters(derivedParameters, null)), LocalDateTime.now());
+
+        Assert.assertFalse(tokenGenService.validToken(queryParameters, secondToken));
+    }
+
+    @Test
+    public void extractTimeTest() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("test", 64);
+        parameters.put("test_2", 64);
+        final QueryParameters queryParameters = new QueryParameters(parameters, null);
+        final LocalDateTime nowDateTime = LocalDateTime.now();
+        final String token = tokenGenService.generateToken(queryParameters, nowDateTime);
+        final Optional<LocalDateTime> tokenDateOptional = tokenGenService.extractTime(token);
+        Assert.assertTrue(tokenDateOptional.isPresent());
+        final String token2 = tokenGenService.generateToken(queryParameters, tokenDateOptional.get());
+        Assert.assertEquals(token, token2);
+    }
+
+    @Test
+    public void validTokenTest() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("test", 64);
+        final Map<String, Object> derivedParameters = new HashMap<>();
+        derivedParameters.put("test_2", 64);
+        final QueryParameters queryParameters = new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
+        final boolean validToken = tokenGenService.validToken(queryParameters, "mH6CM2lOiArjXgVjEdKvQdQ0FpSF/AtmOXTkuoG5bZw=1560160206745");
+        Assert.assertTrue(validToken);
+
+    }
+
+    @Test(expected = BadTokenException.class)
+    public void invalidTokenTest() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("test", 64);
+        final Map<String, Object> derivedParameters = new HashMap<>();
+        derivedParameters.put("test_2", 64);
+        final QueryParameters queryParameters = new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
+        tokenGenService.validToken(queryParameters, "42845727346");
+    }
+
+}

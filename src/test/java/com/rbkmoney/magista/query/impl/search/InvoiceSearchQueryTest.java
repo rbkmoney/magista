@@ -8,13 +8,15 @@ import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.AbstractQueryTest;
 import com.rbkmoney.magista.query.parser.QueryParserException;
+import com.rbkmoney.magista.service.TokenGenService;
 import com.rbkmoney.magista.util.DamselUtil;
-import com.rbkmoney.magista.util.TokenUtil;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -22,6 +24,9 @@ import static org.junit.Assert.*;
 @Transactional
 @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
 public class InvoiceSearchQueryTest extends AbstractQueryTest {
+
+    @Autowired
+    private TokenGenService tokenGenService;
 
     @Test
     public void testInvoices() {
@@ -45,14 +50,15 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
         StatResponse statResponse = queryProcessor.processQuery(statRequest);
         assertEquals(1, statResponse.getData().getInvoices().size());
         assertNotNull(statResponse.getContinuationToken());
-        assertEquals((Long) 9L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
+        final LocalDateTime localDateTime = tokenGenService.extractTime(statResponse.getContinuationToken()).get();
+        //assertEquals((Long) 9L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
         DamselUtil.toJson(statResponse);
 
         statRequest.setContinuationToken(statResponse.getContinuationToken());
         statResponse = queryProcessor.processQuery(statRequest);
         assertEquals(1, statResponse.getData().getInvoices().size());
         assertNotNull(statResponse.getContinuationToken());
-        assertEquals((Long) 8L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
+        //assertEquals((Long) 8L, TokenUtil.extractIdValue(statResponse.getContinuationToken()).get());
 
         statRequest.setContinuationToken(statResponse.getContinuationToken());
         statResponse = queryProcessor.processQuery(statRequest);
@@ -63,7 +69,7 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
     public void testBadToken() {
         String json = "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatRequest statRequest = new StatRequest(json);
-        statRequest.setContinuationToken(UUID.randomUUID().toString());
+        statRequest.setContinuationToken("3gOc9TNJDkE1dOoK5oy6bJvgShunXxk2rTZuCn3SBts=1560155771740");
         queryProcessor.processQuery(statRequest);
     }
 
