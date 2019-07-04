@@ -92,6 +92,8 @@ public class MapperHelper {
                         TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()), DigitalWalletProvider.class),
                         rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_ID.getName())
                 ));
+            case crypto_currency:
+                return PaymentTool.crypto_currency(TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.CRYPTO_CURRENCY.getName()), CryptoCurrency.class));
             default:
                 throw new NotFoundException(String.format("Payment tool '%s' not found", paymentToolType));
         }
