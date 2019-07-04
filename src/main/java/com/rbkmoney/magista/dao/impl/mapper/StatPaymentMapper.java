@@ -1,8 +1,10 @@
 package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.base.Content;
+import com.rbkmoney.damsel.domain.AdditionalTransactionInfo;
 import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
 import com.rbkmoney.damsel.domain.BankCardTokenProvider;
+import com.rbkmoney.damsel.domain.TransactionInfo;
 import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.FailureClass;
@@ -17,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -71,6 +74,11 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
                     )
             );
         }
+
+        AdditionalTransactionInfo additionalTransactionInfo = new AdditionalTransactionInfo();
+        additionalTransactionInfo.setRrn(rs.getString(PAYMENT_DATA.PAYMENT_RRN.getName()));
+        additionalTransactionInfo.setApprovalCode(rs.getString(PAYMENT_DATA.PAYMENT_APPROVAL_CODE.getName()));
+        statPayment.setAdditionalTransactionInfo(additionalTransactionInfo);
 
         return new AbstractMap.SimpleEntry<>(rs.getLong(PAYMENT_DATA.ID.getName()), statPayment);
     }
