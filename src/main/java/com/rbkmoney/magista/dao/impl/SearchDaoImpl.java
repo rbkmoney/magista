@@ -83,8 +83,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(paymentData.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
                 .addValue(paymentData.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
                 .addValue(paymentData.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), EQUALS)
-                .addValue(paymentData.PAYMENT_BANK_CARD_BIN, parameters.getPaymentBankCardBin(), EQUALS)
-                .addValue(paymentData.PAYMENT_BANK_CARD_MASKED_PAN, parameters.getPaymentBankCardLastDigits(), EQUALS)
+                .addValue(paymentData.PAYMENT_BANK_CARD_FIRST6, parameters.getPaymentBankCardFirst6(), EQUALS)
+                .addValue(paymentData.PAYMENT_BANK_CARD_LAST4, parameters.getPaymentBankCardLast4(), EQUALS)
                 .addValue(paymentData.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
                 .addValue(paymentData.PAYMENT_STATUS,
                         TypeUtil.toEnumField(parameters.getPaymentStatus(), com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
@@ -311,10 +311,9 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_BIN, parameters.getPaymentBankCardBin(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6, parameters.getPaymentBankCardFirst6(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM, parameters.getPaymentBankCardSystem(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_BIN, parameters.getPaymentBankCardBin(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_MASKED_PAN, parameters.getPaymentBankCardLastDigits(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4, parameters.getPaymentBankCardLast4(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)

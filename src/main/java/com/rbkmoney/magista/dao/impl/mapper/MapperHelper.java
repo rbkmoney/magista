@@ -74,8 +74,8 @@ public class MapperHelper {
                 BankCard bankCard = new BankCard(
                         rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN.getName()),
                         TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()), BankCardPaymentSystem.class),
-                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_BIN.getName()),
-                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_MASKED_PAN.getName())
+                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6.getName()),
+                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4.getName())
                 );
                 bankCard.setTokenProvider(
                         Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()))

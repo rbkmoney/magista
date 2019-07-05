@@ -158,12 +158,12 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             return getLongParameter(PAYMENT_AMOUNT_PARAM, false);
         }
 
-        public String getPaymentBankCardBin() {
-            return getStringParameter(PAYMENT_BANK_CARD_BIN_PARAM, false);
+        public String getPaymentBankCardFirst6() {
+            return getStringParameter(PAYMENT_BANK_CARD_FIRST6, false);
         }
 
-        public String getPaymentBankCardLastDigits() {
-            return getStringParameter(PAYMENT_BANK_CARD_LAST_DIGITS_PARAM, false);
+        public String getPaymentBankCardLast4() {
+            return getStringParameter(PAYMENT_BANK_CARD_LAST4, false);
         }
 
 
@@ -191,14 +191,14 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             super.validateParameters(parameters);
             PaymentsParameters paymentsParameters = super.checkParamsType(parameters, PaymentsParameters.class);
 
-            String bin = paymentsParameters.getPaymentBankCardBin();
-            if (bin != null && !bin.matches("^\\d{6,8}$")) {
-                checkParamsResult(true, PAYMENT_BANK_CARD_BIN_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            String cardFirst6 = paymentsParameters.getPaymentBankCardFirst6();
+            if (cardFirst6 != null && !cardFirst6.matches("^\\d{6,8}$")) {
+                checkParamsResult(true, PAYMENT_BANK_CARD_FIRST6, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
-            String lastDigits = paymentsParameters.getPaymentBankCardLastDigits();
-            if (lastDigits != null && !lastDigits.matches("^\\d{2,4}$")) {
-                checkParamsResult(true, PAYMENT_BANK_CARD_LAST_DIGITS_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
+            String cardLast4 = paymentsParameters.getPaymentBankCardLast4();
+            if (cardLast4 != null && !cardLast4.matches("^\\d{2,4}$")) {
+                checkParamsResult(true, PAYMENT_BANK_CARD_LAST4, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
             validateTimePeriod(paymentsParameters.getFromTime(), paymentsParameters.getToTime());
