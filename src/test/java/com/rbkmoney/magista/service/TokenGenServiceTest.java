@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -34,6 +36,18 @@ public class TokenGenServiceTest {
 
         final String token = tokenGenService.generateToken(queryParameters, LocalDateTime.now());
         Assert.assertTrue(tokenGenService.validToken(queryParameters, token));
+    }
+
+    @Test
+    public void validateTokenAfterUrlDecoderTest() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("test", 64);
+        parameters.put("test_2", 64);
+        final QueryParameters queryParameters = new QueryParameters(parameters, null);
+
+        final String token = tokenGenService.generateToken(queryParameters, LocalDateTime.now());
+        System.out.println(token);
+        Assert.assertTrue(tokenGenService.validToken(queryParameters, URLDecoder.decode(token, StandardCharsets.UTF_8)));
     }
 
     @Test
@@ -71,7 +85,7 @@ public class TokenGenServiceTest {
         final Map<String, Object> derivedParameters = new HashMap<>();
         derivedParameters.put("test_2", 64);
         final QueryParameters queryParameters = new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
-        final boolean validToken = tokenGenService.validToken(queryParameters, "mH6CM2lOiArjXgVjEdKvQdQ0FpSF/AtmOXTkuoG5bZw=1560160206745");
+        final boolean validToken = tokenGenService.validToken(queryParameters, "mH6CM2lOiArjXgVjEdKvQdQ0FpSF_AtmOXTkuoG5bZw;1560160206745");
         Assert.assertTrue(validToken);
 
     }

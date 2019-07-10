@@ -96,10 +96,21 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
 
         if (!paymentParameterSource.getConditionFields().isEmpty()) {
             selectJoinStep = selectJoinStep.join(paymentData).on(
-                    appendConditions(
-                            INVOICE_DATA.INVOICE_ID.eq(paymentData.INVOICE_ID),
-                            Operator.AND,
-                            paymentParameterSource
+                    appendDateTimeRangeConditions(
+                            appendConditions(
+                                    INVOICE_DATA.INVOICE_ID.eq(paymentData.INVOICE_ID),
+                                    Operator.AND,
+                                    paymentParameterSource
+                                            .addValue(paymentData.PARTY_ID,
+                                                    Optional.ofNullable(parameters.getMerchantId())
+                                                            .map(merchantId -> UUID.fromString(merchantId))
+                                                            .orElse(null),
+                                                    EQUALS)
+                                            .addValue(paymentData.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                            ),
+                            paymentData.PAYMENT_CREATED_AT,
+                            fromTime,
+                            toTime
                     )
             );
         }

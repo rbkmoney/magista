@@ -15,8 +15,9 @@ public final class HmacUtil {
     private static final String HMAC_SHA256 = "HmacSHA256";
 
     public static String encode(String key, byte[] data) throws GeneralSecurityException {
-        if (key == null || data == null)
+        if (key == null || data == null) {
             throw new IllegalArgumentException("key/data can't be null");
+        }
 
         final Mac hmac = Mac.getInstance(HMAC_SHA256);
         byte[] hmacKeyBytes = key.getBytes(StandardCharsets.UTF_8);
@@ -24,7 +25,7 @@ public final class HmacUtil {
         hmac.init(secretKey);
         byte[] res = hmac.doFinal(data);
 
-        return Base64.encodeBase64String(res);
+        return Base64.encodeBase64URLSafeString(res);
     }
 
 }
