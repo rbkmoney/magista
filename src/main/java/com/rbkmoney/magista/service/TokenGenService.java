@@ -1,13 +1,11 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.config.properties.TokenGenProperties;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.QueryParameters;
 import com.rbkmoney.magista.util.HmacUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -16,7 +14,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,10 +33,8 @@ public class TokenGenService {
             return Optional.empty();
         }
         try {
-            final long l = Long.parseLong(token.split("=")[1]);
-            return Optional.of(LocalDateTime.ofInstant(
-                        Instant.ofEpochMilli(Long.parseLong(token.split("=")[1])
-                    ), ZoneOffset.UTC));
+            final long timestamp = Long.parseLong(extractToken(token).getTimestamp());
+            return Optional.of(LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC));
         } catch (Exception e) {
             log.error("Exception while extract dateTime from: " + token, e);
             return Optional.empty();
@@ -47,8 +44,10 @@ public class TokenGenService {
     public String generateToken(QueryParameters queryParameters, LocalDateTime createdAt) {
         String val = queryParamsToString(queryParameters);
         try {
-            String token = HmacUtil.encode(tokenGenProperties.getKey(), val.getBytes(StandardCharsets.UTF_8));
-            token += createdAt.atZone(ZoneOffset.UTC).toInstant().toEpochMilli();
+            String token = String.format("%s;%d",
+                    HmacUtil.encode(tokenGenProperties.getKey(), val.getBytes(StandardCharsets.UTF_8)),
+                    createdAt.atZone(ZoneOffset.UTC).toInstant().toEpochMilli()
+            );
             log.debug("Generated token: {}", token);
             return token;
         } catch (GeneralSecurityException e) {
@@ -83,7 +82,7 @@ public class TokenGenService {
     }
 
     private TokenHolder extractToken(String token) {
-        String[] tokenSplit = token.split("=");
+        String[] tokenSplit = token.split(";");
         if (tokenSplit.length != 2) {
             throw new BadTokenException("Bad token format: " + token);
         }
