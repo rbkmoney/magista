@@ -18,7 +18,6 @@ import com.rbkmoney.magista.query.impl.RefundsFunction;
 import org.jooq.Condition;
 import org.jooq.Operator;
 import org.jooq.Query;
-import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
@@ -63,84 +62,84 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
             int limit
     ) throws DaoException {
 
-        SelectJoinStep selectJoinStep = getDslContext()
-                .select()
-                .from(INVOICE_DATA);
+        Condition condition = appendDateTimeRangeConditions(
+                appendConditions(DSL.trueCondition(), Operator.AND,
+                        new ConditionParameterSource()
+                                .addValue(INVOICE_DATA.PARTY_ID,
+                                        Optional.ofNullable(parameters.getMerchantId())
+                                                .map(merchantId -> UUID.fromString(merchantId))
+                                                .orElse(null),
+                                        EQUALS)
+                                .addValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                                .addValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                                .addValue(INVOICE_DATA.INVOICE_CREATED_AT, whereTime.orElse(null), LESS)
+                                .addValue(INVOICE_DATA.INVOICE_STATUS,
+                                        toEnumField(
+                                                parameters.getInvoiceStatus(),
+                                                com.rbkmoney.magista.domain.enums.InvoiceStatus.class
+                                        ),
+                                        EQUALS)
+                                .addValue(INVOICE_DATA.INVOICE_AMOUNT, parameters.getInvoiceAmount(), EQUALS)),
+                INVOICE_DATA.INVOICE_CREATED_AT,
+                fromTime,
+                toTime
+        );
 
-        PaymentData paymentData = PAYMENT_DATA.as("payment_data");
         ConditionParameterSource paymentParameterSource = new ConditionParameterSource()
-                .addValue(paymentData.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
-                .addValue(paymentData.PAYMENT_FLOW,
+                .addValue(PAYMENT_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_FLOW,
                         TypeUtil.toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
                         EQUALS)
-                .addValue(paymentData.PAYMENT_TOOL,
+                .addValue(PAYMENT_DATA.PAYMENT_TOOL,
                         TypeUtil.toEnumField(parameters.getPaymentMethod(), com.rbkmoney.magista.domain.enums.PaymentTool.class),
                         EQUALS)
-                .addValue(paymentData.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
                         toEnumField(parameters.getPaymentBankCardTokenProvider(), com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
                         EQUALS)
-                .addValue(paymentData.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
-                .addValue(paymentData.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
-                .addValue(paymentData.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
-                .addValue(paymentData.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), EQUALS)
-                .addValue(paymentData.PAYMENT_BANK_CARD_FIRST6, parameters.getPaymentBankCardFirst6(), EQUALS)
-                .addValue(paymentData.PAYMENT_BANK_CARD_LAST4, parameters.getPaymentBankCardLast4(), EQUALS)
-                .addValue(paymentData.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
-                .addValue(paymentData.PAYMENT_STATUS,
+                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6, parameters.getPaymentBankCardFirst6(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4, parameters.getPaymentBankCardLast4(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_STATUS,
                         TypeUtil.toEnumField(parameters.getPaymentStatus(), com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
                         EQUALS)
-                .addValue(paymentData.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
-                .addValue(paymentData.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
-                .addValue(paymentData.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
-                .addValue(paymentData.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL);
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL);
 
         if (!paymentParameterSource.getConditionFields().isEmpty()) {
-            selectJoinStep = selectJoinStep.join(paymentData).on(
-                    appendDateTimeRangeConditions(
-                            appendConditions(
-                                    INVOICE_DATA.INVOICE_ID.eq(paymentData.INVOICE_ID),
-                                    Operator.AND,
-                                    paymentParameterSource
-                                            .addValue(paymentData.PARTY_ID,
-                                                    Optional.ofNullable(parameters.getMerchantId())
-                                                            .map(merchantId -> UUID.fromString(merchantId))
-                                                            .orElse(null),
-                                                    EQUALS)
-                                            .addValue(paymentData.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                            ),
-                            paymentData.PAYMENT_CREATED_AT,
-                            fromTime,
-                            toTime
-                    )
+            condition = condition.and(
+              DSL.exists(
+                      getDslContext().selectOne().from(PAYMENT_DATA)
+                      .where(
+                              appendDateTimeRangeConditions(
+                                      appendConditions(
+                                              INVOICE_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID),
+                                              Operator.AND,
+                                              paymentParameterSource
+                                                      .addValue(PAYMENT_DATA.PARTY_ID,
+                                                              Optional.ofNullable(parameters.getMerchantId())
+                                                                      .map(merchantId -> UUID.fromString(merchantId))
+                                                                      .orElse(null),
+                                                              EQUALS)
+                                                      .addValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                                      ),
+                                      PAYMENT_DATA.PAYMENT_CREATED_AT,
+                                      fromTime,
+                                      toTime
+                              )
+                      )
+              )
             );
         }
 
-        selectJoinStep.where(
-                appendDateTimeRangeConditions(
-                        appendConditions(DSL.trueCondition(), Operator.AND,
-                                new ConditionParameterSource()
-                                        .addValue(INVOICE_DATA.PARTY_ID,
-                                                Optional.ofNullable(parameters.getMerchantId())
-                                                        .map(merchantId -> UUID.fromString(merchantId))
-                                                        .orElse(null),
-                                                EQUALS)
-                                        .addValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                                        .addValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                                        .addValue(INVOICE_DATA.INVOICE_CREATED_AT, whereTime.orElse(null), LESS)
-                                        .addValue(INVOICE_DATA.INVOICE_STATUS,
-                                                toEnumField(
-                                                        parameters.getInvoiceStatus(),
-                                                        com.rbkmoney.magista.domain.enums.InvoiceStatus.class
-                                                ),
-                                                EQUALS)
-                                        .addValue(INVOICE_DATA.INVOICE_AMOUNT, parameters.getInvoiceAmount(), EQUALS)),
-                        INVOICE_DATA.INVOICE_CREATED_AT,
-                        fromTime,
-                        toTime
-                )
-        );
-
-        Query query = selectJoinStep
+        Query query = getDslContext()
+                .selectFrom(INVOICE_DATA)
+                .where(condition)
                 .orderBy(INVOICE_DATA.INVOICE_CREATED_AT.desc())
                 .limit(limit);
         return fetch(query, statInvoiceMapper);
