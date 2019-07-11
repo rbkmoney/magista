@@ -50,7 +50,7 @@ public abstract class AbstractIntegrationTest {
     }
 
     @ClassRule
-    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:9.6")
+    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:11.4")
             .withStartupTimeout(Duration.ofMinutes(5));
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
