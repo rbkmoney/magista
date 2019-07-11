@@ -114,7 +114,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         if (!paymentParameterSource.getConditionFields().isEmpty()) {
             condition = condition.and(
               DSL.exists(
-                      getDslContext().selectOne().from(PAYMENT_DATA)
+                      getDslContext().select(DSL.field("1")).from(PAYMENT_DATA)
                       .where(
                               appendDateTimeRangeConditions(
                                       appendConditions(
