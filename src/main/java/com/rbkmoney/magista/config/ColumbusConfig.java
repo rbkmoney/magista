@@ -1,10 +1,7 @@
 package com.rbkmoney.magista.config;
 
 import com.rbkmoney.damsel.geo_ip.GeoIpServiceSrv;
-import com.rbkmoney.woody.api.event.CompositeClientEventListener;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
-import com.rbkmoney.woody.thrift.impl.http.event.ClientEventLogListener;
-import com.rbkmoney.woody.thrift.impl.http.event.HttpClientEventLogListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
