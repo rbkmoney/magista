@@ -1,12 +1,16 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
-import com.rbkmoney.damsel.payment_processing.*;
+import com.rbkmoney.damsel.domain.AdditionalTransactionInfo;
+import com.rbkmoney.damsel.domain.TransactionInfo;
+import com.rbkmoney.damsel.payment_processing.InvoiceChange;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentSessionChange;
+import com.rbkmoney.damsel.payment_processing.SessionTransactionBound;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.mapper.Mapper;
 import com.rbkmoney.magista.event.mapper.PaymentMapper;
 import org.springframework.stereotype.Component;
 
@@ -31,8 +35,12 @@ public class PaymentTransactionBoundMapper implements PaymentMapper {
                 .getPayload()
                 .getSessionTransactionBound();
 
-        paymentData.setPaymentRrn(sessionChangePayload.getTrx().getAdditionalInfo().getRrn());
-        paymentData.setPaymentApprovalCode(sessionChangePayload.getTrx().getAdditionalInfo().getApprovalCode());
+        TransactionInfo transactionInfo = sessionChangePayload.getTrx();
+        if (transactionInfo.isSetAdditionalInfo()) {
+            AdditionalTransactionInfo additionalTransactionInfo = transactionInfo.getAdditionalInfo();
+            paymentData.setPaymentRrn(additionalTransactionInfo.getRrn());
+            paymentData.setPaymentApprovalCode(additionalTransactionInfo.getApprovalCode());
+        }
 
         return paymentData;
     }
