@@ -8,7 +8,9 @@ import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.mapper.Mapper;
 import com.rbkmoney.magista.event.mapper.PaymentMapper;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PaymentTransactionBoundMapper implements PaymentMapper {
     @Override
     public PaymentData map(InvoiceChange change, MachineEvent machineEvent) {
