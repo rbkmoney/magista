@@ -30,6 +30,8 @@
         <db.password>postgres</db.password>
         <db.schema>mst</db.schema>
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+        <lombok.version>1.18.4</lombok.version>
+        <machinegun-proto.version>1.12-ebae56f</machinegun-proto.version>
     </properties>
 
     <dependencies>
@@ -92,6 +94,27 @@
             <artifactId>logstash-logback-encoder</artifactId>
             <version>5.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>2.2.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>kafka-common-lib</artifactId>
+            <version>0.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>sink-common-lib</artifactId>
+            <version>0.0.3</version>
+        </dependency>
 
         <!--RBK libs-->
         <dependency>
@@ -139,6 +162,12 @@
             <artifactId>spring-boot-starter-metrics-statsd</artifactId>
             <version>1.1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>machinegun-proto</artifactId>
+            <version>${machinegun-proto.version}</version>
+        </dependency>
+
         <!--Test libs-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
