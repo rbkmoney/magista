@@ -43,7 +43,7 @@ public class RefundDaoImpl extends AbstractDao implements RefundDao {
     public void save(Refund refund) throws DaoException {
         Query query = getDslContext().insertInto(REFUND)
                 .set(getDslContext().newRecord(REFUND, refund))
-                .onConflict(REFUND.EVENT_ID, REFUND.EVENT_TYPE, REFUND.REFUND_STATUS)
+                .onConflict(REFUND.INVOICE_ID, REFUND.PAYMENT_ID, REFUND.REFUND_ID, REFUND.EVENT_ID, REFUND.EVENT_TYPE, REFUND.REFUND_STATUS)
                 .doUpdate()
                 .set(getDslContext().newRecord(REFUND, refund));
 
