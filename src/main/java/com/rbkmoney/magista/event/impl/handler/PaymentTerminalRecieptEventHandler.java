@@ -30,7 +30,7 @@ public class PaymentTerminalRecieptEventHandler implements Handler<InvoiceChange
         Event event = parent.getSourceEvent().getProcessingEvent();
 
         PaymentEvent paymentEvent = new PaymentEvent();
-        paymentEvent.setEventId(event.getId());
+        paymentEvent.setEventId((long) event.getSequence());
         paymentEvent.setEventType(InvoiceEventType.PAYMENT_TERMINAL_RECIEPT);
         paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
         paymentEvent.setInvoiceId(event.getSource().getInvoiceId());
