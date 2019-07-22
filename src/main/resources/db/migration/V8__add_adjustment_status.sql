@@ -1,0 +1,1 @@
+alter type adjustment_status add value 'processed';
