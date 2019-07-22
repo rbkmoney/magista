@@ -18,10 +18,11 @@
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
         <damsel.version>1.303-d99319c</damsel.version>
-        <shared.resources.version>0.3.3</shared.resources.version>
+        <shared.resources.version>0.3.6</shared.resources.version>
         <server.port>8022</server.port>
         <exposed.ports>${server.port}</exposed.ports>
-        <dockerfile.base.service.tag>2a8b44ac628c1bdb729abd04ed7a2a54676e574b</dockerfile.base.service.tag>
+        <dockerfile.base.service.tag>bc95d0d6dc13c693acd2b274531a7d604b877bf3</dockerfile.base.service.tag>
+        <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <db.name>magista</db.name>
         <db.port>5432</db.port>
