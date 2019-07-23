@@ -137,7 +137,7 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
 
         PaymentEvent paymentEvent = new PaymentEvent();
         paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
-        paymentEvent.setEventId(event.getId());
+        paymentEvent.setEventId((long) event.getSequence());
         paymentEvent.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
         paymentEvent.setInvoiceId(invoiceId);
         paymentEvent.setPaymentId(paymentId);

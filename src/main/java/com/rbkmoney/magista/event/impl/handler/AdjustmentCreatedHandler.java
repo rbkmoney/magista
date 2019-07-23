@@ -40,7 +40,7 @@ public class AdjustmentCreatedHandler implements Handler<InvoiceChange, StockEve
         Adjustment adjustment = new Adjustment();
 
         Event event = parent.getSourceEvent().getProcessingEvent();
-        adjustment.setEventId(event.getId());
+        adjustment.setEventId((long) event.getSequence());
         adjustment.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
         adjustment.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_CREATED);
         adjustment.setInvoiceId(event.getSource().getInvoiceId());
