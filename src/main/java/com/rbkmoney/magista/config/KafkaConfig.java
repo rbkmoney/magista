@@ -37,8 +37,6 @@ public class KafkaConfig {
 
     @Value("${kafka.consumer.auto-offset-reset}")
     private String autoOffsetReset;
-    @Value("${kafka.consumer.enable-auto-commit}")
-    private boolean enableAutoCommit;
     @Value("${kafka.consumer.group-id}")
     private String groupId;
     @Value("${kafka.client-id}")
@@ -62,7 +60,7 @@ public class KafkaConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, MachineEventDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.CLIENT_ID_CONFIG, clientId);
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, enableAutoCommit);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset);
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
 
