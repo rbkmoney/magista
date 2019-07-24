@@ -51,12 +51,11 @@ public class PaymentsForReportFunction extends PagedBaseFunction<Map.Entry<Long,
                     StatResponse statResponse = new StatResponse(statResponseData);
                     List<Map.Entry<Long, StatPayment>> paymentStats = paymentsForReportResult.getCollectedStream();
                     if (!paymentsForReportResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == paymentStats.size()) {
-                        statResponse.setContinuationToken(
-                                TokenUtil.buildToken(
-                                        getQueryParameters(),
-                                        paymentStats.get(paymentStats.size() - 1).getKey()
-                                )
-                        );
+                        String createdAt = paymentStats.get(paymentStats.size() - 1).getValue().getStatus().getCaptured().getAt();
+                        String token = getContext(context)
+                                .getTokenGenService()
+                                .generateToken(getQueryParameters(), TypeUtil.stringToLocalDateTime(createdAt));
+                        statResponse.setContinuationToken(token);
                     }
                     return statResponse;
                 }
@@ -160,9 +159,9 @@ public class PaymentsForReportFunction extends PagedBaseFunction<Map.Entry<Long,
         private PaymentsForReportValidator validator = new PaymentsForReportValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
             Query resultQuery = buildSingleQuery(PaymentsForReportParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
-            validator.validateQuery(resultQuery);
+            validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 
@@ -209,7 +208,7 @@ public class PaymentsForReportFunction extends PagedBaseFunction<Map.Entry<Long,
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
-                        getFromId(),
+                        getTime(functionContext),
                         parameters.getSize()
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);

@@ -33,8 +33,8 @@ public class QueryProcessorImpl implements QueryProcessor<StatRequest, StatRespo
     @Override
     public StatResponse processQuery(StatRequest source) throws BadTokenException, QueryProcessingException {
         List<QueryPart> queryParts = sourceParser.parseQuery(source.getDsl(), null);
-        Query query = queryBuilder.buildQuery(queryParts, source.getContinuationToken(), null, null);
         QueryContext queryContext = queryContextFactory.getContext();
+        Query query = queryBuilder.buildQuery(queryContext, queryParts, source.getContinuationToken(), null, null);
         QueryResult queryResult = query.execute(queryContext);
         Object result = queryResult.getCollectedStream();
         if (result instanceof StatResponse) {

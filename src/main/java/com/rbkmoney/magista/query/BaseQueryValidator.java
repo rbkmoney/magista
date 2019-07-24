@@ -1,5 +1,7 @@
 package com.rbkmoney.magista.query;
 
+import com.rbkmoney.magista.query.impl.FunctionQueryContext;
+
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
 
@@ -41,5 +43,14 @@ public abstract class BaseQueryValidator implements QueryValidator {
         if (hasError) {
             checkParamsResult(hasError, "Validation failed for field: " + fieldName + ": " + msg);
         }
+    }
+
+    protected FunctionQueryContext getContext(QueryContext context) {
+        if (FunctionQueryContext.class.isAssignableFrom(context.getClass())) {
+            return (FunctionQueryContext) context;
+        } else {
+            throw new QueryExecutionException("Wrong context type");
+        }
+
     }
 }

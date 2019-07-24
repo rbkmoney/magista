@@ -65,7 +65,7 @@ public class RootQuery extends BaseQuery {
         }
 
         @Override
-        public void validateQuery(Query query) throws IllegalArgumentException {
+        public void validateQuery(Query query, QueryContext queryContext) throws IllegalArgumentException {
             if (query instanceof RootQuery) {
                 Query childQuery = ((RootQuery) query).childQuery;
                 if (childQuery instanceof CompositeQuery) {
@@ -110,14 +110,14 @@ public class RootQuery extends BaseQuery {
         private RootValidator validator = new RootValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(RootParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken, baseBuilder));
-            validator.validateQuery(resultQuery);
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildSingleQuery(RootParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryContext, queryPart, continuationToken, baseBuilder));
+            validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 
-        private RootQuery createQuery(QueryPart queryPart, String continuationToken, QueryBuilder baseBuilder) {
-            Query childQuery = baseBuilder.buildQuery(queryPart.getChildren(), continuationToken, queryPart, baseBuilder);
+        private RootQuery createQuery(QueryContext queryContext, QueryPart queryPart, String continuationToken, QueryBuilder baseBuilder) {
+            Query childQuery = baseBuilder.buildQuery(queryContext, queryPart.getChildren(), continuationToken, queryPart, baseBuilder);
             RootQuery rootQuery = new RootQuery(queryPart.getDescriptor(), queryPart.getParameters(), childQuery);
             childQuery.setParentQuery(rootQuery);
             return rootQuery;
