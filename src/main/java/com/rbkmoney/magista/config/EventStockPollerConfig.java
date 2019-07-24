@@ -15,18 +15,6 @@ import java.io.IOException;
 @Configuration
 public class EventStockPollerConfig {
 
-    @Value("${bm.processing.pooling.url}")
-    private Resource processingPoolingUrl;
-
-    @Value("${bm.processing.pooling.querySize}")
-    private int processingPoolingQuerySize;
-
-    @Value("${bm.processing.pooling.maxPoolSize}")
-    private int processingPoolingMaxPoolSize;
-
-    @Value("${bm.processing.pooling.delay}")
-    private int processingPoolingMaxDelay;
-
     @Value("${bm.payout.pooling.url}")
     private Resource payoutPoolingUrl;
 
@@ -38,15 +26,6 @@ public class EventStockPollerConfig {
 
     @Value("${bm.payout.pooling.delay}")
     private int payoutPoolingMaxDelay;
-
-    @Bean
-    public DefaultPollingEventPublisherBuilder processingEventPublisherBuilder() throws IOException {
-        return new PollingEventPublisherBuilder()
-                .withURI(processingPoolingUrl.getURI())
-                .withMaxQuerySize(processingPoolingQuerySize)
-                .withMaxPoolSize(processingPoolingMaxPoolSize)
-                .withPollDelay(processingPoolingMaxDelay);
-    }
 
     @Bean
     public DefaultPollingEventPublisherBuilder payoutEventPublisherBuilder() throws IOException {
