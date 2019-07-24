@@ -63,7 +63,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
             InvoicesFunction.InvoicesParameters parameters,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             int limit
     ) throws DaoException {
         InvoiceEvent invoiceEvent = INVOICE_EVENT.as("invoice_event");
@@ -91,7 +91,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                                         EQUALS)
                                                 .addValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
                                                 .addValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                                                .addValue(INVOICE_DATA.ID, fromId.orElse(null), LESS)
+                                                .addValue(INVOICE_DATA.INVOICE_CREATED_AT, whereTime.orElse(null), LESS)
                                                 .addValue(invoiceEvent.INVOICE_STATUS,
                                                         toEnumField(
                                                                 parameters.getInvoiceStatus(),

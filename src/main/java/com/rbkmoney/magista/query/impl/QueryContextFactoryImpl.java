@@ -5,6 +5,7 @@ import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.query.QueryContext;
 import com.rbkmoney.magista.query.QueryContextFactory;
 import com.rbkmoney.magista.dao.StatisticsDao;
+import com.rbkmoney.magista.service.TokenGenService;
 
 /**
  * Created by vpankrashkin on 29.08.16.
@@ -17,14 +18,17 @@ public class QueryContextFactoryImpl implements QueryContextFactory {
 
     private final SearchDao searchDao;
 
-    public QueryContextFactoryImpl(StatisticsDao statisticsDao, SearchDao searchDao, ReportDao reportDao) {
+    private final TokenGenService tokenGenService;
+
+    public QueryContextFactoryImpl(StatisticsDao statisticsDao, SearchDao searchDao, ReportDao reportDao, TokenGenService tokenGenService) {
         this.statisticsDao = statisticsDao;
         this.searchDao = searchDao;
         this.reportDao = reportDao;
+        this.tokenGenService = tokenGenService;
     }
 
     @Override
     public QueryContext getContext() {
-        return new FunctionQueryContext(statisticsDao, searchDao, reportDao);
+        return new FunctionQueryContext(statisticsDao, searchDao, reportDao, tokenGenService);
     }
 }
