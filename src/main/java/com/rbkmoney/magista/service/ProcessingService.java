@@ -3,7 +3,6 @@ package com.rbkmoney.magista.service;
 import com.rbkmoney.eventstock.client.poll.DefaultPollingEventPublisherBuilder;
 import com.rbkmoney.magista.dao.EventDao;
 import com.rbkmoney.magista.event.Handler;
-import com.rbkmoney.magista.event.flow.InvoiceEventFlow;
 import com.rbkmoney.magista.event.flow.PayoutEventFlow;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.StorageException;
@@ -17,20 +16,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * Created by tolkonepiu on 24.08.16.
- */
 @Service
 public class ProcessingService {
-
-    @Value("${bm.processing.handler.queue.limit}")
-    private int processingHandlerQueueLimit;
-
-    @Value("${bm.processing.handler.threadPoolSize}")
-    private int processingHandlerThreadPoolSize;
-
-    @Value("${bm.processing.handler.timeout}")
-    private int processingHandlerTimeout;
 
     @Value("${bm.payout.handler.queue.limit}")
     private int payoutHandlerQueueLimit;
@@ -45,44 +32,26 @@ public class ProcessingService {
 
     private final EventDao eventDao;
 
-    private final DefaultPollingEventPublisherBuilder processingEventPublisherBuilder;
     private final DefaultPollingEventPublisherBuilder payoutEventPublisherBuilder;
 
-    private final AtomicReference<InvoiceEventFlow> invoiceEventFlow = new AtomicReference<>();
     private final AtomicReference<PayoutEventFlow> payoutEventFlow = new AtomicReference<>();
 
     @Autowired
     public ProcessingService(
             List<Handler> handlers,
             EventDao eventDao,
-            @Qualifier("processingEventPublisherBuilder") DefaultPollingEventPublisherBuilder processingEventPublisherBuilder,
             @Qualifier("payoutEventPublisherBuilder") DefaultPollingEventPublisherBuilder payoutEventPublisherBuilder
     ) {
         this.handlers = handlers;
         this.eventDao = eventDao;
-        this.processingEventPublisherBuilder = processingEventPublisherBuilder;
         this.payoutEventPublisherBuilder = payoutEventPublisherBuilder;
     }
 
     public void start() {
-        InvoiceEventFlow newInvoiceEventFlow = new InvoiceEventFlow(handlers, processingEventPublisherBuilder, processingHandlerThreadPoolSize, processingHandlerQueueLimit, processingHandlerTimeout);
-        if (invoiceEventFlow.compareAndSet(null, newInvoiceEventFlow)) {
-            Optional<Long> lastEventId = getLastInvoiceEventId();
-            newInvoiceEventFlow.start(lastEventId);
-        }
-
         PayoutEventFlow newPayoutEventFlow = new PayoutEventFlow(handlers, payoutEventPublisherBuilder, payoutHandlerThreadPoolSize, payoutHandlerQueueLimit, payoutHandlerTimeout);
         if (payoutEventFlow.compareAndSet(null, newPayoutEventFlow)) {
             Optional<Long> lastEventId = getLastPayoutEventId();
             newPayoutEventFlow.start(lastEventId);
-        }
-    }
-
-    public Optional<Long> getLastInvoiceEventId() throws StorageException {
-        try {
-            return eventDao.getLastInvoiceEventId();
-        } catch (DaoException ex) {
-            throw new StorageException("Failed to get last invoice event id", ex);
         }
     }
 
@@ -96,10 +65,6 @@ public class ProcessingService {
 
     @PreDestroy
     public void stop() {
-        if (invoiceEventFlow.get() != null) {
-            invoiceEventFlow.getAndSet(null).stop();
-        }
-
         if (payoutEventFlow.get() != null) {
             payoutEventFlow.getAndSet(null).stop();
         }
