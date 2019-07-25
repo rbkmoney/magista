@@ -353,7 +353,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                 toTime
                         )
                 )
-                .orderBy(PAYMENT_EVENT.ID)
+                .orderBy(PAYMENT_EVENT.EVENT_CREATED_AT)
                 .limit(limit);
 
         return fetch(query, statPaymentMapper);
