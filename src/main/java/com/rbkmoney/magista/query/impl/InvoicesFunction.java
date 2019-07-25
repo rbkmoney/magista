@@ -57,12 +57,11 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
 
                     List<Map.Entry<Long, StatInvoice>> invoiceStats = invoicesResult.getCollectedStream();
                     if (!invoicesResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == invoiceStats.size()) {
-                        statResponse.setContinuationToken(
-                                TokenUtil.buildToken(
-                                        getQueryParameters(),
-                                        invoiceStats.get(invoiceStats.size() - 1).getKey()
-                                )
-                        );
+                        String createdAt = invoiceStats.get(invoiceStats.size() - 1).getValue().getCreatedAt();
+                        String token = getContext(context)
+                                .getTokenGenService()
+                                .generateToken(getQueryParameters(), TypeUtil.stringToLocalDateTime(createdAt));
+                        statResponse.setContinuationToken(token);
                     }
                     return statResponse;
                 });
@@ -154,9 +153,9 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
         private InvoicesValidator validator = new InvoicesValidator();
 
         @Override
-        public Query buildQuery(List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
             Query resultQuery = buildSingleQuery(InvoicesParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
-            validator.validateQuery(resultQuery);
+            validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 
@@ -201,7 +200,7 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
                         parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
-                        getFromId(),
+                        getTime(functionContext),
                         parameters.getSize()
                 );
                 return new BaseQueryResult<>(() -> result.stream(), () -> result);

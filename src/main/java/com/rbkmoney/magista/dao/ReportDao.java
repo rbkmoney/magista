@@ -49,7 +49,7 @@ public interface ReportDao {
             Optional<String> paymentId,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             int limit
     ) throws DaoException;
 

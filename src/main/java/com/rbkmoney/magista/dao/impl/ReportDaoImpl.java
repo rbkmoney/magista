@@ -275,7 +275,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
             Optional<String> paymentId,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
-            Optional<Long> fromId,
+            Optional<LocalDateTime> whereTime,
             int limit
     ) throws DaoException {
         Query query = getDslContext()
@@ -344,7 +344,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                                 .and(PAYMENT_EVENT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured)),
                                         Operator.AND,
                                         new ConditionParameterSource()
-                                                .addValue(PAYMENT_EVENT.ID, fromId.orElse(null), GREATER)
+                                                .addValue(PAYMENT_EVENT.EVENT_CREATED_AT, whereTime.orElse(null), GREATER)
                                                 .addValue(PAYMENT_DATA.INVOICE_ID, invoiceId.orElse(null), EQUALS)
                                                 .addValue(PAYMENT_DATA.PAYMENT_ID, paymentId.orElse(null), EQUALS)
                                 ),
