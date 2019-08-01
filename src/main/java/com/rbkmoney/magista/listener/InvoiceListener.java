@@ -37,7 +37,16 @@ public class InvoiceListener implements MessageListener {
             ack.acknowledge();
             log.info("Records have been committed, size={}, {}", messages.size(), toSummaryStringWithValues(messages));
         } catch (RuntimeException ex) {
+            sleepBeforeRetry();
             throw new ConsumerException(String.format("Records commit failed, size=%d, %s", messages.size(), toSummaryString(messages)), ex);
+        }
+    }
+
+    private void sleepBeforeRetry() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
