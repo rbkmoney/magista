@@ -99,7 +99,7 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
     public void testInvoicesWithoutMerchantAndShopId() {
         String json = "{'query': {'invoices': {'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(3, statResponse.getData().getInvoices().size());
+        assertEquals(5, statResponse.getData().getInvoices().size());
         DamselUtil.toJson(statResponse);
     }
 

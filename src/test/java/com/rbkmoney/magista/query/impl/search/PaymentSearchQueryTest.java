@@ -39,6 +39,14 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
         assertEquals(1, statResponse.getData().getPayments().size());
     }
 
+    @Test
+    @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
+    public void testPaymentExcludeField() {
+        String json = "{'query': {'payments': {'merchant_id': 'b9c3bf7f-f62a-4675-8489-2da7775024bb', 'from_time': '2016-10-25T15:45:20Z', 'to_time': '3018-10-25T18:10:10Z', 'exclude': {'shop_id': ['6789']}}}}";
+        final StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(1, statResponse.getData().getPayments().size());
+    }
+
     @Test(expected = QueryParserException.class)
     public void testWhenSizeOverflow() {
         String json = "{'query': {'payments': {'size': 1001}}}";
@@ -72,7 +80,7 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
 
     @Test(expected = BadTokenException.class)
     public void testBadToken() {
-        String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
+        String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': '6789','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatRequest statRequest = new StatRequest(json);
         statRequest.setContinuationToken("3gOc9TNJDkE1dOoK5oy6bJvgShunXxk2rTZuCn3SBts=1560155771740");
         queryProcessor.processQuery(statRequest);
@@ -149,7 +157,7 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
     public void testPaymentsWithoutMerchantAndShopId() {
         String json = "{'query': {'payments': {'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(4, statResponse.getData().getPayments().size());
+        assertEquals(6, statResponse.getData().getPayments().size());
         DamselUtil.toJson(statResponse);
     }
 
