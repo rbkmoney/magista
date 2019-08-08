@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -33,8 +32,8 @@ public class TokenGenService {
             return Optional.empty();
         }
         try {
-            final long timestamp = Long.parseLong(extractToken(token).getTimestamp());
-            return Optional.of(LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC));
+            final String timestamp = extractToken(token).getTimestamp();
+            return Optional.of(LocalDateTime.ofInstant(Instant.parse(timestamp), ZoneOffset.UTC));
         } catch (Exception e) {
             log.error("Exception while extract dateTime from: " + token, e);
             return Optional.empty();
@@ -44,9 +43,9 @@ public class TokenGenService {
     public String generateToken(QueryParameters queryParameters, LocalDateTime createdAt) {
         String val = queryParamsToString(queryParameters);
         try {
-            String token = String.format("%s;%d",
+            String token = String.format("%s;%s",
                     HmacUtil.encode(tokenGenProperties.getKey(), val.getBytes(StandardCharsets.UTF_8)),
-                    createdAt.atZone(ZoneOffset.UTC).toInstant().toEpochMilli()
+                    createdAt.atZone(ZoneOffset.UTC).toInstant().toString()
             );
             log.debug("Generated token: {}", token);
             return token;
@@ -57,7 +56,7 @@ public class TokenGenService {
 
     public boolean validToken(QueryParameters queryParameters, String validateToken) {
         TokenHolder validateTokenHolder = extractToken(validateToken);
-        LocalDateTime createdAt = new Timestamp(Long.valueOf(validateTokenHolder.getTimestamp())).toLocalDateTime();
+        LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.parse(validateTokenHolder.getTimestamp()), ZoneOffset.UTC);
         String generatedToken = generateToken(queryParameters, createdAt);
         TokenHolder generatedTokenHolder = extractToken(generatedToken);
 
