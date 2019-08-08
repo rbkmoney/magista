@@ -13,11 +13,11 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>2.0.4-SNAPSHOT</version>
+    <version>2.0.5-SNAPSHOT</version>
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
-        <damsel.version>1.315-78c1128</damsel.version>
+        <damsel.version>1.323-ae26a6c</damsel.version>
         <shared.resources.version>0.3.6</shared.resources.version>
         <server.port>8022</server.port>
         <exposed.ports>${server.port}</exposed.ports>
@@ -161,7 +161,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>kafka-common-lib</artifactId>
-            <version>0.0.7</version>
+            <version>0.1.1</version>
         </dependency>
         <!--Test libs-->
         <dependency>
