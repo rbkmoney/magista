@@ -180,42 +180,34 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
             Optional<Integer> offset,
             int limit
     ) throws DaoException {
-        Condition conditions = prepareRefundCondition(parameters, fromTime, toTime);
+        ConditionParameterSource refundParameterSource = prepareRefundCondition(parameters, whereTime);
 
         Query query = getDslContext().selectFrom(REFUND_DATA)
-                .where(conditions)
+                .where(
+                        appendDateTimeRangeConditions(
+                                appendConditions(DSL.trueCondition(), Operator.AND, refundParameterSource),
+                                REFUND_DATA.REFUND_CREATED_AT,
+                                fromTime,
+                                toTime
+                        )
+                )
                 .orderBy(REFUND_DATA.REFUND_CREATED_AT.desc())
                 .limit(limit)
                 .offset(offset.orElse(0));
         return fetch(query, statRefundMapper);
     }
 
-    private Condition prepareRefundCondition(RefundsFunction.RefundsParameters parameters, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime) {
-        Condition condition = DSL.trueCondition();
-        if (parameters.getMerchantId() != null) {
-            condition = condition.and(REFUND_DATA.PARTY_ID.eq(parameters.getMerchantId()));
-        }
-        if (parameters.getShopId() != null) {
-            condition = condition.and(REFUND_DATA.PARTY_SHOP_ID.eq(parameters.getShopId()));
-        }
-
-        condition = appendDateTimeRangeConditions(
-                condition,
-                REFUND_DATA.EVENT_CREATED_AT,
-                fromTime,
-                toTime
-        );
-
-        ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
+    private ConditionParameterSource prepareRefundCondition(RefundsFunction.RefundsParameters parameters, Optional<LocalDateTime> whereTime) {
+        return new ConditionParameterSource()
                 .addValue(REFUND_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
                 .addValue(REFUND_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
                 .addValue(REFUND_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                 .addValue(REFUND_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
                 .addValue(REFUND_DATA.REFUND_ID, parameters.getRefundId(), EQUALS)
+                .addValue(REFUND_DATA.REFUND_CREATED_AT, whereTime.orElse(null), LESS)
                 .addValue(REFUND_DATA.REFUND_STATUS,
                         toEnumField(parameters.getRefundStatus(), RefundStatus.class),
                         EQUALS);
-        return appendConditions(condition, Operator.AND, conditionParameterSource);
     }
 
     @Override
@@ -255,14 +247,21 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
 
     @Override
     public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(RefundsFunction.RefundsParameters parameters, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<LocalDateTime> whereTime, int limit) throws DaoException {
-        Condition conditions = prepareRefundCondition(parameters, fromTime, toTime);
+        ConditionParameterSource refundParameterSource = prepareRefundCondition(parameters, whereTime);
 
         Query query = getDslContext()
                 .selectFrom(REFUND_DATA
                         .join(PAYMENT_DATA).on(PAYMENT_DATA.INVOICE_ID.eq(REFUND_DATA.INVOICE_ID), PAYMENT_DATA.PAYMENT_ID.eq(REFUND_DATA.PAYMENT_ID))
                         .join(INVOICE_DATA).on(INVOICE_DATA.INVOICE_ID.eq(REFUND_DATA.INVOICE_ID))
                 )
-                .where(conditions)
+                .where(
+                        appendDateTimeRangeConditions(
+                                appendConditions(DSL.trueCondition(), Operator.AND, refundParameterSource),
+                                REFUND_DATA.REFUND_CREATED_AT,
+                                fromTime,
+                                toTime
+                        )
+                )
                 .orderBy(REFUND_DATA.REFUND_CREATED_AT.desc())
                 .limit(limit);
 
