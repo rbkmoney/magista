@@ -1,6 +1,8 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.damsel.merch_stat.EnrichedStatInvoice;
+import com.rbkmoney.damsel.merch_stat.StatResponse;
+import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
@@ -50,7 +52,13 @@ public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, 
 
                     List<Map.Entry<Long, EnrichedStatInvoice>> enrichedInvoicesStats = enrichedInvoicesResult.getCollectedStream();
                     if (!enrichedInvoicesResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == enrichedInvoicesStats.size()) {
-                        String createdAt = enrichedInvoicesStats.get(enrichedInvoicesStats.size() - 1).getValue().getInvoice().getCreatedAt();
+                        String createdAt = enrichedInvoicesStats
+                                .stream()
+                                .map(Map.Entry::getValue)
+                                .flatMap(enrichedStatInvoice -> enrichedStatInvoice.getPayments().stream())
+                                .min(Comparator.comparing(o -> TypeUtil.stringToLocalDateTime(o.getCreatedAt())))
+                                .get()
+                                .getCreatedAt();
                         String token = getContext(context)
                                 .getTokenGenService()
                                 .generateToken(getQueryParameters(), TypeUtil.stringToLocalDateTime(createdAt));

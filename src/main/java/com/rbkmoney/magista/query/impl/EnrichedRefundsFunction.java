@@ -52,7 +52,13 @@ public class EnrichedRefundsFunction extends PagedBaseFunction<Map.Entry<Long, E
 
                     List<Map.Entry<Long, EnrichedStatInvoice>> enrichedInvoicesStats = enrichedInvoicesResult.getCollectedStream();
                     if (!enrichedInvoicesResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == enrichedInvoicesStats.size()) {
-                        final String createdAt = enrichedInvoicesStats.get(enrichedInvoicesStats.size() - 1).getValue().getInvoice().getCreatedAt();
+                        final String createdAt = enrichedInvoicesStats
+                                .stream()
+                                .map(Map.Entry::getValue)
+                                .flatMap(enrichedStatInvoice -> enrichedStatInvoice.getRefunds().stream())
+                                .min(Comparator.comparing(o -> TypeUtil.stringToLocalDateTime(o.getCreatedAt())))
+                                .get()
+                                .getCreatedAt();
                         final String token = getContext(context)
                                 .getTokenGenService()
                                 .generateToken(getQueryParameters(), TypeUtil.stringToLocalDateTime(createdAt));
