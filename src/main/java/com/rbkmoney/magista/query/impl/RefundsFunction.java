@@ -205,7 +205,7 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
                         parameters,
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
-                        Optional.empty(),
+                        getTime(functionContext),
                         Optional.ofNullable(parameters.getFrom()),
                         parameters.getSize()
                 );
