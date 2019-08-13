@@ -9,30 +9,25 @@ import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
-import com.rbkmoney.magista.domain.tables.PaymentData;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.impl.InvoicesFunction;
 import com.rbkmoney.magista.query.impl.PaymentsFunction;
 import com.rbkmoney.magista.query.impl.PayoutsFunction;
 import com.rbkmoney.magista.query.impl.RefundsFunction;
-import org.jooq.Condition;
-import org.jooq.Operator;
-import org.jooq.Query;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.rbkmoney.geck.common.util.TypeUtil.*;
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.PayoutData.PAYOUT_DATA;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
+import static com.rbkmoney.magista.query.impl.Parameters.SHOP_ID_PARAM;
 import static org.jooq.Comparator.*;
 
 @Component
@@ -155,7 +150,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     ) throws DaoException {
         ConditionParameterSource conditionParameterSource = preparePaymentsCondition(parameters, whereTime);
 
-        Query query = getDslContext()
+        SelectConditionStep<Record> conditionStep = getDslContext()
                 .select()
                 .from(PAYMENT_DATA)
                 .where(
@@ -165,7 +160,12 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                 fromTime,
                                 toTime
                         )
-                ).orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
+                );
+        Condition excludeCondition = prepareExcludeCondition(parameters);
+        if (excludeCondition != null) {
+            conditionStep.and(excludeCondition);
+        }
+        Query query = conditionStep.orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
                 .limit(limit);
 
         return fetch(query, statPaymentMapper);
@@ -331,5 +331,18 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime.orElse(null), LESS)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS);
+    }
+
+    private Condition prepareExcludeCondition(PaymentsFunction.PaymentsParameters parameters) {
+        Object paramObject = parameters.getExclude();
+        Map excludeParam = paramObject instanceof Map ? ((Map) paramObject) : null;
+        if (excludeParam != null) {
+            Object shopIdParam = excludeParam.get(SHOP_ID_PARAM);
+            List<String> excludeShopIds = shopIdParam instanceof List ? ((List) shopIdParam) : null;
+            if (excludeShopIds != null && !excludeShopIds.isEmpty()) {
+                return PAYMENT_DATA.PARTY_SHOP_ID.notIn(excludeShopIds);
+            }
+        }
+        return null;
     }
 }
