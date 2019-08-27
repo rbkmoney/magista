@@ -2,9 +2,11 @@ package com.rbkmoney.magista.dao.impl;
 
 import com.google.common.collect.ImmutableMap;
 import com.rbkmoney.damsel.merch_stat.StatPayment;
+import com.rbkmoney.damsel.merch_stat.StatRefund;
 import com.rbkmoney.magista.dao.ReportDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.StatPaymentMapper;
+import com.rbkmoney.magista.dao.impl.mapper.StatRefundMapper;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
@@ -36,10 +38,12 @@ import static org.jooq.Comparator.GREATER;
 public class ReportDaoImpl extends AbstractDao implements ReportDao {
 
     private final StatPaymentMapper statPaymentMapper;
+    private final StatRefundMapper statRefundMapper;
 
     public ReportDaoImpl(@Qualifier("slaveDataSource") DataSource ds) {
         super(ds);
         statPaymentMapper = new StatPaymentMapper();
+        statRefundMapper = new StatRefundMapper();
     }
 
     @Override
@@ -357,6 +361,30 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                 .limit(limit);
 
         return fetch(query, statPaymentMapper);
+    }
+
+    @Override
+    public Collection<Map.Entry<Long, StatRefund>> getRefundsForReport(String partyId, String shopId, Optional<String> invoiceId, Optional<String> paymentId, Optional<String> refundId, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<LocalDateTime> whereTime, int limit) throws DaoException {
+        Query query = getDslContext().selectFrom(REFUND)
+                .where(
+                        appendDateTimeRangeConditions(
+                                appendConditions(
+                                        REFUND.PARTY_ID.eq(partyId)
+                                                .and(REFUND.PARTY_SHOP_ID.eq(shopId))
+                                                .and(REFUND.REFUND_STATUS.eq(RefundStatus.succeeded)),
+                                        Operator.AND,
+                                        new ConditionParameterSource()
+                                                .addValue(REFUND.EVENT_CREATED_AT, whereTime.orElse(null), GREATER)
+                                                .addValue(REFUND.INVOICE_ID, invoiceId.orElse(null), EQUALS)
+                                                .addValue(REFUND.PAYMENT_ID, paymentId.orElse(null), EQUALS)
+                                ),
+                                REFUND.EVENT_CREATED_AT,
+                                fromTime,
+                                toTime
+                        )
+                ).orderBy(REFUND.EVENT_CREATED_AT);
+
+        return fetch(query, statRefundMapper);
     }
 
 }

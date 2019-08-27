@@ -20,6 +20,7 @@ public class QueryParserImpl extends BaseQueryParser {
                         new RootQuery.RootParser(),
                         new PaymentsFunction.PaymentsParser(),
                         new PaymentsForReportFunction.PaymentsForReportParser(),
+                        new RefundsForReportFunction.RefundsForReportParser(),
                         new InvoicesFunction.InvoicesParser(),
                         new RefundsFunction.RefundsParser(),
                         new PayoutsFunction.PayoutsParser(),
