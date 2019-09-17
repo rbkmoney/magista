@@ -38,10 +38,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -153,6 +150,14 @@ public class InvoicingKafkaTest {
         SessionTransactionBound sessionTransactionBound = new SessionTransactionBound();
         sessionTransactionBound.setTrx(transactionInfo);
 
+        InvoicePaymentCaptureParams invoicePaymentCaptureParams = new InvoicePaymentCaptureParams();
+        invoicePaymentCaptureParams.setReason("test reason");
+        Cash invoiceCartCash = new Cash(10L, new CurrencyRef("RUB"));
+        InvoiceCart invoiceCart = new InvoiceCart()
+                .setLines(Collections.singletonList(new InvoiceLine("test prod", 1, invoiceCartCash, new HashMap<>())));
+        invoicePaymentCaptureParams.setCart(invoiceCart);
+        invoicePaymentCaptureParams.setCash(new Cash(5L, new CurrencyRef("USD")));
+
         EventPayload eventPayload = EventPayload.invoice_changes(
                 Arrays.asList(
                         InvoiceChange.invoice_created(
@@ -244,6 +249,14 @@ public class InvoicingKafkaTest {
                                                 )
                                         )
                                 )
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_capture_started(
+                                                new InvoicePaymentCaptureStarted(
+                                                        invoicePaymentCaptureParams
+                                                )
+                                        ))
                         )
                 )
         );
