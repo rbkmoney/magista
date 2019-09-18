@@ -197,6 +197,14 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
                         TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()), DigitalWalletProvider.class),
                         rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_ID.getName())
                 ));
+            case crypto_currency:
+                return PaymentTool.crypto_currency(TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.CRYPTO_CURRENCY.getName()), CryptoCurrency.class));
+            case mobile_commerce:
+                MobilePhone mobilePhone = new MobilePhone(rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_PHONE_CC.getName()),
+                        rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_PHONE_CTN.getName()));
+                MobileOperator mobileOperator = TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_OPERATOR.getName()),
+                        MobileOperator.class);
+                return PaymentTool.mobile_commerce(new MobileCommerce(mobileOperator, mobilePhone));
             default:
                 throw new NotFoundException(String.format("Payment tool '%s' not found", paymentToolType));
         }
