@@ -95,8 +95,8 @@ public class MapperHelper {
             case crypto_currency:
                 return PaymentTool.crypto_currency(TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.CRYPTO_CURRENCY.getName()), CryptoCurrency.class));
             case mobile_commerce:
-                MobilePhone mobilePhone = new MobilePhone(rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_CC.getName()),
-                        rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_CTN.getName()));
+                MobilePhone mobilePhone = new MobilePhone(rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_PHONE_CC.getName()),
+                        rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_PHONE_CTN.getName()));
                 MobileOperator mobileOperator = TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_OPERATOR.getName()),
                         MobileOperator.class);
                 return PaymentTool.mobile_commerce(new MobileCommerce(mobileOperator, mobilePhone));

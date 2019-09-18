@@ -54,7 +54,7 @@ public class PaymentStartedEventMapper implements PaymentMapper {
 
         paymentData.setPaymentCreatedAt(TypeUtil.stringToLocalDateTime(invoicePayment.getCreatedAt()));
 
-        var paymentFlow = invoicePayment.getFlow();
+        InvoicePaymentFlow paymentFlow = invoicePayment.getFlow();
         paymentData.setPaymentFlow(TBaseUtil.unionFieldToEnum(paymentFlow, PaymentFlow.class));
         if (paymentFlow.isSetHold()) {
             InvoicePaymentFlowHold hold = paymentFlow.getHold();
@@ -204,8 +204,8 @@ public class PaymentStartedEventMapper implements PaymentMapper {
         if (paymentTool.isSetMobileCommerce()) {
             MobileOperator mobileOperator = paymentTool.getMobileCommerce().getOperator();
             paymentData.setPaymentMobileOperator(TypeUtil.toEnumField(mobileOperator.name(), MobileOperatorType.class));
-            paymentData.setPaymentMobileCc(paymentTool.getMobileCommerce().getPhone().getCc());
-            paymentData.setPaymentMobileCtn(paymentTool.getMobileCommerce().getPhone().getCtn());
+            paymentData.setPaymentMobilePhoneCc(paymentTool.getMobileCommerce().getPhone().getCc());
+            paymentData.setPaymentMobilePhoneCtn(paymentTool.getMobileCommerce().getPhone().getCtn());
         }
 
     }
