@@ -200,6 +200,14 @@ public class PaymentStartedEventMapper implements PaymentMapper {
         if (paymentTool.isSetCryptoCurrency()) {
             paymentData.setCryptoCurrency(paymentTool.getCryptoCurrency().toString());
         }
+
+        if (paymentTool.isSetMobileCommerce()) {
+            MobileOperator mobileOperator = paymentTool.getMobileCommerce().getOperator();
+            paymentData.setPaymentMobileOperator(TypeUtil.toEnumField(mobileOperator.name(), MobileOperatorType.class));
+            paymentData.setPaymentMobilePhoneCc(paymentTool.getMobileCommerce().getPhone().getCc());
+            paymentData.setPaymentMobilePhoneCtn(paymentTool.getMobileCommerce().getPhone().getCtn());
+        }
+
     }
 
     private void mapContactInfo(PaymentData paymentData, ContactInfo contactInfo) {
