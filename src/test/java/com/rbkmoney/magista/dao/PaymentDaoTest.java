@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -65,6 +66,7 @@ public class PaymentDaoTest extends AbstractDaoTest {
                                     return paymentData;
                                 }
                         )
+                .sorted(Comparator.comparing(PaymentData::getEventId))
         ).collect(Collectors.toList());
 
         paymentDao.insert(payments);

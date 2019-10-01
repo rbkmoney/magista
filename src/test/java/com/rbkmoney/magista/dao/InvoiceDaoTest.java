@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -57,7 +58,9 @@ public class InvoiceDaoTest extends AbstractDaoTest {
                                     invoiceData.setInvoiceId(invoiceId);
                                     return invoiceData;
                                 }
-                        ).collect(Collectors.toList());
+                        )
+                .sorted(Comparator.comparing(InvoiceData::getEventId))
+                .collect(Collectors.toList());
 
         invoiceDao.insert(invoices);
         invoiceDao.insert(invoices);
