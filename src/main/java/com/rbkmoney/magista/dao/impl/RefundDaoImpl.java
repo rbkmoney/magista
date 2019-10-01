@@ -54,8 +54,9 @@ public class RefundDaoImpl extends AbstractDao implements RefundDao {
                                         .onConflict(REFUND_DATA.INVOICE_ID, REFUND_DATA.PAYMENT_ID, REFUND_DATA.REFUND_ID)
                                         .doUpdate()
                                         .set(refundDataRecord)
+                                        .where(REFUND_DATA.EVENT_ID.le(refundDataRecord.getEventId()))
                 )
                 .collect(Collectors.toList());
-        batchExecute(queries, 1);
+        batchExecute(queries);
     }
 }

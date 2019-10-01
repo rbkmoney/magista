@@ -72,9 +72,8 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
                                 .set(paymentDataRecord)
                                 .where(
                                         PAYMENT_DATA.INVOICE_ID.eq(paymentDataRecord.getInvoiceId())
-                                                .and(
-                                                        PAYMENT_DATA.PAYMENT_ID.eq(paymentDataRecord.getPaymentId())
-                                                )
+                                                .and(PAYMENT_DATA.PAYMENT_ID.eq(paymentDataRecord.getPaymentId()))
+                                                .and(PAYMENT_DATA.EVENT_ID.le(paymentDataRecord.getEventId()))
                                 )
                 )
                 .collect(Collectors.toList());

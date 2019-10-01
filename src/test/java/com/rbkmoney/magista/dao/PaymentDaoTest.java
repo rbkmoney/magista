@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomStreamOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 @ContextConfiguration(classes = {PaymentDaoImpl.class})
 public class PaymentDaoTest extends AbstractDaoTest {
@@ -36,6 +38,20 @@ public class PaymentDaoTest extends AbstractDaoTest {
     }
 
     @Test
+    public void updatePreviousEventTest() {
+        PaymentData paymentData = random(PaymentData.class);
+
+        paymentDao.insert(List.of(paymentData));
+        paymentDao.update(List.of(paymentData));
+
+        PaymentData paymentDataWithPreviousEventId = new PaymentData(paymentData);
+        paymentDataWithPreviousEventId.setEventId(paymentData.getEventId() - 1);
+
+        paymentDao.update(List.of(paymentDataWithPreviousEventId));
+        assertEquals(paymentData, paymentDao.get(paymentData.getInvoiceId(), paymentData.getPaymentId()));
+    }
+
+    @Test
     public void batchUpsertTest() {
         String invoiceId = "invoiceId";
         String paymentId = "paymentId";
@@ -50,6 +66,7 @@ public class PaymentDaoTest extends AbstractDaoTest {
                                     return paymentData;
                                 }
                         )
+                .sorted(Comparator.comparing(PaymentData::getEventId))
         ).collect(Collectors.toList());
 
         paymentDao.insert(payments);

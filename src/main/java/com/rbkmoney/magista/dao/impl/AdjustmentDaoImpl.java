@@ -55,9 +55,10 @@ public class AdjustmentDaoImpl extends AbstractDao implements AdjustmentDao {
                                         .onConflict(ADJUSTMENT_DATA.INVOICE_ID, ADJUSTMENT_DATA.PAYMENT_ID, ADJUSTMENT_DATA.ADJUSTMENT_ID)
                                         .doUpdate()
                                         .set(adjustmentDataRecord)
+                                        .where(ADJUSTMENT_DATA.EVENT_ID.le(adjustmentDataRecord.getEventId()))
                 )
                 .collect(Collectors.toList());
-        batchExecute(queries, 1);
+        batchExecute(queries);
     }
 
 }

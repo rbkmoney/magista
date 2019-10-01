@@ -2,6 +2,7 @@ package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.dao.impl.AdjustmentDaoImpl;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
+import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.exception.DaoException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,20 @@ public class AdjustmentDaoTest extends AbstractDaoTest {
         adjustmentDao.save(List.of(adjustment));
 
         assertEquals(adjustment, adjustmentDao.get(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId()));
+    }
+
+    @Test
+    public void updatePreviousEventTest() {
+        AdjustmentData adjustmentData = random(AdjustmentData.class);
+
+        adjustmentDao.save(List.of(adjustmentData));
+        adjustmentDao.save(List.of(adjustmentData));
+
+        AdjustmentData adjustmentDataWithPreviousEventId = new AdjustmentData(adjustmentData);
+        adjustmentDataWithPreviousEventId.setEventId(adjustmentData.getEventId() - 1);
+
+        adjustmentDao.save(List.of(adjustmentDataWithPreviousEventId));
+        assertEquals(adjustmentData, adjustmentDao.get(adjustmentData.getInvoiceId(), adjustmentData.getPaymentId(), adjustmentData.getAdjustmentId()));
     }
 
 }

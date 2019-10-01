@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,6 +35,20 @@ public class InvoiceDaoTest extends AbstractDaoTest {
     }
 
     @Test
+    public void updatePreviousEventTest() {
+        InvoiceData invoiceData = random(InvoiceData.class);
+
+        invoiceDao.insert(List.of(invoiceData));
+        invoiceDao.update(List.of(invoiceData));
+
+        InvoiceData invoiceDataWithPreviousEventId = new InvoiceData(invoiceData);
+        invoiceDataWithPreviousEventId.setEventId(invoiceData.getEventId() - 1);
+
+        invoiceDao.update(List.of(invoiceDataWithPreviousEventId));
+        assertEquals(invoiceData, invoiceDao.get(invoiceData.getInvoiceId()));
+    }
+
+    @Test
     public void testBatchUpsert() {
         String invoiceId = "invoiceId";
 
@@ -43,7 +58,9 @@ public class InvoiceDaoTest extends AbstractDaoTest {
                                     invoiceData.setInvoiceId(invoiceId);
                                     return invoiceData;
                                 }
-                        ).collect(Collectors.toList());
+                        )
+                .sorted(Comparator.comparing(InvoiceData::getEventId))
+                .collect(Collectors.toList());
 
         invoiceDao.insert(invoices);
         invoiceDao.insert(invoices);
