@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomStreamOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 @ContextConfiguration(classes = {PaymentDaoImpl.class})
 public class PaymentDaoTest extends AbstractDaoTest {
@@ -32,6 +33,20 @@ public class PaymentDaoTest extends AbstractDaoTest {
         paymentDao.update(List.of(paymentData));
         paymentDao.update(List.of(paymentData));
 
+        assertEquals(paymentData, paymentDao.get(paymentData.getInvoiceId(), paymentData.getPaymentId()));
+    }
+
+    @Test
+    public void updatePreviousEventTest() {
+        PaymentData paymentData = random(PaymentData.class);
+
+        paymentDao.insert(List.of(paymentData));
+        paymentDao.update(List.of(paymentData));
+
+        PaymentData paymentDataWithPreviousEventId = new PaymentData(paymentData);
+        paymentDataWithPreviousEventId.setEventId(paymentData.getEventId() - 1);
+
+        paymentDao.update(List.of(paymentDataWithPreviousEventId));
         assertEquals(paymentData, paymentDao.get(paymentData.getInvoiceId(), paymentData.getPaymentId()));
     }
 

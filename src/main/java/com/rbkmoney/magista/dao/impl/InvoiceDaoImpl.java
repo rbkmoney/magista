@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.rbkmoney.magista.domain.Tables.INVOICE_DATA;
+import static com.rbkmoney.magista.domain.Tables.PAYMENT_DATA;
 
 @Component
 public class InvoiceDaoImpl extends AbstractDao implements InvoiceDao {
@@ -71,7 +72,10 @@ public class InvoiceDaoImpl extends AbstractDao implements InvoiceDao {
                         invoiceDataRecord ->
                                 getDslContext().update(INVOICE_DATA)
                                         .set(invoiceDataRecord)
-                                        .where(INVOICE_DATA.INVOICE_ID.eq(invoiceDataRecord.getInvoiceId()))
+                                        .where(
+                                                INVOICE_DATA.INVOICE_ID.eq(invoiceDataRecord.getInvoiceId())
+                                                        .and(INVOICE_DATA.EVENT_ID.le(invoiceDataRecord.getEventId()))
+                                        )
                 )
                 .collect(Collectors.toList());
         batchExecute(queries);

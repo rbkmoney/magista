@@ -34,6 +34,20 @@ public class InvoiceDaoTest extends AbstractDaoTest {
     }
 
     @Test
+    public void updatePreviousEventTest() {
+        InvoiceData invoiceData = random(InvoiceData.class);
+
+        invoiceDao.insert(List.of(invoiceData));
+        invoiceDao.update(List.of(invoiceData));
+
+        InvoiceData invoiceDataWithPreviousEventId = new InvoiceData(invoiceData);
+        invoiceDataWithPreviousEventId.setEventId(invoiceData.getEventId() - 1);
+
+        invoiceDao.update(List.of(invoiceDataWithPreviousEventId));
+        assertEquals(invoiceData, invoiceDao.get(invoiceData.getInvoiceId()));
+    }
+
+    @Test
     public void testBatchUpsert() {
         String invoiceId = "invoiceId";
 

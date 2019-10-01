@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.dao.impl.RefundDaoImpl;
+import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.exception.DaoException;
 import org.junit.Test;
@@ -25,5 +26,19 @@ public class RefundDaoTest extends AbstractDaoTest {
         refundDao.save(List.of(refund));
 
         assertEquals(refund, refundDao.get(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId()));
+    }
+
+    @Test
+    public void updatePreviousEventTest() {
+        RefundData refundData = random(RefundData.class);
+
+        refundDao.save(List.of(refundData));
+        refundDao.save(List.of(refundData));
+
+        RefundData refundDataWithPreviousEventId = new RefundData(refundData);
+        refundDataWithPreviousEventId.setEventId(refundData.getEventId() - 1);
+
+        refundDao.save(List.of(refundDataWithPreviousEventId));
+        assertEquals(refundData, refundDao.get(refundData.getInvoiceId(), refundData.getPaymentId(), refundData.getRefundId()));
     }
 }
