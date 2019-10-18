@@ -124,10 +124,6 @@ public class RefundsForReportFunction extends PagedBaseFunction<Map.Entry<Long, 
                 checkParamsResult(true, MERCHANT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
-            if (refundsParameters.getShopId() == null) {
-                checkParamsResult(true, SHOP_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
-            }
-
             validateTimePeriod(refundsParameters.getFromTime(), refundsParameters.getToTime());
         }
     }
@@ -206,7 +202,7 @@ public class RefundsForReportFunction extends PagedBaseFunction<Map.Entry<Long, 
             try {
                 Collection<Map.Entry<Long, StatRefund>> result = functionContext.getReportDao().getRefundsForReport(
                         parameters.getMerchantId(),
-                        parameters.getShopId(),
+                        Optional.ofNullable(parameters.getShopId()),
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(parameters.getRefundId()),

@@ -56,7 +56,7 @@ public interface ReportDao {
 
     Collection<Map.Entry<Long, StatRefund>> getRefundsForReport(
             String partyId,
-            String shopId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> refundId,

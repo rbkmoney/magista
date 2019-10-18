@@ -364,19 +364,19 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
     }
 
     @Override
-    public Collection<Map.Entry<Long, StatRefund>> getRefundsForReport(String partyId, String shopId, Optional<String> invoiceId, Optional<String> paymentId, Optional<String> refundId, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<LocalDateTime> whereTime, int limit) throws DaoException {
+    public Collection<Map.Entry<Long, StatRefund>> getRefundsForReport(String partyId, Optional<String> shopId, Optional<String> invoiceId, Optional<String> paymentId, Optional<String> refundId, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<LocalDateTime> whereTime, int limit) throws DaoException {
         Query query = getDslContext().selectFrom(REFUND)
                 .where(
                         appendDateTimeRangeConditions(
                                 appendConditions(
                                         REFUND.PARTY_ID.eq(partyId)
-                                                .and(REFUND.PARTY_SHOP_ID.eq(shopId))
                                                 .and(REFUND.REFUND_STATUS.eq(RefundStatus.succeeded)),
                                         Operator.AND,
                                         new ConditionParameterSource()
                                                 .addValue(REFUND.EVENT_CREATED_AT, whereTime.orElse(null), GREATER)
                                                 .addValue(REFUND.INVOICE_ID, invoiceId.orElse(null), EQUALS)
                                                 .addValue(REFUND.PAYMENT_ID, paymentId.orElse(null), EQUALS)
+                                                .addValue(REFUND.PARTY_SHOP_ID, shopId.orElse(null), EQUALS)
                                 ),
                                 REFUND.EVENT_CREATED_AT,
                                 fromTime,
