@@ -274,7 +274,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
     @Override
     public Collection<Map.Entry<Long, StatPayment>> getPaymentsForReport(
             String partyId,
-            String shopId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<LocalDateTime> fromTime,
@@ -341,7 +341,6 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                         appendDateTimeRangeConditions(
                                 appendConditions(
                                         PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(partyId))
-                                                .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId))
                                                 .and(PAYMENT_DATA.INVOICE_ID.eq(PAYMENT_EVENT.INVOICE_ID))
                                                 .and(PAYMENT_DATA.PAYMENT_ID.eq(PAYMENT_EVENT.PAYMENT_ID))
                                                 .and(PAYMENT_EVENT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
@@ -351,6 +350,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                                 .addValue(PAYMENT_EVENT.EVENT_CREATED_AT, whereTime.orElse(null), GREATER)
                                                 .addValue(PAYMENT_DATA.INVOICE_ID, invoiceId.orElse(null), EQUALS)
                                                 .addValue(PAYMENT_DATA.PAYMENT_ID, paymentId.orElse(null), EQUALS)
+                                                .addValue(PAYMENT_DATA.PARTY_SHOP_ID, shopId.orElse(null), EQUALS)
                                 ),
                                 PAYMENT_EVENT.EVENT_CREATED_AT,
                                 fromTime,

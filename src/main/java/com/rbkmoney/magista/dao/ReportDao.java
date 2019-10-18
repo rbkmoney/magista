@@ -45,7 +45,7 @@ public interface ReportDao {
 
     Collection<Map.Entry<Long, StatPayment>> getPaymentsForReport(
             String partyId,
-            String shopId,
+            Optional<String> shopId,
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<LocalDateTime> fromTime,

@@ -121,10 +121,6 @@ public class PaymentsForReportFunction extends PagedBaseFunction<Map.Entry<Long,
                 checkParamsResult(true, MERCHANT_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
             }
 
-            if (paymentsParameters.getShopId() == null) {
-                checkParamsResult(true, SHOP_ID_PARAM, RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING);
-            }
-
             validateTimePeriod(paymentsParameters.getFromTime(), paymentsParameters.getToTime());
         }
     }
@@ -203,7 +199,7 @@ public class PaymentsForReportFunction extends PagedBaseFunction<Map.Entry<Long,
             try {
                 Collection<Map.Entry<Long, StatPayment>> result = functionContext.getReportDao().getPaymentsForReport(
                         parameters.getMerchantId(),
-                        parameters.getShopId(),
+                        Optional.ofNullable(parameters.getShopId()),
                         Optional.ofNullable(parameters.getInvoiceId()),
                         Optional.ofNullable(parameters.getPaymentId()),
                         Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
