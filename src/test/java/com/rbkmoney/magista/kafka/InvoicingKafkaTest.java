@@ -3,6 +3,7 @@ package com.rbkmoney.magista.kafka;
 import com.rbkmoney.damsel.domain.Invoice;
 import com.rbkmoney.damsel.domain.InvoicePayment;
 import com.rbkmoney.damsel.domain.*;
+import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.geck.serializer.kit.mock.MockMode;
