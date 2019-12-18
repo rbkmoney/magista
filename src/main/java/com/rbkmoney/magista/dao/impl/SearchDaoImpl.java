@@ -62,7 +62,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         new ConditionParameterSource()
                                 .addValue(INVOICE_DATA.PARTY_ID,
                                         Optional.ofNullable(parameters.getMerchantId())
-                                                .map(merchantId -> UUID.fromString(merchantId))
+                                                .map(UUID::fromString)
                                                 .orElse(null),
                                         EQUALS)
                                 .addValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
@@ -104,7 +104,9 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL);
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS);
 
         if (!paymentParameterSource.getConditionFields().isEmpty()) {
             condition = condition.and(
@@ -118,7 +120,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                               paymentParameterSource
                                                       .addValue(PAYMENT_DATA.PARTY_ID,
                                                               Optional.ofNullable(parameters.getMerchantId())
-                                                                      .map(merchantId -> UUID.fromString(merchantId))
+                                                                      .map(UUID::fromString)
                                                                       .orElse(null),
                                                               EQUALS)
                                                       .addValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
@@ -297,7 +299,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(
                         PAYMENT_DATA.PARTY_ID,
                         Optional.ofNullable(parameters.getMerchantId())
-                                .map(merchantId -> UUID.fromString(merchantId))
+                                .map(UUID::fromString)
                                 .orElse(null),
                         EQUALS
                 )

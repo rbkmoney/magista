@@ -33,6 +33,14 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
 
     @Test
     @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
+    public void testPaymentAdditionalInfoWithInvoiceSearch() {
+        String json = "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32', 'payment_rrn': '43253', 'payment_approval_code': '5324'}}}";
+        final StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(1, statResponse.getData().getInvoices().size());
+    }
+
+    @Test
+    @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
     public void testPaymentAdditionalInfo() {
         String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32', 'payment_rrn': '43253', 'payment_approval_code': '5324'}}}";
         final StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));

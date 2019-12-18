@@ -32,7 +32,7 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
     public void testInvoices() {
         String json = "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(2, statResponse.getData().getInvoices().size());
+        assertEquals(3, statResponse.getData().getInvoices().size());
         DamselUtil.toJson(statResponse);
     }
 
@@ -62,6 +62,11 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
 
         statRequest.setContinuationToken(statResponse.getContinuationToken());
         statResponse = queryProcessor.processQuery(statRequest);
+        assertEquals(1, statResponse.getData().getInvoices().size());
+        assertNotNull(statResponse.getContinuationToken());
+
+        statRequest.setContinuationToken(statResponse.getContinuationToken());
+        statResponse = queryProcessor.processQuery(statRequest);
         assertNull(statResponse.getContinuationToken());
     }
 
@@ -85,7 +90,7 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
     public void testOrderByEventIdInvoices() {
         String json = "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(2, statResponse.getData().getInvoices().size());
+        assertEquals(3, statResponse.getData().getInvoices().size());
         Instant instant = Instant.MAX;
         for (StatInvoice statInvoice : statResponse.getData().getInvoices()) {
             Instant statInstant = Instant.from(TypeUtil.stringToTemporal(statInvoice.getCreatedAt()));
@@ -99,7 +104,7 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
     public void testInvoicesWithoutMerchantAndShopId() {
         String json = "{'query': {'invoices': {'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-26T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(5, statResponse.getData().getInvoices().size());
+        assertEquals(6, statResponse.getData().getInvoices().size());
         DamselUtil.toJson(statResponse);
     }
 
