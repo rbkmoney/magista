@@ -6,10 +6,12 @@ import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.*;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
+import com.rbkmoney.magista.domain.enums.PaymentTool;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.enums.RefundStatus;
 import com.rbkmoney.magista.exception.DaoException;
+import com.rbkmoney.magista.exception.WrongParametersException;
 import com.rbkmoney.magista.query.impl.InvoicesFunction;
 import com.rbkmoney.magista.query.impl.PaymentsFunction;
 import com.rbkmoney.magista.query.impl.PayoutsFunction;
@@ -294,8 +296,9 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         return fetch(query, enrichedStatInvoiceMapper);
     }
 
-    private ConditionParameterSource preparePaymentsCondition(PaymentsFunction.PaymentsParameters parameters, Optional<LocalDateTime> whereTime) {
-        return new ConditionParameterSource()
+    private ConditionParameterSource preparePaymentsCondition(PaymentsFunction.PaymentsParameters parameters,
+                                                              Optional<LocalDateTime> whereTime) {
+        ConditionParameterSource parameterSource = new ConditionParameterSource()
                 .addValue(
                         PAYMENT_DATA.PARTY_ID,
                         Optional.ofNullable(parameters.getMerchantId())
@@ -333,6 +336,46 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime.orElse(null), LESS)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS);
+
+        if (parameters.getPaymentMethod() == null) {
+            fillCorrectPaymentMethod(parameters, parameterSource);
+        } else {
+            checkPaymentToolCorrectness(parameters);
+        }
+        return parameterSource;
+    }
+
+    private void fillCorrectPaymentMethod(PaymentsFunction.PaymentsParameters parameters,
+                                          ConditionParameterSource parameterSource) {
+        if (parameters.getPaymentMethod() == null && parameters.getPaymentBankCardTokenProvider() != null) {
+            parameterSource
+                    .addValue(PAYMENT_DATA.PAYMENT_TOOL, PaymentTool.bank_card, EQUALS)
+                    .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
+                            toEnumField(
+                                    parameters.getPaymentBankCardTokenProvider(),
+                                    com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class
+                            ),
+                            EQUALS);
+        }
+        if (parameters.getPaymentMethod() == null && parameters.getPaymentTerminalProvider() != null) {
+            parameterSource
+                    .addValue(PAYMENT_DATA.PAYMENT_TOOL, PaymentTool.payment_terminal, EQUALS)
+                    .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS);
+        }
+    }
+
+    private void checkPaymentToolCorrectness(PaymentsFunction.PaymentsParameters parameters) {
+        boolean bankCardMismatch = PaymentTool.bank_card.getName().equals(parameters.getPaymentMethod())
+                && parameters.getPaymentTerminalProvider() != null;
+        boolean terminalMismatch = PaymentTool.payment_terminal.getName().equals(parameters.getPaymentMethod())
+                && parameters.getPaymentBankCardTokenProvider() != null;
+        if (bankCardMismatch || terminalMismatch) {
+            throw new WrongParametersException(String.format("Incorrect parameters PaymentMethod (%s) and %s",
+                    parameters.getPaymentMethod(),
+                    parameters.getPaymentTerminalProvider() != null ?
+                            "PaymentTerminalProvider" : "PaymentBankCardTokenProvider")
+            );
+        }
     }
 
     private Condition prepareExcludeCondition(PaymentsFunction.PaymentsParameters parameters) {
