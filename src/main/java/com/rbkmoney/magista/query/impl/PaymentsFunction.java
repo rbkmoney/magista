@@ -4,6 +4,7 @@ import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.domain.enums.PaymentTool;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
@@ -134,6 +135,10 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             return getStringParameter(PAYMENT_METHOD_PARAM, false);
         }
 
+        public void setPaymentMethod(String paymentMethod) {
+            setParameter(PAYMENT_METHOD_PARAM, paymentMethod);
+        }
+
         public String getPaymentTerminalProvider() {
             return getStringParameter(PAYMENT_TERMINAL_PROVIDER_PARAM, false);
         }
@@ -206,6 +211,35 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             }
 
             validateTimePeriod(paymentsParameters.getFromTime(), paymentsParameters.getToTime());
+
+            if (paymentsParameters.getPaymentMethod() == null) {
+                fillCorrectPaymentMethod(paymentsParameters);
+            } else {
+                validatePaymentToolCorrectness(paymentsParameters);
+            }
+        }
+
+        private void fillCorrectPaymentMethod(PaymentsParameters paymentsParameters) {
+            if (paymentsParameters.getPaymentBankCardTokenProvider() != null) {
+                paymentsParameters.setPaymentMethod(PaymentTool.bank_card.getName());
+            }
+            if (paymentsParameters.getPaymentTerminalProvider() != null) {
+                paymentsParameters.setPaymentMethod(PaymentTool.payment_terminal.getName());
+            }
+        }
+
+        private void validatePaymentToolCorrectness(PaymentsFunction.PaymentsParameters parameters) {
+            boolean bankCardMismatch = PaymentTool.bank_card.getName().equals(parameters.getPaymentMethod())
+                    && parameters.getPaymentTerminalProvider() != null;
+            boolean terminalMismatch = PaymentTool.payment_terminal.getName().equals(parameters.getPaymentMethod())
+                    && parameters.getPaymentBankCardTokenProvider() != null;
+            if (bankCardMismatch || terminalMismatch) {
+                throw new IllegalArgumentException(String.format("Incorrect parameters PaymentMethod (%s) and %s",
+                        parameters.getPaymentMethod(),
+                        parameters.getPaymentTerminalProvider() != null ?
+                                "PaymentTerminalProvider" : "PaymentBankCardTokenProvider")
+                );
+            }
         }
     }
 
