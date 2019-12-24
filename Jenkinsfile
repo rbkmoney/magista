@@ -1,5 +1,5 @@
 #!groovy
-build('magista', 'java-maven') {
+build('magista', 'conrunner4') {
     checkoutRepo()
         loadBuildUtils()
 
