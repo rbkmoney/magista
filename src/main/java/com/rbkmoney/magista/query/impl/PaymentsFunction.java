@@ -237,7 +237,7 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
                 throw new IllegalArgumentException(String.format("Incorrect parameters PaymentMethod (%s) and %s",
                         parameters.getPaymentMethod(),
                         parameters.getPaymentTerminalProvider() != null ?
-                                "PaymentTerminalProvider" : "PaymentBankCardTokenProvider")
+                                PAYMENT_TERMINAL_PROVIDER_PARAM : PAYMENT_BANK_CARD_TOKEN_PROVIDER_PARAM)
                 );
             }
         }
