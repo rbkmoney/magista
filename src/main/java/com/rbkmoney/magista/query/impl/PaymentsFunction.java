@@ -131,13 +131,15 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             return getStringParameter(PAYMENT_FLOW_PARAM, false);
         }
 
-        public String getPaymentMethod() {
-            return getStringParameter(PAYMENT_METHOD_PARAM, false);
+        public PaymentTool getPaymentMethod() {
+            return TypeUtil.toEnumField(
+                    getStringParameter(PAYMENT_METHOD_PARAM, false),
+                    com.rbkmoney.magista.domain.enums.PaymentTool.class
+            );
         }
 
-        public String setPaymentMethod(String paymentMethod) {
-            Object value = setParameter(PAYMENT_METHOD_PARAM, paymentMethod);
-            return value == null ? null : (String) value;
+        public void setPaymentMethod(String paymentMethod) {
+            setParameter(PAYMENT_METHOD_PARAM, paymentMethod);
         }
 
         public String getPaymentTerminalProvider() {
@@ -222,18 +224,18 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
 
         private void fillCorrectPaymentMethod(PaymentsParameters paymentsParameters) {
             if (paymentsParameters.getPaymentBankCardTokenProvider() != null) {
-                paymentsParameters.setPaymentMethod(PaymentTool.bank_card.getName());
+                paymentsParameters.setPaymentMethod(PaymentTool.bank_card.getLiteral());
             }
             if (paymentsParameters.getPaymentTerminalProvider() != null) {
-                paymentsParameters.setPaymentMethod(PaymentTool.payment_terminal.getName());
+                paymentsParameters.setPaymentMethod(PaymentTool.payment_terminal.getLiteral());
             }
         }
 
         private void validatePaymentToolCorrectness(PaymentsFunction.PaymentsParameters parameters) {
             boolean bankCardMismatch = parameters.getPaymentTerminalProvider() != null
-                    && !PaymentTool.payment_terminal.getLiteral().equals(parameters.getPaymentMethod());
+                    && PaymentTool.payment_terminal != parameters.getPaymentMethod();
             boolean terminalMismatch = parameters.getPaymentBankCardTokenProvider() != null
-                    && !PaymentTool.bank_card.getLiteral().equals(parameters.getPaymentMethod());
+                    && PaymentTool.bank_card != parameters.getPaymentMethod();
             if (bankCardMismatch || terminalMismatch) {
                 String provider = parameters.getPaymentTerminalProvider() != null ?
                         PAYMENT_TERMINAL_PROVIDER_PARAM : PAYMENT_BANK_CARD_TOKEN_PROVIDER_PARAM;
