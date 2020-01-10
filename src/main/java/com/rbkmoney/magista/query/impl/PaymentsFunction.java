@@ -231,9 +231,9 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
 
         private void validatePaymentToolCorrectness(PaymentsFunction.PaymentsParameters parameters) {
             boolean bankCardMismatch = parameters.getPaymentTerminalProvider() != null
-                    && !PaymentTool.payment_terminal.getName().equals(parameters.getPaymentMethod());
+                    && !PaymentTool.payment_terminal.getLiteral().equals(parameters.getPaymentMethod());
             boolean terminalMismatch = parameters.getPaymentBankCardTokenProvider() != null
-                    && !PaymentTool.bank_card.getName().equals(parameters.getPaymentMethod());
+                    && !PaymentTool.bank_card.getLiteral().equals(parameters.getPaymentMethod());
             if (bankCardMismatch || terminalMismatch) {
                 String provider = parameters.getPaymentTerminalProvider() != null ?
                         PAYMENT_TERMINAL_PROVIDER_PARAM : PAYMENT_BANK_CARD_TOKEN_PROVIDER_PARAM;
