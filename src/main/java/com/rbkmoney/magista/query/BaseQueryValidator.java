@@ -45,6 +45,13 @@ public abstract class BaseQueryValidator implements QueryValidator {
         }
     }
 
+    protected void checkParamsResult(boolean hasError, String fieldName, String msg, String additionalInfo) {
+        if (hasError) {
+            checkParamsResult(hasError, "Validation failed for field: " + fieldName + ": " + msg
+                    + " (" + additionalInfo + ")");
+        }
+    }
+
     protected FunctionQueryContext getContext(QueryContext context) {
         if (FunctionQueryContext.class.isAssignableFrom(context.getClass())) {
             return (FunctionQueryContext) context;

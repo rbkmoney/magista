@@ -15,7 +15,7 @@ CREATE INDEX IF NOT EXISTS payment_data_payment_ip_by_created_date_idx
     WHERE payment_ip IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS payment_data_payment_customer_id_by_created_date_idx
-    ON mst.payment_data USING BTREE (party_id, payment_customer_id, payment_created_at)
+    ON mst.payment_data USING BTREE (party_id, payment_customer_id)
     WHERE payment_customer_id IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS payment_data_payment_amount_by_created_date_idx
@@ -25,7 +25,8 @@ CREATE INDEX IF NOT EXISTS payment_data_flow_by_created_date_idx
     ON mst.payment_data USING BTREE (party_id, payment_flow, payment_created_at);
 
 CREATE INDEX IF NOT EXISTS payment_data_payment_tool_card_system_by_created_date_idx
-    ON mst.payment_data USING BTREE (party_id, payment_tool, payment_bank_card_system, payment_created_at);
+    ON mst.payment_data USING BTREE (party_id, payment_bank_card_system, payment_created_at)
+    WHERE payment_tool = 'bank_card';
 
 CREATE INDEX IF NOT EXISTS payment_data_payment_tool_card_token_prov_by_created_date_idx
     ON mst.payment_data USING BTREE (party_id, payment_bank_card_token_provider, payment_created_at)

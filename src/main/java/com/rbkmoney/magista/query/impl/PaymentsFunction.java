@@ -135,8 +135,9 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             return getStringParameter(PAYMENT_METHOD_PARAM, false);
         }
 
-        public void setPaymentMethod(String paymentMethod) {
-            setParameter(PAYMENT_METHOD_PARAM, paymentMethod);
+        public String setPaymentMethod(String paymentMethod) {
+            Object value = setParameter(PAYMENT_METHOD_PARAM, paymentMethod);
+            return value == null ? null : (String) value;
         }
 
         public String getPaymentTerminalProvider() {
@@ -229,15 +230,18 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
         }
 
         private void validatePaymentToolCorrectness(PaymentsFunction.PaymentsParameters parameters) {
-            boolean bankCardMismatch = PaymentTool.bank_card.getName().equals(parameters.getPaymentMethod())
-                    && parameters.getPaymentTerminalProvider() != null;
-            boolean terminalMismatch = PaymentTool.payment_terminal.getName().equals(parameters.getPaymentMethod())
-                    && parameters.getPaymentBankCardTokenProvider() != null;
+            boolean bankCardMismatch = parameters.getPaymentTerminalProvider() != null
+                    && !PaymentTool.payment_terminal.getName().equals(parameters.getPaymentMethod());
+            boolean terminalMismatch = parameters.getPaymentBankCardTokenProvider() != null
+                    && !PaymentTool.bank_card.getName().equals(parameters.getPaymentMethod());
             if (bankCardMismatch || terminalMismatch) {
-                throw new IllegalArgumentException(String.format("Incorrect parameters PaymentMethod (%s) and %s",
-                        parameters.getPaymentMethod(),
-                        parameters.getPaymentTerminalProvider() != null ?
-                                PAYMENT_TERMINAL_PROVIDER_PARAM : PAYMENT_BANK_CARD_TOKEN_PROVIDER_PARAM)
+                String provider = parameters.getPaymentTerminalProvider() != null ?
+                        PAYMENT_TERMINAL_PROVIDER_PARAM : PAYMENT_BANK_CARD_TOKEN_PROVIDER_PARAM;
+                checkParamsResult(
+                        true,
+                        provider,
+                        RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING,
+                        String.format("Incorrect PaymentMethod %s and provider %s", parameters.getPaymentMethod(), provider)
                 );
             }
         }
