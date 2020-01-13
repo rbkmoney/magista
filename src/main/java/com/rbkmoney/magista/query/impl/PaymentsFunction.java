@@ -134,7 +134,7 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
         public PaymentTool getPaymentMethod() {
             return TypeUtil.toEnumField(
                     getStringParameter(PAYMENT_METHOD_PARAM, false),
-                    com.rbkmoney.magista.domain.enums.PaymentTool.class
+                    PaymentTool.class
             );
         }
 
