@@ -138,8 +138,8 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             );
         }
 
-        public void setPaymentMethod(String paymentMethod) {
-            setParameter(PAYMENT_METHOD_PARAM, paymentMethod);
+        public void setPaymentMethod(PaymentTool paymentMethod) {
+            setParameter(PAYMENT_METHOD_PARAM, paymentMethod.getLiteral());
         }
 
         public String getPaymentTerminalProvider() {
@@ -224,10 +224,10 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
 
         private void fillCorrectPaymentMethod(PaymentsParameters paymentsParameters) {
             if (paymentsParameters.getPaymentBankCardTokenProvider() != null) {
-                paymentsParameters.setPaymentMethod(PaymentTool.bank_card.getLiteral());
+                paymentsParameters.setPaymentMethod(PaymentTool.bank_card);
             }
             if (paymentsParameters.getPaymentTerminalProvider() != null) {
-                paymentsParameters.setPaymentMethod(PaymentTool.payment_terminal.getLiteral());
+                paymentsParameters.setPaymentMethod(PaymentTool.payment_terminal);
             }
         }
 
