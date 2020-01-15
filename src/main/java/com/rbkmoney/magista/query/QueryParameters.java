@@ -32,6 +32,10 @@ public class QueryParameters {
         return parameters.getOrDefault(key, deepSearch && derivedParameters != null ? derivedParameters.getParameter(key, deepSearch) : null);
     }
 
+    public Object setParameter(String key, Object value) {
+        return parameters.put(key, value);
+    }
+
     public <T extends QueryParameters> T removeParameters(QueryParametersRef<T> parametersRef, String... keys) {
         Map<String, Object> newParameters = new HashMap<>(parameters);
         for (String key : keys) {

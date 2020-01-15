@@ -4,6 +4,7 @@ import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.domain.enums.PaymentTool;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
@@ -130,8 +131,15 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             return getStringParameter(PAYMENT_FLOW_PARAM, false);
         }
 
-        public String getPaymentMethod() {
-            return getStringParameter(PAYMENT_METHOD_PARAM, false);
+        public PaymentTool getPaymentMethod() {
+            return TypeUtil.toEnumField(
+                    getStringParameter(PAYMENT_METHOD_PARAM, false),
+                    PaymentTool.class
+            );
+        }
+
+        public void setPaymentMethod(PaymentTool paymentMethod) {
+            setParameter(PAYMENT_METHOD_PARAM, paymentMethod.getLiteral());
         }
 
         public String getPaymentTerminalProvider() {
@@ -206,6 +214,38 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             }
 
             validateTimePeriod(paymentsParameters.getFromTime(), paymentsParameters.getToTime());
+
+            if (paymentsParameters.getPaymentMethod() == null) {
+                fillCorrectPaymentMethod(paymentsParameters);
+            } else {
+                validatePaymentToolCorrectness(paymentsParameters);
+            }
+        }
+
+        private void fillCorrectPaymentMethod(PaymentsParameters paymentsParameters) {
+            if (paymentsParameters.getPaymentBankCardTokenProvider() != null) {
+                paymentsParameters.setPaymentMethod(PaymentTool.bank_card);
+            }
+            if (paymentsParameters.getPaymentTerminalProvider() != null) {
+                paymentsParameters.setPaymentMethod(PaymentTool.payment_terminal);
+            }
+        }
+
+        private void validatePaymentToolCorrectness(PaymentsFunction.PaymentsParameters parameters) {
+            boolean bankCardMismatch = parameters.getPaymentTerminalProvider() != null
+                    && PaymentTool.payment_terminal != parameters.getPaymentMethod();
+            boolean terminalMismatch = parameters.getPaymentBankCardTokenProvider() != null
+                    && PaymentTool.bank_card != parameters.getPaymentMethod();
+            if (bankCardMismatch || terminalMismatch) {
+                String provider = parameters.getPaymentTerminalProvider() != null ?
+                        PAYMENT_TERMINAL_PROVIDER_PARAM : PAYMENT_BANK_CARD_TOKEN_PROVIDER_PARAM;
+                checkParamsResult(
+                        true,
+                        provider,
+                        RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING,
+                        String.format("Incorrect PaymentMethod %s and provider %s", parameters.getPaymentMethod(), provider)
+                );
+            }
         }
     }
 

@@ -7,17 +7,13 @@ import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.magista.endpoint.StatisticsServletIface;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.QueryProcessor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
-/**
- * Created by vpankrashkin on 09.08.16.
- */
+@Slf4j
 public class MerchantStatisticsHandler implements StatisticsServletIface {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private QueryProcessor<StatRequest, StatResponse> queryProcessor;
 

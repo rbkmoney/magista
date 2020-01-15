@@ -85,9 +85,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_FLOW,
                         TypeUtil.toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
                         EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_TOOL,
-                        TypeUtil.toEnumField(parameters.getPaymentMethod(), com.rbkmoney.magista.domain.enums.PaymentTool.class),
-                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
                         toEnumField(parameters.getPaymentBankCardTokenProvider(), com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
                         EQUALS)
@@ -294,7 +292,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         return fetch(query, enrichedStatInvoiceMapper);
     }
 
-    private ConditionParameterSource preparePaymentsCondition(PaymentsFunction.PaymentsParameters parameters, Optional<LocalDateTime> whereTime) {
+    private ConditionParameterSource preparePaymentsCondition(PaymentsFunction.PaymentsParameters parameters,
+                                                              Optional<LocalDateTime> whereTime) {
         return new ConditionParameterSource()
                 .addValue(
                         PAYMENT_DATA.PARTY_ID,
@@ -312,9 +311,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_FLOW,
                         toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
                         EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_TOOL,
-                        toEnumField(parameters.getPaymentMethod(), com.rbkmoney.magista.domain.enums.PaymentTool.class),
-                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
                         toEnumField(parameters.getPaymentBankCardTokenProvider(), com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
                         EQUALS)
