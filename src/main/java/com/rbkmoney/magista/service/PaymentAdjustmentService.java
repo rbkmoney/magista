@@ -1,6 +1,8 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.dao.AdjustmentDao;
+import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
+import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.exception.DaoException;
@@ -61,8 +63,27 @@ public class PaymentAdjustmentService {
                 .peek(adjustmentData -> adjustmentDataCacheMap.put(adjustmentData.getInvoiceId() + adjustmentData.getPaymentId() + adjustmentData.getAdjustmentId(), adjustmentData))
                 .collect(Collectors.toList());
 
+        List<PaymentData> adjustedPaymentEvents = enrichedAdjustmentEvents.stream()
+                .filter(adjustmentData -> adjustmentData.getAdjustmentStatus() == AdjustmentStatus.captured)
+                .map(adjustmentData -> {
+                            PaymentData paymentData = new PaymentData();
+                            paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
+                            paymentData.setEventId(adjustmentData.getEventId());
+                            paymentData.setEventCreatedAt(adjustmentData.getEventCreatedAt());
+                            paymentData.setInvoiceId(adjustmentData.getInvoiceId());
+                            paymentData.setPaymentId(adjustmentData.getPaymentId());
+                            paymentData.setPaymentFee(adjustmentData.getAdjustmentFee());
+                            paymentData.setPaymentProviderFee(adjustmentData.getAdjustmentProviderFee());
+                            paymentData.setPaymentExternalFee(adjustmentData.getAdjustmentExternalFee());
+                            paymentData.setPaymentDomainRevision(adjustmentData.getAdjustmentDomainRevision());
+                            return paymentData;
+                        }
+                )
+                .collect(Collectors.toList());
+
         try {
             adjustmentDao.save(enrichedAdjustmentEvents);
+            paymentService.savePayments(adjustedPaymentEvents);
             log.info("Adjustment events have been saved, size={}", enrichedAdjustmentEvents.size());
         } catch (DaoException ex) {
             throw new StorageException(String.format("Failed to save adjustment events, size=%d", adjustments.size()), ex);

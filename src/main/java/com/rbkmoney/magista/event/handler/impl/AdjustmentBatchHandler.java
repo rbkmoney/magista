@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class AdjustmentBatchHandler implements BatchHandler<InvoiceChange, MachineEvent> {
 
     private final PaymentAdjustmentService paymentAdjustmentService;
-    private final PaymentService paymentService;
     private final List<AdjustmentMapper> mappers;
 
     @Override
@@ -42,28 +41,7 @@ public class AdjustmentBatchHandler implements BatchHandler<InvoiceChange, Machi
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        List<PaymentData> adjustedPaymentEvents = adjustmentEvents.stream()
-                .filter(adjustmentData -> adjustmentData.getAdjustmentStatus() == AdjustmentStatus.captured)
-                .map(adjustmentData -> {
-                            PaymentData paymentData = new PaymentData();
-                            paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
-                            paymentData.setEventId(adjustmentData.getEventId());
-                            paymentData.setEventCreatedAt(adjustmentData.getEventCreatedAt());
-                            paymentData.setInvoiceId(adjustmentData.getInvoiceId());
-                            paymentData.setPaymentId(adjustmentData.getPaymentId());
-                            paymentData.setPaymentFee(adjustmentData.getAdjustmentFee());
-                            paymentData.setPaymentProviderFee(adjustmentData.getAdjustmentProviderFee());
-                            paymentData.setPaymentExternalFee(adjustmentData.getAdjustmentExternalFee());
-                            paymentData.setPaymentDomainRevision(adjustmentData.getAdjustmentDomainRevision());
-                            return paymentData;
-                        }
-                )
-                .collect(Collectors.toList());
-
-        return () -> {
-            paymentAdjustmentService.saveAdjustments(adjustmentEvents);
-            paymentService.savePayments(adjustedPaymentEvents);
-        };
+        return () -> paymentAdjustmentService.saveAdjustments(adjustmentEvents);
     }
 
     @Override
