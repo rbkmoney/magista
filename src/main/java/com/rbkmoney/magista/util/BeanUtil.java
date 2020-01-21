@@ -18,14 +18,10 @@ public class BeanUtil {
         Assert.notNull(source, "Source must not be null");
         Assert.notNull(target, "Target must not be null");
 
-        List<String> ignoreList = Optional.ofNullable(ignoreProperties)
-                .map(properties -> Arrays.asList(properties))
-                .orElse(Collections.emptyList());
-
         PropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(source.getClass());
         for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
             Method writeMethod = propertyDescriptor.getWriteMethod();
-            if (writeMethod != null && !ignoreList.contains(propertyDescriptor.getName())) {
+            if (writeMethod != null && Arrays.binarySearch(ignoreProperties, propertyDescriptor.getName()) < 0) {
                 Method readMethod = propertyDescriptor.getReadMethod();
                 if (readMethod != null) {
                     try {

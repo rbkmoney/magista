@@ -6,6 +6,7 @@ import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.payment_processing.*;
+import com.rbkmoney.geck.serializer.kit.mock.FieldHandler;
 import com.rbkmoney.geck.serializer.kit.mock.MockMode;
 import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
@@ -66,11 +67,17 @@ import static org.mockito.Mockito.verify;
         RefundCreatedMapper.class,
         RefundStatusChangedMapper.class,
         AdjustmentBatchHandler.class,
-        AdjustmentMapper.class,
+        AdjustmentCreatedMapper.class,
         AdjustmentStatusChangedMapper.class
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class InvoicingKafkaTest {
+
+    private static final Map.Entry<FieldHandler, String[]> timeFields = Map.entry(
+            structHandler -> structHandler.value(Instant.now().toString()),
+            new String[]{"created_at", "at", "due"}
+    );
+
 
     public static final String SOURCE_ID = "source_id";
     public static final String SOURCE_NS = "source_ns";
@@ -93,9 +100,13 @@ public class InvoicingKafkaTest {
     @MockBean
     private PaymentAdjustmentService paymentAdjustmentService;
 
+    private MockTBaseProcessor mockTBaseProcessor;
 
     @Before
     public void setup() {
+        mockTBaseProcessor = new MockTBaseProcessor(MockMode.ALL, 15, 1);
+        mockTBaseProcessor.addFieldHandler(timeFields.getKey(), timeFields.getValue());
+
         given(geoProvider.getLocationInfo(any()))
                 .willReturn(new LocationInfo(-1, -1));
     }
@@ -266,15 +277,14 @@ public class InvoicingKafkaTest {
         invoiceListener.handle(Arrays.asList(message), null);
 
         verify(invoiceService).saveInvoices(any());
-        verify(paymentService, times(2)).savePayments(any());
+        verify(paymentService).savePayments(any());
         verify(paymentRefundService).saveRefunds(any());
         verify(paymentAdjustmentService).saveAdjustments(any());
     }
 
     @SneakyThrows
     public <T extends TBase> T fillTBaseObject(T tBase, Class<T> type) {
-        return new MockTBaseProcessor(MockMode.RANDOM, 15, 1)
-                .process(tBase, new TBaseHandler<>(type));
+        return mockTBaseProcessor.process(tBase, new TBaseHandler<>(type));
     }
 
     @SneakyThrows
