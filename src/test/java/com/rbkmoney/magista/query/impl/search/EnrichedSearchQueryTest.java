@@ -31,8 +31,14 @@ public class EnrichedSearchQueryTest extends AbstractQueryTest {
         assertEquals(3, statResponse.getData().getEnrichedInvoices().size());
         DamselUtil.toJson(statResponse);
     }
-//
-//    @Test
-//    @Sql("classpath:data/sql/search/enriched_invoices_search_data.sql")
-//    public void testRight
+
+    @Test
+    @Sql("classpath:data/sql/search/enriched_invoices_time_test.sql")
+    public void testNewTimeRanges() {
+        String json = "{'query': {'enriched_payments': {'from_time': '3000-01-02T00:00:00Z','to_time': '3000-01-02T02:00:00Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(4, statResponse.getData().getEnrichedInvoices().size());
+        assertEquals(3L, statResponse.getData().getEnrichedInvoices().stream().filter(enrichedStatInvoice -> enrichedStatInvoice.refunds.size() > 0).count());
+        DamselUtil.toJson(statResponse);
+    }
 }

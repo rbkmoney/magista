@@ -257,12 +257,12 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .where(
                         appendDateTimeRangeConditions(
                                 appendConditions(DSL.trueCondition(), Operator.AND, refundParameterSource),
-                                REFUND_DATA.REFUND_CREATED_AT,
+                                REFUND_DATA.EVENT_CREATED_AT,
                                 fromTime,
                                 toTime
                         )
                 )
-                .orderBy(REFUND_DATA.REFUND_CREATED_AT.desc())
+                .orderBy(REFUND_DATA.EVENT_CREATED_AT.desc())
                 .limit(limit);
 
         return fetch(query, enrichedStatInvoiceMapper);
@@ -281,12 +281,12 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .where(
                         appendDateTimeRangeConditions(
                                 appendConditions(DSL.trueCondition(), Operator.AND, conditionParameterSource),
-                                PAYMENT_DATA.PAYMENT_CREATED_AT,
+                                PAYMENT_DATA.EVENT_CREATED_AT,
                                 fromTime,
                                 toTime
                         )
                 )
-                .orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
+                .orderBy(PAYMENT_DATA.EVENT_CREATED_AT.desc())
                 .limit(limit);
 
         return fetch(query, enrichedStatInvoiceMapper);
