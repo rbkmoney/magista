@@ -19,4 +19,4 @@ CREATE INDEX IF NOT EXISTS refund_data_okko_special
         '31637869-9400-4192-b337-06c122a1717a',
         '86193978-37ec-11e8-9a7b-54e1adfb0dee1',
         '4ca8016c-9406-434a-88c0-39309c209fd2',
-        '86193978-37ec-11e8-9a7b-54e1adfb0dee')
+        '86193978-37ec-11e8-9a7b-54e1adfb0dee');
