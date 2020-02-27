@@ -1,8 +1,6 @@
 package com.rbkmoney.magista.query.impl;
 
-import com.rbkmoney.damsel.merch_stat.EnrichedStatInvoice;
-import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.damsel.merch_stat.StatResponseData;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
@@ -16,6 +14,8 @@ import com.rbkmoney.magista.query.parser.QueryPart;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.apache.http.util.TextUtils.isBlank;
 
 public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, EnrichedStatInvoice>, StatResponse> implements CompositeQuery<Map.Entry<Long, EnrichedStatInvoice>, StatResponse> {
 
@@ -52,20 +52,44 @@ public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, 
 
                     List<Map.Entry<Long, EnrichedStatInvoice>> enrichedInvoicesStats = enrichedInvoicesResult.getCollectedStream();
                     if (!enrichedInvoicesResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == enrichedInvoicesStats.size()) {
-                        String createdAt = enrichedInvoicesStats
+                        String eventStatusChangeAt = enrichedInvoicesStats
                                 .stream()
                                 .map(Map.Entry::getValue)
                                 .flatMap(enrichedStatInvoice -> enrichedStatInvoice.getPayments().stream())
-                                .min(Comparator.comparing(o -> TypeUtil.stringToLocalDateTime(o.getCreatedAt())))
+                                .map(o -> Map.entry(this.extractEventOccuredAtTime(o), o))
+                                .min(Map.Entry.comparingByKey())
                                 .get()
-                                .getCreatedAt();
+                                .getKey();
                         String token = getContext(context)
                                 .getTokenGenService()
-                                .generateToken(getQueryParameters(), TypeUtil.stringToLocalDateTime(createdAt));
+                                .generateToken(getQueryParameters(), TypeUtil.stringToLocalDateTime(eventStatusChangeAt));
                         statResponse.setContinuationToken(token);
                     }
                     return statResponse;
                 });
+    }
+
+    private String extractEventOccuredAtTime(StatPayment o) {
+        InvoicePaymentStatus status = o.getStatus();
+        String eventOccuredAt = null;
+        if (status.isSetFailed()) {
+            eventOccuredAt = status.getFailed().getAt();
+        } else if (status.isSetCancelled()) {
+            eventOccuredAt =  status.getCancelled().getAt();
+        } else if (status.isSetCaptured()) {
+            eventOccuredAt =  status.getCaptured().getAt();
+        } else if (status.isSetPending()) {
+            // no eventOccuredAt field
+        } else if (status.isSetProcessed()) {
+            eventOccuredAt =  status.getProcessed().getAt();
+        } else if (status.isSetRefunded()) {
+            eventOccuredAt =  status.getRefunded().getAt();
+        }
+        if (!isBlank(eventOccuredAt)) {
+            return eventOccuredAt;
+        } else {
+            return o.getCreatedAt(); //we can't return null, return CreatedAt instead
+        }
     }
 
     @Override
