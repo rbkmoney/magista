@@ -247,7 +247,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
 
     @Override
     public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(RefundsFunction.RefundsParameters parameters, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<LocalDateTime> whereTime, int limit) throws DaoException {
-        ConditionParameterSource refundParameterSource = prepareRefundCondition(parameters, whereTime);
+        ConditionParameterSource refundParameterSource = prepareEnrichedRefundCondition(parameters, whereTime);
 
         Query query = getDslContext()
                 .selectFrom(REFUND_DATA
@@ -270,7 +270,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
 
     @Override
     public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(PaymentsFunction.PaymentsParameters parameters, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<LocalDateTime> whereTime, int limit) throws DaoException {
-        ConditionParameterSource conditionParameterSource = preparePaymentsCondition(parameters, whereTime);
+        ConditionParameterSource conditionParameterSource = prepareEnrichedPaymentsCondition(parameters, whereTime);
 
         Query query = getDslContext()
                 .select()
@@ -330,6 +330,59 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime.orElse(null), LESS)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS);
+    }
+
+    private ConditionParameterSource prepareEnrichedPaymentsCondition(PaymentsFunction.PaymentsParameters parameters,
+                                                              Optional<LocalDateTime> whereTime) {
+        return new ConditionParameterSource()
+                .addValue(
+                        PAYMENT_DATA.PARTY_ID,
+                        Optional.ofNullable(parameters.getMerchantId())
+                                .map(UUID::fromString)
+                                .orElse(null),
+                        EQUALS
+                )
+                .addValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                .addValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_STATUS,
+                        toEnumField(parameters.getPaymentStatus(), com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
+                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_FLOW,
+                        toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
+                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
+                        toEnumField(parameters.getPaymentBankCardTokenProvider(), com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
+                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6, parameters.getPaymentBankCardFirst6(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM, parameters.getPaymentBankCardSystem(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4, parameters.getPaymentBankCardLast4(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
+                .addValue(PAYMENT_DATA.EVENT_CREATED_AT, whereTime.orElse(null), LESS)
+                .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS);
+    }
+
+    private ConditionParameterSource prepareEnrichedRefundCondition(RefundsFunction.RefundsParameters parameters, Optional<LocalDateTime> whereTime) {
+        return new ConditionParameterSource()
+                .addValue(REFUND_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
+                .addValue(REFUND_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                .addValue(REFUND_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                .addValue(REFUND_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
+                .addValue(REFUND_DATA.REFUND_ID, parameters.getRefundId(), EQUALS)
+                .addValue(REFUND_DATA.EVENT_CREATED_AT, whereTime.orElse(null), LESS)
+                .addValue(REFUND_DATA.REFUND_STATUS,
+                        toEnumField(parameters.getRefundStatus(), RefundStatus.class),
+                        EQUALS);
     }
 
     private Condition prepareExcludeCondition(PaymentsFunction.PaymentsParameters parameters) {
