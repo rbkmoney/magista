@@ -4,7 +4,6 @@ import com.rbkmoney.magista.dao.RefundDao;
 import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.domain.tables.records.RefundDataRecord;
-import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Query;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -26,7 +25,7 @@ public class RefundDaoImpl extends AbstractDao implements RefundDao {
     }
 
     @Override
-    public RefundData get(String invoiceId, String paymentId, String refundId) throws DaoException {
+    public RefundData get(String invoiceId, String paymentId, String refundId) {
         Query query = getDslContext().selectFrom(REFUND_DATA)
                 .where(
                         REFUND_DATA.INVOICE_ID.eq(invoiceId)
@@ -37,7 +36,7 @@ public class RefundDaoImpl extends AbstractDao implements RefundDao {
     }
 
     @Override
-    public void save(List<RefundData> refunds) throws DaoException {
+    public void save(List<RefundData> refunds) {
         List<Query> queries = refunds.stream()
                 .map(
                         refundData -> {

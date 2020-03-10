@@ -4,7 +4,6 @@ import com.rbkmoney.magista.dao.PaymentDao;
 import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.records.PaymentDataRecord;
-import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -28,7 +27,7 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
     }
 
     @Override
-    public PaymentData get(String invoiceId, String paymentId) throws DaoException {
+    public PaymentData get(String invoiceId, String paymentId) {
         Query query = getDslContext().selectFrom(PAYMENT_DATA)
                 .where(PAYMENT_DATA.INVOICE_ID.eq(invoiceId))
                 .and(PAYMENT_DATA.PAYMENT_ID.eq(paymentId));
@@ -36,7 +35,7 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
     }
 
     @Override
-    public void insert(List<PaymentData> payments) throws DaoException {
+    public void insert(List<PaymentData> payments) {
         List<Query> queries = payments.stream()
                 .map(
                         paymentData -> {
@@ -57,7 +56,7 @@ public class PaymentDaoImpl extends AbstractDao implements PaymentDao {
     }
 
     @Override
-    public void update(List<PaymentData> payments) throws DaoException {
+    public void update(List<PaymentData> payments) {
         List<Query> queries = payments.stream()
                 .map(
                         paymentData -> {

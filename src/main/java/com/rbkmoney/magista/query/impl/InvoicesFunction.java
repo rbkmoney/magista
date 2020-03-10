@@ -197,12 +197,12 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
             try {
                 Collection<Map.Entry<Long, StatInvoice>> result = functionContext.getSearchDao().getInvoices(
                         parameters,
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
+                        TypeUtil.toLocalDateTime(parameters.getFromTime()),
+                        TypeUtil.toLocalDateTime(parameters.getToTime()),
                         getTime(functionContext),
                         parameters.getSize()
                 );
-                return new BaseQueryResult<>(() -> result.stream(), () -> result);
+                return new BaseQueryResult<>(result::stream, () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }

@@ -30,8 +30,8 @@ public abstract class PagedBaseFunction<T, CT> extends ScopedBaseFunction<T, CT>
         return continuationToken;
     }
 
-    public Optional<LocalDateTime> getTime(QueryContext queryContext) {
-        return getContext(queryContext).getTokenGenService().extractTime(continuationToken);
+    public LocalDateTime getTime(QueryContext queryContext) {
+        return getContext(queryContext).getTokenGenService().extractTime(continuationToken).orElse(null);
     }
 
     public static class PagedBaseParameters extends ScopedBaseParameters {
@@ -42,10 +42,6 @@ public abstract class PagedBaseFunction<T, CT> extends ScopedBaseFunction<T, CT>
 
         public PagedBaseParameters(QueryParameters parameters, QueryParameters derivedParameters) {
             super(parameters, derivedParameters);
-        }
-
-        public Integer getFrom() {
-            return getIntParameter(FROM_PARAMETER, true);
         }
 
         public Integer getSize() {

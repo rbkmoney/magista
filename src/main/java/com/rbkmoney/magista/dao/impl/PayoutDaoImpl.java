@@ -24,14 +24,14 @@ public class PayoutDaoImpl extends AbstractDao implements PayoutDao {
     }
 
     @Override
-    public PayoutData get(String payoutId) throws DaoException {
+    public PayoutData get(String payoutId) {
         Query query = getDslContext().selectFrom(PAYOUT_DATA)
                 .where(PAYOUT_DATA.PAYOUT_ID.eq(payoutId));
         return fetchOne(query, payoutEventStatRowMapper);
     }
 
     @Override
-    public void save(PayoutData payoutData) throws DaoException {
+    public void save(PayoutData payoutData) {
         PayoutDataRecord payoutDataRecord = getDslContext().newRecord(PAYOUT_DATA, payoutData);
         Query query = getDslContext().insertInto(PAYOUT_DATA)
                 .set(payoutDataRecord)

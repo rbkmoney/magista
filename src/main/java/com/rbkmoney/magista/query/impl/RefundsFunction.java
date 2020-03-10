@@ -203,13 +203,12 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
             try {
                 Collection<Map.Entry<Long, StatRefund>> result = functionContext.getSearchDao().getRefunds(
                         parameters,
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
+                        TypeUtil.toLocalDateTime(parameters.getFromTime()),
+                        TypeUtil.toLocalDateTime(parameters.getToTime()),
                         getTime(functionContext),
-                        Optional.ofNullable(parameters.getFrom()),
                         parameters.getSize()
                 );
-                return new BaseQueryResult<>(() -> result.stream(), () -> result);
+                return new BaseQueryResult<>(result::stream, () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }
