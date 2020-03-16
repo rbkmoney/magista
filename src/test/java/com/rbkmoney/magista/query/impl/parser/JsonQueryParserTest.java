@@ -55,7 +55,6 @@ public class JsonQueryParserTest {
         assertEquals("1212", parameters.getPaymentBankCardLast4());
         assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
         assertEquals("2016-03-22T01:12:00Z", TypeUtil.temporalToString(parameters.getToTime()));
-        assertNull(parameters.getFrom());
         assertEquals("2144325", parameters.getPaymentRrn());
         assertEquals("3414", parameters.getPaymentApproveCode());
     }
@@ -81,8 +80,7 @@ public class JsonQueryParserTest {
         assertEquals("1212", parameters.getPaymentBankCardLast4());
         assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
         assertEquals("2016-03-22T01:12:00Z", TypeUtil.temporalToString(parameters.getToTime()));
-        assertEquals(Integer.valueOf(2), parameters.getSize());
-        assertEquals(Integer.valueOf(1), parameters.getFrom());
+        assertEquals((Integer) 2, parameters.getSize());
 
     }
 
@@ -132,8 +130,7 @@ public class JsonQueryParserTest {
         assertEquals("1212", parameters.getPaymentBankCardLast4());
         assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
         assertEquals("2016-03-22T01:12:00Z", TypeUtil.temporalToString(parameters.getToTime()));
-        assertEquals(new Integer(2), parameters.getSize());
-        assertEquals(new Integer(1), parameters.getFrom());
+        assertEquals((Integer) 2, parameters.getSize());
 
     }
 
@@ -176,7 +173,6 @@ public class JsonQueryParserTest {
         assertEquals("paid", parameters.getInvoiceStatus());
         assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
         assertNull(parameters.getToTime());
-        assertNull(parameters.getFrom());
     }
 
     @Test
@@ -197,13 +193,10 @@ public class JsonQueryParserTest {
         assertEquals("2", parameters.getShopId());
         assertEquals("A", parameters.getInvoiceId());
         assertEquals("paid", parameters.getInvoiceStatus());
-        assertEquals(1, parameters.getFrom().intValue());
         assertEquals(2, parameters.getSize().intValue());
         assertEquals("2016-03-22T00:12:00Z", TypeUtil.temporalToString(parameters.getFromTime()));
         assertEquals("2016-03-22T01:12:00Z", TypeUtil.temporalToString(parameters.getToTime()));
-        assertEquals(new Integer(2), parameters.getSize());
-        assertEquals(new Integer(1), parameters.getFrom());
-
+        assertEquals((Integer) 2, parameters.getSize());
     }
 
     @Test(expected = QueryParserException.class)
@@ -235,7 +228,7 @@ public class JsonQueryParserTest {
 
     @Test
     public void testStatFunctionsMatch() {
-        String functionNames[] = {
+        String[] functionNames = {
                 CustomersRateStatFunction.CustomersRateStatParser.getMainDescriptor(),
                 PaymentsConversionStatFunction.PaymentsConversionStatParser.getMainDescriptor(),
                 PaymentsGeoStatFunction.PaymentsGeoStatParser.getMainDescriptor(),

@@ -218,14 +218,14 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
 
     protected Condition appendDateTimeRangeConditions(Condition condition,
                                                       Field<LocalDateTime> field,
-                                                      Optional<LocalDateTime> fromTime,
-                                                      Optional<LocalDateTime> toTime) {
-        if (fromTime.isPresent()) {
-            condition = condition.and(field.ge(fromTime.get()));
+                                                      LocalDateTime fromTime,
+                                                      LocalDateTime toTime) {
+        if (fromTime != null) {
+            condition = condition.and(field.ge(fromTime));
         }
 
-        if (toTime.isPresent()) {
-            condition = condition.and(field.lt(toTime.get()));
+        if (toTime != null) {
+            condition = condition.and(field.lt(toTime));
         }
         return condition;
     }

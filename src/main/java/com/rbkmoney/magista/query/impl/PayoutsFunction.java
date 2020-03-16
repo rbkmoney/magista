@@ -203,13 +203,12 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
             try {
                 Collection<Map.Entry<Long, StatPayout>> result = functionContext.getSearchDao().getPayouts(
                         parameters,
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
-                        Optional.empty(),
-                        Optional.ofNullable(parameters.getFrom()),
+                        TypeUtil.toLocalDateTime(parameters.getFromTime()),
+                        TypeUtil.toLocalDateTime(parameters.getToTime()),
+                        getTime(functionContext),
                         parameters.getSize()
                 );
-                return new BaseQueryResult<>(() -> result.stream(), () -> result);
+                return new BaseQueryResult<>(result::stream, () -> result);
             } catch (DaoException e) {
                 throw new QueryExecutionException(e);
             }

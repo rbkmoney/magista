@@ -179,8 +179,8 @@ public class EnrichedRefundsFunction extends PagedBaseFunction<Map.Entry<Long, E
             try {
                 Collection<Map.Entry<Long, EnrichedStatInvoice>> result = functionContext.getSearchDao().getEnrichedInvoices(
                         parameters,
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getFromTime())),
-                        Optional.ofNullable(TypeUtil.toLocalDateTime(parameters.getToTime())),
+                        TypeUtil.toLocalDateTime(parameters.getFromTime()),
+                        TypeUtil.toLocalDateTime(parameters.getToTime()),
                         getTime(functionContext),
                         parameters.getSize()
                 );
