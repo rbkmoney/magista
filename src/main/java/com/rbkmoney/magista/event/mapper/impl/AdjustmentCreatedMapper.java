@@ -10,8 +10,8 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
-import com.rbkmoney.magista.event.mapper.AdjustmentMapper;
 import com.rbkmoney.magista.event.ChangeType;
+import com.rbkmoney.magista.event.mapper.AdjustmentMapper;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
 import org.springframework.stereotype.Component;
@@ -61,6 +61,19 @@ public class AdjustmentCreatedMapper implements AdjustmentMapper {
         adjustmentData.setAdjustmentFee(fees.getOrDefault(FeeType.FEE, 0L));
         adjustmentData.setAdjustmentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
         adjustmentData.setAdjustmentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
+
+        if (invoicePaymentAdjustment.isSetState()) {
+            if (invoicePaymentAdjustment.getState().isSetCashFlow()) {
+                adjustmentData.setAdjustmentDomainRevision(
+                        invoicePaymentAdjustment.getState().getCashFlow().getScenario().getDomainRevision());
+            }
+            if (invoicePaymentAdjustment.getState().isSetStatusChange()) {
+                AdjustmentStatus adjustmentStatus = TBaseUtil.unionFieldToEnum(
+                        invoicePaymentAdjustment.getState().getStatusChange().getScenario().getTargetStatus(),
+                        AdjustmentStatus.class);
+                adjustmentData.setAdjustmentStatus(adjustmentStatus);
+            }
+        }
 
         return adjustmentData;
     }

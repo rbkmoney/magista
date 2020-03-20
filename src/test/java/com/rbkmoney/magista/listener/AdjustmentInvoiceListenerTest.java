@@ -1,9 +1,7 @@
 package com.rbkmoney.magista.listener;
 
-import com.rbkmoney.damsel.domain.InvoicePaymentAdjustment;
-import com.rbkmoney.damsel.domain.InvoicePaymentAdjustmentCaptured;
+import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.InvoicePaymentAdjustmentPending;
-import com.rbkmoney.damsel.domain.InvoicePaymentAdjustmentStatus;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.config.CacheConfig;
@@ -20,6 +18,7 @@ import com.rbkmoney.magista.service.InvoiceService;
 import com.rbkmoney.magista.service.PaymentAdjustmentService;
 import com.rbkmoney.magista.service.PaymentService;
 import org.assertj.core.util.Lists;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -99,6 +98,7 @@ public class AdjustmentInvoiceListenerTest extends AbstractDaoTest {
                                                                                 .setPartyRevision(1)
                                                                                 .setNewCashFlow(Lists.emptyList())
                                                                                 .setOldCashFlowInverse(Lists.emptyList())
+                                                                                .setState(buildInvoicePaymentAdjustmentState())
                                                                 )
                                                         )
                                                 )
@@ -137,6 +137,19 @@ public class AdjustmentInvoiceListenerTest extends AbstractDaoTest {
         AdjustmentData adjustmentData = paymentAdjustmentService.getAdjustment("invoice_id", "payment_id", "adjustment_id");
         assertEquals(0L, (long) adjustmentData.getAdjustmentFee());
 
+    }
+
+    @NotNull
+    private InvoicePaymentAdjustmentState buildInvoicePaymentAdjustmentState() {
+        InvoicePaymentAdjustmentState invoicePaymentAdjustmentState = new InvoicePaymentAdjustmentState();
+        InvoicePaymentAdjustmentStatusChangeState invoicePaymentAdjustmentStatusChangeState = new InvoicePaymentAdjustmentStatusChangeState();
+        InvoicePaymentAdjustmentStatusChange invoicePaymentAdjustmentStatusChange = new InvoicePaymentAdjustmentStatusChange();
+        InvoicePaymentStatus invoicePaymentStatus = new InvoicePaymentStatus();
+        invoicePaymentStatus.setFailed(new InvoicePaymentFailed());
+        invoicePaymentAdjustmentStatusChange.setTargetStatus(invoicePaymentStatus);
+        invoicePaymentAdjustmentStatusChangeState.setScenario(invoicePaymentAdjustmentStatusChange);
+        invoicePaymentAdjustmentState.setStatusChange(invoicePaymentAdjustmentStatusChangeState);
+        return invoicePaymentAdjustmentState;
     }
 
 }
