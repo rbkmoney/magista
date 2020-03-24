@@ -43,20 +43,16 @@ public class AdjustmentServiceTest extends AbstractDaoTest {
     @Autowired
     public PaymentAdjustmentService paymentAdjustmentService;
 
-    @SpyBean
+    @Autowired
     public PaymentService paymentService;
 
-    @SpyBean
+    @Autowired
     public InvoiceService invoiceService;
-
-    @Before
-    public void setup() {
-        Mockito.reset(paymentService);
-    }
 
     @Test
     public void testSaveAdjustment() {
         InvoiceData invoiceData = random(InvoiceData.class);
+        invoiceData.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
         invoiceService.saveInvoices(Collections.singletonList(invoiceData));
         PaymentData paymentData = random(PaymentData.class);
         paymentData.setInvoiceId(invoiceData.getInvoiceId());
@@ -77,6 +73,7 @@ public class AdjustmentServiceTest extends AbstractDaoTest {
     @Test
     public void testPaymentStatusAdjustment() {
         InvoiceData invoiceData = random(InvoiceData.class);
+        invoiceData.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
         invoiceService.saveInvoices(Collections.singletonList(invoiceData));
         PaymentData paymentData = random(PaymentData.class);
         paymentData.setPaymentStatus(InvoicePaymentStatus.processed);
@@ -99,6 +96,7 @@ public class AdjustmentServiceTest extends AbstractDaoTest {
     @Test
     public void testNullPaymentStatusAdjustment() {
         InvoiceData invoiceData = random(InvoiceData.class);
+        invoiceData.setEventType(InvoiceEventType.INVOICE_PAYMENT_STARTED);
         invoiceService.saveInvoices(Collections.singletonList(invoiceData));
         PaymentData paymentData = random(PaymentData.class);
         paymentData.setPaymentStatus(InvoicePaymentStatus.processed);
