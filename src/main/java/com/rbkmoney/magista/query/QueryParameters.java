@@ -75,9 +75,9 @@ public class QueryParameters {
         }
     }
 
-    public List getArrayParameter(String key, boolean deepSearch) {
+    public <T> List<T> getArrayParameter(String key, boolean deepSearch) {
         Object val = getParameter(key, deepSearch);
-        return val != null ? (List) val : null;
+        return val != null ? (List<T>) val : null;
     }
 
     public String getStringParameter(String key, boolean deepSearch) {

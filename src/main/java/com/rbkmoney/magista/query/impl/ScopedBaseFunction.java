@@ -4,6 +4,7 @@ import com.rbkmoney.magista.query.BaseFunction;
 import com.rbkmoney.magista.query.BaseQueryValidator;
 import com.rbkmoney.magista.query.QueryContext;
 import com.rbkmoney.magista.query.QueryParameters;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -53,6 +54,10 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
             return getStringParameter(SHOP_ID_PARAM, false);
         }
 
+        public List<String> getShopIds() {
+            return getArrayParameter(SHOP_IDS_PARAM, false);
+        }
+
         public List<Integer> getShopCategoryIds() {
             return getArrayParameter(SHOP_CATEGORY_IDS_PARAM, false);
         }
@@ -65,8 +70,13 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
             super.validateParameters(parameters);
             ScopedBaseParameters scopedParameters = super.checkParamsType(parameters, ScopedBaseParameters.class);
 
-            if (!StringUtils.hasLength(scopedParameters.getMerchantId()) && StringUtils.hasLength(scopedParameters.getShopId())) {
-                checkParamsResult(true, SHOP_ID_PARAM, "when searching by shop_id, merchant_id must be set");
+            if (scopedParameters.getShopId() != null && scopedParameters.getShopIds() != null) {
+                checkParamsResult(true, String.format("Need to specify only one parameter: %s or %s", SHOP_ID_PARAM, SHOP_IDS_PARAM));
+            }
+
+            if (!StringUtils.hasLength(scopedParameters.getMerchantId()) && (
+                    StringUtils.hasLength(scopedParameters.getShopId()) || !CollectionUtils.isEmpty(scopedParameters.getShopIds()))) {
+                checkParamsResult(true, SHOP_ID_PARAM, "when searching by shop_id/shop_ids, merchant_id must be set");
             }
         }
 

@@ -243,4 +243,12 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
         DamselUtil.toJson(statResponse);
     }
 
+    @Test
+    @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
+    public void testSearchByShopIds() {
+        String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_ids': ['SHOP_ID'],'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(3, statResponse.getData().getPayments().size());
+    }
+
 }
