@@ -248,6 +248,10 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         return fetch(query, statPayoutMapper);
     }
 
+    /**
+     * merchant OKKO-specific, in general shouldn't be touched
+     * @author n.pospolita
+     */
     @Override
     public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(
             RefundsFunction.RefundsParameters parameters,
@@ -277,6 +281,10 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         return fetch(query, enrichedStatInvoiceMapper);
     }
 
+    /**
+     * merchant OKKO-specific, in general shouldn't be touched
+     * @author n.pospolita
+     */
     @Override
     public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(
             PaymentsFunction.PaymentsParameters parameters,
@@ -348,6 +356,10 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS);
     }
 
+    /**
+     * merchant OKKO-specific, in general shouldn't be touched
+     * @author n.pospolita
+     */
     private ConditionParameterSource prepareEnrichedPaymentsCondition(PaymentsFunction.PaymentsParameters parameters,
                                                                       LocalDateTime whereTime) {
         return new ConditionParameterSource()
@@ -389,6 +401,10 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS);
     }
 
+    /**
+     * merchant OKKO-specific, in general shouldn't be touched
+     * @author n.pospolita
+     */
     private ConditionParameterSource prepareEnrichedRefundCondition(RefundsFunction.RefundsParameters parameters, LocalDateTime whereTime) {
         return new ConditionParameterSource()
                 .addValue(REFUND_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
