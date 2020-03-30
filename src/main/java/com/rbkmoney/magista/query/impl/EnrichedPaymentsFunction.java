@@ -17,6 +17,10 @@ import java.util.stream.Stream;
 
 import static org.apache.http.util.TextUtils.isBlank;
 
+/**
+ * merchant OKKO-specific, in general shouldn't be touched
+ * @author n.pospolita
+ */
 public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, EnrichedStatInvoice>, StatResponse> implements CompositeQuery<Map.Entry<Long, EnrichedStatInvoice>, StatResponse> {
 
     public static final String FUNC_NAME = "enriched_payments";
