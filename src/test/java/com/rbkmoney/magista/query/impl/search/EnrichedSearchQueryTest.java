@@ -46,12 +46,4 @@ public class EnrichedSearchQueryTest extends AbstractQueryTest {
         DamselUtil.toJson(statResponse);
     }
 
-    @Test
-    @Sql("classpath:data/sql/search/enriched_invoices_search_data.sql")
-    public void testSearchByShopIds() {
-        String json = "{'query': {'enriched_payments': {'merchant_id': 'DB79AD6C-A507-43ED-9ECF-3BBD88475B32', 'shop_ids': ['SHOP_ID']}}}";
-        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
-        assertEquals(3, statResponse.getData().getEnrichedInvoices().size());
-    }
-
 }
