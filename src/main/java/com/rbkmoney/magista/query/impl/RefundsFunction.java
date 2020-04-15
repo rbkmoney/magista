@@ -126,6 +126,10 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
             RefundsFunction.RefundsParameters refundsParameters = super.checkParamsType(parameters, RefundsFunction.RefundsParameters.class);
 
             validateTimePeriod(refundsParameters.getFromTime(), refundsParameters.getToTime());
+
+            if (refundsParameters.getShopId() != null && refundsParameters.getShopIds() != null) {
+                checkParamsResult(true, String.format("Need to specify only one parameter: %s or %s", SHOP_ID_PARAM, SHOP_IDS_PARAM));
+            }
         }
     }
 

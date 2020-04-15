@@ -13,6 +13,10 @@ import java.util.Map;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 
+/**
+ * merchant OKKO-specific, in general shouldn't be touched
+ * @author n.pospolita
+ */
 public class EnrichedStatInvoiceMapper implements RowMapper<Map.Entry<Long, EnrichedStatInvoice>> {
 
     private final StatInvoiceMapper statInvoiceMapper;

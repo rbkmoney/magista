@@ -10,6 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * merchant OKKO-specific, in general shouldn't be touched
+ * @author n.pospolita
+ */
 @Transactional
 public class EnrichedSearchQueryTest extends AbstractQueryTest {
 
@@ -41,4 +45,5 @@ public class EnrichedSearchQueryTest extends AbstractQueryTest {
         assertEquals(3L, statResponse.getData().getEnrichedInvoices().stream().filter(enrichedStatInvoice -> enrichedStatInvoice.refunds.size() > 0).count());
         DamselUtil.toJson(statResponse);
     }
+
 }

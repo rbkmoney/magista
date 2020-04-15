@@ -142,4 +142,30 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
         DamselUtil.toJson(statResponse);
     }
 
+    @Test
+    public void testSearchByShopIds() {
+        String json = "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_ids': ['SHOP_ID']}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(3, statResponse.getData().getInvoices().size());
+    }
+
+    @Test
+    public void testSearchByMultipleShopIds() {
+        String json = "{'query': {'invoices': {'merchant_id': 'B9C3BF7F-F62A-4675-8489-2DA7775024BB','shop_ids': ['12345', '6789']}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(2, statResponse.getData().getInvoices().size());
+    }
+
+    @Test(expected = QueryParserException.class)
+    public void testDuplicateShopIdParam() {
+        String json = "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'shop_ids': ['SHOP_ID']}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+    }
+
+    @Test(expected = QueryParserException.class)
+    public void testShopIdsWithoutMerchantId() {
+        String json = "{'query': {'invoices': {'shop_ids': ['SHOP_ID']}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+    }
+
 }

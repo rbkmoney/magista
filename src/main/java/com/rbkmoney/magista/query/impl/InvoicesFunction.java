@@ -118,6 +118,10 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
             InvoicesParameters paymentsParameters = super.checkParamsType(parameters, InvoicesParameters.class);
 
             validateTimePeriod(paymentsParameters.getFromTime(), paymentsParameters.getToTime());
+
+            if (paymentsParameters.getShopId() != null && paymentsParameters.getShopIds() != null) {
+                checkParamsResult(true, String.format("Need to specify only one parameter: %s or %s", SHOP_ID_PARAM, SHOP_IDS_PARAM));
+            }
         }
     }
 
