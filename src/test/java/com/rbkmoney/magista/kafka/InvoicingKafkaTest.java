@@ -12,12 +12,10 @@ import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.msgpack.Value;
+import com.rbkmoney.magista.TestData;
 import com.rbkmoney.magista.converter.BinaryConverterImpl;
 import com.rbkmoney.magista.converter.SourceEventParser;
-import com.rbkmoney.magista.event.handler.impl.AdjustmentBatchHandler;
-import com.rbkmoney.magista.event.handler.impl.InvoiceBatchHandler;
-import com.rbkmoney.magista.event.handler.impl.PaymentBatchHandler;
-import com.rbkmoney.magista.event.handler.impl.RefundBatchHandler;
+import com.rbkmoney.magista.event.handler.impl.*;
 import com.rbkmoney.magista.event.mapper.AdjustmentMapper;
 import com.rbkmoney.magista.event.mapper.impl.*;
 import com.rbkmoney.magista.listener.InvoiceListener;
@@ -68,7 +66,9 @@ import static org.mockito.Mockito.verify;
         RefundStatusChangedMapper.class,
         AdjustmentBatchHandler.class,
         AdjustmentCreatedMapper.class,
-        AdjustmentStatusChangedMapper.class
+        AdjustmentStatusChangedMapper.class,
+        ChargebackBatchHandler.class,
+        ChargebackCreatedMapper.class,
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class InvoicingKafkaTest {
@@ -99,6 +99,9 @@ public class InvoicingKafkaTest {
 
     @MockBean
     private PaymentAdjustmentService paymentAdjustmentService;
+
+    @MockBean
+    private PaymentChargebackService paymentChargebackService;
 
     private MockTBaseProcessor mockTBaseProcessor;
 
@@ -269,6 +272,14 @@ public class InvoicingKafkaTest {
                                                         invoicePaymentCaptureParams
                                                 )
                                         ))
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_chargeback_change(
+                                                new InvoicePaymentChargebackChange(
+                                                        "testId",
+                                                        TestData.buildInvoiceChargebackChangePayload())
+                                        ))
                         )
                 )
         );
@@ -280,6 +291,7 @@ public class InvoicingKafkaTest {
         verify(paymentService).savePayments(any());
         verify(paymentRefundService).saveRefunds(any());
         verify(paymentAdjustmentService).saveAdjustments(any());
+        verify(paymentChargebackService).saveChargeback(any());
     }
 
     @SneakyThrows
