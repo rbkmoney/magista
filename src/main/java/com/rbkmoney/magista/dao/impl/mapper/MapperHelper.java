@@ -203,6 +203,11 @@ public class MapperHelper {
                 invoicePaymentProcessed.setAt(eventCreatedAtString);
                 paymentStatus = InvoicePaymentStatus.processed(invoicePaymentProcessed);
                 break;
+            case charged_back:
+                InvoicePaymentProcessed invoicePaymentChargeback = new InvoicePaymentProcessed();
+                invoicePaymentChargeback.setAt(eventCreatedAtString);
+                paymentStatus = InvoicePaymentStatus.charged_back(new InvoicePaymentChargedBack());
+                break;
             default:
                 throw new NotFoundException(String.format("Payment status '%s' not found", invoicePaymentStatus.getLiteral()));
         }
