@@ -18,7 +18,7 @@ public class ChargebackStageChangedMapper implements ChargebackMapper {
         ChargebackData chargebackData = new ChargebackData();
         chargebackData.setEventId(machineEvent.getEventId());
         chargebackData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
-        chargebackData.setEventType(InvoiceEventType.INVOICE_PAYMENT_CHARGEBACK_LEVY_CHANGED);
+        chargebackData.setEventType(InvoiceEventType.INVOICE_PAYMENT_CHARGEBACK_STAGE_CHANGE);
         chargebackData.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();

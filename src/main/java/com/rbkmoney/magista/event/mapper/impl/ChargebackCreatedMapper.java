@@ -23,7 +23,7 @@ public class ChargebackCreatedMapper implements ChargebackMapper {
         ChargebackData chargeback = new ChargebackData();
         chargeback.setEventId(machineEvent.getEventId());
         chargeback.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
-        chargeback.setEventType(InvoiceEventType.INVOICE_PAYMENT_REFUND_CREATED);
+        chargeback.setEventType(InvoiceEventType.INVOICE_PAYMENT_CHARGEBACK_CREATED);
         chargeback.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();

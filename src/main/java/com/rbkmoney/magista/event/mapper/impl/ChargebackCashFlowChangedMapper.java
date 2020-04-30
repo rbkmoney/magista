@@ -24,7 +24,7 @@ public class ChargebackCashFlowChangedMapper implements ChargebackMapper {
         ChargebackData chargebackData = new ChargebackData();
         chargebackData.setEventId(machineEvent.getEventId());
         chargebackData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
-        chargebackData.setEventType(InvoiceEventType.INVOICE_PAYMENT_CHARGEBACK_BODY_CHANGED);
+        chargebackData.setEventType(InvoiceEventType.INVOICE_PAYMENT_CHARGEBACK_CASHFLOW_CHANGED);
         chargebackData.setInvoiceId(machineEvent.getSourceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
@@ -42,7 +42,6 @@ public class ChargebackCashFlowChangedMapper implements ChargebackMapper {
                 .getInvoicePaymentChargebackCashFlowChanged();
         List<FinalCashFlowPosting> cashFlow = invoicePaymentChargebackCashFlowChanged.getCashFlow();
         Map<FeeType, Long> fees = DamselUtil.getFees(cashFlow);
-        chargebackData.setChargebackAmount(fees.getOrDefault(FeeType.AMOUNT, 0L));
         chargebackData.setChargebackFee(fees.getOrDefault(FeeType.FEE, 0L));
         chargebackData.setChargebackProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
         chargebackData.setChargebackExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
