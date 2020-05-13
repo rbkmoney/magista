@@ -88,6 +88,8 @@ public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, 
             eventOccuredAt =  status.getProcessed().getAt();
         } else if (status.isSetRefunded()) {
             eventOccuredAt =  status.getRefunded().getAt();
+        } else if (status.isSetChargedBack()) {
+            eventOccuredAt = status.getChargedBack().getAt();
         }
         if (!isBlank(eventOccuredAt)) {
             return eventOccuredAt;
