@@ -6,6 +6,7 @@ import com.rbkmoney.magista.domain.tables.pojos.ChargebackData;
 import com.rbkmoney.magista.domain.tables.records.ChargebackDataRecord;
 import org.jooq.Query;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static com.rbkmoney.magista.domain.tables.ChargebackData.CHARGEBACK_DATA;
 
+@Component
 public class ChargebackDaoImpl extends AbstractDao implements ChargebackDao {
 
     private final RowMapper<ChargebackData> chargebackRowMapper;
