@@ -60,20 +60,6 @@ public class PaymentAdjustmentService {
                 break;
         }
 
-        if (adjustment.getAdjustmentStatus() == AdjustmentStatus.captured) {
-            PaymentEvent paymentEvent = new PaymentEvent();
-            paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
-            paymentEvent.setEventId(adjustment.getEventId());
-            paymentEvent.setEventCreatedAt(adjustment.getEventCreatedAt());
-            paymentEvent.setInvoiceId(adjustment.getInvoiceId());
-            paymentEvent.setPaymentId(adjustment.getPaymentId());
-            paymentEvent.setPaymentFee(adjustment.getAdjustmentFee());
-            paymentEvent.setPaymentProviderFee(adjustment.getAdjustmentProviderFee());
-            paymentEvent.setPaymentExternalFee(adjustment.getAdjustmentExternalFee());
-            paymentEvent.setPaymentDomainRevision(adjustment.getAdjustmentDomainRevision());
-            paymentService.savePaymentChange(paymentEvent);
-        }
-
         try {
             adjustmentDao.save(adjustment);
             log.info("Adjustment event have been saved, adjustment='{}'", adjustment);

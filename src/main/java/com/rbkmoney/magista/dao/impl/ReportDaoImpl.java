@@ -141,31 +141,22 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                 ADJUSTMENT.PARTY_ID.as("merchant_id"),
                 ADJUSTMENT.PARTY_SHOP_ID.as("shop_id"),
                 PAYMENT_DATA.PAYMENT_CURRENCY_CODE.as("currency_code"),
-                DSL.sum(PAYMENT_EVENT.PAYMENT_FEE.minus(ADJUSTMENT.ADJUSTMENT_FEE)).as("funds_adjusted")
+                DSL.sum(ADJUSTMENT.ADJUSTMENT_AMOUNT).as("funds_adjusted")
         ).from(ADJUSTMENT)
-                .join(PAYMENT_DATA)
-                .on(
+                .where(
                         appendDateTimeRangeConditions(
                                 ADJUSTMENT.PARTY_ID.eq(merchantId)
                                         .and(ADJUSTMENT.PARTY_SHOP_ID.eq(shopId))
-                                        .and(ADJUSTMENT.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID))
-                                        .and(ADJUSTMENT.PAYMENT_ID.eq(PAYMENT_DATA.PAYMENT_ID))
                                         .and(ADJUSTMENT.ADJUSTMENT_STATUS.eq(AdjustmentStatus.captured))
-                                        .and(PAYMENT_DATA.PAYMENT_CURRENCY_CODE.eq(currencyCode)),
+                                        .and(ADJUSTMENT.ADJUSTMENT_CURRENCY_CODE.eq(currencyCode)),
                                 ADJUSTMENT.EVENT_CREATED_AT,
                                 fromTime,
                                 Optional.of(toTime)
                         )
-                ).join(PAYMENT_EVENT)
-                .on(
-                        PAYMENT_DATA.INVOICE_ID.eq(PAYMENT_EVENT.INVOICE_ID)
-                                .and(PAYMENT_DATA.PAYMENT_ID.eq(PAYMENT_EVENT.PAYMENT_ID))
-                                .and(PAYMENT_EVENT.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
-                                .and(PAYMENT_EVENT.PAYMENT_STATUS.eq(com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.captured))
                 ).groupBy(
                         ADJUSTMENT.PARTY_ID,
                         ADJUSTMENT.PARTY_SHOP_ID,
-                        PAYMENT_DATA.PAYMENT_CURRENCY_CODE
+                        ADJUSTMENT.ADJUSTMENT_CURRENCY_CODE
                 );
         return Optional.ofNullable(
                 fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
