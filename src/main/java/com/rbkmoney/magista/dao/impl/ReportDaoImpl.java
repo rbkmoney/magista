@@ -288,7 +288,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                         .put("merchant_id", rs.getString("merchant_id"))
                         .put("shop_id", rs.getString("shop_id"))
                         .put("currency_code", rs.getString("currency_code"))
-                        .put("funds_adjusted", rs.getString("funds_returned"))
+                        .put("funds_returned", rs.getString("funds_returned"))
                         .build())
         ).orElse(
                 ImmutableMap.<String, String>builder()
