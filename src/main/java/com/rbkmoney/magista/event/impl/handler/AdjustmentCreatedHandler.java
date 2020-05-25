@@ -16,11 +16,8 @@ import com.rbkmoney.magista.event.Handler;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.service.PaymentAdjustmentService;
 import com.rbkmoney.magista.util.DamselUtil;
-import com.rbkmoney.magista.util.FeeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * Created by tolkonepiu on 21/06/2017.
@@ -72,10 +69,11 @@ public class AdjustmentCreatedHandler implements Handler<InvoiceChange, StockEve
         );
         adjustment.setAdjustmentDomainRevision(invoicePaymentAdjustment.getDomainRevision());
 
-        Map<FeeType, Long> fees = DamselUtil.getFees(invoicePaymentAdjustment.getNewCashFlow());
-        adjustment.setAdjustmentFee(fees.getOrDefault(FeeType.FEE, 0L));
-        adjustment.setAdjustmentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
-        adjustment.setAdjustmentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
+        Long oldAmount = DamselUtil.computeMerchantAmount(invoicePaymentAdjustment.getOldCashFlowInverse());
+        Long newAmount = DamselUtil.computeMerchantAmount(invoicePaymentAdjustment.getNewCashFlow());
+        Long amount = oldAmount + newAmount;
+
+        adjustment.setAdjustmentAmount(amount);
 
         return () -> paymentAdjustmentService.savePaymentAdjustment(adjustment);
     }

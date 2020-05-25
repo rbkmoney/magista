@@ -23,6 +23,9 @@ public enum ChangeType {
     INVOICE_PAYMENT_REFUND_CREATED("invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_created", new IsNullCondition().not()),
     INVOICE_PAYMENT_REFUND_STATUS_CHANGED("invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_status_changed", new IsNullCondition().not()),
     INVOICE_PAYMENT_CAPTURE_STARTED("invoice_payment_change.payload.invoice_payment_capture_started", new IsNullCondition().not()),
+    INVOICE_PAYMENT_CHARGEBACK_CREATED("invoice_payment_change.payload.invoice_payment_chargeback_change.payload.invoice_payment_chargeback_created", new IsNullCondition().not()),
+    INVOICE_PAYMENT_CHARGEBACK_STATUS_CHANGED("invoice_payment_change.payload.invoice_payment_chargeback_change.payload.invoice_payment_chargeback_status_changed", new IsNullCondition().not()),
+    INVOICE_PAYMENT_CHARGEBACK_CASH_FLOW_CHANGED("invoice_payment_change.payload.invoice_payment_chargeback_change.payload.invoice_payment_chargeback_cash_flow_changed", new IsNullCondition().not()),
     PAYOUT_CREATED("payout_created", new IsNullCondition().not()),
     PAYOUT_STATUS_CHANGED("payout_status_changed", new IsNullCondition().not());
 

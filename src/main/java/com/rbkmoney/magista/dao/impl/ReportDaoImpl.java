@@ -7,10 +7,7 @@ import com.rbkmoney.magista.dao.ReportDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.StatPaymentMapper;
 import com.rbkmoney.magista.dao.impl.mapper.StatRefundMapper;
-import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
-import com.rbkmoney.magista.domain.enums.InvoiceEventType;
-import com.rbkmoney.magista.domain.enums.PayoutStatus;
-import com.rbkmoney.magista.domain.enums.RefundStatus;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Field;
 import org.jooq.Operator;
@@ -26,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.rbkmoney.magista.domain.Tables.CHARGEBACK_DATA;
 import static com.rbkmoney.magista.domain.Tables.PAYMENT_EVENT;
 import static com.rbkmoney.magista.domain.tables.Adjustment.ADJUSTMENT;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
@@ -258,6 +256,46 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                         .put("shop_id", shopId)
                         .put("currency_code", currencyCode)
                         .put("funds_paid_out", "0")
+                        .build()
+        );
+    }
+
+    @Override
+    public Map<String, String> getChargebackAccountingData(String merchantId, String shopId, String currencyCode, LocalDateTime fromTime, LocalDateTime toTime) {
+        Query query = getDslContext().select(
+                CHARGEBACK_DATA.PARTY_ID.as("merchant_id"),
+                CHARGEBACK_DATA.PARTY_SHOP_ID.as("shop_id"),
+                CHARGEBACK_DATA.CHARGEBACK_CURRENCY_CODE.as("currency_code"),
+                DSL.sum(CHARGEBACK_DATA.CHARGEBACK_AMOUNT).as("funds_returned")
+        ).from(CHARGEBACK_DATA)
+                .where(
+                        appendDateTimeRangeConditions(
+                                CHARGEBACK_DATA.PARTY_ID.eq(merchantId)
+                                        .and(CHARGEBACK_DATA.PARTY_SHOP_ID.eq(shopId))
+                                        .and(CHARGEBACK_DATA.CHARGEBACK_STATUS.eq(ChargebackStatus.accepted))
+                                        .and(CHARGEBACK_DATA.CHARGEBACK_CURRENCY_CODE.eq(currencyCode)),
+                                CHARGEBACK_DATA.EVENT_CREATED_AT,
+                                Optional.ofNullable(fromTime),
+                                Optional.of(toTime)
+                        )
+                ).groupBy(
+                        CHARGEBACK_DATA.PARTY_ID,
+                        CHARGEBACK_DATA.PARTY_SHOP_ID,
+                        CHARGEBACK_DATA.CHARGEBACK_CURRENCY_CODE
+                );
+        return Optional.ofNullable(
+                fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
+                        .put("merchant_id", rs.getString("merchant_id"))
+                        .put("shop_id", rs.getString("shop_id"))
+                        .put("currency_code", rs.getString("currency_code"))
+                        .put("funds_adjusted", rs.getString("funds_returned"))
+                        .build())
+        ).orElse(
+                ImmutableMap.<String, String>builder()
+                        .put("merchant_id", merchantId)
+                        .put("shop_id", shopId)
+                        .put("currency_code", currencyCode)
+                        .put("funds_returned", "0")
                         .build()
         );
     }
