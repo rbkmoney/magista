@@ -67,6 +67,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                 .addValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
                                 .addInConditionValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopIds())
                                 .addValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                                .addValue(INVOICE_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS)
                                 .addValue(INVOICE_DATA.INVOICE_CREATED_AT, whereTime, LESS)
                                 .addValue(INVOICE_DATA.INVOICE_STATUS,
                                         toEnumField(
@@ -104,7 +105,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS);
+                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS)
+                .addValue(PAYMENT_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS);
 
         if (!paymentParameterSource.getConditionFields().isEmpty()) {
             condition = condition.and(
@@ -203,6 +205,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(REFUND_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                 .addValue(REFUND_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
                 .addValue(REFUND_DATA.REFUND_ID, parameters.getRefundId(), EQUALS)
+                .addValue(REFUND_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS)
                 .addValue(REFUND_DATA.REFUND_CREATED_AT, whereTime, LESS)
                 .addValue(REFUND_DATA.REFUND_STATUS,
                         toEnumField(parameters.getRefundStatus(), RefundStatus.class),
@@ -353,7 +356,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime, LESS)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS);
+                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS)
+                .addValue(PAYMENT_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS);
     }
 
     /**
@@ -397,7 +401,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
                 .addValue(PAYMENT_DATA.EVENT_CREATED_AT, whereTime, LESS)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS);
+                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS)
+                .addValue(PAYMENT_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS);
     }
 
     /**
@@ -411,6 +416,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(REFUND_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                 .addValue(REFUND_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
                 .addValue(REFUND_DATA.REFUND_ID, parameters.getRefundId(), EQUALS)
+                .addValue(REFUND_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS)
                 .addValue(REFUND_DATA.EVENT_CREATED_AT, whereTime, LESS)
                 .addValue(REFUND_DATA.REFUND_STATUS,
                         toEnumField(parameters.getRefundStatus(), RefundStatus.class),

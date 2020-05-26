@@ -108,6 +108,10 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
             return getLongParameter(INVOICE_AMOUNT_PARAM, false);
         }
 
+        public String getExternalId() {
+            return getStringParameter(EXTERNAL_ID_PARAM, false);
+        }
+
     }
 
     public static class InvoicesValidator extends PagedBaseValidator {

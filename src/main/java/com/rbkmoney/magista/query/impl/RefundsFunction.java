@@ -116,6 +116,10 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
             return getTimeParameter(TO_TIME_PARAM, false);
         }
 
+        public String getExternalId() {
+            return getStringParameter(EXTERNAL_ID_PARAM, false);
+        }
+
     }
 
     public static class RefundsValidator extends PagedBaseValidator {
