@@ -48,6 +48,7 @@ public class ChargebackCreatedHandler implements Handler<InvoiceChange, StockEve
         InvoicePaymentChargeback invoicePaymentChargeback = invoicePaymentChargebackCreated.getChargeback();
 
         chargeback.setChargebackId(invoicePaymentChargeback.getId());
+        chargeback.setExternalId(invoicePaymentChargeback.getExternalId());
         chargeback.setChargebackStatus(TBaseUtil.unionFieldToEnum(invoicePaymentChargeback.getStatus(), ChargebackStatus.class));
         chargeback.setChargebackCreatedAt(TypeUtil.stringToLocalDateTime(invoicePaymentChargeback.getCreatedAt()));
         chargeback.setChargebackAmount(invoicePaymentChargeback.getBody().getAmount());

@@ -29,6 +29,7 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
     public Map.Entry<Long, StatPayment> mapRow(ResultSet rs, int i) throws SQLException {
         StatPayment statPayment = new StatPayment();
         statPayment.setId(rs.getString(PAYMENT_DATA.PAYMENT_ID.getName()));
+        statPayment.setExternalId(rs.getString(PAYMENT_DATA.EXTERNAL_ID.getName()));
         statPayment.setInvoiceId(rs.getString(PAYMENT_DATA.INVOICE_ID.getName()));
         statPayment.setOwnerId(rs.getString(PAYMENT_DATA.PARTY_ID.getName()));
         statPayment.setShopId(rs.getString(PAYMENT_DATA.PARTY_SHOP_ID.getName()));
