@@ -5,6 +5,7 @@ import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatRefund;
 import com.rbkmoney.magista.dao.ReportDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
+import com.rbkmoney.magista.dao.impl.mapper.ColumnStringMapRowMapper;
 import com.rbkmoney.magista.dao.impl.mapper.StatPaymentMapper;
 import com.rbkmoney.magista.dao.impl.mapper.StatRefundMapper;
 import com.rbkmoney.magista.domain.enums.*;
@@ -47,11 +48,11 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
     @Override
     public Map<String, String> getPaymentAccountingData(String merchantId, String shopId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
         Query query = getDslContext().select(
-                PAYMENT_DATA.PARTY_ID.as("merchant_id"),
-                PAYMENT_DATA.PARTY_SHOP_ID.as("shop_id"),
-                PAYMENT_DATA.PAYMENT_CURRENCY_CODE.as("currency_code"),
-                DSL.sum(PAYMENT_EVENT.PAYMENT_AMOUNT).as("funds_acquired"),
-                DSL.sum(PAYMENT_EVENT.PAYMENT_FEE).as("fee_charged")
+                DSL.val(merchantId).as("merchant_id"),
+                DSL.val(shopId).as("shop_id"),
+                DSL.val(currencyCode).as("currency_code"),
+                DSL.ifnull(DSL.sum(PAYMENT_EVENT.PAYMENT_AMOUNT), 0L).as("funds_acquired"),
+                DSL.ifnull(DSL.sum(PAYMENT_EVENT.PAYMENT_FEE), 0L).as("fee_charged")
         ).from(PAYMENT_DATA)
                 .join(PAYMENT_EVENT)
                 .on(
@@ -67,39 +68,18 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                 fromTime,
                                 Optional.of(toTime)
                         )
-                ).groupBy(
-                        PAYMENT_DATA.PARTY_ID,
-                        PAYMENT_DATA.PARTY_SHOP_ID,
-                        PAYMENT_DATA.PAYMENT_CURRENCY_CODE
                 );
 
-        return Optional.ofNullable(
-                fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
-                        .put("merchant_id", rs.getString("merchant_id"))
-                        .put("shop_id", rs.getString("shop_id"))
-                        .put("currency_code", rs.getString("currency_code"))
-                        .put("funds_acquired", rs.getString("funds_acquired"))
-                        .put("fee_charged", rs.getString("fee_charged"))
-                        .build()
-                )
-        ).orElse(
-                ImmutableMap.<String, String>builder()
-                        .put("merchant_id", merchantId)
-                        .put("shop_id", shopId)
-                        .put("currency_code", currencyCode)
-                        .put("funds_acquired", "0")
-                        .put("fee_charged", "0")
-                        .build()
-        );
+        return fetchOne(query, new ColumnStringMapRowMapper());
     }
 
     @Override
     public Map<String, String> getRefundAccountingData(String merchantId, String shopId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
         Query query = getDslContext().select(
-                REFUND.PARTY_ID.as("merchant_id"),
-                REFUND.PARTY_SHOP_ID.as("shop_id"),
-                REFUND.REFUND_CURRENCY_CODE.as("currency_code"),
-                DSL.sum(REFUND.REFUND_AMOUNT.minus(REFUND.REFUND_FEE)).as("funds_refunded")
+                DSL.val(merchantId).as("merchant_id"),
+                DSL.val(shopId).as("shop_id"),
+                DSL.val(currencyCode).as("currency_code"),
+                DSL.ifnull(DSL.sum(REFUND.REFUND_AMOUNT.minus(REFUND.REFUND_FEE)), 0L).as("funds_refunded")
         ).from(REFUND).where(
                 appendDateTimeRangeConditions(
                         REFUND.PARTY_ID.eq(merchantId)
@@ -110,36 +90,18 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                         fromTime,
                         Optional.of(toTime)
                 )
-        ).groupBy(
-                REFUND.PARTY_ID,
-                REFUND.PARTY_SHOP_ID,
-                REFUND.REFUND_CURRENCY_CODE
         );
 
-        return Optional.ofNullable(
-                fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
-                        .put("merchant_id", rs.getString("merchant_id"))
-                        .put("shop_id", rs.getString("shop_id"))
-                        .put("currency_code", rs.getString("currency_code"))
-                        .put("funds_refunded", rs.getString("funds_refunded"))
-                        .build())
-        ).orElse(
-                ImmutableMap.<String, String>builder()
-                        .put("merchant_id", merchantId)
-                        .put("shop_id", shopId)
-                        .put("currency_code", currencyCode)
-                        .put("funds_refunded", "0")
-                        .build()
-        );
+        return fetchOne(query, new ColumnStringMapRowMapper());
     }
 
     @Override
     public Map<String, String> getAdjustmentAccountingData(String merchantId, String shopId, String currencyCode, Optional<LocalDateTime> fromTime, LocalDateTime toTime) throws DaoException {
         Query query = getDslContext().select(
-                ADJUSTMENT.PARTY_ID.as("merchant_id"),
-                ADJUSTMENT.PARTY_SHOP_ID.as("shop_id"),
-                PAYMENT_DATA.PAYMENT_CURRENCY_CODE.as("currency_code"),
-                DSL.sum(ADJUSTMENT.ADJUSTMENT_AMOUNT).as("funds_adjusted")
+                DSL.val(merchantId).as("merchant_id"),
+                DSL.val(shopId).as("shop_id"),
+                DSL.val(currencyCode).as("currency_code"),
+                DSL.ifnull(DSL.sum(ADJUSTMENT.ADJUSTMENT_AMOUNT), 0L).as("funds_adjusted")
         ).from(ADJUSTMENT)
                 .where(
                         appendDateTimeRangeConditions(
@@ -151,26 +113,8 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                 fromTime,
                                 Optional.of(toTime)
                         )
-                ).groupBy(
-                        ADJUSTMENT.PARTY_ID,
-                        ADJUSTMENT.PARTY_SHOP_ID,
-                        ADJUSTMENT.ADJUSTMENT_CURRENCY_CODE
                 );
-        return Optional.ofNullable(
-                fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
-                        .put("merchant_id", rs.getString("merchant_id"))
-                        .put("shop_id", rs.getString("shop_id"))
-                        .put("currency_code", rs.getString("currency_code"))
-                        .put("funds_adjusted", rs.getString("funds_adjusted"))
-                        .build())
-        ).orElse(
-                ImmutableMap.<String, String>builder()
-                        .put("merchant_id", merchantId)
-                        .put("shop_id", shopId)
-                        .put("currency_code", currencyCode)
-                        .put("funds_adjusted", "0")
-                        .build()
-        );
+        return fetchOne(query, new ColumnStringMapRowMapper());
     }
 
     @Override
@@ -186,15 +130,16 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                 merchantIdField,
                 shopIdField,
                 currencyCodeField,
-                paidFundsField.minus(DSL.coalesce(cancelledFundsField, 0)).as(fundsPaidOutField)
+                DSL.ifnull(paidFundsField, 0L)
+                        .minus(DSL.ifnull(cancelledFundsField, 0L)).as(fundsPaidOutField)
         ).from(
                 getDslContext().select(
-                        PAYOUT_EVENT_STAT.PARTY_ID.as(merchantIdField),
-                        PAYOUT_EVENT_STAT.PARTY_SHOP_ID.as(shopIdField),
-                        PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE.as(currencyCodeField),
+                        DSL.val(merchantId).as(merchantIdField),
+                        DSL.val(shopId).as(shopIdField),
+                        DSL.val(currencyCode).as(currencyCodeField),
                         DSL.sum(
-                                PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
-                                        .minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))
+                                DSL.ifnull(PAYOUT_EVENT_STAT.PAYOUT_AMOUNT, 0L)
+                                        .minus(DSL.ifnull(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0L))
                         ).as(paidFundsField)
                 ).from(PAYOUT_EVENT_STAT).where(
                         appendDateTimeRangeConditions(
@@ -206,15 +151,11 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                 fromTime,
                                 Optional.of(toTime)
                         )
-                ).groupBy(
-                        PAYOUT_EVENT_STAT.PARTY_ID,
-                        PAYOUT_EVENT_STAT.PARTY_SHOP_ID,
-                        PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
                 ).asTable().leftJoin(
                         getDslContext().select(
                                 DSL.sum(
-                                        PAYOUT_EVENT_STAT.PAYOUT_AMOUNT
-                                                .minus(DSL.coalesce(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0))
+                                        DSL.ifnull(PAYOUT_EVENT_STAT.PAYOUT_AMOUNT, 0L)
+                                                .minus(DSL.ifnull(PAYOUT_EVENT_STAT.PAYOUT_FEE, 0L))
                                 ).as(cancelledFundsField)
                         ).from(PAYOUT_EVENT_STAT).where(
                                 appendDateTimeRangeConditions(
@@ -235,38 +176,20 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                         fromTime,
                                         Optional.of(toTime)
                                 )
-                        ).groupBy(
-                                PAYOUT_EVENT_STAT.PARTY_ID,
-                                PAYOUT_EVENT_STAT.PARTY_SHOP_ID,
-                                PAYOUT_EVENT_STAT.PAYOUT_CURRENCY_CODE
                         ).asTable()
                 ).on()
         );
 
-        return Optional.ofNullable(
-                fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
-                        .put("merchant_id", rs.getString("merchant_id"))
-                        .put("shop_id", rs.getString("shop_id"))
-                        .put("currency_code", rs.getString("currency_code"))
-                        .put("funds_paid_out", rs.getString("funds_paid_out"))
-                        .build())
-        ).orElse(
-                ImmutableMap.<String, String>builder()
-                        .put("merchant_id", merchantId)
-                        .put("shop_id", shopId)
-                        .put("currency_code", currencyCode)
-                        .put("funds_paid_out", "0")
-                        .build()
-        );
+        return fetchOne(query, new ColumnStringMapRowMapper());
     }
 
     @Override
     public Map<String, String> getChargebackAccountingData(String merchantId, String shopId, String currencyCode, LocalDateTime fromTime, LocalDateTime toTime) {
         Query query = getDslContext().select(
-                CHARGEBACK_DATA.PARTY_ID.as("merchant_id"),
-                CHARGEBACK_DATA.PARTY_SHOP_ID.as("shop_id"),
-                CHARGEBACK_DATA.CHARGEBACK_CURRENCY_CODE.as("currency_code"),
-                DSL.sum(CHARGEBACK_DATA.CHARGEBACK_AMOUNT).as("funds_returned")
+                DSL.val(merchantId).as("merchant_id"),
+                DSL.val(shopId).as("shop_id"),
+                DSL.val(currencyCode).as("currency_code"),
+                DSL.ifnull(DSL.sum(CHARGEBACK_DATA.CHARGEBACK_AMOUNT), 0L).as("funds_returned")
         ).from(CHARGEBACK_DATA)
                 .where(
                         appendDateTimeRangeConditions(
@@ -278,26 +201,8 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                 Optional.ofNullable(fromTime),
                                 Optional.of(toTime)
                         )
-                ).groupBy(
-                        CHARGEBACK_DATA.PARTY_ID,
-                        CHARGEBACK_DATA.PARTY_SHOP_ID,
-                        CHARGEBACK_DATA.CHARGEBACK_CURRENCY_CODE
                 );
-        return Optional.ofNullable(
-                fetchOne(query, (rs, i) -> ImmutableMap.<String, String>builder()
-                        .put("merchant_id", rs.getString("merchant_id"))
-                        .put("shop_id", rs.getString("shop_id"))
-                        .put("currency_code", rs.getString("currency_code"))
-                        .put("funds_returned", rs.getString("funds_returned"))
-                        .build())
-        ).orElse(
-                ImmutableMap.<String, String>builder()
-                        .put("merchant_id", merchantId)
-                        .put("shop_id", shopId)
-                        .put("currency_code", currencyCode)
-                        .put("funds_returned", "0")
-                        .build()
-        );
+        return fetchOne(query, new ColumnStringMapRowMapper());
     }
 
     @Override
