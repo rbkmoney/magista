@@ -203,7 +203,7 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
 
         if (paymentTool.isSetBankCard()) {
             BankCard bankCard = paymentTool.getBankCard();
-            paymentData.setPaymentBankCardMaskedPan(bankCard.getMaskedPan());
+            paymentData.setPaymentBankCardMaskedPan(bankCard.getLastDigits());
             paymentData.setPaymentBankCardSystem(bankCard.getPaymentSystem().toString());
             paymentData.setPaymentBankCardBin(bankCard.getBin());
             paymentData.setPaymentBankCardToken(bankCard.getToken());

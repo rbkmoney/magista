@@ -43,6 +43,15 @@ public interface ReportDao {
             LocalDateTime toTime
     ) throws DaoException;
 
+
+    Map<String, String> getChargebackAccountingData(
+            String merchantId,
+            String shopId,
+            String currencyCode,
+            LocalDateTime fromTime,
+            LocalDateTime toTime
+    );
+
     Collection<Map.Entry<Long, StatPayment>> getPaymentsForReport(
             String partyId,
             Optional<String> shopId,

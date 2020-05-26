@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -79,6 +80,24 @@ public class DamselUtil {
                 .sum();
     }
 
+    public static Long computeMerchantAmount(List<FinalCashFlowPosting> finalCashFlow) {
+        long amountSource = computeAmount(finalCashFlow, FinalCashFlowPosting::getSource);
+        long amountDest = computeAmount(finalCashFlow, FinalCashFlowPosting::getDestination);
+        return amountDest - amountSource;
+    }
+
+    private static long computeAmount(List<FinalCashFlowPosting> finalCashFlow,
+                                      Function<FinalCashFlowPosting, FinalCashFlowAccount> func) {
+        return finalCashFlow.stream()
+                .filter(f -> isMerchantSettlement(func.apply(f).getAccountType()))
+                .mapToLong(cashFlow -> cashFlow.getVolume().getAmount())
+                .sum();
+    }
+
+    private static boolean isMerchantSettlement(CashFlowAccount cashFlowAccount) {
+        return cashFlowAccount.isSetMerchant() &&
+                cashFlowAccount.getMerchant() == MerchantCashFlowAccount.settlement;
+    }
 
     public static Map<FeeType, Long> getFees(List<FinalCashFlowPosting> finalCashFlowPostings) {
         return finalCashFlowPostings.stream()
