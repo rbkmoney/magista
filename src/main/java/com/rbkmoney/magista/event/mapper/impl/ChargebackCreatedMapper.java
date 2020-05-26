@@ -55,6 +55,7 @@ public class ChargebackCreatedMapper implements ChargebackMapper {
         if (invoicePaymentChargeback.getContext() != null) {
             chargeback.setChargebackContext(invoicePaymentChargeback.getContext().getData());
         }
+        chargeback.setExternalId(invoicePaymentChargeback.getExternalId());
 
         return chargeback;
     }
