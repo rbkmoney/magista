@@ -191,6 +191,10 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             return getStringParameter(PAYMENT_APPROVAL_CODE_PARAM, false);
         }
 
+        public String getExternalId() {
+            return getStringParameter(EXTERNAL_ID_PARAM, false);
+        }
+
         public Object getExclude() {
             return getParameter(EXCLUDE_PARAM, false);
         }

@@ -17,6 +17,7 @@ public class Parameters {
     public static final String CURRENCY_CODE = "currency_code";
     public static final String FROM_TIME_PARAM = "from_time";
     public static final String TO_TIME_PARAM = "to_time";
+    public static final String EXTERNAL_ID_PARAM = "external_id";
 
     public static final String INVOICE_ID_PARAM = "invoice_id";
     public static final String INVOICE_STATUS_PARAM = "invoice_status";

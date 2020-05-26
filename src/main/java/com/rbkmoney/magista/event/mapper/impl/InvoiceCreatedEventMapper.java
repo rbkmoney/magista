@@ -67,6 +67,7 @@ public class InvoiceCreatedEventMapper implements InvoiceMapper {
         invoiceData.setInvoiceStatusDetails(
                 DamselUtil.getInvoiceStatusDetails(invoiceStatus)
         );
+        invoiceData.setExternalId(invoice.getExternalId());
 
         return invoiceData;
     }

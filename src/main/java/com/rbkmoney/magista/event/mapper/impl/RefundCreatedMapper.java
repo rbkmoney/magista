@@ -64,6 +64,7 @@ public class RefundCreatedMapper implements RefundMapper {
         refund.setRefundFee(fees.getOrDefault(FeeType.FEE, 0L));
         refund.setRefundProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
         refund.setRefundExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
+        refund.setExternalId(invoicePaymentRefund.getExternalId());
 
         return refund;
     }
