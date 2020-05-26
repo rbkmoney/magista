@@ -41,7 +41,7 @@ public class RefundCreatedHandler implements Handler<InvoiceChange, StockEvent> 
         refund.setEventId(event.getId());
         refund.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
         refund.setEventType(InvoiceEventType.INVOICE_PAYMENT_REFUND_CREATED);
-        refund.setInvoiceId(event.getSource().getInvoiceId());;
+        refund.setInvoiceId(event.getSource().getInvoiceId());
 
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
 
