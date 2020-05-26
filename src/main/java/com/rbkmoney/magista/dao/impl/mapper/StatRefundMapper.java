@@ -22,6 +22,7 @@ public class StatRefundMapper implements RowMapper<Map.Entry<Long, StatRefund>> 
     public Map.Entry<Long, StatRefund> mapRow(ResultSet rs, int i) throws SQLException {
         StatRefund statRefund = new StatRefund();
         statRefund.setId(rs.getString(REFUND.REFUND_ID.getName()));
+        statRefund.setExternalId(rs.getString(REFUND.EXTERNAL_ID.getName()));
         statRefund.setInvoiceId(rs.getString(REFUND.INVOICE_ID.getName()));
         statRefund.setPaymentId(rs.getString(REFUND.PAYMENT_ID.getName()));
         statRefund.setOwnerId(rs.getString(REFUND.PARTY_ID.getName()));

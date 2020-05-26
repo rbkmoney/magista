@@ -63,6 +63,7 @@ public class PaymentStartedEventHandler implements Handler<InvoiceChange, StockE
         PaymentData paymentData = new PaymentData();
         paymentData.setInvoiceId(invoiceId);
         paymentData.setPaymentId(paymentId);
+        paymentData.setExternalId(invoicePayment.getExternalId());
 
         Cash cost = invoicePayment.getCost();
         paymentData.setPaymentOriginAmount(cost.getAmount());

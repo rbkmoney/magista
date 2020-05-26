@@ -58,6 +58,7 @@ public class RefundCreatedHandler implements Handler<InvoiceChange, StockEvent> 
                 .getRefund();
 
         refund.setRefundId(invoicePaymentRefund.getId());
+        refund.setExternalId(invoicePaymentRefund.getExternalId());
         refund.setRefundStatus(
                 TBaseUtil.unionFieldToEnum(invoicePaymentRefund.getStatus(), RefundStatus.class)
         );

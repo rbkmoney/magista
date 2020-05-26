@@ -46,6 +46,7 @@ public class InvoiceCreatedEventHandler implements Handler<InvoiceChange, StockE
 
         InvoiceData invoiceData = new InvoiceData();
         invoiceData.setInvoiceId(invoice.getId());
+        invoiceData.setExternalId(invoice.getExternalId());
         invoiceData.setPartyId(UUID.fromString(invoice.getOwnerId()));
         invoiceData.setPartyShopId(invoice.getShopId());
         invoiceData.setInvoiceTemplateId(invoice.getTemplateId());
