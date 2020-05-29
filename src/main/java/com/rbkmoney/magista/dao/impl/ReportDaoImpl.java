@@ -250,6 +250,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                         PAYMENT_DATA.PAYMENT_PARTY_REVISION,
                         PAYMENT_DATA.PAYMENT_CONTEXT_TYPE,
                         PAYMENT_DATA.PAYMENT_CONTEXT,
+                        PAYMENT_DATA.EXTERNAL_ID,
                         PAYMENT_EVENT.ID,
                         PAYMENT_EVENT.EVENT_ID,
                         PAYMENT_EVENT.EVENT_CREATED_AT,
