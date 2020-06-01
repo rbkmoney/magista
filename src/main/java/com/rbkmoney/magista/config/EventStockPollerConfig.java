@@ -21,7 +21,7 @@ public class EventStockPollerConfig {
     @Value("${payouter.pooling.querySize}")
     private int payoutPoolingQuerySize;
 
-    @Value("${payoutert.pooling.maxPoolSize}")
+    @Value("${payouter.pooling.maxPoolSize}")
     private int payoutPoolingMaxPoolSize;
 
     @Value("${payouter.pooling.delay}")

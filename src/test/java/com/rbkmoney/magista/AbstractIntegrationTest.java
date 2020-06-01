@@ -27,7 +27,7 @@ import java.time.Duration;
  */
 
 @RunWith(SpringRunner.class)
-@TestPropertySource(properties = {"bm.pooling.enabled=false"})
+@TestPropertySource(properties = {"payouter.pooling.enabled=false"})
 @ContextConfiguration(classes = MagistaApplication.class, initializers = AbstractIntegrationTest.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class AbstractIntegrationTest {
