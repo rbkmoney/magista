@@ -19,15 +19,14 @@ public class PayoutEventFlow extends AbstractEventFlow {
         super("PayoutEvent", mappers, defaultPollingEventPublisherBuilder, threadPoolSize, queueLimit, timeout);
     }
 
-    public void processEvent(StockEvent stockEvent) {
-        Event event = stockEvent.getSourceEvent().getPayoutEvent();
+    public void processEvent(Event event) {
         if (event.getPayload().isSetPayoutChanges()) {
             for (PayoutChange payoutChange : event.getPayload().getPayoutChanges()) {
                 PayoutMapper mapper = (PayoutMapper) getMapper(payoutChange);
                 if (mapper != null) {
                     log.info("Start payout event handling, id='{}', eventType='{}', handlerType='{}'",
-                            stockEvent.getSourceEvent().getPayoutEvent().getId(), mapper.getChangeType(), mapper.getClass().getSimpleName());
-                    submitAndPutInQueue(() -> mapper.map(payoutChange, stockEvent));
+                            event.getId(), mapper.getChangeType(), mapper.getClass().getSimpleName());
+                    submitAndPutInQueue(() -> mapper.map(payoutChange, event));
                 }
             }
         }

@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
-import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payout_processing.Event;
 import com.rbkmoney.damsel.payout_processing.PayoutChange;
 import com.rbkmoney.damsel.payout_processing.PayoutStatusChanged;
@@ -25,8 +24,7 @@ public class PayoutStatusChangedMapper implements PayoutMapper {
     }
 
     @Override
-    public Processor map(PayoutChange change, StockEvent parent) {
-        Event event = parent.getSourceEvent().getPayoutEvent();
+    public Processor map(PayoutChange change, Event event) {
         PayoutData payoutData = new PayoutData();
 
         payoutData.setEventId(event.getId());
