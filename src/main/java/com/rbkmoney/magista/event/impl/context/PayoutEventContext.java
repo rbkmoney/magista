@@ -1,24 +1,24 @@
 package com.rbkmoney.magista.event.impl.context;
 
-import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.payout_processing.Event;
 import com.rbkmoney.damsel.payout_processing.PayoutChange;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutEventStat;
 import com.rbkmoney.magista.event.EventContext;
 
-public class PayoutEventContext implements EventContext<StockEvent> {
+public class PayoutEventContext implements EventContext<Event> {
     private final PayoutChange payoutChange;
-    private final StockEvent stockEvent;
+    private final Event event;
     private PayoutEventStat payoutEventStat;
 
-    public PayoutEventContext(PayoutChange payoutChange, StockEvent stockEvent) {
+    public PayoutEventContext(PayoutChange payoutChange, Event event) {
         this.payoutChange = payoutChange;
-        this.stockEvent = stockEvent;
+        this.event = event;
         this.payoutEventStat = new PayoutEventStat();
     }
 
     @Override
-    public StockEvent getSource() {
-        return stockEvent;
+    public Event getSource() {
+        return event;
     }
 
     public PayoutChange getPayoutChange() {

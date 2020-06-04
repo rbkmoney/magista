@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.event.impl.handler;
 
-import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.payout_processing.Event;
 import com.rbkmoney.damsel.payout_processing.PayoutChange;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Mapper;
@@ -32,7 +32,7 @@ public class PayoutStatusChangedHandler extends AbstractPayoutEventHandler {
     }
 
     @Override
-    public Processor handle(PayoutChange change, StockEvent parent) {
+    public Processor handle(PayoutChange change, Event parent) {
         PayoutEventContext context = generateContext(change, parent);
         return () -> payoutEventService.changePayoutEventStatus(context.getPayoutEventStat());
     }

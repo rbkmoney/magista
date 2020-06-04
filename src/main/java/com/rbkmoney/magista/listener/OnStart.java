@@ -15,7 +15,7 @@ public class OnStart implements ApplicationListener<ApplicationReadyEvent> {
 
     private final ProcessingService processingService;
 
-    @Value("${bm.pooling.enabled}")
+    @Value("${payouter.pooling.enabled}")
     private boolean poolingEnabled;
 
     @Autowired
