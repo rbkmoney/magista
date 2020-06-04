@@ -33,6 +33,7 @@
         <sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
         <spring.kafka.version>2.2.3.RELEASE</spring.kafka.version>
         <lombok.version>1.18.4</lombok.version>
+        <eventstock-client.version>1.2.10</eventstock-client.version>
     </properties>
 
     <dependencies>
@@ -110,8 +111,8 @@
         <!--RBK libs-->
         <dependency>
             <groupId>com.rbkmoney</groupId>
-            <artifactId>eventstock-client</artifactId>
-            <version>1.2.1</version>
+            <artifactId>eventstock-client-damsel</artifactId>
+            <version>${eventstock-client.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.rbkmoney.geck</groupId>

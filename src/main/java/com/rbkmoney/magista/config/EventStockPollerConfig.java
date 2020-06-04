@@ -15,22 +15,23 @@ import java.io.IOException;
 @Configuration
 public class EventStockPollerConfig {
 
-    @Value("${bm.payout.pooling.url}")
+    @Value("${payouter.pooling.url}")
     private Resource payoutPoolingUrl;
 
-    @Value("${bm.payout.pooling.querySize}")
+    @Value("${payouter.pooling.querySize}")
     private int payoutPoolingQuerySize;
 
-    @Value("${bm.payout.pooling.maxPoolSize}")
+    @Value("${payouter.pooling.maxPoolSize}")
     private int payoutPoolingMaxPoolSize;
 
-    @Value("${bm.payout.pooling.delay}")
+    @Value("${payouter.pooling.delay}")
     private int payoutPoolingMaxDelay;
 
     @Bean
     public DefaultPollingEventPublisherBuilder payoutEventPublisherBuilder() throws IOException {
         return new PollingEventPublisherBuilder()
                 .withURI(payoutPoolingUrl.getURI())
+                .withPayoutServiceAdapter()
                 .withMaxQuerySize(payoutPoolingQuerySize)
                 .withMaxPoolSize(payoutPoolingMaxPoolSize)
                 .withPollDelay(payoutPoolingMaxDelay);

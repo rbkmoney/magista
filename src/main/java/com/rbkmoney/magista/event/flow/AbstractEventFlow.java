@@ -1,12 +1,12 @@
 package com.rbkmoney.magista.event.flow;
 
-import com.rbkmoney.damsel.event_stock.StockEvent;
+import com.rbkmoney.damsel.payout_processing.Event;
 import com.rbkmoney.eventstock.client.*;
 import com.rbkmoney.eventstock.client.poll.DefaultPollingEventPublisherBuilder;
 import com.rbkmoney.eventstock.client.poll.EventFlowFilter;
 import com.rbkmoney.magista.event.EventSaver;
-import com.rbkmoney.magista.event.mapper.Mapper;
 import com.rbkmoney.magista.event.Processor;
+import com.rbkmoney.magista.event.mapper.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ public abstract class AbstractEventFlow {
 
     private final BlockingQueue queue;
     private final List<? extends Mapper> mappers;
-    private final EventPublisher<StockEvent> eventPublisher;
+    private final EventPublisher<Event> eventPublisher;
     private final ThreadGroup threadGroup;
     private final ExecutorService executorService;
     private final EventSaver eventSaver;
@@ -37,8 +37,8 @@ public abstract class AbstractEventFlow {
         this.mappers = mappers;
         this.queue = new LinkedBlockingQueue<>(queueLimit);
         this.eventPublisher = defaultPollingEventPublisherBuilder
-                .withEventHandler((EventHandler<StockEvent>) (stockEvent, s) -> {
-                    processEvent(stockEvent);
+                .withEventHandler((EventHandler<Event>) (event, s) -> {
+                    processEvent(event);
                     return EventAction.CONTINUE;
                 }).build();
         this.executorService = Executors.newFixedThreadPool(threadPoolSize, new ThreadFactory() {
@@ -66,14 +66,12 @@ public abstract class AbstractEventFlow {
 
     private SubscriberConfig buildSubscriberConfig(Optional<Long> lastEventIdOptional) {
         EventConstraint.EventIDRange eventIDRange = new EventConstraint.EventIDRange();
-        if (lastEventIdOptional.isPresent()) {
-            eventIDRange.setFromExclusive(lastEventIdOptional.get() - 1);
-        }
+        lastEventIdOptional.ifPresent(eventIDRange::setFromExclusive);
         EventFlowFilter eventFlowFilter = new EventFlowFilter(new EventConstraint(eventIDRange));
         return new DefaultSubscriberConfig(eventFlowFilter);
     }
 
-    public abstract void processEvent(StockEvent stockEvent);
+    public abstract void processEvent(Event event);
 
     protected <C> Mapper getMapper(C change) {
         for (Mapper handler : mappers) {
