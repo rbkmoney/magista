@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class PayoutMapper implements Mapper<PayoutEventContext> {
     @Override
     public PayoutEventContext fill(PayoutEventContext context) {
-        Event event = context.getSource().getSourceEvent().getPayoutEvent();
+        Event event = context.getSource();
         PayoutEventStat payoutEventStat = context.getPayoutEventStat();
 
         payoutEventStat.setEventId(event.getId());

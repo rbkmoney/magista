@@ -13,7 +13,7 @@ import com.rbkmoney.magista.event.impl.context.PayoutEventContext;
 public class PayoutStatusMapper implements Mapper<PayoutEventContext> {
     @Override
     public PayoutEventContext fill(PayoutEventContext context) {
-        Event event = context.getSource().getSourceEvent().getPayoutEvent();
+        Event event = context.getSource();
         PayoutEventStat payoutEventStat = context.getPayoutEventStat();
 
         payoutEventStat.setEventId(event.getId());

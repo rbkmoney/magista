@@ -19,13 +19,13 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 public class ProcessingService {
 
-    @Value("${bm.payout.handler.queue.limit}")
+    @Value("${payouter.handler.queue.limit}")
     private int payoutHandlerQueueLimit;
 
-    @Value("${bm.payout.handler.threadPoolSize}")
+    @Value("${payouter.handler.threadPoolSize}")
     private int payoutHandlerThreadPoolSize;
 
-    @Value("${bm.payout.handler.timeout}")
+    @Value("${payouter.handler.timeout}")
     private int payoutHandlerTimeout;
 
     private final List<Handler> handlers;
