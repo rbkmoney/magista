@@ -66,6 +66,8 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
 
         statPayment.setShortId(rs.getString(PAYMENT_DATA.PAYMENT_SHORT_ID.getName()));
 
+        statPayment.setExternalId(rs.getString(PAYMENT_DATA.EXTERNAL_ID.getName()));
+
         byte[] context = rs.getBytes(PAYMENT_DATA.PAYMENT_CONTEXT.getName());
         if (context != null) {
             statPayment.setContext(

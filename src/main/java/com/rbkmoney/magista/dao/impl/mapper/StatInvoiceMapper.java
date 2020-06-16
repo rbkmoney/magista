@@ -30,6 +30,7 @@ public class StatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>
         statInvoice.setCurrencySymbolicCode(rs.getString(INVOICE_DATA.INVOICE_CURRENCY_CODE.getName()));
         statInvoice.setProduct(rs.getString(INVOICE_DATA.INVOICE_PRODUCT.getName()));
         statInvoice.setDescription(rs.getString(INVOICE_DATA.INVOICE_DESCRIPTION.getName()));
+        statInvoice.setExternalId(rs.getString(INVOICE_DATA.EXTERNAL_ID.getName()));
         statInvoice.setCreatedAt(
                 TypeUtil.temporalToString(
                         rs.getObject(INVOICE_DATA.INVOICE_CREATED_AT.getName(), LocalDateTime.class)

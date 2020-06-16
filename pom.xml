@@ -13,11 +13,11 @@
 
     <groupId>com.rbkmoney.magista</groupId>
     <artifactId>magista</artifactId>
-    <version>2.0.7-SNAPSHOT</version>
+    <version>2.0.8-SNAPSHOT</version>
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
-        <damsel.version>1.403-9383078</damsel.version>
+        <damsel.version>1.414-f49cb86</damsel.version>
         <shared.resources.version>0.3.6</shared.resources.version>
         <server.port>8022</server.port>
         <exposed.ports>${server.port}</exposed.ports>
@@ -33,6 +33,7 @@
         <sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
         <spring.kafka.version>2.2.3.RELEASE</spring.kafka.version>
         <lombok.version>1.18.4</lombok.version>
+        <eventstock-client.version>1.2.10</eventstock-client.version>
     </properties>
 
     <dependencies>
@@ -110,8 +111,8 @@
         <!--RBK libs-->
         <dependency>
             <groupId>com.rbkmoney</groupId>
-            <artifactId>eventstock-client</artifactId>
-            <version>1.2.1</version>
+            <artifactId>eventstock-client-damsel</artifactId>
+            <version>${eventstock-client.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.rbkmoney.geck</groupId>

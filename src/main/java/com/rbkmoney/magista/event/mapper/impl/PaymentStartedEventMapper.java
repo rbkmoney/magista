@@ -161,6 +161,7 @@ public class PaymentStartedEventMapper implements PaymentMapper {
             paymentData.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
             paymentData.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
         }
+        paymentData.setExternalId(invoicePayment.getExternalId());
 
         return paymentData;
     }

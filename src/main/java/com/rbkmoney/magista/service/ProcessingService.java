@@ -2,7 +2,6 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.eventstock.client.poll.DefaultPollingEventPublisherBuilder;
 import com.rbkmoney.magista.dao.EventDao;
-import com.rbkmoney.magista.event.mapper.Mapper;
 import com.rbkmoney.magista.event.flow.PayoutEventFlow;
 import com.rbkmoney.magista.event.mapper.PayoutMapper;
 import com.rbkmoney.magista.exception.DaoException;
@@ -26,13 +25,13 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 public class ProcessingService {
 
-    @Value("${bm.payout.handler.queue.limit}")
+    @Value("${payouter.handler.queue.limit}")
     private int payoutHandlerQueueLimit;
 
-    @Value("${bm.payout.handler.threadPoolSize}")
+    @Value("${payouter.handler.threadPoolSize}")
     private int payoutHandlerThreadPoolSize;
 
-    @Value("${bm.payout.handler.timeout}")
+    @Value("${payouter.handler.timeout}")
     private int payoutHandlerTimeout;
 
     private final List<PayoutMapper> mappers;
