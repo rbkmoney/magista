@@ -53,7 +53,6 @@ public class ChargebackCreatedHandler implements Handler<InvoiceChange, StockEve
         chargeback.setChargebackCreatedAt(TypeUtil.stringToLocalDateTime(invoicePaymentChargeback.getCreatedAt()));
         chargeback.setChargebackAmount(invoicePaymentChargeback.getBody().getAmount());
         chargeback.setChargebackCurrencyCode(invoicePaymentChargeback.getBody().getCurrency().getSymbolicCode());
-        chargeback.setChargebackReason(invoicePaymentChargeback.getReason().getCode());
         chargeback.setChargebackDomainRevision(invoicePaymentChargeback.getDomainRevision());
         chargeback.setChargebackPartyRevision(invoicePaymentChargeback.getPartyRevision());
 

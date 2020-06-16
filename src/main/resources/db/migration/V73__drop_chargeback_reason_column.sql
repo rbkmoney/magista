@@ -1,0 +1,1 @@
+alter table mst.chargeback_data drop column chargeback_reason;
