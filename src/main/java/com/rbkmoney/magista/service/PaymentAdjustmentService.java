@@ -77,6 +77,9 @@ public class PaymentAdjustmentService {
                             paymentData.setPaymentExternalFee(adjustmentData.getAdjustmentExternalFee());
                             paymentData.setPaymentDomainRevision(adjustmentData.getAdjustmentDomainRevision());
                             paymentData.setPaymentStatus(adjustmentData.getPaymentStatus()); // NPE
+                            paymentData.setPaymentOperationFailureClass(adjustmentData.getPaymentOperationFailureClass());
+                            paymentData.setPaymentExternalFailure(adjustmentData.getPaymentExternalFailure());
+                            paymentData.setPaymentExternalFailureReason(adjustmentData.getPaymentExternalFailureReason());
                             return paymentData;
                         }
                 )

@@ -14,6 +14,7 @@ import com.rbkmoney.magista.query.impl.PaymentsFunction;
 import com.rbkmoney.magista.query.impl.PayoutsFunction;
 import com.rbkmoney.magista.query.impl.RefundsFunction;
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
