@@ -31,7 +31,6 @@
         <db.password>postgres</db.password>
         <db.schema>mst</db.schema>
         <sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
-        <spring.kafka.version>2.2.3.RELEASE</spring.kafka.version>
         <lombok.version>1.18.4</lombok.version>
         <eventstock-client.version>1.2.10</eventstock-client.version>
     </properties>
@@ -63,7 +62,7 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-            <version>${spring.kafka.version}</version>
+            <version>${spring-kafka.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
