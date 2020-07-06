@@ -1,20 +1,16 @@
 package com.rbkmoney.magista.listener;
 
-import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.InvoicePaymentAdjustmentPending;
+import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.config.CacheConfig;
 import com.rbkmoney.magista.dao.AbstractDaoTest;
 import com.rbkmoney.magista.dao.impl.AdjustmentDaoImpl;
-import com.rbkmoney.magista.dao.impl.InvoiceDaoImpl;
-import com.rbkmoney.magista.dao.impl.PaymentDaoImpl;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.handler.impl.AdjustmentBatchHandler;
 import com.rbkmoney.magista.event.mapper.impl.AdjustmentCreatedMapper;
 import com.rbkmoney.magista.event.mapper.impl.AdjustmentStatusChangedMapper;
-import com.rbkmoney.magista.service.InvoiceService;
 import com.rbkmoney.magista.service.PaymentAdjustmentService;
 import com.rbkmoney.magista.service.PaymentService;
 import org.assertj.core.util.Lists;
@@ -34,7 +30,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static org.junit.Assert.assertEquals;
@@ -145,7 +140,19 @@ public class AdjustmentInvoiceListenerTest extends AbstractDaoTest {
         InvoicePaymentAdjustmentStatusChangeState invoicePaymentAdjustmentStatusChangeState = new InvoicePaymentAdjustmentStatusChangeState();
         InvoicePaymentAdjustmentStatusChange invoicePaymentAdjustmentStatusChange = new InvoicePaymentAdjustmentStatusChange();
         InvoicePaymentStatus invoicePaymentStatus = new InvoicePaymentStatus();
-        invoicePaymentStatus.setFailed(new InvoicePaymentFailed());
+        invoicePaymentStatus.setFailed(
+                new InvoicePaymentFailed(
+                        OperationFailure.failure(
+                                new Failure()
+                                        .setCode("code")
+                                        .setReason("reason")
+                                        .setSub(
+                                                new SubFailure()
+                                                        .setCode("sub_failure_code")
+                                        )
+                        )
+                )
+        );
         invoicePaymentAdjustmentStatusChange.setTargetStatus(invoicePaymentStatus);
         invoicePaymentAdjustmentStatusChangeState.setScenario(invoicePaymentAdjustmentStatusChange);
         invoicePaymentAdjustmentState.setStatusChange(invoicePaymentAdjustmentStatusChangeState);
