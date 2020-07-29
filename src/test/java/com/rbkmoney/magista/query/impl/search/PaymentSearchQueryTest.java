@@ -62,6 +62,53 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
     }
 
     @Test
+    @Sql("classpath:data/sql/search/payment_with_provider_and_terminal_id.sql")
+    public void testPaymentSearchByTerminalId() {
+        StatResponse statResponse = queryProcessor.processQuery(
+                new StatRequest("{'query': {'payments': {'payment_terminal_id': 120}}}")
+        );
+        assertEquals(1, statResponse.getData().getPayments().size());
+
+        statResponse = queryProcessor.processQuery(
+                new StatRequest("{'query': {'payments': {'payment_terminal_id': 111}}}")
+        );
+        assertTrue(statResponse.getData().getPayments().isEmpty());
+    }
+
+    @Test
+    @Sql("classpath:data/sql/search/payment_with_provider_and_terminal_id.sql")
+    public void testPaymentSearchByProviderId() {
+        StatResponse statResponse = queryProcessor.processQuery(
+                new StatRequest("{'query': {'payments': {'payment_provider_id': 115}}}")
+        );
+        assertEquals(1, statResponse.getData().getPayments().size());
+
+        statResponse = queryProcessor.processQuery(
+                new StatRequest("{'query': {'payments': {'payment_provider_id': 111}}}")
+        );
+        assertTrue(statResponse.getData().getPayments().isEmpty());
+    }
+
+    @Test
+    @Sql("classpath:data/sql/search/payment_with_provider_and_terminal_id.sql")
+    public void testPaymentSearchByProviderAndTerminalId() {
+        StatResponse statResponse = queryProcessor.processQuery(
+                new StatRequest("{'query': {'payments': {'payment_terminal_id': 120, 'payment_provider_id': 115}}}")
+        );
+        assertEquals(1, statResponse.getData().getPayments().size());
+
+        statResponse = queryProcessor.processQuery(
+                new StatRequest("{'query': {'payments': {'payment_terminal_id': 120, 'payment_provider_id': 111}}}")
+        );
+        assertTrue(statResponse.getData().getPayments().isEmpty());
+
+        statResponse = queryProcessor.processQuery(
+                new StatRequest("{'query': {'payments': {'payment_terminal_id': 111, 'payment_provider_id': 115}}}")
+        );
+        assertTrue(statResponse.getData().getPayments().isEmpty());
+    }
+
+    @Test
     @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
     public void testContinuationTokenWithPayments() {
         String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z', 'size': 1}}}";

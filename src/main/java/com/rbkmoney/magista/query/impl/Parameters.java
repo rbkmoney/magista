@@ -40,6 +40,8 @@ public class Parameters {
     public static final String FROM_PAYMENT_DOMAIN_REVISION_PARAM = "from_payment_domain_revision";
     public static final String TO_PAYMENT_DOMAIN_REVISION_PARAM = "to_payment_domain_revision";
     public static final String PAYMENT_CUSTOMER_ID_PARAM = "payment_customer_id";
+    public static final String PAYMENT_PROVIDER_ID_PARAM = "payment_provider_id";
+    public static final String PAYMENT_TERMINAL_ID_PARAM = "payment_terminal_id";
 
     public static final String PAYMENT_RRN_PARAM = "payment_rrn";
     public static final String PAYMENT_APPROVAL_CODE_PARAM = "payment_approval_code";

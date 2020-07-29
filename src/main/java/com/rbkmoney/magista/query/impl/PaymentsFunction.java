@@ -162,6 +162,14 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             return getStringParameter(PAYMENT_CUSTOMER_ID_PARAM, false);
         }
 
+        public Integer getPaymentProviderId() {
+            return getIntParameter(PAYMENT_PROVIDER_ID_PARAM, false);
+        }
+
+        public Integer getPaymentTerminalId() {
+            return getIntParameter(PAYMENT_TERMINAL_ID_PARAM, false);
+        }
+
         public Long getPaymentAmount() {
             return getLongParameter(PAYMENT_AMOUNT_PARAM, false);
         }
