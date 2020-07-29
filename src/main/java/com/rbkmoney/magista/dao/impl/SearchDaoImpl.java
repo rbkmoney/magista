@@ -101,7 +101,6 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_STATUS,
                         TypeUtil.toEnumField(parameters.getPaymentStatus(), InvoicePaymentStatus.class),
                         EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_ID)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
