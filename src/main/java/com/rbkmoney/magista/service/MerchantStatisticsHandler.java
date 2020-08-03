@@ -46,6 +46,11 @@ public class MerchantStatisticsHandler implements StatisticsServletIface {
         return getStatResponse(statRequest);
     }
 
+    @Override
+    public StatResponse getChargebacks(StatRequest statRequest) throws TException {
+        return getStatResponse(statRequest);
+    }
+
     private StatResponse getStatResponse(StatRequest statRequest) throws InvalidRequest, BadToken {
         log.info("New stat request: {}" ,statRequest);
         try {

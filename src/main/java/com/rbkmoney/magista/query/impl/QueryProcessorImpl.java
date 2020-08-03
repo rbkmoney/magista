@@ -12,9 +12,6 @@ import com.rbkmoney.magista.query.parser.QueryPart;
 
 import java.util.List;
 
-/**
- * Created by vpankrashkin on 29.08.16.
- */
 public class QueryProcessorImpl implements QueryProcessor<StatRequest, StatResponse> {
     private QueryParser<String> sourceParser;
     private QueryBuilder queryBuilder;
@@ -24,7 +21,9 @@ public class QueryProcessorImpl implements QueryProcessor<StatRequest, StatRespo
         this(new JsonQueryParser(), new QueryBuilderImpl(), queryContextFactory);
     }
 
-    public QueryProcessorImpl(QueryParser<String> sourceParser, QueryBuilder queryBuilder, QueryContextFactory queryContextFactory) {
+    public QueryProcessorImpl(QueryParser<String> sourceParser,
+                              QueryBuilder queryBuilder,
+                              QueryContextFactory queryContextFactory) {
         this.sourceParser = sourceParser;
         this.queryBuilder = queryBuilder;
         this.queryContextFactory = queryContextFactory;
@@ -34,7 +33,13 @@ public class QueryProcessorImpl implements QueryProcessor<StatRequest, StatRespo
     public StatResponse processQuery(StatRequest source) throws BadTokenException, QueryProcessingException {
         List<QueryPart> queryParts = sourceParser.parseQuery(source.getDsl(), null);
         QueryContext queryContext = queryContextFactory.getContext();
-        Query query = queryBuilder.buildQuery(queryContext, queryParts, source.getContinuationToken(), null, null);
+        Query query = queryBuilder.buildQuery(
+                queryContext,
+                queryParts,
+                source.getContinuationToken(),
+                null,
+                null
+        );
         QueryResult queryResult = query.execute(queryContext);
         Object result = queryResult.getCollectedStream();
         if (result instanceof StatResponse) {

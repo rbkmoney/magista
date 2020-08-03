@@ -3,16 +3,52 @@ package com.rbkmoney.magista.dao.impl.mapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
-import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
+import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.BankCardTokenProvider;
-import com.rbkmoney.damsel.domain.Residence;
 import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.damsel.merch_stat.BankCard;
+import com.rbkmoney.damsel.merch_stat.CryptoCurrency;
+import com.rbkmoney.damsel.merch_stat.CustomerPayer;
+import com.rbkmoney.damsel.merch_stat.DigitalWallet;
+import com.rbkmoney.damsel.merch_stat.DigitalWalletProvider;
+import com.rbkmoney.damsel.merch_stat.InternationalBankAccount;
+import com.rbkmoney.damsel.merch_stat.InternationalBankDetails;
+import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
+import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
+import com.rbkmoney.damsel.merch_stat.InvoicePaid;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentCancelled;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentCaptured;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentChargedBack;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentFailed;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentFlow;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentFlowHold;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentFlowInstant;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentPending;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentProcessed;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundFailed;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundPending;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundStatus;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundSucceeded;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefunded;
 import com.rbkmoney.damsel.merch_stat.InvoicePaymentStatus;
 import com.rbkmoney.damsel.merch_stat.InvoiceStatus;
+import com.rbkmoney.damsel.merch_stat.InvoiceUnpaid;
+import com.rbkmoney.damsel.merch_stat.MobileCommerce;
+import com.rbkmoney.damsel.merch_stat.MobileOperator;
+import com.rbkmoney.damsel.merch_stat.MobilePhone;
 import com.rbkmoney.damsel.merch_stat.OnHoldExpiration;
+import com.rbkmoney.damsel.merch_stat.OperationFailure;
+import com.rbkmoney.damsel.merch_stat.Payer;
+import com.rbkmoney.damsel.merch_stat.PaymentResourcePayer;
+import com.rbkmoney.damsel.merch_stat.PaymentTerminal;
 import com.rbkmoney.damsel.merch_stat.PaymentTool;
 import com.rbkmoney.damsel.merch_stat.PayoutStatus;
 import com.rbkmoney.damsel.merch_stat.PayoutType;
+import com.rbkmoney.damsel.merch_stat.RecurrentParentPayment;
+import com.rbkmoney.damsel.merch_stat.RecurrentPayer;
+import com.rbkmoney.damsel.merch_stat.RussianBankAccount;
+import com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider;
+import com.rbkmoney.damsel.merch_stat.Wallet;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.exception.NotFoundException;
@@ -26,6 +62,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.rbkmoney.magista.domain.Tables.CHARGEBACK_DATA;
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.PayoutData.PAYOUT_DATA;
@@ -331,5 +368,80 @@ public class MapperHelper {
             default:
                 throw new NotFoundException(String.format("Refund status '%s' not found", refundStatus));
         }
+    }
+
+    public static InvoicePaymentChargebackReason toInvoicePaymentChargebackReason(ResultSet rs) throws SQLException {
+        InvoicePaymentChargebackReason invoicePaymentChargebackReason = new InvoicePaymentChargebackReason();
+        invoicePaymentChargebackReason.setCode(rs.getString(CHARGEBACK_DATA.CHARGEBACK_REASON.getName()));
+        ChargebackCategory chargebackCategory =
+                TypeUtil.toEnumField(rs.getString(
+                        CHARGEBACK_DATA.CHARGEBACK_REASON_CATEGORY.getName()),
+                        ChargebackCategory.class);
+        InvoicePaymentChargebackCategory invoicePaymentChargebackCategory = new InvoicePaymentChargebackCategory();
+        switch (chargebackCategory) {
+            case fraud:
+                invoicePaymentChargebackCategory.setFraud(new InvoicePaymentChargebackCategoryFraud());
+                break;
+            case dispute:
+                invoicePaymentChargebackCategory.setDispute(new InvoicePaymentChargebackCategoryDispute());
+                break;
+            case authorisation:
+                invoicePaymentChargebackCategory.setAuthorisation(new InvoicePaymentChargebackCategoryAuthorisation());
+                break;
+            case processing_error:
+                invoicePaymentChargebackCategory.setProcessingError(new InvoicePaymentChargebackCategoryProcessingError());
+                break;
+            default:
+                throw new NotFoundException(String.format("Chargeback category %s not found", chargebackCategory));
+        }
+        invoicePaymentChargebackReason.setCategory(invoicePaymentChargebackCategory);
+
+        return invoicePaymentChargebackReason;
+    }
+
+    public static InvoicePaymentChargebackStatus toInvoicePaymentChargebackStatus(ResultSet rs)
+            throws SQLException {
+        InvoicePaymentChargebackStatus invoicePaymentChargebackStatus = new InvoicePaymentChargebackStatus();
+        ChargebackStatus chargebackStatus = TypeUtil.toEnumField(rs.getString(
+                CHARGEBACK_DATA.CHARGEBACK_STATUS.getName()),
+                ChargebackStatus.class);
+        switch (chargebackStatus) {
+            case pending:
+                invoicePaymentChargebackStatus.setPending(new InvoicePaymentChargebackPending());
+                break;
+            case accepted:
+                invoicePaymentChargebackStatus.setAccepted(new InvoicePaymentChargebackAccepted());
+                break;
+            case rejected:
+                invoicePaymentChargebackStatus.setRejected(new InvoicePaymentChargebackRejected());
+                break;
+            case cancelled:
+                invoicePaymentChargebackStatus.setCancelled(new InvoicePaymentChargebackCancelled());
+                break;
+            default:
+                throw new NotFoundException(String.format("Chargeback status %s not found", chargebackStatus));
+        }
+        return invoicePaymentChargebackStatus;
+    }
+
+    public static InvoicePaymentChargebackStage toInvoicePaymentChargebackStage(ResultSet rs) throws SQLException {
+        InvoicePaymentChargebackStage chargebackStage = new InvoicePaymentChargebackStage();
+        ChargebackStage stage = TypeUtil.toEnumField(rs.getString(
+                CHARGEBACK_DATA.CHARGEBACK_STAGE.getName()),
+                ChargebackStage.class);
+        switch (stage) {
+            case chargeback:
+                chargebackStage.setChargeback(new InvoicePaymentChargebackStageChargeback());
+                break;
+            case pre_arbitration:
+                chargebackStage.setPreArbitration(new InvoicePaymentChargebackStagePreArbitration());
+                break;
+            case arbitration:
+                chargebackStage.setArbitration(new InvoicePaymentChargebackStageArbitration());
+                break;
+            default:
+                throw new NotFoundException(String.format("Chargeback stage %s not found", stage));
+        }
+        return chargebackStage;
     }
 }

@@ -2,6 +2,7 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.config.properties.TokenGenProperties;
 import com.rbkmoney.magista.exception.BadTokenException;
+import com.rbkmoney.magista.exception.TokenGeneratorException;
 import com.rbkmoney.magista.query.QueryParameters;
 import com.rbkmoney.magista.util.HmacUtil;
 import lombok.Data;
