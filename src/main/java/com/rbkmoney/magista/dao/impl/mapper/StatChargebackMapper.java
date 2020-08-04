@@ -21,6 +21,7 @@ public class StatChargebackMapper implements RowMapper<Map.Entry<Long, StatCharg
                 .setInvoiceId(rs.getString(CHARGEBACK_DATA.INVOICE_ID.getName()))
                 .setPaymentId(rs.getString(CHARGEBACK_DATA.PAYMENT_ID.getName()))
                 .setChargebackId(rs.getString(CHARGEBACK_DATA.CHARGEBACK_ID.getName()))
+                .setExternalId(rs.getString(CHARGEBACK_DATA.EXTERNAL_ID.getName()))
                 .setPartyId(rs.getString(CHARGEBACK_DATA.PARTY_ID.getName()))
                 .setShopId(rs.getString(CHARGEBACK_DATA.PARTY_SHOP_ID.getName()))
                 .setChargebackStatus(MapperHelper.toInvoicePaymentChargebackStatus(rs))
