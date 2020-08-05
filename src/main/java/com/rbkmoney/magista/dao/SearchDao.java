@@ -1,10 +1,7 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.damsel.merch_stat.*;
-import com.rbkmoney.magista.query.impl.InvoicesFunction;
-import com.rbkmoney.magista.query.impl.PaymentsFunction;
-import com.rbkmoney.magista.query.impl.PayoutsFunction;
-import com.rbkmoney.magista.query.impl.RefundsFunction;
+import com.rbkmoney.magista.query.impl.*;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -44,6 +41,13 @@ public interface SearchDao {
             int limit
     );
 
+    Collection<Map.Entry<Long, StatChargeback>> getChargebacks(
+            ChargebacksFunction.ChargebacksParameters parameters,
+            LocalDateTime fromTime,
+            LocalDateTime toTime,
+            LocalDateTime whereTime,
+            int limit
+    );
 
     Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(
             RefundsFunction.RefundsParameters parameters,

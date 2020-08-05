@@ -203,6 +203,20 @@
 - `payment_status` - статус платежа, имена берем из thrift-интерфейса **domain.InvoicePaymentStatus**, к примеру: `succeeded`
 - `invoice_status` - статус инвойса, имена берем из thrift-интерфейса **domain.InvoiceStatus**, к примеру: `paid`
 
+##### `chargebacks` 
+Выборка по чарджбекам. Параметры:
+
+- `merchant_id`
+- `shop_ids`
+- `invoice_id`
+- `payment_id`
+- `chargeback_id`
+- `from_time`
+- `to_time`
+- `chargeback_statuses` - список интересующих статусов (pending, accepted, rejected, cancelled)
+- `chargeback_categories` - список интересующих категорий (fraud, dispute, authorisation, processing_error)
+- `chargeback_stages` - список интересующих этапов (chargeback, pre_arbitration, arbitration)
+
 ### Параметры запросов отчетов
 
 ##### `shop_accounting_report`

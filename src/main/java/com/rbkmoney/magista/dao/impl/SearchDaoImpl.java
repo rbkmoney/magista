@@ -9,10 +9,7 @@ import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
-import com.rbkmoney.magista.query.impl.InvoicesFunction;
-import com.rbkmoney.magista.query.impl.PaymentsFunction;
-import com.rbkmoney.magista.query.impl.PayoutsFunction;
-import com.rbkmoney.magista.query.impl.RefundsFunction;
+import com.rbkmoney.magista.query.impl.*;
 import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
@@ -23,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.rbkmoney.geck.common.util.TypeUtil.*;
+import static com.rbkmoney.magista.domain.tables.ChargebackData.CHARGEBACK_DATA;
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.PayoutData.PAYOUT_DATA;
@@ -37,6 +35,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     private final StatPaymentMapper statPaymentMapper;
     private final StatRefundMapper statRefundMapper;
     private final StatPayoutMapper statPayoutMapper;
+    private final StatChargebackMapper statChargebackMapper;
     private final EnrichedStatInvoiceMapper enrichedStatInvoiceMapper;
 
     public SearchDaoImpl(DataSource ds) {
@@ -45,6 +44,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         statPaymentMapper = new StatPaymentMapper();
         statRefundMapper = new StatRefundMapper();
         statPayoutMapper = new StatPayoutMapper();
+        statChargebackMapper = new StatChargebackMapper();
         enrichedStatInvoiceMapper = new EnrichedStatInvoiceMapper();
     }
 
@@ -250,6 +250,44 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .limit(limit);
 
         return fetch(query, statPayoutMapper);
+    }
+
+    @Override
+    public Collection<Map.Entry<Long, StatChargeback>> getChargebacks(
+            ChargebacksFunction.ChargebacksParameters parameters,
+            LocalDateTime fromTime,
+            LocalDateTime toTime,
+            LocalDateTime whereTime,
+            int limit) {
+        Query query = getDslContext().selectFrom(CHARGEBACK_DATA)
+                .where(
+                        appendDateTimeRangeConditions(
+                                appendConditions(
+                                        DSL.trueCondition(),
+                                        Operator.AND,
+                                        new ConditionParameterSource()
+                                                .addValue(CHARGEBACK_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
+                                                .addValue(CHARGEBACK_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                                                .addInConditionValue(CHARGEBACK_DATA.PARTY_SHOP_ID, parameters.getShopIds())
+                                                .addValue(CHARGEBACK_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                                                .addValue(CHARGEBACK_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
+                                                .addValue(CHARGEBACK_DATA.CHARGEBACK_ID, parameters.getChargebackId(), EQUALS)
+                                                .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_STATUS,
+                                                        toEnumFields(parameters.getChargebackStatuses(), ChargebackStatus.class))
+                                                .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_STAGE,
+                                                        toEnumFields(parameters.getChargebackStages(), ChargebackStage.class))
+                                                .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_REASON_CATEGORY,
+                                                        toEnumFields(parameters.getChargebackCategories(), ChargebackCategory.class))
+                                                .addValue(CHARGEBACK_DATA.CHARGEBACK_CREATED_AT, whereTime, LESS)
+                                ),
+                                CHARGEBACK_DATA.CHARGEBACK_CREATED_AT,
+                                fromTime,
+                                toTime
+                        )
+                ).orderBy(CHARGEBACK_DATA.CHARGEBACK_CREATED_AT.desc())
+                .limit(limit);
+
+        return fetch(query, statChargebackMapper);
     }
 
     /**

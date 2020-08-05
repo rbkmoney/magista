@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.service;
+package com.rbkmoney.magista.exception;
 
 public class TokenGeneratorException extends RuntimeException {
 

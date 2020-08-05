@@ -51,6 +51,11 @@ public class Parameters {
     public static final String REFUND_ID_PARAM = "refund_id";
     public static final String REFUND_STATUS_PARAM = "refund_status";
 
+    public static final String CHARGEBACK_ID_PARAM = "chargeback_id";
+    public static final String CHARGEBACK_STATUSES_PARAM = "chargeback_statuses";
+    public static final String CHARGEBACK_CATEGORIES_PARAM = "chargeback_categories";
+    public static final String CHARGEBACK_STAGES_PARAM = "chargeback_stages";
+
     public static final String PAYOUT_ID_PARAM = "payout_id";
     public static final String PAYOUT_STATUS_PARAM = "payout_status";
     public static final String PAYOUT_STATUSES_PARAM = "payout_statuses";
