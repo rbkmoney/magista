@@ -55,6 +55,14 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
         assertEquals(1, statResponse.getData().getPayments().size());
     }
 
+    @Test
+    @Sql("classpath:data/sql/search/invoice_and_payment_search_amount_from_to.sql")
+    public void testPaymentFromTo() {
+        String json = "{'query':{'payments':{'exclude':{'shop_id':['']},'from_time':'2019-12-31T21:00:00Z', 'to_time': '3018-10-25T18:10:10Z', 'payment_amount_from':10000,'payment_amount_to':30000}},'size':20}";
+        final StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(3, statResponse.getData().getPayments().size());
+    }
+
     @Test(expected = QueryParserException.class)
     public void testWhenSizeOverflow() {
         String json = "{'query': {'payments': {'size': 1001}}}";

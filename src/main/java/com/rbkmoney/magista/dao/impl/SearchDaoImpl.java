@@ -168,6 +168,12 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         if (excludeCondition != null) {
             conditionStep.and(excludeCondition);
         }
+        if (parameters.getPaymentAmountFrom() != null && parameters.getPaymentAmountTo() != null) {
+            Condition paymentBetweenCondition = PAYMENT_DATA.PAYMENT_AMOUNT
+                    .between(parameters.getPaymentAmountFrom())
+                    .and(parameters.getPaymentAmountTo());
+            conditionStep.and(paymentBetweenCondition);
+        }
         Query query = conditionStep.orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
                 .limit(limit);
 

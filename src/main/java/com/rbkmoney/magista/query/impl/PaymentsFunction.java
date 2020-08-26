@@ -206,6 +206,14 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
         public Object getExclude() {
             return getParameter(EXCLUDE_PARAM, false);
         }
+
+        public Long getPaymentAmountFrom() {
+            return getLongParameter(PAYMENT_AMOUNT_FROM, false);
+        }
+
+        public Long getPaymentAmountTo() {
+            return getLongParameter(PAYMENT_AMOUNT_TO, false);
+        }
     }
 
     public static class PaymentsValidator extends PagedBaseValidator {
