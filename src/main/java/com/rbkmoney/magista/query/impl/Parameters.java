@@ -42,6 +42,8 @@ public class Parameters {
     public static final String PAYMENT_CUSTOMER_ID_PARAM = "payment_customer_id";
     public static final String PAYMENT_PROVIDER_ID_PARAM = "payment_provider_id";
     public static final String PAYMENT_TERMINAL_ID_PARAM = "payment_terminal_id";
+    public static final String PAYMENT_AMOUNT_FROM = "payment_amount_from";
+    public static final String PAYMENT_AMOUNT_TO = "payment_amount_to";
 
     public static final String PAYMENT_RRN_PARAM = "payment_rrn";
     public static final String PAYMENT_APPROVAL_CODE_PARAM = "payment_approval_code";

@@ -398,6 +398,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime, LESS)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmountFrom(), GREATER_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmountTo(), LESS_OR_EQUAL)
                 .addValue(PAYMENT_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS);
     }
 
