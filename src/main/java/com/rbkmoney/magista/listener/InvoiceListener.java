@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithValues;
+import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithMachineEventValues;
 
 @Slf4j
 @Component
@@ -32,7 +32,7 @@ public class InvoiceListener implements MessageListener {
 
         handle(machineEvents, ack);
         ack.acknowledge();
-        log.info("Records have been committed, size={}, {}", messages.size(), toSummaryStringWithValues(messages));
+        log.info("Records have been committed, size={}, {}", messages.size(), toSummaryStringWithMachineEventValues(messages));
     }
 
     @Override
