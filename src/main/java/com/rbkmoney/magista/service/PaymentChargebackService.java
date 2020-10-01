@@ -49,7 +49,9 @@ public class PaymentChargebackService {
                         PaymentData paymentData = paymentService.getPaymentData(chargeback.getInvoiceId(), chargeback.getPaymentId());
                         chargeback.setPartyId(paymentData.getPartyId().toString());
                         chargeback.setPartyShopId(paymentData.getPartyShopId());
-                        chargeback.setChargebackStage(ChargebackStage.chargeback);
+                        if (chargeback.getChargebackStage() == null) {
+                            chargeback.setChargebackStage(ChargebackStage.chargeback);
+                        }
                         if (chargeback.getChargebackAmount() == null) {
                             chargeback.setChargebackAmount(paymentData.getPaymentAmount());
                             chargeback.setChargebackCurrencyCode(paymentData.getPaymentCurrencyCode());

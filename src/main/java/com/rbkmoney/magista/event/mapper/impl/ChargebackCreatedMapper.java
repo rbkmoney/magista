@@ -8,6 +8,7 @@ import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.ChargebackCategory;
+import com.rbkmoney.magista.domain.enums.ChargebackStage;
 import com.rbkmoney.magista.domain.enums.ChargebackStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.ChargebackData;
@@ -45,6 +46,9 @@ public class ChargebackCreatedMapper implements ChargebackMapper {
         chargeback.setChargebackAmount(invoicePaymentChargeback.getBody().getAmount());
         chargeback.setChargebackCurrencyCode(invoicePaymentChargeback.getBody().getCurrency().getSymbolicCode());
         chargeback.setChargebackLevyAmount(invoicePaymentChargeback.getLevy().getAmount());
+        chargeback.setChargebackStage(
+                TBaseUtil.unionFieldToEnum(invoicePaymentChargeback.getStage(), ChargebackStage.class)
+        );
         chargeback.setChargebackLevyCurrencyCode(invoicePaymentChargeback.getLevy().getCurrency().getSymbolicCode());
         chargeback.setChargebackReason(invoicePaymentChargeback.getReason().getCode());
         chargeback.setChargebackReasonCategory(
