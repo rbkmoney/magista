@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.dao.ChargebackDao;
+import com.rbkmoney.magista.domain.enums.ChargebackStage;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.ChargebackData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
@@ -48,6 +49,9 @@ public class PaymentChargebackService {
                         PaymentData paymentData = paymentService.getPaymentData(chargeback.getInvoiceId(), chargeback.getPaymentId());
                         chargeback.setPartyId(paymentData.getPartyId().toString());
                         chargeback.setPartyShopId(paymentData.getPartyShopId());
+                        if (chargeback.getChargebackStage() == null) {
+                            chargeback.setChargebackStage(ChargebackStage.chargeback);
+                        }
                         if (chargeback.getChargebackAmount() == null) {
                             chargeback.setChargebackAmount(paymentData.getPaymentAmount());
                             chargeback.setChargebackCurrencyCode(paymentData.getPaymentCurrencyCode());
