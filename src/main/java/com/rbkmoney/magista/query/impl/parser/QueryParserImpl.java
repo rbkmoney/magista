@@ -21,6 +21,7 @@ public class QueryParserImpl extends BaseQueryParser {
                         new PaymentsFunction.PaymentsParser(),
                         new PaymentsForReportFunction.PaymentsForReportParser(),
                         new RefundsForReportFunction.RefundsForReportParser(),
+                        new AdjustmentsForReportFunction.AdjustmentsForReportParser(),
                         new InvoicesFunction.InvoicesParser(),
                         new RefundsFunction.RefundsParser(),
                         new PayoutsFunction.PayoutsParser(),

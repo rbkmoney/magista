@@ -2,6 +2,7 @@ package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatRefund;
+import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
 import com.rbkmoney.magista.exception.DaoException;
 
 import java.time.LocalDateTime;
@@ -69,6 +70,15 @@ public interface ReportDao {
             Optional<String> invoiceId,
             Optional<String> paymentId,
             Optional<String> refundId,
+            Optional<LocalDateTime> fromTime,
+            Optional<LocalDateTime> toTime,
+            Optional<LocalDateTime> whereTime,
+            int limit
+    ) throws DaoException;
+
+    Collection<Adjustment> getAdjustmentsForReport(
+            String partyId,
+            Optional<String> shopId,
             Optional<LocalDateTime> fromTime,
             Optional<LocalDateTime> toTime,
             Optional<LocalDateTime> whereTime,

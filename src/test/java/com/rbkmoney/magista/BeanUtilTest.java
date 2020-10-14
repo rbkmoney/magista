@@ -1,15 +1,33 @@
 package com.rbkmoney.magista;
 
+import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
+import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.util.BeanUtil;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
+import java.util.Map;
+
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class BeanUtilTest {
+
+    @Test
+    public void testTOStringMap() {
+        Adjustment adjustment = new Adjustment();
+        adjustment.setAdjustmentId("adj1");
+        adjustment.setAdjustmentAmount(5000L);
+        adjustment.setAdjustmentStatus(AdjustmentStatus.captured);
+        adjustment.setEventCreatedAt(LocalDateTime.parse("2020-10-14T17:22:42.086188"));
+
+        Map<String, String> adjustmentStringMap = BeanUtil.toStringMap(adjustment);
+        assertEquals("adj1", adjustmentStringMap.get("adjustment_id"));
+        assertEquals("2020-10-14T17:22:42.086188Z", adjustmentStringMap.get("event_created_at"));
+        assertEquals("captured", adjustmentStringMap.get("adjustment_status"));
+        assertEquals("5000", adjustmentStringMap.get("adjustment_amount"));
+    }
 
     @Test
     public void testMerge() {
@@ -43,7 +61,6 @@ public class BeanUtilTest {
         assertEquals(source.getPaymentOperationFailureClass(), target.getPaymentOperationFailureClass());
         assertEquals(source.getPaymentExternalFailure(), target.getPaymentExternalFailure());
     }
-
 
 
 }

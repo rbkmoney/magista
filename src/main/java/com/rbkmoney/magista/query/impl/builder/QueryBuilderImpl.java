@@ -19,6 +19,7 @@ public class QueryBuilderImpl extends BaseQueryBuilder {
                         new PaymentsFunction.PaymentsBuilder(),
                         new PaymentsForReportFunction.PaymentsForReportBuilder(),
                         new RefundsForReportFunction.RefundsForReportBuilder(),
+                        new AdjustmentsForReportFunction.AdjustmentsForReportBuilder(),
                         new InvoicesFunction.InvoicesBuilder(),
                         new RefundsFunction.RefundsBuilder(),
                         new PayoutsFunction.PayoutsBuilder(),
