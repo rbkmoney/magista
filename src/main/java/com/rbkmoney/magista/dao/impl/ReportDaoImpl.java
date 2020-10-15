@@ -322,7 +322,8 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                 fromTime,
                                 toTime
                         )
-                ).orderBy(REFUND.EVENT_CREATED_AT);
+                ).orderBy(REFUND.EVENT_CREATED_AT)
+                .limit(limit);
 
         return fetch(query, statRefundMapper);
     }
@@ -344,7 +345,8 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                 fromTime,
                                 toTime
                         )
-                ).orderBy(ADJUSTMENT.EVENT_CREATED_AT);
+                ).orderBy(ADJUSTMENT.EVENT_CREATED_AT)
+                .limit(limit);
 
         return fetch(query, adjustmentRowMapper);
     }
