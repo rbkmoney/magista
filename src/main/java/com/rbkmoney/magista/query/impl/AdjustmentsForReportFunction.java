@@ -48,7 +48,7 @@ public class AdjustmentsForReportFunction extends PagedBaseFunction<Adjustment, 
                 adjustmentsForReportResult::getDataStream,
                 () -> {
                     StatResponseData statResponseData = StatResponseData.records(adjustmentsForReportResult.getDataStream()
-                            .map(adjustmentResponse -> BeanUtil.toStringMap(adjustmentResponse)).collect(Collectors.toList()));
+                            .map(BeanUtil::toStringMap).collect(Collectors.toList()));
                     StatResponse statResponse = new StatResponse(statResponseData);
                     List<Adjustment> adjustmentStats = adjustmentsForReportResult.getCollectedStream();
                     if (!adjustmentsForReportResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == adjustmentStats.size()) {
