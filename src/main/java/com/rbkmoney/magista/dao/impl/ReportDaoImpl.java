@@ -1,20 +1,23 @@
 package com.rbkmoney.magista.dao.impl;
 
-import com.google.common.collect.ImmutableMap;
 import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.damsel.merch_stat.StatRefund;
 import com.rbkmoney.magista.dao.ReportDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.ColumnStringMapRowMapper;
+import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.dao.impl.mapper.StatPaymentMapper;
 import com.rbkmoney.magista.dao.impl.mapper.StatRefundMapper;
+import com.rbkmoney.magista.domain.Tables;
 import com.rbkmoney.magista.domain.enums.*;
+import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Field;
 import org.jooq.Operator;
 import org.jooq.Query;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -38,11 +41,13 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
 
     private final StatPaymentMapper statPaymentMapper;
     private final StatRefundMapper statRefundMapper;
+    private final RowMapper<Adjustment> adjustmentRowMapper;
 
     public ReportDaoImpl(@Qualifier("slaveDataSource") DataSource ds) {
         super(ds);
         statPaymentMapper = new StatPaymentMapper();
         statRefundMapper = new StatRefundMapper();
+        adjustmentRowMapper = new RecordRowMapper<>(Tables.ADJUSTMENT, Adjustment.class);
     }
 
     @Override
@@ -320,6 +325,28 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                 ).orderBy(REFUND.EVENT_CREATED_AT);
 
         return fetch(query, statRefundMapper);
+    }
+
+    @Override
+    public Collection<Adjustment> getAdjustmentsForReport(String partyId, Optional<String> shopId, Optional<LocalDateTime> fromTime, Optional<LocalDateTime> toTime, Optional<LocalDateTime> whereTime, int limit) throws DaoException {
+        Query query = getDslContext().selectFrom(ADJUSTMENT)
+                .where(
+                        appendDateTimeRangeConditions(
+                                appendConditions(
+                                        ADJUSTMENT.PARTY_ID.eq(partyId)
+                                                .and(ADJUSTMENT.ADJUSTMENT_STATUS.eq(AdjustmentStatus.captured)),
+                                        Operator.AND,
+                                        new ConditionParameterSource()
+                                                .addValue(ADJUSTMENT.EVENT_CREATED_AT, whereTime.orElse(null), GREATER)
+                                                .addValue(ADJUSTMENT.PARTY_SHOP_ID, shopId.orElse(null), EQUALS)
+                                ),
+                                ADJUSTMENT.EVENT_CREATED_AT,
+                                fromTime,
+                                toTime
+                        )
+                ).orderBy(REFUND.EVENT_CREATED_AT);
+
+        return fetch(query, adjustmentRowMapper);
     }
 
 }

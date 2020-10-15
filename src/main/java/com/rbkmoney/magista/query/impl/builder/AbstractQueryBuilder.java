@@ -44,7 +44,7 @@ public abstract class AbstractQueryBuilder implements QueryBuilder {
                         () -> childQueries.stream().map(query -> query.execute(context)).collect(Collectors.toList())
                 ),
                 (context, queryResults) -> new BaseQueryResult<>(
-                        () -> queryResults.stream(),
+                        queryResults::stream,
                         () -> queryResults
                 )
 
