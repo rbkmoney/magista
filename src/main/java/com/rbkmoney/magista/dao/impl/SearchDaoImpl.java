@@ -230,7 +230,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                         new ConditionParameterSource()
                                                 .addValue(PAYOUT_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
                                                 .addValue(PAYOUT_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                                                .addInConditionValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopIds())
+                                                .addInConditionValue(PAYOUT_DATA.PARTY_SHOP_ID, parameters.getShopIds())
                                                 .addValue(PAYOUT_DATA.PAYOUT_ID, parameters.getPayoutId(), EQUALS)
                                                 .addValue(PAYOUT_DATA.PAYOUT_STATUS,
                                                         toEnumField(parameters.getPayoutStatus(), PayoutStatus.class),
