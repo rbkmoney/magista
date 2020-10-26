@@ -41,7 +41,7 @@ public class PaymentChargebackService {
                 chargeback.setPartyId(paymentData.getPartyId().toString());
                 chargeback.setPartyShopId(paymentData.getPartyShopId());
                 break;
-            case INVOICE_PAYMENT_CHARGEBACK_STATUS_CHANGED:
+            default:
                 ChargebackData previousChargebackEvent = getChargeback(chargeback.getInvoiceId(), chargeback.getPaymentId(), chargeback.getChargebackId());
                 BeanUtil.merge(previousChargebackEvent, chargeback, "id");
                 break;
