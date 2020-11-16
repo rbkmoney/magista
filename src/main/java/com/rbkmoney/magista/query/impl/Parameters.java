@@ -12,7 +12,7 @@ public class Parameters {
 
     public static final String MERCHANT_ID_PARAM = "merchant_id";
     public static final String SHOP_ID_PARAM = "shop_id";
-    public static final String SHOP_IDS_PARAM= "shop_ids";
+    public static final String SHOP_IDS_PARAM = "shop_ids";
     public static final String SHOP_CATEGORY_IDS_PARAM = "shop_category_ids";
     public static final String CURRENCY_CODE = "currency_code";
     public static final String FROM_TIME_PARAM = "from_time";
@@ -22,6 +22,7 @@ public class Parameters {
     public static final String INVOICE_ID_PARAM = "invoice_id";
     public static final String INVOICE_STATUS_PARAM = "invoice_status";
     public static final String INVOICE_AMOUNT_PARAM = "invoice_amount";
+    public static final String INVOICE_IDS_PARAM = "invoice_ids";
 
     public static final String PAYMENT_ID_PARAM = "payment_id";
     public static final String PAYMENT_STATUS_PARAM = "payment_status";

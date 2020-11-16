@@ -1,7 +1,6 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.dao.impl.RefundDaoImpl;
-import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.exception.DaoException;
 import org.junit.Test;

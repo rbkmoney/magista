@@ -2,7 +2,9 @@ package com.rbkmoney.magista.query.impl;
 
 
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.query.*;
+import com.rbkmoney.magista.query.Query;
+import com.rbkmoney.magista.query.QueryContext;
+import com.rbkmoney.magista.query.QueryParameters;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
 import com.rbkmoney.magista.query.builder.QueryBuilderException;
 import com.rbkmoney.magista.query.impl.builder.AbstractQueryBuilder;

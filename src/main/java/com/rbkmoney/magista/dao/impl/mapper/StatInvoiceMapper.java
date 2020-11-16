@@ -2,9 +2,9 @@ package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.InvoiceCart;
-import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.damsel.merch_stat.InvoiceStatus;
+import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Map;
 
-import static com.rbkmoney.magista.dao.impl.mapper.MapperHelper.mapInvoiceStatus;
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 
 public class StatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>> {

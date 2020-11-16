@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.kafka;
 
-import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import com.rbkmoney.magista.serde.MachineEventSerializer;
 import lombok.extern.slf4j.Slf4j;

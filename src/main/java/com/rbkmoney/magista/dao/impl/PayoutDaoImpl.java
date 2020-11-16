@@ -4,7 +4,6 @@ import com.rbkmoney.magista.dao.PayoutDao;
 import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutData;
 import com.rbkmoney.magista.domain.tables.records.PayoutDataRecord;
-import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Query;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;

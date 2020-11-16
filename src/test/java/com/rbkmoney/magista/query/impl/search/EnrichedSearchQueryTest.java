@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * merchant OKKO-specific, in general shouldn't be touched
+ *
  * @author n.pospolita
  */
 @Transactional

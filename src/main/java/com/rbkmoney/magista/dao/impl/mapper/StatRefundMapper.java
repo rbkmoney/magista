@@ -1,11 +1,7 @@
 package com.rbkmoney.magista.dao.impl.mapper;
 
-import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.damsel.merch_stat.StatRefund;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.domain.enums.FailureClass;
-import com.rbkmoney.magista.domain.enums.RefundStatus;
-import com.rbkmoney.magista.exception.NotFoundException;
-import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -14,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Map;
 
-import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 
 public class StatRefundMapper implements RowMapper<Map.Entry<Long, StatRefund>> {

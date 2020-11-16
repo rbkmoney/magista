@@ -13,7 +13,10 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 

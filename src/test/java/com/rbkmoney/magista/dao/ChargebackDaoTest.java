@@ -2,7 +2,6 @@ package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.dao.impl.ChargebackDaoImpl;
 import com.rbkmoney.magista.domain.tables.pojos.ChargebackData;
-import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import org.junit.Assert;
 import org.junit.Test;

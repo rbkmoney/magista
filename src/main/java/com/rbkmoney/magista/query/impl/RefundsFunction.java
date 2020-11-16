@@ -14,7 +14,10 @@ import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 
 import java.time.temporal.TemporalAccessor;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -94,6 +97,10 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
 
         public String getInvoiceId() {
             return getStringParameter(INVOICE_ID_PARAM, false);
+        }
+
+        public List<String> getInvoiceIds() {
+            return getArrayParameter(INVOICE_IDS_PARAM, false);
         }
 
         public String getPaymentId() {

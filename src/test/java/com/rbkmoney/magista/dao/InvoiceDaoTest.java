@@ -2,7 +2,6 @@ package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.dao.impl.InvoiceDaoImpl;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
-import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -10,7 +9,6 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomStreamOf;
@@ -53,12 +51,12 @@ public class InvoiceDaoTest extends AbstractDaoTest {
         String invoiceId = "invoiceId";
 
         List<InvoiceData> invoices = randomStreamOf(100, InvoiceData.class)
-                        .map(
-                                invoiceData -> {
-                                    invoiceData.setInvoiceId(invoiceId);
-                                    return invoiceData;
-                                }
-                        )
+                .map(
+                        invoiceData -> {
+                            invoiceData.setInvoiceId(invoiceId);
+                            return invoiceData;
+                        }
+                )
                 .sorted(Comparator.comparing(InvoiceData::getEventId))
                 .collect(Collectors.toList());
 

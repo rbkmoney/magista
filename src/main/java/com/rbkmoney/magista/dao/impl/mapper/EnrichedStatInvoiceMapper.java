@@ -15,6 +15,7 @@ import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 
 /**
  * merchant OKKO-specific, in general shouldn't be touched
+ *
  * @author n.pospolita
  */
 public class EnrichedStatInvoiceMapper implements RowMapper<Map.Entry<Long, EnrichedStatInvoice>> {

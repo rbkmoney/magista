@@ -2,8 +2,8 @@ package com.rbkmoney.magista.kafka;
 
 import com.rbkmoney.damsel.domain.Invoice;
 import com.rbkmoney.damsel.domain.InvoicePayment;
-import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
+import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.geck.serializer.kit.mock.FieldHandler;
@@ -16,7 +16,6 @@ import com.rbkmoney.magista.TestData;
 import com.rbkmoney.magista.converter.BinaryConverterImpl;
 import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.event.handler.impl.*;
-import com.rbkmoney.magista.event.mapper.AdjustmentMapper;
 import com.rbkmoney.magista.event.mapper.impl.*;
 import com.rbkmoney.magista.listener.InvoiceListener;
 import com.rbkmoney.magista.provider.GeoProvider;
@@ -42,7 +41,6 @@ import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @Slf4j

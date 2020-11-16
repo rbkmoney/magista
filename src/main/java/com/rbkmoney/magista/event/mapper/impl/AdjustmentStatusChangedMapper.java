@@ -11,8 +11,8 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
-import com.rbkmoney.magista.event.mapper.AdjustmentMapper;
 import com.rbkmoney.magista.event.ChangeType;
+import com.rbkmoney.magista.event.mapper.AdjustmentMapper;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.stereotype.Component;
 

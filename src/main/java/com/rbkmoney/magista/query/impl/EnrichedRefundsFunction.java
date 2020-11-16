@@ -11,7 +11,10 @@ import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,6 +22,7 @@ import static org.apache.http.util.TextUtils.isBlank;
 
 /**
  * merchant OKKO-specific, in general shouldn't be touched
+ *
  * @author n.pospolita
  */
 public class EnrichedRefundsFunction extends PagedBaseFunction<Map.Entry<Long, EnrichedStatInvoice>, StatResponse> implements CompositeQuery<Map.Entry<Long, EnrichedStatInvoice>, StatResponse> {
@@ -81,7 +85,7 @@ public class EnrichedRefundsFunction extends PagedBaseFunction<Map.Entry<Long, E
         } else if (status.isSetPending()) {
             // no eventOccuredAt field
         } else if (status.isSetSucceeded()) {
-            eventOccuredAt =  status.getSucceeded().getAt();
+            eventOccuredAt = status.getSucceeded().getAt();
         }
         if (!isBlank(eventOccuredAt)) {
             return eventOccuredAt;
