@@ -2,17 +2,13 @@ package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.AdditionalTransactionInfo;
-import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
-import com.rbkmoney.damsel.domain.BankCardTokenProvider;
-import com.rbkmoney.damsel.domain.TransactionInfo;
-import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.damsel.domain.ProviderRef;
+import com.rbkmoney.damsel.domain.TerminalRef;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentStatus;
+import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
-import com.rbkmoney.magista.domain.enums.PaymentPayerType;
-import com.rbkmoney.magista.exception.NotFoundException;
-import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.nio.ByteBuffer;
@@ -20,9 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 
@@ -84,7 +78,8 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
         if (TBaseUtil.getSetFieldsCount(additionalTransactionInfo) > 0) {
             statPayment.setAdditionalTransactionInfo(additionalTransactionInfo);
         }
-
+        statPayment.setProviderId(new ProviderRef(rs.getInt(PAYMENT_DATA.PAYMENT_PROVIDER_ID.getName())));
+        statPayment.setTerminalId(new TerminalRef(rs.getInt(PAYMENT_DATA.PAYMENT_TERMINAL_ID.getName())));
         return new AbstractMap.SimpleEntry<>(rs.getLong(PAYMENT_DATA.ID.getName()), statPayment);
     }
 

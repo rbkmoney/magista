@@ -1,10 +1,7 @@
 package com.rbkmoney.magista.endpoint;
 
 import com.rbkmoney.damsel.merch_stat.MerchantStatisticsSrv;
-import com.rbkmoney.woody.api.event.CompositeServiceEventListener;
 import com.rbkmoney.woody.thrift.impl.http.THServiceBuilder;
-import com.rbkmoney.woody.thrift.impl.http.event.HttpServiceEventLogListener;
-import com.rbkmoney.woody.thrift.impl.http.event.ServiceEventLogListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.*;

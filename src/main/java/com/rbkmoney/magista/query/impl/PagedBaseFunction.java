@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.rbkmoney.magista.query.impl.Parameters.FROM_PARAMETER;
 import static com.rbkmoney.magista.query.impl.Parameters.SIZE_PARAMETER;
 
 /**

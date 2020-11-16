@@ -1,7 +1,10 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.domain.InvoicePaymentChargebackStage;
-import com.rbkmoney.damsel.payment_processing.*;
+import com.rbkmoney.damsel.payment_processing.InvoiceChange;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentChargebackChange;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentChargebackStageChanged;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;

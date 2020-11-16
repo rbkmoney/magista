@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.event.flow;
 
-import com.rbkmoney.damsel.event_stock.StockEvent;
 import com.rbkmoney.damsel.payout_processing.Event;
 import com.rbkmoney.damsel.payout_processing.PayoutChange;
 import com.rbkmoney.eventstock.client.poll.DefaultPollingEventPublisherBuilder;

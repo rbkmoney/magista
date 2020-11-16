@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.rbkmoney.magista.domain.Tables.INVOICE_DATA;
-import static com.rbkmoney.magista.domain.Tables.PAYMENT_DATA;
 
 @Component
 public class InvoiceDaoImpl extends AbstractDao implements InvoiceDao {

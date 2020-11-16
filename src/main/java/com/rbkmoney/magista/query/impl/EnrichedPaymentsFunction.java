@@ -11,7 +11,10 @@ import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,6 +22,7 @@ import static org.apache.http.util.TextUtils.isBlank;
 
 /**
  * merchant OKKO-specific, in general shouldn't be touched
+ *
  * @author n.pospolita
  */
 public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, EnrichedStatInvoice>, StatResponse> implements CompositeQuery<Map.Entry<Long, EnrichedStatInvoice>, StatResponse> {
@@ -79,15 +83,15 @@ public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, 
         if (status.isSetFailed()) {
             eventOccuredAt = status.getFailed().getAt();
         } else if (status.isSetCancelled()) {
-            eventOccuredAt =  status.getCancelled().getAt();
+            eventOccuredAt = status.getCancelled().getAt();
         } else if (status.isSetCaptured()) {
-            eventOccuredAt =  status.getCaptured().getAt();
+            eventOccuredAt = status.getCaptured().getAt();
         } else if (status.isSetPending()) {
             // no eventOccuredAt field
         } else if (status.isSetProcessed()) {
-            eventOccuredAt =  status.getProcessed().getAt();
+            eventOccuredAt = status.getProcessed().getAt();
         } else if (status.isSetRefunded()) {
-            eventOccuredAt =  status.getRefunded().getAt();
+            eventOccuredAt = status.getRefunded().getAt();
         } else if (status.isSetChargedBack()) {
             eventOccuredAt = status.getChargedBack().getAt();
         }

@@ -15,9 +15,7 @@ import java.time.Instant;
 
 import static com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider.euroset;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 @Transactional
 public class PaymentSearchQueryTest extends AbstractQueryTest {
@@ -304,6 +302,14 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
         String json = "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_ids': ['SHOP_ID'],'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
         assertEquals(3, statResponse.getData().getPayments().size());
+    }
+
+    @Test
+    @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
+    public void testSearchByInvoiceIds() {
+        String json = "{'query': {'payments': {'invoice_ids': ['INVOICE_NEW_ID_3', 'INVOICE_NEW_ID_4']}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(2, statResponse.getData().getPayments().size());
     }
 
 }

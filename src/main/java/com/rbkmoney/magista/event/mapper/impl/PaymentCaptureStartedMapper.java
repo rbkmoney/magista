@@ -1,9 +1,9 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
-import com.rbkmoney.damsel.domain.AdditionalTransactionInfo;
 import com.rbkmoney.damsel.domain.Cash;
-import com.rbkmoney.damsel.domain.TransactionInfo;
-import com.rbkmoney.damsel.payment_processing.*;
+import com.rbkmoney.damsel.payment_processing.InvoiceChange;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentCaptureStarted;
+import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;

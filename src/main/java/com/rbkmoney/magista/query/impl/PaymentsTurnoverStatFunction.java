@@ -3,11 +3,10 @@ package com.rbkmoney.magista.query.impl;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.damsel.merch_stat.StatResponseData;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.query.*;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import com.rbkmoney.magista.exception.DaoException;
 
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

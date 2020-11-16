@@ -13,7 +13,10 @@ import com.rbkmoney.magista.query.impl.parser.AbstractQueryParser;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -110,6 +113,10 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
 
         public String getExternalId() {
             return getStringParameter(EXTERNAL_ID_PARAM, false);
+        }
+
+        public List<String> getInvoiceIds() {
+            return getArrayParameter(INVOICE_IDS_PARAM, false);
         }
 
     }

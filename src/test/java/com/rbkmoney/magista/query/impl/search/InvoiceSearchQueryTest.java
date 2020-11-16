@@ -4,7 +4,6 @@ import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.AbstractIntegrationTest;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.AbstractQueryTest;
 import com.rbkmoney.magista.query.parser.QueryParserException;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -166,6 +164,13 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
     public void testShopIdsWithoutMerchantId() {
         String json = "{'query': {'invoices': {'shop_ids': ['SHOP_ID']}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+    }
+
+    @Test
+    public void testSearchByInvoiceIds() {
+        String json = "{'query': {'invoices': {'invoice_ids': ['INVOICE_NEW_ID_3', 'INVOICE_NEW_ID_4']}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(2, statResponse.getData().getInvoices().size());
     }
 
 }

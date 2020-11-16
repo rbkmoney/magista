@@ -9,8 +9,8 @@ import com.rbkmoney.magista.domain.enums.PayoutEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutData;
 import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.mapper.PayoutMapper;
 import com.rbkmoney.magista.event.Processor;
+import com.rbkmoney.magista.event.mapper.PayoutMapper;
 import com.rbkmoney.magista.service.PayoutService;
 import org.springframework.stereotype.Component;
 

@@ -2,15 +2,11 @@ package com.rbkmoney.magista.event.handler.impl;
 
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
-import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
-import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.handler.BatchHandler;
 import com.rbkmoney.magista.event.mapper.AdjustmentMapper;
 import com.rbkmoney.magista.service.PaymentAdjustmentService;
-import com.rbkmoney.magista.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

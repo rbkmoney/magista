@@ -46,7 +46,7 @@ public abstract class BaseQuery<T, CT> implements Query<T, CT> {
         return query == null ? null : query.getQueryParameters();
     }
 
-    protected  <R extends QueryContext> R getContext(QueryContext context, Class<R> expectedType) {
+    protected <R extends QueryContext> R getContext(QueryContext context, Class<R> expectedType) {
         if (expectedType.isAssignableFrom(context.getClass())) {
             return (R) context;
         } else {

@@ -1,26 +1,22 @@
 package com.rbkmoney.magista.query.impl.builder;
 
 import com.rbkmoney.magista.config.properties.TokenGenProperties;
-import com.rbkmoney.magista.dao.SearchDao;
-import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.query.Query;
-import com.rbkmoney.magista.query.QueryContext;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
 import com.rbkmoney.magista.query.builder.QueryBuilderException;
 import com.rbkmoney.magista.query.impl.FunctionQueryContext;
-import com.rbkmoney.magista.query.impl.QueryContextFactoryImpl;
 import com.rbkmoney.magista.query.impl.RootQuery;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.service.TokenGenService;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by vpankrashkin on 28.08.16.

@@ -1,12 +1,10 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.dao.AbstractDaoTest;
-import com.rbkmoney.magista.dao.impl.PaymentDaoImpl;
 import com.rbkmoney.magista.dao.impl.RefundDaoImpl;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.RefundData;
-import com.rbkmoney.magista.event.mapper.impl.PaymentStatusChangedEventMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
