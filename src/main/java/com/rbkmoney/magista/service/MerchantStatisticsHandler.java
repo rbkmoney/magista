@@ -50,6 +50,11 @@ public class MerchantStatisticsHandler implements Iface {
         return getStatResponse(statRequest);
     }
 
+    @Override
+    public StatResponse getChargebacks(StatRequest statRequest) throws InvalidRequest, BadToken, TException {
+        return getStatResponse(statRequest);
+    }
+
     private StatResponse getStatResponse(StatRequest statRequest) throws InvalidRequest, BadToken {
         log.info("New stat request: {}" ,statRequest);
         try {
