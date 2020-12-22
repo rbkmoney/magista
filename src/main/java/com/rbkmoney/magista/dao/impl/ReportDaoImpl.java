@@ -33,8 +33,7 @@ import static com.rbkmoney.magista.domain.tables.Adjustment.ADJUSTMENT;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.PayoutEventStat.PAYOUT_EVENT_STAT;
 import static com.rbkmoney.magista.domain.tables.Refund.REFUND;
-import static org.jooq.Comparator.EQUALS;
-import static org.jooq.Comparator.GREATER;
+import static org.jooq.Comparator.*;
 
 @Component
 public class ReportDaoImpl extends AbstractDao implements ReportDao {
@@ -340,6 +339,7 @@ public class ReportDaoImpl extends AbstractDao implements ReportDao {
                                         new ConditionParameterSource()
                                                 .addValue(ADJUSTMENT.EVENT_CREATED_AT, whereTime.orElse(null), GREATER)
                                                 .addValue(ADJUSTMENT.PARTY_SHOP_ID, shopId.orElse(null), EQUALS)
+                                                .addValue(ADJUSTMENT.ADJUSTMENT_AMOUNT, 0L, NOT_EQUALS)
                                 ),
                                 ADJUSTMENT.EVENT_CREATED_AT,
                                 fromTime,
