@@ -15,8 +15,8 @@ spring:
         reWriteBatchedInserts: true
   application:
     name: @project.name@
-    flyway:
-      schemas: mst
+  flyway:
+    schemas: mst
 
 # need to fix dbinit
 db:
