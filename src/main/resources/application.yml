@@ -56,6 +56,19 @@ management:
     export:
       statsd:
         flavor: etsy
+      prometheus:
+        enabled: true
+  server:
+    port: @management.port@
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
 
 kafka:
   bootstrap-servers: kenny-kafka1.bst1.rbkmoney.net:9092
