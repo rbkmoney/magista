@@ -16,7 +16,7 @@
     <version>2.0.12-SNAPSHOT</version>
 
     <properties>
-        <damsel.version>1.466-060478e</damsel.version>
+        <damsel.version>1.475-bde841f</damsel.version>
         <shared.resources.version>0.3.8</shared.resources.version>
         <server.port>8022</server.port>
         <management.port>8023</management.port>
