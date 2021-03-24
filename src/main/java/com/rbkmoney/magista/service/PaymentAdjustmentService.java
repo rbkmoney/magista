@@ -1,8 +1,11 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.dao.AdjustmentDao;
+import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
+import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.Adjustment;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
+import com.rbkmoney.magista.domain.tables.pojos.PaymentEvent;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
@@ -33,27 +36,34 @@ public class PaymentAdjustmentService {
         try {
             Adjustment adjustment = adjustmentDao.get(invoiceId, paymentId, adjustmentId);
             if (adjustment == null) {
-                throw new NotFoundException(String.format("Adjustment not found, invoiceId='%s', paymentId='%s', adjustmentId='%s'", invoiceId, paymentId, adjustmentId));
+                throw new NotFoundException(
+                        String.format("Adjustment not found, invoiceId='%s', paymentId='%s', adjustmentId='%s'",
+                                invoiceId, paymentId, adjustmentId));
             }
             return adjustment;
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to get adjustment, invoiceId='%s', paymentId='%s', adjustmentId='%s'", invoiceId, paymentId, adjustmentId), ex);
+            throw new StorageException(
+                    String.format("Failed to get adjustment, invoiceId='%s', paymentId='%s', adjustmentId='%s'",
+                            invoiceId, paymentId, adjustmentId), ex);
         }
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void savePaymentAdjustment(Adjustment adjustment) throws NotFoundException, StorageException {
         log.info("Trying to save adjustment event, eventType='{}', invoiceId='{}', paymentId='{}', adjustmentId='{}'",
-                adjustment.getEventType(), adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId());
+                adjustment.getEventType(), adjustment.getInvoiceId(), adjustment.getPaymentId(),
+                adjustment.getAdjustmentId());
         switch (adjustment.getEventType()) {
             case INVOICE_PAYMENT_ADJUSTMENT_CREATED:
-                PaymentData paymentData = paymentService.getPaymentData(adjustment.getInvoiceId(), adjustment.getPaymentId());
+                PaymentData paymentData =
+                        paymentService.getPaymentData(adjustment.getInvoiceId(), adjustment.getPaymentId());
                 adjustment.setPartyId(paymentData.getPartyId().toString());
                 adjustment.setPartyShopId(paymentData.getPartyShopId());
                 adjustment.setAdjustmentCurrencyCode(paymentData.getPaymentCurrencyCode());
                 break;
             case INVOICE_PAYMENT_ADJUSTMENT_STATUS_CHANGED:
-                Adjustment previousAdjustmentEvent = getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId());
+                Adjustment previousAdjustmentEvent = getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(),
+                        adjustment.getAdjustmentId());
                 BeanUtil.merge(previousAdjustmentEvent, adjustment, "id");
                 break;
         }
@@ -64,6 +74,30 @@ public class PaymentAdjustmentService {
         } catch (DaoException ex) {
             throw new StorageException(String.format("Failed to save adjustment, adjustment='%s'", adjustment), ex);
         }
-    }
 
+        if (adjustment.getAdjustmentStatus() == AdjustmentStatus.captured && adjustment.getPaymentStatus() != null) {
+            PaymentEvent paymentEvent = new PaymentEvent();
+
+            paymentEvent.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
+            paymentEvent.setEventId(adjustment.getEventId());
+            paymentEvent.setEventCreatedAt(adjustment.getEventCreatedAt());
+            paymentEvent.setInvoiceId(adjustment.getInvoiceId());
+            paymentEvent.setPaymentId(adjustment.getPaymentId());
+            paymentEvent.setPaymentFee(adjustment.getAdjustmentFee());
+            paymentEvent.setPaymentProviderFee(adjustment.getAdjustmentProviderFee());
+            paymentEvent.setPaymentExternalFee(adjustment.getAdjustmentExternalFee());
+            paymentEvent.setPaymentDomainRevision(adjustment.getAdjustmentDomainRevision());
+            paymentEvent.setPaymentStatus(adjustment.getPaymentStatus());
+            paymentEvent.setPaymentOperationFailureClass(adjustment.getPaymentOperationFailureClass());
+            paymentEvent.setPaymentExternalFailure(adjustment.getPaymentExternalFailure());
+            paymentEvent.setPaymentExternalFailureReason(adjustment.getPaymentExternalFailureReason());
+
+            paymentService.savePaymentChange(paymentEvent);
+        } else if (adjustment.getAdjustmentStatus() == AdjustmentStatus.captured &&
+                adjustment.getPaymentStatus() == null) {
+            log.warn(
+                    "Cant save PaymentEvent at AdjustmentStatus.captured because PaymentStatus is null, adjustment='{}'",
+                    adjustment);
+        }
+    }
 }
