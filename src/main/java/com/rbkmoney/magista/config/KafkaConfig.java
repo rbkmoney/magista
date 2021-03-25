@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.config;
 
-import com.rbkmoney.kafka.common.exception.handler.SeekToCurrentWithSleepBatchErrorHandler;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.config.properties.KafkaSslProperties;
 import com.rbkmoney.magista.serde.MachineEventDeserializer;
@@ -20,7 +19,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.BatchErrorHandler;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.retry.support.RetryTemplate;
+import org.springframework.kafka.listener.SeekToCurrentBatchErrorHandler;
 
 import java.io.File;
 import java.util.HashMap;
@@ -85,8 +84,7 @@ public class KafkaConfig {
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, MachineEvent>>
             kafkaListenerContainerFactory(
-                ConsumerFactory<String, MachineEvent> consumerFactory,
-                RetryTemplate retryTemplate
+                ConsumerFactory<String, MachineEvent> consumerFactory
     ) {
         ConcurrentKafkaListenerContainerFactory<String, MachineEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
@@ -100,6 +98,6 @@ public class KafkaConfig {
     }
 
     public BatchErrorHandler kafkaErrorHandler() {
-        return new SeekToCurrentWithSleepBatchErrorHandler();
+        return new SeekToCurrentBatchErrorHandler();
     }
 }
