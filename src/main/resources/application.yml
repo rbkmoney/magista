@@ -52,15 +52,20 @@ info:
     version: '@damsel.version@'
 
 management:
+  security:
+    flag: false
+  server:
+    port: '@management.port@'
   metrics:
     export:
       statsd:
         flavor: etsy
+        enabled: false
       prometheus:
-        enabled: true
-  server:
-    port: '@management.port@'
+        enabled: false
   endpoint:
+    health:
+      show-details: always
     metrics:
       enabled: true
     prometheus:

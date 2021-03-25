@@ -20,7 +20,6 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.BatchErrorHandler;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.retry.support.RetryTemplate;
 
 import java.io.File;
 import java.util.HashMap;
@@ -85,8 +84,7 @@ public class KafkaConfig {
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, MachineEvent>>
             kafkaListenerContainerFactory(
-                ConsumerFactory<String, MachineEvent> consumerFactory,
-                RetryTemplate retryTemplate
+                ConsumerFactory<String, MachineEvent> consumerFactory
     ) {
         ConcurrentKafkaListenerContainerFactory<String, MachineEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
