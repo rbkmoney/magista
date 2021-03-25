@@ -23,27 +23,41 @@ import java.util.stream.Stream;
 
 import static com.rbkmoney.magista.query.impl.Parameters.*;
 
-public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefund>, StatResponse> implements CompositeQuery<Map.Entry<Long, StatRefund>, StatResponse> {
+public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefund>, StatResponse>
+        implements CompositeQuery<Map.Entry<Long, StatRefund>, StatResponse> {
 
     public static final String FUNC_NAME = "refunds";
 
     private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
-    private RefundsFunction(Object descriptor, QueryParameters params, String continuationToken, CompositeQuery subquery) {
+    private RefundsFunction(Object descriptor, QueryParameters params, String continuationToken,
+                            CompositeQuery subquery) {
         super(descriptor, params, FUNC_NAME, continuationToken);
         this.subquery = subquery;
     }
 
+    private static RefundsFunction createRefundsFunction(Object descriptor, QueryParameters queryParameters,
+                                                         String continuationToken,
+                                                         CompositeQuery<QueryResult, List<QueryResult>> subquery) {
+        RefundsFunction refundsFunction = new RefundsFunction(descriptor, queryParameters, continuationToken, subquery);
+        subquery.setParentQuery(refundsFunction);
+        return refundsFunction;
+    }
+
     @Override
-    public QueryResult<Map.Entry<Long, StatRefund>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+    public QueryResult<Map.Entry<Long, StatRefund>, StatResponse> execute(QueryContext context)
+            throws QueryExecutionException {
         QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
 
         return execute(context, collectedResults.getCollectedStream());
     }
 
     @Override
-    public QueryResult<Map.Entry<Long, StatRefund>, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
-        QueryResult<Map.Entry<Long, StatRefund>, List<Map.Entry<Long, StatRefund>>> refundsResult = (QueryResult<Map.Entry<Long, StatRefund>, List<Map.Entry<Long, StatRefund>>>) collectedResults.get(0);
+    public QueryResult<Map.Entry<Long, StatRefund>, StatResponse> execute(QueryContext context,
+                                                                          List<QueryResult> collectedResults)
+            throws QueryExecutionException {
+        QueryResult<Map.Entry<Long, StatRefund>, List<Map.Entry<Long, StatRefund>>> refundsResult =
+                (QueryResult<Map.Entry<Long, StatRefund>, List<Map.Entry<Long, StatRefund>>>) collectedResults.get(0);
 
         return new BaseQueryResult<>(
                 () -> refundsResult.getDataStream(),
@@ -134,12 +148,14 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
         @Override
         public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
             super.validateParameters(parameters);
-            RefundsFunction.RefundsParameters refundsParameters = super.checkParamsType(parameters, RefundsFunction.RefundsParameters.class);
+            RefundsFunction.RefundsParameters refundsParameters =
+                    super.checkParamsType(parameters, RefundsFunction.RefundsParameters.class);
 
             validateTimePeriod(refundsParameters.getFromTime(), refundsParameters.getToTime());
 
             if (refundsParameters.getShopId() != null && refundsParameters.getShopIds() != null) {
-                checkParamsResult(true, String.format("Need to specify only one parameter: %s or %s", SHOP_ID_PARAM, SHOP_IDS_PARAM));
+                checkParamsResult(true,
+                        String.format("Need to specify only one parameter: %s or %s", SHOP_ID_PARAM, SHOP_IDS_PARAM));
             }
         }
     }
@@ -147,10 +163,15 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
     public static class RefundsParser extends AbstractQueryParser {
         private RefundsValidator validator = new RefundsValidator();
 
+        public static String getMainDescriptor() {
+            return FUNC_NAME;
+        }
+
         @Override
         public List<QueryPart> parseQuery(Map<String, Object> source, QueryPart parent) throws QueryParserException {
             Map<String, Object> funcSource = (Map) source.get(FUNC_NAME);
-            RefundsParameters parameters = getValidatedParameters(funcSource, parent, RefundsParameters::new, validator);
+            RefundsParameters parameters =
+                    getValidatedParameters(funcSource, parent, RefundsParameters::new, validator);
 
             return Stream.of(
                     new QueryPart(FUNC_NAME, parameters, parent)
@@ -164,32 +185,32 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
                     && RootQuery.RootParser.getMainDescriptor().equals(parent.getDescriptor())
                     && (source.get(FUNC_NAME) instanceof Map);
         }
-
-        public static String getMainDescriptor() {
-            return FUNC_NAME;
-        }
     }
 
     public static class RefundsBuilder extends AbstractQueryBuilder {
         private RefundsValidator validator = new RefundsValidator();
 
         @Override
-        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(RefundsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,
+                                QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildSingleQuery(RefundsParser.getMainDescriptor(), queryParts,
+                    queryPart -> createQuery(queryPart, continuationToken));
             validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 
         private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken)
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME,
+                            queryPart.getParameters(), continuationToken)
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
                     queryPart.getDescriptor(),
                     getParameters(queryPart.getParent()),
                     queries
             );
-            return createRefundsFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken, compositeQuery);
+            return createRefundsFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken,
+                    compositeQuery);
         }
 
         @Override
@@ -198,13 +219,8 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
         }
     }
 
-    private static RefundsFunction createRefundsFunction(Object descriptor, QueryParameters queryParameters, String continuationToken, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
-        RefundsFunction refundsFunction = new RefundsFunction(descriptor, queryParameters, continuationToken, subquery);
-        subquery.setParentQuery(refundsFunction);
-        return refundsFunction;
-    }
-
-    private static class GetDataFunction extends PagedBaseFunction<Map.Entry<Long, StatRefund>, Collection<Map.Entry<Long, StatRefund>>> {
+    private static class GetDataFunction
+            extends PagedBaseFunction<Map.Entry<Long, StatRefund>, Collection<Map.Entry<Long, StatRefund>>> {
         private static final String FUNC_NAME = RefundsFunction.FUNC_NAME + "_data";
 
         public GetDataFunction(Object descriptor, QueryParameters params, String continuationToken) {
@@ -212,9 +228,11 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
         }
 
         @Override
-        public QueryResult<Map.Entry<Long, StatRefund>, Collection<Map.Entry<Long, StatRefund>>> execute(QueryContext context) throws QueryExecutionException {
+        public QueryResult<Map.Entry<Long, StatRefund>, Collection<Map.Entry<Long, StatRefund>>> execute(
+                QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
-            RefundsParameters parameters = new RefundsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
+            RefundsParameters parameters =
+                    new RefundsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Collection<Map.Entry<Long, StatRefund>> result = functionContext.getSearchDao().getRefunds(
                         parameters,

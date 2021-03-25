@@ -17,7 +17,8 @@ public class RefundSearchQueryTest extends AbstractQueryTest {
 
     @Test
     public void testRefunds() {
-        String json = "{'query': {'refunds': {'merchant_id': 'PARTY_ID_1','shop_id': 'SHOP_ID_1','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
+        String json =
+                "{'query': {'refunds': {'merchant_id': 'PARTY_ID_1','shop_id': 'SHOP_ID_1','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
         assertEquals(3, statResponse.getData().getRefunds().size());
         DamselUtil.toJson(statResponse);
@@ -33,7 +34,8 @@ public class RefundSearchQueryTest extends AbstractQueryTest {
 
     @Test
     public void testExternalFailure() {
-        String json = "{'query': {'refunds': {'merchant_id': 'PARTY_ID_1','shop_id': 'SHOP_ID_1', 'refund_status': 'failed', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-28T18:10:10Z', 'size':'1'}}}";
+        String json =
+                "{'query': {'refunds': {'merchant_id': 'PARTY_ID_1','shop_id': 'SHOP_ID_1', 'refund_status': 'failed', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-28T18:10:10Z', 'size':'1'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
         assertTrue(statResponse.getData().getRefunds().stream().allMatch(
                 refund -> refund.getStatus().isSetFailed()

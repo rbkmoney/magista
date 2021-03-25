@@ -11,7 +11,8 @@ import java.util.List;
  */
 public interface QueryBuilder {
 
-    Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException;
+    Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,
+                     QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException;
 
     boolean apply(List<QueryPart> queryParts, QueryPart parent);
 }

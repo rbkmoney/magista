@@ -5,16 +5,17 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.*;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
-import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.query.impl.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -104,7 +105,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(),
+                        GREATER_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS)
@@ -121,11 +123,13 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                                             Operator.AND,
                                                             paymentParameterSource
                                                                     .addValue(PAYMENT_DATA.PARTY_ID,
-                                                                            Optional.ofNullable(parameters.getMerchantId())
+                                                                            Optional.ofNullable(
+                                                                                    parameters.getMerchantId())
                                                                                     .map(UUID::fromString)
                                                                                     .orElse(null),
                                                                             EQUALS)
-                                                                    .addValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                                                                    .addValue(PAYMENT_DATA.PARTY_SHOP_ID,
+                                                                            parameters.getShopId(), EQUALS)
                                                     ),
                                                     PAYMENT_DATA.PAYMENT_CREATED_AT,
                                                     fromTime,
@@ -199,7 +203,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         return fetch(query, statRefundMapper);
     }
 
-    private ConditionParameterSource prepareRefundCondition(RefundsFunction.RefundsParameters parameters, LocalDateTime whereTime) {
+    private ConditionParameterSource prepareRefundCondition(RefundsFunction.RefundsParameters parameters,
+                                                            LocalDateTime whereTime) {
         return new ConditionParameterSource()
                 .addValue(REFUND_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
                 .addValue(REFUND_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
@@ -238,7 +243,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                                         toEnumField(parameters.getPayoutStatus(), PayoutStatus.class),
                                                         EQUALS)
                                                 .addInConditionValue(PAYOUT_DATA.PAYOUT_STATUS,
-                                                        toEnumFields(parameters.getPayoutStatuses(), PayoutStatus.class))
+                                                        toEnumFields(parameters.getPayoutStatuses(),
+                                                                PayoutStatus.class))
                                                 .addValue(PAYOUT_DATA.PAYOUT_TYPE,
                                                         toEnumField(parameters.getPayoutType(), PayoutType.class),
                                                         EQUALS)
@@ -270,16 +276,21 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                         new ConditionParameterSource()
                                                 .addValue(CHARGEBACK_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
                                                 .addValue(CHARGEBACK_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                                                .addInConditionValue(CHARGEBACK_DATA.PARTY_SHOP_ID, parameters.getShopIds())
+                                                .addInConditionValue(CHARGEBACK_DATA.PARTY_SHOP_ID,
+                                                        parameters.getShopIds())
                                                 .addValue(CHARGEBACK_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                                                 .addValue(CHARGEBACK_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
-                                                .addValue(CHARGEBACK_DATA.CHARGEBACK_ID, parameters.getChargebackId(), EQUALS)
+                                                .addValue(CHARGEBACK_DATA.CHARGEBACK_ID, parameters.getChargebackId(),
+                                                        EQUALS)
                                                 .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_STATUS,
-                                                        toEnumFields(parameters.getChargebackStatuses(), ChargebackStatus.class))
+                                                        toEnumFields(parameters.getChargebackStatuses(),
+                                                                ChargebackStatus.class))
                                                 .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_STAGE,
-                                                        toEnumFields(parameters.getChargebackStages(), ChargebackStage.class))
+                                                        toEnumFields(parameters.getChargebackStages(),
+                                                                ChargebackStage.class))
                                                 .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_REASON_CATEGORY,
-                                                        toEnumFields(parameters.getChargebackCategories(), ChargebackCategory.class))
+                                                        toEnumFields(parameters.getChargebackCategories(),
+                                                                ChargebackCategory.class))
                                                 .addValue(CHARGEBACK_DATA.CHARGEBACK_CREATED_AT, whereTime, LESS)
                                 ),
                                 CHARGEBACK_DATA.CHARGEBACK_CREATED_AT,
@@ -293,7 +304,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     }
 
     /**
-     * merchant OKKO-specific, in general shouldn't be touched
+     * merchant OKKO-specific, in general shouldn't be touched.
      *
      * @author n.pospolita
      */
@@ -309,7 +320,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
 
         Query query = getDslContext()
                 .selectFrom(REFUND_DATA
-                        .join(PAYMENT_DATA).on(PAYMENT_DATA.INVOICE_ID.eq(REFUND_DATA.INVOICE_ID), PAYMENT_DATA.PAYMENT_ID.eq(REFUND_DATA.PAYMENT_ID))
+                        .join(PAYMENT_DATA).on(PAYMENT_DATA.INVOICE_ID.eq(REFUND_DATA.INVOICE_ID),
+                                PAYMENT_DATA.PAYMENT_ID.eq(REFUND_DATA.PAYMENT_ID))
                         .join(INVOICE_DATA).on(INVOICE_DATA.INVOICE_ID.eq(REFUND_DATA.INVOICE_ID))
                 )
                 .where(
@@ -327,7 +339,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     }
 
     /**
-     * merchant OKKO-specific, in general shouldn't be touched
+     * merchant OKKO-specific, in general shouldn't be touched.
      *
      * @author n.pospolita
      */
@@ -344,7 +356,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         Query query = getDslContext()
                 .select()
                 .from(PAYMENT_DATA
-                        .leftJoin(REFUND_DATA).on(REFUND_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID), REFUND_DATA.PAYMENT_ID.eq(PAYMENT_DATA.PAYMENT_ID))
+                        .leftJoin(REFUND_DATA).on(REFUND_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID),
+                                REFUND_DATA.PAYMENT_ID.eq(PAYMENT_DATA.PAYMENT_ID))
                         .join(INVOICE_DATA).on(INVOICE_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID))
                 )
                 .where(
@@ -377,14 +390,16 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addInConditionValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceIds())
                 .addValue(PAYMENT_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_STATUS,
-                        toEnumField(parameters.getPaymentStatus(), com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
+                        toEnumField(parameters.getPaymentStatus(),
+                                com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_FLOW,
                         toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
-                        toEnumField(parameters.getPaymentBankCardTokenProvider(), com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
+                        toEnumField(parameters.getPaymentBankCardTokenProvider(),
+                                com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
@@ -398,7 +413,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_ID, parameters.getPaymentTerminalId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(),
+                        GREATER_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime, LESS)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
@@ -409,7 +425,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     }
 
     /**
-     * merchant OKKO-specific, in general shouldn't be touched
+     * merchant OKKO-specific, in general shouldn't be touched.
      *
      * @author n.pospolita
      */
@@ -427,14 +443,16 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_STATUS,
-                        toEnumField(parameters.getPaymentStatus(), com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
+                        toEnumField(parameters.getPaymentStatus(),
+                                com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_FLOW,
                         toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
-                        toEnumField(parameters.getPaymentBankCardTokenProvider(), com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
+                        toEnumField(parameters.getPaymentBankCardTokenProvider(),
+                                com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
@@ -446,7 +464,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(), GREATER_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(),
+                        GREATER_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
                 .addValue(PAYMENT_DATA.EVENT_CREATED_AT, whereTime, LESS)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
@@ -459,7 +478,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
      *
      * @author n.pospolita
      */
-    private ConditionParameterSource prepareEnrichedRefundCondition(RefundsFunction.RefundsParameters parameters, LocalDateTime whereTime) {
+    private ConditionParameterSource prepareEnrichedRefundCondition(RefundsFunction.RefundsParameters parameters,
+                                                                    LocalDateTime whereTime) {
         return new ConditionParameterSource()
                 .addValue(REFUND_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
                 .addValue(REFUND_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)

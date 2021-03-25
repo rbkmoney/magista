@@ -54,7 +54,8 @@ public class AdjustmentCreatedMapper implements AdjustmentMapper {
 
         adjustmentData.setAdjustmentReason(invoicePaymentAdjustment.getReason());
 
-        adjustmentData.setAdjustmentStatus(TBaseUtil.unionFieldToEnum(invoicePaymentAdjustment.getStatus(), AdjustmentStatus.class));
+        adjustmentData.setAdjustmentStatus(
+                TBaseUtil.unionFieldToEnum(invoicePaymentAdjustment.getStatus(), AdjustmentStatus.class));
         adjustmentData.setAdjustmentStatusCreatedAt(
                 DamselUtil.getAdjustmentStatusCreatedAt(invoicePaymentAdjustment.getStatus())
         );
@@ -72,16 +73,21 @@ public class AdjustmentCreatedMapper implements AdjustmentMapper {
                         paymentAdjustmentState.getCashFlow().getScenario().getDomainRevision());
             }
             if (invoicePaymentAdjustment.getState().isSetStatusChange()) {
-                InvoicePaymentAdjustmentStatusChangeState paymentAdjustmentStatusChangeState = paymentAdjustmentState.getStatusChange();
-                InvoicePaymentAdjustmentStatusChange paymentAdjustmentStatusChange = paymentAdjustmentStatusChangeState.getScenario();
+                InvoicePaymentAdjustmentStatusChangeState paymentAdjustmentStatusChangeState =
+                        paymentAdjustmentState.getStatusChange();
+                InvoicePaymentAdjustmentStatusChange paymentAdjustmentStatusChange =
+                        paymentAdjustmentStatusChangeState.getScenario();
 
-                InvoicePaymentStatus invoicePaymentStatus = TBaseUtil.unionFieldToEnum(
-                        paymentAdjustmentStatusChange.getTargetStatus(),
-                        InvoicePaymentStatus.class);
+                InvoicePaymentStatus invoicePaymentStatus =
+                        TBaseUtil.unionFieldToEnum(
+                                paymentAdjustmentStatusChange.getTargetStatus(),
+                                InvoicePaymentStatus.class
+                        );
                 adjustmentData.setPaymentStatus(invoicePaymentStatus);
 
                 if (paymentAdjustmentStatusChange.getTargetStatus().isSetFailed()) {
-                    OperationFailure operationFailure = paymentAdjustmentStatusChange.getTargetStatus().getFailed().getFailure();
+                    OperationFailure operationFailure =
+                            paymentAdjustmentStatusChange.getTargetStatus().getFailed().getFailure();
                     adjustmentData.setPaymentOperationFailureClass(
                             TBaseUtil.unionFieldToEnum(operationFailure, FailureClass.class)
                     );

@@ -32,7 +32,8 @@ public class InvoiceListener implements MessageListener {
 
         handle(machineEvents, ack);
         ack.acknowledge();
-        log.info("Records have been committed, size={}, {}", messages.size(), toSummaryStringWithMachineEventValues(messages));
+        log.info("Records have been committed, size={}, {}", messages.size(),
+                toSummaryStringWithMachineEventValues(messages));
     }
 
     @Override
@@ -41,13 +42,12 @@ public class InvoiceListener implements MessageListener {
                 .map(machineEvent -> Map.entry(eventParser.parseEvent(machineEvent), machineEvent))
                 .filter(entry -> entry.getKey().isSetInvoiceChanges())
                 .map(entry -> {
-                            List<Map.Entry<InvoiceChange, MachineEvent>> invoiceChangesWithMachineEvent = new ArrayList<>();
-                            for (InvoiceChange invoiceChange : entry.getKey().getInvoiceChanges()) {
-                                invoiceChangesWithMachineEvent.add(Map.entry(invoiceChange, entry.getValue()));
-                            }
-                            return invoiceChangesWithMachineEvent;
-                        }
-                )
+                    List<Map.Entry<InvoiceChange, MachineEvent>> invoiceChangesWithMachineEvent = new ArrayList<>();
+                    for (InvoiceChange invoiceChange : entry.getKey().getInvoiceChanges()) {
+                        invoiceChangesWithMachineEvent.add(Map.entry(invoiceChange, entry.getValue()));
+                    }
+                    return invoiceChangesWithMachineEvent;
+                })
                 .flatMap(List::stream)
                 .sorted(Comparator.comparingLong(o -> o.getValue().getEventId()))
                 .collect(

@@ -14,7 +14,7 @@ import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 
 /**
- * merchant OKKO-specific, in general shouldn't be touched
+ * merchant OKKO-specific, in general shouldn't be touched.
  *
  * @author n.pospolita
  */
@@ -36,9 +36,8 @@ public class EnrichedStatInvoiceMapper implements RowMapper<Map.Entry<Long, Enri
                 new EnrichedStatInvoice(
                         statInvoiceMapper.mapRow(resultSet, i).getValue(),
                         List.of(statPaymentMapper.mapRow(resultSet, i).getValue()),
-                        StringUtils.isEmpty(resultSet.getString(REFUND_DATA.REFUND_ID.getName())) ?
-                                List.of() :
-                                List.of(statRefundMapper.mapRow(resultSet, i).getValue())
+                        StringUtils.isEmpty(resultSet.getString(REFUND_DATA.REFUND_ID.getName()))
+                                ? List.of() : List.of(statRefundMapper.mapRow(resultSet, i).getValue())
                 ));
     }
 

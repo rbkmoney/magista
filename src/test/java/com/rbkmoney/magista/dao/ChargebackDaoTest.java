@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ContextConfiguration(classes = {ChargebackDaoImpl.class})
 public class ChargebackDaoTest extends AbstractDaoTest {
@@ -26,7 +26,8 @@ public class ChargebackDaoTest extends AbstractDaoTest {
 
         chargebackDao.save(Collections.singletonList(chargebackData));
 
-        ChargebackData chargeback = chargebackDao.get(chargebackData.getInvoiceId(), chargebackData.getPaymentId(), chargebackData.getChargebackId());
+        ChargebackData chargeback = chargebackDao
+                .get(chargebackData.getInvoiceId(), chargebackData.getPaymentId(), chargebackData.getChargebackId());
         Assert.assertEquals(chargebackData, chargeback);
     }
 

@@ -55,7 +55,8 @@ public abstract class PagedBaseFunction<T, CT> extends ScopedBaseFunction<T, CT>
         public void validateQuery(Query query, QueryContext queryContext) throws IllegalArgumentException {
             super.validateQuery(query, queryContext);
             if (query instanceof PagedBaseFunction) {
-                validateContinuationToken(queryContext, query.getQueryParameters(), ((PagedBaseFunction) query).getContinuationToken());
+                validateContinuationToken(queryContext, query.getQueryParameters(),
+                        ((PagedBaseFunction) query).getContinuationToken());
             }
         }
 
@@ -72,9 +73,11 @@ public abstract class PagedBaseFunction<T, CT> extends ScopedBaseFunction<T, CT>
             );
         }
 
-        private void validateContinuationToken(QueryContext queryContext, QueryParameters queryParameters, String continuationToken) throws BadTokenException {
+        private void validateContinuationToken(QueryContext queryContext, QueryParameters queryParameters,
+                                               String continuationToken) throws BadTokenException {
             if (continuationToken != null) {
-                final boolean validToken = getContext(queryContext).getTokenGenService().validToken(queryParameters, continuationToken);
+                final boolean validToken =
+                        getContext(queryContext).getTokenGenService().validToken(queryParameters, continuationToken);
                 if (!validToken) {
                     throw new BadTokenException("Token validation failure");
                 }

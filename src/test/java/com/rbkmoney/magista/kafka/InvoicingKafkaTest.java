@@ -1,9 +1,9 @@
 package com.rbkmoney.magista.kafka;
 
+import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.Invoice;
 import com.rbkmoney.damsel.domain.InvoicePayment;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
-import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.geck.serializer.kit.mock.FieldHandler;
@@ -71,15 +71,12 @@ import static org.mockito.Mockito.verify;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class InvoicingKafkaTest {
 
-    private static final Map.Entry<FieldHandler, String[]> timeFields = Map.entry(
-            structHandler -> structHandler.value(Instant.now().toString()),
-            new String[]{"created_at", "at", "due"}
-    );
-
-
     public static final String SOURCE_ID = "source_id";
     public static final String SOURCE_NS = "source_ns";
-
+    private static final Map.Entry<FieldHandler, String[]> timeFields = Map.entry(
+            structHandler -> structHandler.value(Instant.now().toString()),
+            new String[] {"created_at", "at", "due"}
+    );
     @Autowired
     private InvoiceListener invoiceListener;
 
@@ -200,9 +197,11 @@ public class InvoicingKafkaTest {
                                         InvoicePaymentChangePayload.invoice_payment_refund_change(
                                                 new InvoicePaymentRefundChange(
                                                         invoicePaymentRefund.getId(),
-                                                        InvoicePaymentRefundChangePayload.invoice_payment_refund_created(
-                                                                new InvoicePaymentRefundCreated(invoicePaymentRefund, new ArrayList<>())
-                                                        )
+                                                        InvoicePaymentRefundChangePayload
+                                                                .invoice_payment_refund_created(
+                                                                        new InvoicePaymentRefundCreated(
+                                                                                invoicePaymentRefund, new ArrayList<>())
+                                                                )
                                                 )
                                         )
                                 )
@@ -212,13 +211,14 @@ public class InvoicingKafkaTest {
                                         InvoicePaymentChangePayload.invoice_payment_refund_change(
                                                 new InvoicePaymentRefundChange(
                                                         invoicePaymentRefund.getId(),
-                                                        InvoicePaymentRefundChangePayload.invoice_payment_refund_status_changed(
-                                                                new InvoicePaymentRefundStatusChanged(
-                                                                        InvoicePaymentRefundStatus.succeeded(
-                                                                                new InvoicePaymentRefundSucceeded()
+                                                        InvoicePaymentRefundChangePayload
+                                                                .invoice_payment_refund_status_changed(
+                                                                        new InvoicePaymentRefundStatusChanged(
+                                                                                InvoicePaymentRefundStatus.succeeded(
+                                                                                        new InvoicePaymentRefundSucceeded()
+                                                                                )
                                                                         )
                                                                 )
-                                                        )
                                                 )
 
                                         )
@@ -229,9 +229,11 @@ public class InvoicingKafkaTest {
                                         InvoicePaymentChangePayload.invoice_payment_adjustment_change(
                                                 new InvoicePaymentAdjustmentChange(
                                                         invoicePaymentAdjustment.getId(),
-                                                        InvoicePaymentAdjustmentChangePayload.invoice_payment_adjustment_created(
-                                                                new InvoicePaymentAdjustmentCreated(invoicePaymentAdjustment)
-                                                        )
+                                                        InvoicePaymentAdjustmentChangePayload
+                                                                .invoice_payment_adjustment_created(
+                                                                        new InvoicePaymentAdjustmentCreated(
+                                                                                invoicePaymentAdjustment)
+                                                                )
                                                 )
                                         )
                                 )
@@ -241,14 +243,16 @@ public class InvoicingKafkaTest {
                                         InvoicePaymentChangePayload.invoice_payment_adjustment_change(
                                                 new InvoicePaymentAdjustmentChange(
                                                         invoicePaymentAdjustment.getId(),
-                                                        InvoicePaymentAdjustmentChangePayload.invoice_payment_adjustment_status_changed(
-                                                                new InvoicePaymentAdjustmentStatusChanged(
-                                                                        InvoicePaymentAdjustmentStatus.captured(new InvoicePaymentAdjustmentCaptured(
-                                                                                        Instant.now().toString()
+                                                        InvoicePaymentAdjustmentChangePayload
+                                                                .invoice_payment_adjustment_status_changed(
+                                                                        new InvoicePaymentAdjustmentStatusChanged(
+                                                                                InvoicePaymentAdjustmentStatus.captured(
+                                                                                        new InvoicePaymentAdjustmentCaptured(
+                                                                                                Instant.now().toString()
+                                                                                        )
                                                                                 )
                                                                         )
                                                                 )
-                                                        )
                                                 )
                                         )
                                 )
@@ -257,8 +261,10 @@ public class InvoicingKafkaTest {
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_session_change(
                                                 new InvoicePaymentSessionChange(
-                                                        TargetInvoicePaymentStatus.processed(new InvoicePaymentProcessed()),
-                                                        SessionChangePayload.session_transaction_bound(sessionTransactionBound)
+                                                        TargetInvoicePaymentStatus
+                                                                .processed(new InvoicePaymentProcessed()),
+                                                        SessionChangePayload
+                                                                .session_transaction_bound(sessionTransactionBound)
                                                 )
                                         )
                                 )

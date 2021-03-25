@@ -3,8 +3,9 @@ package com.rbkmoney.magista.dao.impl.mapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
-import com.rbkmoney.damsel.domain.BankCardTokenProvider;
 import com.rbkmoney.damsel.domain.*;
+import com.rbkmoney.damsel.domain.BankCardTokenProvider;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.BankCard;
 import com.rbkmoney.damsel.merch_stat.CryptoCurrency;
 import com.rbkmoney.damsel.merch_stat.CustomerPayer;
@@ -48,11 +49,12 @@ import com.rbkmoney.damsel.merch_stat.RecurrentPayer;
 import com.rbkmoney.damsel.merch_stat.RussianBankAccount;
 import com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider;
 import com.rbkmoney.damsel.merch_stat.Wallet;
-import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.util.DamselUtil;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -69,9 +71,12 @@ import static com.rbkmoney.magista.domain.tables.PayoutData.PAYOUT_DATA;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 import static com.rbkmoney.magista.util.DamselUtil.jsonToTBase;
 
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MapperHelper {
 
-    static InvoiceStatus mapInvoiceStatus(ResultSet rs, com.rbkmoney.magista.domain.enums.InvoiceStatus invoiceStatusType, String eventCreatedAtString) throws SQLException {
+    static InvoiceStatus mapInvoiceStatus(ResultSet rs,
+                                          com.rbkmoney.magista.domain.enums.InvoiceStatus invoiceStatusType,
+                                          String eventCreatedAtString) throws SQLException {
         InvoiceStatus invoiceStatus;
         switch (invoiceStatusType) {
             case cancelled:
@@ -95,7 +100,8 @@ public class MapperHelper {
                 invoiceStatus = InvoiceStatus.fulfilled(invoiceFulfilled);
                 break;
             default:
-                throw new NotFoundException(String.format("Invoice status '%s' not found", invoiceStatusType.getLiteral()));
+                throw new NotFoundException(
+                        String.format("Invoice status '%s' not found", invoiceStatusType.getLiteral()));
         }
         return invoiceStatus;
     }
@@ -110,32 +116,39 @@ public class MapperHelper {
             case bank_card:
                 BankCard bankCard = new BankCard(
                         rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN.getName()),
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()), BankCardPaymentSystem.class),
+                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()),
+                                BankCardPaymentSystem.class),
                         rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6.getName()),
                         rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4.getName())
                 );
                 bankCard.setTokenProvider(
                         Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()))
-                                .map(bankCardTokenProvider -> TypeUtil.toEnumField(bankCardTokenProvider, BankCardTokenProvider.class))
+                                .map(bankCardTokenProvider -> TypeUtil
+                                        .toEnumField(bankCardTokenProvider, BankCardTokenProvider.class))
                                 .orElse(null)
                 );
                 return PaymentTool.bank_card(bankCard);
             case payment_terminal:
                 return PaymentTool.payment_terminal(new PaymentTerminal(
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER.getName()), TerminalPaymentProvider.class)
+                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER.getName()),
+                                TerminalPaymentProvider.class)
                 ));
             case digital_wallet:
                 return PaymentTool.digital_wallet(new DigitalWallet(
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()), DigitalWalletProvider.class),
+                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()),
+                                DigitalWalletProvider.class),
                         rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_ID.getName())
                 ));
             case crypto_currency:
-                return PaymentTool.crypto_currency(TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.CRYPTO_CURRENCY.getName()), CryptoCurrency.class));
+                return PaymentTool.crypto_currency(
+                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.CRYPTO_CURRENCY.getName()),
+                                CryptoCurrency.class));
             case mobile_commerce:
                 MobilePhone mobilePhone = new MobilePhone(rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_PHONE_CC.getName()),
                         rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_PHONE_CTN.getName()));
-                MobileOperator mobileOperator = TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_OPERATOR.getName()),
-                        MobileOperator.class);
+                MobileOperator mobileOperator =
+                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_OPERATOR.getName()),
+                                MobileOperator.class);
                 return PaymentTool.mobile_commerce(new MobileCommerce(mobileOperator, mobilePhone));
             default:
                 throw new NotFoundException(String.format("Payment tool '%s' not found", paymentToolType));
@@ -174,8 +187,10 @@ public class MapperHelper {
                 recurrentPayer.setPaymentTool(MapperHelper.buildPaymentTool(rs));
 
                 RecurrentParentPayment recurrentParentPayment = new RecurrentParentPayment();
-                recurrentParentPayment.setInvoiceId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_INVOICE_ID.getName()));
-                recurrentParentPayment.setPaymentId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_PAYMENT_ID.getName()));
+                recurrentParentPayment
+                        .setInvoiceId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_INVOICE_ID.getName()));
+                recurrentParentPayment
+                        .setPaymentId(rs.getString(PAYMENT_DATA.PAYMENT_RECURRENT_PAYER_PARENT_PAYMENT_ID.getName()));
                 recurrentPayer.setRecurrentParent(recurrentParentPayment);
 
                 return Payer.recurrent(recurrentPayer);
@@ -184,11 +199,13 @@ public class MapperHelper {
         }
     }
 
-    static void buildStatPaymentFlow(ResultSet rs, StatPayment statPayment, PaymentFlow paymentFlow) throws SQLException {
+    static void buildStatPaymentFlow(ResultSet rs, StatPayment statPayment, PaymentFlow paymentFlow)
+            throws SQLException {
         switch (paymentFlow) {
             case hold:
                 InvoicePaymentFlowHold invoicePaymentFlowHold = new InvoicePaymentFlowHold(
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_HOLD_ON_EXPIRATION.getName()), OnHoldExpiration.class),
+                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_HOLD_ON_EXPIRATION.getName()),
+                                OnHoldExpiration.class),
                         TypeUtil.temporalToString(
                                 rs.getObject(PAYMENT_DATA.PAYMENT_HOLD_UNTIL.getName(), LocalDateTime.class)
                         )
@@ -203,7 +220,10 @@ public class MapperHelper {
         }
     }
 
-    static InvoicePaymentStatus buildInvoicePaymentStatus(ResultSet rs, String eventCreatedAtString, com.rbkmoney.magista.domain.enums.InvoicePaymentStatus invoicePaymentStatus) throws SQLException {
+    static InvoicePaymentStatus buildInvoicePaymentStatus(
+            ResultSet rs,
+            String eventCreatedAtString,
+            com.rbkmoney.magista.domain.enums.InvoicePaymentStatus invoicePaymentStatus) throws SQLException {
         InvoicePaymentStatus paymentStatus;
         switch (invoicePaymentStatus) {
             case pending:
@@ -218,7 +238,8 @@ public class MapperHelper {
                 InvoicePaymentFailed invoicePaymentFailed = new InvoicePaymentFailed();
                 invoicePaymentFailed.setAt(eventCreatedAtString);
                 OperationFailure operationFailure = DamselUtil.toOperationFailure(
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_OPERATION_FAILURE_CLASS.getName()), FailureClass.class),
+                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_OPERATION_FAILURE_CLASS.getName()),
+                                FailureClass.class),
                         rs.getString(PAYMENT_DATA.PAYMENT_EXTERNAL_FAILURE.getName()),
                         rs.getString(PAYMENT_DATA.PAYMENT_EXTERNAL_FAILURE_REASON.getName())
                 );
@@ -246,13 +267,16 @@ public class MapperHelper {
                 paymentStatus = InvoicePaymentStatus.charged_back(new InvoicePaymentChargedBack());
                 break;
             default:
-                throw new NotFoundException(String.format("Payment status '%s' not found", invoicePaymentStatus.getLiteral()));
+                throw new NotFoundException(
+                        String.format("Payment status '%s' not found", invoicePaymentStatus.getLiteral()));
         }
         return paymentStatus;
     }
 
     static PayoutType toPayoutType(ResultSet rs) throws SQLException {
-        com.rbkmoney.magista.domain.enums.PayoutType payoutType = TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_TYPE.getName()), com.rbkmoney.magista.domain.enums.PayoutType.class);
+        com.rbkmoney.magista.domain.enums.PayoutType payoutType =
+                TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_TYPE.getName()),
+                        com.rbkmoney.magista.domain.enums.PayoutType.class);
         switch (payoutType) {
             case bank_account:
                 return PayoutType.bank_account(toPayoutAccount(rs));
@@ -264,7 +288,8 @@ public class MapperHelper {
     }
 
     static PayoutAccount toPayoutAccount(ResultSet rs) throws SQLException {
-        PayoutAccountType payoutAccountType = TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_TYPE.getName()), PayoutAccountType.class);
+        PayoutAccountType payoutAccountType =
+                TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_TYPE.getName()), PayoutAccountType.class);
         switch (payoutAccountType) {
             case RUSSIAN_PAYOUT_ACCOUNT:
                 RussianBankAccount russianBankAccount = new RussianBankAccount();
@@ -288,19 +313,30 @@ public class MapperHelper {
                 bankDetails.setBic(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_BIC.getName()));
                 bankDetails.setAbaRtn(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_ABA_RTN.getName()));
                 bankDetails.setAddress(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_ADDRESS.getName()));
-                bankDetails.setCountry(TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_COUNTRY_CODE.getName()), Residence.class));
+                bankDetails.setCountry(
+                        TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_COUNTRY_CODE.getName()),
+                                Residence.class));
                 internationalBankAccount.setBank(bankDetails);
 
                 InternationalBankAccount correspondentBankAccount = new InternationalBankAccount();
-                correspondentBankAccount.setAccountHolder(rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ACCOUNT.getName()));
-                correspondentBankAccount.setNumber(rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_NUMBER.getName()));
-                correspondentBankAccount.setIban(rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_IBAN.getName()));
+                correspondentBankAccount.setAccountHolder(
+                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ACCOUNT.getName()));
+                correspondentBankAccount.setNumber(
+                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_NUMBER.getName()));
+                correspondentBankAccount.setIban(
+                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_IBAN.getName()));
                 InternationalBankDetails correspondentBankDetails = new InternationalBankDetails();
-                correspondentBankDetails.setName(rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_NAME.getName()));
-                correspondentBankDetails.setBic(rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_BIC.getName()));
-                correspondentBankDetails.setAddress(rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ADDRESS.getName()));
-                correspondentBankDetails.setAbaRtn(rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ABA_RTN.getName()));
-                correspondentBankDetails.setCountry(TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_COUNTRY_CODE.getName()), Residence.class));
+                correspondentBankDetails.setName(
+                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_NAME.getName()));
+                correspondentBankDetails.setBic(rs
+                        .getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_BIC.getName()));
+                correspondentBankDetails.setAddress(
+                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ADDRESS.getName()));
+                correspondentBankDetails.setAbaRtn(
+                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ABA_RTN.getName()));
+                correspondentBankDetails.setCountry(TypeUtil.toEnumField(rs.getString(
+                        PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_COUNTRY_CODE.getName()),
+                        Residence.class));
                 correspondentBankAccount.setBank(correspondentBankDetails);
                 internationalBankAccount.setCorrespondentAccount(correspondentBankAccount);
 
@@ -332,14 +368,17 @@ public class MapperHelper {
     }
 
     static PayoutStatus toPayoutStatus(ResultSet rs) throws SQLException {
-        com.rbkmoney.magista.domain.enums.PayoutStatus payoutStatus = TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_STATUS.getName()), com.rbkmoney.magista.domain.enums.PayoutStatus.class);
+        com.rbkmoney.magista.domain.enums.PayoutStatus payoutStatus =
+                TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_STATUS.getName()),
+                        com.rbkmoney.magista.domain.enums.PayoutStatus.class);
         switch (payoutStatus) {
             case unpaid:
                 return PayoutStatus.unpaid(new PayoutUnpaid());
             case paid:
                 return PayoutStatus.paid(new PayoutPaid());
             case cancelled:
-                return PayoutStatus.cancelled(new PayoutCancelled(rs.getString(PAYOUT_DATA.PAYOUT_CANCEL_DETAILS.getName())));
+                return PayoutStatus
+                        .cancelled(new PayoutCancelled(rs.getString(PAYOUT_DATA.PAYOUT_CANCEL_DETAILS.getName())));
             case confirmed:
                 return PayoutStatus.confirmed(new PayoutConfirmed());
             default:
@@ -348,22 +387,26 @@ public class MapperHelper {
     }
 
     static InvoicePaymentRefundStatus toRefundStatus(ResultSet rs) throws SQLException {
-        RefundStatus refundStatus = TypeUtil.toEnumField(rs.getString(REFUND_DATA.REFUND_STATUS.getName()), RefundStatus.class);
+        RefundStatus refundStatus =
+                TypeUtil.toEnumField(rs.getString(REFUND_DATA.REFUND_STATUS.getName()), RefundStatus.class);
         switch (refundStatus) {
             case pending:
                 return InvoicePaymentRefundStatus.pending(new InvoicePaymentRefundPending());
             case succeeded:
                 return InvoicePaymentRefundStatus.succeeded(new InvoicePaymentRefundSucceeded(
-                        TypeUtil.temporalToString(rs.getObject(REFUND_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class))
+                        TypeUtil.temporalToString(
+                                rs.getObject(REFUND_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class))
                 ));
             case failed:
                 return InvoicePaymentRefundStatus.failed(new InvoicePaymentRefundFailed(
                         DamselUtil.toOperationFailure(
-                                TypeUtil.toEnumField(rs.getString(REFUND_DATA.REFUND_OPERATION_FAILURE_CLASS.getName()), FailureClass.class),
+                                TypeUtil.toEnumField(rs.getString(REFUND_DATA.REFUND_OPERATION_FAILURE_CLASS.getName()),
+                                        FailureClass.class),
                                 rs.getString(REFUND_DATA.REFUND_EXTERNAL_FAILURE.getName()),
                                 rs.getString(REFUND_DATA.REFUND_EXTERNAL_FAILURE_REASON.getName())
                         ),
-                        TypeUtil.temporalToString(rs.getObject(REFUND_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class))
+                        TypeUtil.temporalToString(
+                                rs.getObject(REFUND_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class))
                 ));
             default:
                 throw new NotFoundException(String.format("Refund status '%s' not found", refundStatus));
@@ -389,7 +432,8 @@ public class MapperHelper {
                 invoicePaymentChargebackCategory.setAuthorisation(new InvoicePaymentChargebackCategoryAuthorisation());
                 break;
             case processing_error:
-                invoicePaymentChargebackCategory.setProcessingError(new InvoicePaymentChargebackCategoryProcessingError());
+                invoicePaymentChargebackCategory
+                        .setProcessingError(new InvoicePaymentChargebackCategoryProcessingError());
                 break;
             default:
                 throw new NotFoundException(String.format("Chargeback category %s not found", chargebackCategory));

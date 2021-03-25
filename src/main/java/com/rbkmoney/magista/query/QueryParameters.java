@@ -12,10 +12,6 @@ import java.util.Objects;
  * Created by vpankrashkin on 23.08.16.
  */
 public class QueryParameters {
-    public interface QueryParametersRef<T extends QueryParameters> {
-        T newInstance(Map<String, Object> parameters, QueryParameters derivedParameters);
-    }
-
     private final Map<String, Object> parameters;
     private final QueryParameters derivedParameters;
 
@@ -29,7 +25,8 @@ public class QueryParameters {
     }
 
     public Object getParameter(String key, boolean deepSearch) {
-        return parameters.getOrDefault(key, deepSearch && derivedParameters != null ? derivedParameters.getParameter(key, deepSearch) : null);
+        return parameters.getOrDefault(key,
+                deepSearch && derivedParameters != null ? derivedParameters.getParameter(key, deepSearch) : null);
     }
 
     public Object setParameter(String key, Object value) {
@@ -106,11 +103,15 @@ public class QueryParameters {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         QueryParameters that = (QueryParameters) o;
-        return Objects.equals(parameters, that.parameters) &&
-                Objects.equals(derivedParameters, that.derivedParameters);
+        return Objects.equals(parameters, that.parameters)
+                && Objects.equals(derivedParameters, that.derivedParameters);
     }
 
     @Override
@@ -124,5 +125,9 @@ public class QueryParameters {
                 "parameters=" + parameters +
                 ", derivedParameters=" + (derivedParameters == null ? "null" : "notnull") +
                 '}';
+    }
+
+    public interface QueryParametersRef<T extends QueryParameters> {
+        T newInstance(Map<String, Object> parameters, QueryParameters derivedParameters);
     }
 }

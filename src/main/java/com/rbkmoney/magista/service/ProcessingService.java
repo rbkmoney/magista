@@ -14,6 +14,7 @@ import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,28 +26,23 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 public class ProcessingService {
 
+    private final List<PayoutMapper> mappers;
+    private final EventDao eventDao;
+    private final DefaultPollingEventPublisherBuilder payoutEventPublisherBuilder;
+    private final AtomicReference<PayoutEventFlow> payoutEventFlow = new AtomicReference<>();
+    private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
     @Value("${payouter.handler.queue.limit}")
     private int payoutHandlerQueueLimit;
-
     @Value("${payouter.handler.threadPoolSize}")
     private int payoutHandlerThreadPoolSize;
-
     @Value("${payouter.handler.timeout}")
     private int payoutHandlerTimeout;
 
-    private final List<PayoutMapper> mappers;
-
-    private final EventDao eventDao;
-
-    private final DefaultPollingEventPublisherBuilder payoutEventPublisherBuilder;
-
-    private final AtomicReference<PayoutEventFlow> payoutEventFlow = new AtomicReference<>();
-
-    private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
-
     @EventListener(ApplicationReadyEvent.class)
     public void start() {
-        PayoutEventFlow newPayoutEventFlow = new PayoutEventFlow(mappers, payoutEventPublisherBuilder, payoutHandlerThreadPoolSize, payoutHandlerQueueLimit, payoutHandlerTimeout);
+        PayoutEventFlow newPayoutEventFlow =
+                new PayoutEventFlow(mappers, payoutEventPublisherBuilder, payoutHandlerThreadPoolSize,
+                        payoutHandlerQueueLimit, payoutHandlerTimeout);
         if (payoutEventFlow.compareAndSet(null, newPayoutEventFlow)) {
             Optional<Long> lastEventId = getLastPayoutEventId();
             newPayoutEventFlow.start(lastEventId);

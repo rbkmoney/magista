@@ -27,16 +27,20 @@ public class PaymentChargebackService {
 
     private final PaymentService paymentService;
 
-    public ChargebackData getChargeback(String invoiceId, String paymentId, String chargebackId) throws NotFoundException, StorageException {
+    public ChargebackData getChargeback(String invoiceId, String paymentId, String chargebackId)
+            throws NotFoundException, StorageException {
         try {
             ChargebackData chargebackData = chargebackDao.get(invoiceId, paymentId, chargebackId);
             if (chargebackData == null) {
                 throw new NotFoundException(
-                        String.format("Chargeback not found, invoiceId='%s', paymentId='%s', chargebackId='%s'", invoiceId, paymentId, chargebackId));
+                        String.format("Chargeback not found, invoiceId='%s', paymentId='%s', chargebackId='%s'",
+                                invoiceId, paymentId, chargebackId));
             }
             return chargebackData;
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to get chargeback, invoiceId='%s', paymentId='%s', chargebackId='%s'", invoiceId, paymentId, chargebackId), ex);
+            throw new StorageException(
+                    String.format("Failed to get chargeback, invoiceId='%s', paymentId='%s', chargebackId='%s'",
+                            invoiceId, paymentId, chargebackId), ex);
         }
     }
 
@@ -46,7 +50,8 @@ public class PaymentChargebackService {
         List<ChargebackData> enrichedChargebackEvents = chargebackDataList.stream()
                 .map(chargeback -> {
                     if (chargeback.getEventType() == InvoiceEventType.INVOICE_PAYMENT_CHARGEBACK_CREATED) {
-                        PaymentData paymentData = paymentService.getPaymentData(chargeback.getInvoiceId(), chargeback.getPaymentId());
+                        PaymentData paymentData =
+                                paymentService.getPaymentData(chargeback.getInvoiceId(), chargeback.getPaymentId());
                         chargeback.setPartyId(paymentData.getPartyId().toString());
                         chargeback.setPartyShopId(paymentData.getPartyShopId());
                         if (chargeback.getChargebackStage() == null) {
@@ -60,20 +65,24 @@ public class PaymentChargebackService {
                     } else {
                         ChargebackData previousChargeback = chargebackDataMap.computeIfAbsent(
                                 chargeback.getInvoiceId() + chargeback.getPaymentId() + chargeback.getChargebackId(),
-                                key -> getChargeback(chargeback.getInvoiceId(), chargeback.getPaymentId(), chargeback.getChargebackId())
+                                key -> getChargeback(chargeback.getInvoiceId(), chargeback.getPaymentId(),
+                                        chargeback.getChargebackId())
                         );
                         BeanUtil.merge(previousChargeback, chargeback);
                     }
                     return chargeback;
                 })
-                .peek(chargeback -> chargebackDataMap.put(chargeback.getInvoiceId() + chargeback.getPaymentId() + chargeback.getChargebackId(), chargeback))
+                .peek(chargeback -> chargebackDataMap
+                        .put(chargeback.getInvoiceId() + chargeback.getPaymentId() + chargeback.getChargebackId(),
+                                chargeback))
                 .collect(Collectors.toList());
 
         try {
             chargebackDao.save(enrichedChargebackEvents);
             log.info("Chargeback events have been saved, size={}", enrichedChargebackEvents.size());
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save chargeback events, size=%d", enrichedChargebackEvents.size()), ex);
+            throw new StorageException(
+                    String.format("Failed to save chargeback events, size=%d", enrichedChargebackEvents.size()), ex);
         }
     }
 

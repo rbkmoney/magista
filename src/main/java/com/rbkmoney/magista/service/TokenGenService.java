@@ -57,7 +57,8 @@ public class TokenGenService {
 
     public boolean validToken(QueryParameters queryParameters, String validateToken) {
         TokenHolder validateTokenHolder = extractToken(validateToken);
-        LocalDateTime createdAt = LocalDateTime.ofInstant(Instant.parse(validateTokenHolder.getTimestamp()), ZoneOffset.UTC);
+        LocalDateTime createdAt =
+                LocalDateTime.ofInstant(Instant.parse(validateTokenHolder.getTimestamp()), ZoneOffset.UTC);
         String generatedToken = generateToken(queryParameters, createdAt);
         TokenHolder generatedTokenHolder = extractToken(generatedToken);
 

@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,8 @@ public class ChargebackDaoImpl extends AbstractDao implements ChargebackDao {
         List<Query> queries = chargebackDataList.stream()
                 .map(
                         refundData -> {
-                            ChargebackDataRecord chargebackDataRecord = getDslContext().newRecord(CHARGEBACK_DATA, refundData);
+                            ChargebackDataRecord chargebackDataRecord =
+                                    getDslContext().newRecord(CHARGEBACK_DATA, refundData);
                             chargebackDataRecord.changed(true);
                             chargebackDataRecord.changed(CHARGEBACK_DATA.ID, chargebackDataRecord.getId() != null);
                             return chargebackDataRecord;
@@ -50,7 +52,8 @@ public class ChargebackDaoImpl extends AbstractDao implements ChargebackDao {
                         chargebackDataRecord ->
                                 getDslContext().insertInto(CHARGEBACK_DATA)
                                         .set(chargebackDataRecord)
-                                        .onConflict(CHARGEBACK_DATA.INVOICE_ID, CHARGEBACK_DATA.PAYMENT_ID, CHARGEBACK_DATA.CHARGEBACK_ID)
+                                        .onConflict(CHARGEBACK_DATA.INVOICE_ID, CHARGEBACK_DATA.PAYMENT_ID,
+                                                CHARGEBACK_DATA.CHARGEBACK_ID)
                                         .doUpdate()
                                         .set(chargebackDataRecord)
                                         .where(CHARGEBACK_DATA.EVENT_ID.le(chargebackDataRecord.getEventId()))

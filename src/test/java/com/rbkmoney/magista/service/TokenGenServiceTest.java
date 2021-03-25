@@ -48,7 +48,8 @@ public class TokenGenServiceTest {
         final QueryParameters queryParameters = new QueryParameters(parameters, null);
 
         final String token = tokenGenService.generateToken(queryParameters, LocalDateTime.now());
-        Assert.assertTrue(tokenGenService.validToken(queryParameters, URLDecoder.decode(token, StandardCharsets.UTF_8)));
+        Assert.assertTrue(
+                tokenGenService.validToken(queryParameters, URLDecoder.decode(token, StandardCharsets.UTF_8)));
     }
 
     @Test
@@ -57,10 +58,13 @@ public class TokenGenServiceTest {
         parameters.put("test", 64);
         final Map<String, Object> derivedParameters = new HashMap<>();
         derivedParameters.put("test_2", 64);
-        final QueryParameters queryParameters = new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
+        final QueryParameters queryParameters =
+                new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
         final String firstToken = tokenGenService.generateToken(queryParameters, LocalDateTime.now());
         derivedParameters.put("test_3", 64);
-        final String secondToken = tokenGenService.generateToken(new QueryParameters(parameters, new QueryParameters(derivedParameters, null)), LocalDateTime.now());
+        final String secondToken = tokenGenService
+                .generateToken(new QueryParameters(parameters, new QueryParameters(derivedParameters, null)),
+                        LocalDateTime.now());
 
         Assert.assertFalse(tokenGenService.validToken(queryParameters, secondToken));
     }
@@ -85,8 +89,10 @@ public class TokenGenServiceTest {
         parameters.put("test", 64);
         final Map<String, Object> derivedParameters = new HashMap<>();
         derivedParameters.put("test_2", 64);
-        final QueryParameters queryParameters = new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
-        final boolean validToken = tokenGenService.validToken(queryParameters, "mH6CM2lOiArjXgVjEdKvQdQ0FpSF_AtmOXTkuoG5bZw;2019-08-07T16:26:39.611932Z");
+        final QueryParameters queryParameters =
+                new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
+        final boolean validToken = tokenGenService
+                .validToken(queryParameters, "mH6CM2lOiArjXgVjEdKvQdQ0FpSF_AtmOXTkuoG5bZw;2019-08-07T16:26:39.611932Z");
         Assert.assertTrue(validToken);
 
     }
@@ -97,7 +103,8 @@ public class TokenGenServiceTest {
         parameters.put("test", 64);
         final Map<String, Object> derivedParameters = new HashMap<>();
         derivedParameters.put("test_2", 64);
-        final QueryParameters queryParameters = new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
+        final QueryParameters queryParameters =
+                new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
         tokenGenService.validToken(queryParameters, "2019-08-07T16:26:39.611932Z");
     }
 
@@ -108,7 +115,8 @@ public class TokenGenServiceTest {
         final Map<String, Object> derivedParameters = new HashMap<>();
         derivedParameters.put("test_2", 64);
         LocalDateTime now = LocalDateTime.now();
-        final QueryParameters queryParameters = new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
+        final QueryParameters queryParameters =
+                new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
         String token = tokenGenService.generateToken(queryParameters, now);
         LocalDateTime tokenTime = tokenGenService.extractTime(token).get();
         assertEquals(now, tokenTime);

@@ -69,14 +69,16 @@ public class RootQuery extends BaseQuery {
             if (query instanceof RootQuery) {
                 Query childQuery = ((RootQuery) query).childQuery;
                 if (childQuery instanceof CompositeQuery) {
-                    Optional<? extends Collection> childQueries = Optional.ofNullable(((CompositeQuery) childQuery).getChildQueries());
+                    Optional<? extends Collection> childQueries =
+                            Optional.ofNullable(((CompositeQuery) childQuery).getChildQueries());
                     checkParamsResult(
                             !childQueries.isPresent() || childQueries.get().isEmpty(),
                             "Request must contain at least one query"
                     );
                 }
             } else if (query instanceof CompositeQuery) {
-                checkParamsResult(true, "Request can't hold more than one query, received count: " + ((CompositeQuery) query).getChildQueries().size());
+                checkParamsResult(true, "Request can't hold more than one query, received count: " +
+                        ((CompositeQuery) query).getChildQueries().size());
             } else {
                 assert false : "No other types expected here";
             }
@@ -85,6 +87,10 @@ public class RootQuery extends BaseQuery {
 
     public static class RootParser extends AbstractQueryParser {
         private RootValidator validator = new RootValidator();
+
+        public static String getMainDescriptor() {
+            return QUERY_PARAMETER;
+        }
 
         @Override
         public List<QueryPart> parseQuery(Map<String, Object> source, QueryPart parent) throws QueryParserException {
@@ -100,24 +106,24 @@ public class RootQuery extends BaseQuery {
         public boolean apply(Map source, QueryPart parent) {
             return parent == null;
         }
-
-        public static String getMainDescriptor() {
-            return QUERY_PARAMETER;
-        }
     }
 
     public static class RootBuilder extends AbstractQueryBuilder {
         private RootValidator validator = new RootValidator();
 
         @Override
-        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(RootParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryContext, queryPart, continuationToken, baseBuilder));
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,
+                                QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildSingleQuery(RootParser.getMainDescriptor(), queryParts,
+                    queryPart -> createQuery(queryContext, queryPart, continuationToken, baseBuilder));
             validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 
-        private RootQuery createQuery(QueryContext queryContext, QueryPart queryPart, String continuationToken, QueryBuilder baseBuilder) {
-            Query childQuery = baseBuilder.buildQuery(queryContext, queryPart.getChildren(), continuationToken, queryPart, baseBuilder);
+        private RootQuery createQuery(QueryContext queryContext, QueryPart queryPart, String continuationToken,
+                                      QueryBuilder baseBuilder) {
+            Query childQuery = baseBuilder
+                    .buildQuery(queryContext, queryPart.getChildren(), continuationToken, queryPart, baseBuilder);
             RootQuery rootQuery = new RootQuery(queryPart.getDescriptor(), queryPart.getParameters(), childQuery);
             childQuery.setParentQuery(rootQuery);
             return rootQuery;

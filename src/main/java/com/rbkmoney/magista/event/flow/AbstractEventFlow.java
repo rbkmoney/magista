@@ -31,7 +31,9 @@ public abstract class AbstractEventFlow {
 
     private AtomicBoolean isRun = new AtomicBoolean(false);
 
-    public AbstractEventFlow(String name, List<? extends Mapper> mappers, DefaultPollingEventPublisherBuilder defaultPollingEventPublisherBuilder, int threadPoolSize, int queueLimit, long timeout) {
+    public AbstractEventFlow(String name, List<? extends Mapper> mappers,
+                             DefaultPollingEventPublisherBuilder defaultPollingEventPublisherBuilder,
+                             int threadPoolSize, int queueLimit, long timeout) {
         this.threadGroup = new ThreadGroup(name + "Flow");
         this.threadGroup.setDaemon(true);
         this.mappers = mappers;

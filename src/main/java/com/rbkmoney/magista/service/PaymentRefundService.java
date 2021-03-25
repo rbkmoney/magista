@@ -25,15 +25,20 @@ public class PaymentRefundService {
 
     private final PaymentService paymentService;
 
-    public RefundData getRefund(String invoiceId, String paymentId, String refundId) throws NotFoundException, StorageException {
+    public RefundData getRefund(String invoiceId, String paymentId, String refundId)
+            throws NotFoundException, StorageException {
         try {
             RefundData refund = refundDao.get(invoiceId, paymentId, refundId);
             if (refund == null) {
-                throw new NotFoundException(String.format("Refund not found, invoiceId='%s', paymentId='%s', refundId='%s'", invoiceId, paymentId, refundId));
+                throw new NotFoundException(
+                        String.format("Refund not found, invoiceId='%s', paymentId='%s', refundId='%s'", invoiceId,
+                                paymentId, refundId));
             }
             return refund;
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to get refund, invoiceId='%s', paymentId='%s', refundId='%s'", invoiceId, paymentId, refundId), ex);
+            throw new StorageException(
+                    String.format("Failed to get refund, invoiceId='%s', paymentId='%s', refundId='%s'", invoiceId,
+                            paymentId, refundId), ex);
         }
     }
 
@@ -44,7 +49,8 @@ public class PaymentRefundService {
                 .map(refund -> {
                     switch (refund.getEventType()) {
                         case INVOICE_PAYMENT_REFUND_CREATED:
-                            PaymentData paymentData = paymentService.getPaymentData(refund.getInvoiceId(), refund.getPaymentId());
+                            PaymentData paymentData =
+                                    paymentService.getPaymentData(refund.getInvoiceId(), refund.getPaymentId());
                             refund.setPartyId(paymentData.getPartyId().toString());
                             refund.setPartyShopId(paymentData.getPartyShopId());
                             if (refund.getRefundAmount() == null) {
@@ -61,7 +67,9 @@ public class PaymentRefundService {
                             return refund;
                     }
                 })
-                .peek(refundData -> refundDataCacheMap.put(refundData.getInvoiceId() + refundData.getPaymentId() + refundData.getRefundId(), refundData))
+                .peek(refundData -> refundDataCacheMap
+                        .put(refundData.getInvoiceId() + refundData.getPaymentId() + refundData.getRefundId(),
+                                refundData))
                 .collect(Collectors.toList());
 
         try {

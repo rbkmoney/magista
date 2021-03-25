@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,8 @@ public class RefundDaoImpl extends AbstractDao implements RefundDao {
                         refundDataRecord ->
                                 getDslContext().insertInto(REFUND_DATA)
                                         .set(refundDataRecord)
-                                        .onConflict(REFUND_DATA.INVOICE_ID, REFUND_DATA.PAYMENT_ID, REFUND_DATA.REFUND_ID)
+                                        .onConflict(REFUND_DATA.INVOICE_ID, REFUND_DATA.PAYMENT_ID,
+                                                REFUND_DATA.REFUND_ID)
                                         .doUpdate()
                                         .set(refundDataRecord)
                                         .where(REFUND_DATA.EVENT_ID.le(refundDataRecord.getEventId()))

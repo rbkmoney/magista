@@ -29,7 +29,9 @@ public abstract class AbstractQueryBuilder implements QueryBuilder {
             Function<QueryContext, QueryResult<T, CT>> execFunction,
             BiFunction<QueryContext, List<QueryResult>, QueryResult<T, CT>> parallelExecFunction
     ) {
-        return BaseCompositeQuery.newInstance(descriptor, new QueryParameters(Collections.emptyMap(), derivedParameters), childQueries, execFunction, parallelExecFunction);
+        return BaseCompositeQuery
+                .newInstance(descriptor, new QueryParameters(Collections.emptyMap(), derivedParameters), childQueries,
+                        execFunction, parallelExecFunction);
     }
 
     protected CompositeQuery createCompositeQuery(
@@ -57,19 +59,22 @@ public abstract class AbstractQueryBuilder implements QueryBuilder {
             Function<QueryContext, QueryResult<T, CT>> execFunction,
             BiFunction<QueryContext, List<QueryResult>, QueryResult<T, CT>> parallelExecFunction
     ) {
-        return createCompositeQuery(descriptor, new QueryParameters(Collections.emptyMap(), null), childQueries, execFunction, parallelExecFunction);
+        return createCompositeQuery(descriptor, new QueryParameters(Collections.emptyMap(), null), childQueries,
+                execFunction, parallelExecFunction);
     }
 
     protected QueryParameters getParameters(QueryPart queryPart) {
         return queryPart == null ? null : queryPart.getParameters();
     }
 
-    protected List<Query> buildQueries(Object matchDescriptor, List<QueryPart> queryParts, Function<QueryPart, Query> queryCreator) {
+    protected List<Query> buildQueries(Object matchDescriptor, List<QueryPart> queryParts,
+                                       Function<QueryPart, Query> queryCreator) {
         List<QueryPart> matchedParts = getMatchedPartsStream(matchDescriptor, queryParts).collect(Collectors.toList());
         return matchedParts.stream().map(queryPart -> queryCreator.apply(queryPart)).collect(Collectors.toList());
     }
 
-    protected Query buildSingleQuery(Object matchDescriptor, List<QueryPart> queryParts, Function<QueryPart, Query> queryCreator) {
+    protected Query buildSingleQuery(Object matchDescriptor, List<QueryPart> queryParts,
+                                     Function<QueryPart, Query> queryCreator) {
         List<Query> queries = buildQueries(matchDescriptor, queryParts, queryCreator);
         if (queries.size() == 0) {
             throw new QueryBuilderException("No queries found in referred data");
@@ -89,6 +94,7 @@ public abstract class AbstractQueryBuilder implements QueryBuilder {
             BiFunction<QueryContext, List<QueryResult>, QueryResult<T, CT>> parallelExecFunction
     ) {
         List<Query> queries = buildQueries(matchDescriptor, queryParts, queryCreator);
-        return createCompositeQuery(queries.get(0).getDescriptor(), parentParameters, queries, execFunction, parallelExecFunction);
+        return createCompositeQuery(queries.get(0).getDescriptor(), parentParameters, queries, execFunction,
+                parallelExecFunction);
     }
 }

@@ -39,8 +39,22 @@ public class ChargebacksFunction
         this.subquery = subquery;
     }
 
+    private static ChargebacksFunction createChargebacksFunction(
+            Object descriptor,
+            QueryParameters queryParameters,
+            String continuationToken,
+            CompositeQuery<QueryResult, List<QueryResult>> subquery
+    ) {
+        ChargebacksFunction chargebacksFunction = new ChargebacksFunction(
+                descriptor, queryParameters, continuationToken, subquery
+        );
+        subquery.setParentQuery(chargebacksFunction);
+        return chargebacksFunction;
+    }
+
     @Override
-    public QueryResult<Map.Entry<Long, StatChargeback>, StatResponse> execute(QueryContext context) // TODO: StatChargeback
+    public QueryResult<Map.Entry<Long, StatChargeback>, StatResponse> execute(
+            QueryContext context) // TODO: StatChargeback
             throws QueryExecutionException {
         QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
 
@@ -53,7 +67,8 @@ public class ChargebacksFunction
             List<QueryResult> collectedResults
     ) throws QueryExecutionException {
         var chargebacksResult =
-                (QueryResult<Map.Entry<Long, StatChargeback>, List<Map.Entry<Long, StatChargeback>>>) collectedResults.get(0);
+                (QueryResult<Map.Entry<Long, StatChargeback>, List<Map.Entry<Long, StatChargeback>>>) collectedResults
+                        .get(0);
 
         return new BaseQueryResult<>(
                 () -> chargebacksResult.getDataStream(),
@@ -145,7 +160,8 @@ public class ChargebacksFunction
         @Override
         public void validateParameters(QueryParameters parameters) throws IllegalArgumentException {
             super.validateParameters(parameters);
-            ChargebacksParameters chargebacksParameters = super.checkParamsType(parameters, ChargebacksParameters.class);
+            ChargebacksParameters chargebacksParameters =
+                    super.checkParamsType(parameters, ChargebacksParameters.class);
 
             validateTimePeriod(chargebacksParameters.getFromTime(), chargebacksParameters.getToTime());
         }
@@ -153,6 +169,10 @@ public class ChargebacksFunction
 
     public static class ChargebacksParser extends AbstractQueryParser {
         private ChargebacksValidator validator = new ChargebacksValidator();
+
+        public static String getMainDescriptor() {
+            return FUNC_NAME;
+        }
 
         @Override
         public List<QueryPart> parseQuery(Map<String, Object> source, QueryPart parent)
@@ -170,10 +190,6 @@ public class ChargebacksFunction
             return parent != null
                     && RootQuery.RootParser.getMainDescriptor().equals(parent.getDescriptor())
                     && (source.get(FUNC_NAME) instanceof Map);
-        }
-
-        public static String getMainDescriptor() {
-            return FUNC_NAME;
         }
     }
 
@@ -197,8 +213,8 @@ public class ChargebacksFunction
 
         private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":"
-                            + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken)
+                    new GetDataFunction(queryPart.getDescriptor() + ":" +
+                            GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken)
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
                     queryPart.getDescriptor(),
@@ -217,19 +233,6 @@ public class ChargebacksFunction
         public boolean apply(List<QueryPart> queryParts, QueryPart parent) {
             return getMatchedPartsStream(ChargebacksParser.getMainDescriptor(), queryParts).findFirst().isPresent();
         }
-    }
-
-    private static ChargebacksFunction createChargebacksFunction(
-            Object descriptor,
-            QueryParameters queryParameters,
-            String continuationToken,
-            CompositeQuery<QueryResult, List<QueryResult>> subquery
-    ) {
-        ChargebacksFunction chargebacksFunction = new ChargebacksFunction(
-                descriptor, queryParameters, continuationToken, subquery
-        );
-        subquery.setParentQuery(chargebacksFunction);
-        return chargebacksFunction;
     }
 
     private static class GetDataFunction

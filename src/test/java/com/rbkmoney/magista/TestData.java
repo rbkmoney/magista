@@ -14,7 +14,8 @@ import java.time.Instant;
 public class TestData {
 
     public static InvoicePaymentChargebackChangePayload buildInvoiceChargebackChangePayload() {
-        InvoicePaymentChargebackChangePayload invoicePaymentChargebackChangePayload = new InvoicePaymentChargebackChangePayload();
+        InvoicePaymentChargebackChangePayload invoicePaymentChargebackChangePayload =
+                new InvoicePaymentChargebackChangePayload();
         InvoicePaymentChargebackCreated invoicePaymentChargebackCreated = new InvoicePaymentChargebackCreated();
         invoicePaymentChargebackCreated.setChargeback(TestData.buildChargebackCreate());
         invoicePaymentChargebackChangePayload.setInvoicePaymentChargebackCreated(invoicePaymentChargebackCreated);
@@ -25,7 +26,8 @@ public class TestData {
     public static InvoicePaymentChargeback buildChargebackCreate() {
         InvoicePaymentChargeback invoicePaymentChargeback = EnhancedRandom.random(
                 InvoicePaymentChargeback.class, "status", "reason", "stage", "created_at", "context");
-        invoicePaymentChargeback.setStatus(InvoicePaymentChargebackStatus.accepted(new InvoicePaymentChargebackAccepted()));
+        invoicePaymentChargeback
+                .setStatus(InvoicePaymentChargebackStatus.accepted(new InvoicePaymentChargebackAccepted()));
         invoicePaymentChargeback.setReason(
                 new InvoicePaymentChargebackReason()
                         .setCode("653")

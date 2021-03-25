@@ -5,7 +5,9 @@ import com.rbkmoney.magista.util.BeanUtil;
 import org.junit.Test;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class BeanUtilTest {
 

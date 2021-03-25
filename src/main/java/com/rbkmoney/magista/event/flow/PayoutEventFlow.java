@@ -14,7 +14,9 @@ public class PayoutEventFlow extends AbstractEventFlow {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public PayoutEventFlow(List<? extends Mapper> mappers, DefaultPollingEventPublisherBuilder defaultPollingEventPublisherBuilder, int threadPoolSize, int queueLimit, long timeout) {
+    public PayoutEventFlow(List<? extends Mapper> mappers,
+                           DefaultPollingEventPublisherBuilder defaultPollingEventPublisherBuilder, int threadPoolSize,
+                           int queueLimit, long timeout) {
         super("PayoutEvent", mappers, defaultPollingEventPublisherBuilder, threadPoolSize, queueLimit, timeout);
     }
 

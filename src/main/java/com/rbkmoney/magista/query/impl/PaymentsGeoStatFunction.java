@@ -33,7 +33,8 @@ public class PaymentsGeoStatFunction extends StatBaseFunction {
                     TypeUtil.toLocalDateTime(getQueryParameters().getToTime()),
                     getQueryParameters().getSplitInterval()
             );
-            return new BaseQueryResult<>(() -> result.stream(), () -> new StatResponse(StatResponseData.records(result.stream().collect(Collectors.toList()))));
+            return new BaseQueryResult<>(() -> result.stream(),
+                    () -> new StatResponse(StatResponseData.records(result.stream().collect(Collectors.toList()))));
         } catch (DaoException e) {
             throw new QueryExecutionException(e);
         }

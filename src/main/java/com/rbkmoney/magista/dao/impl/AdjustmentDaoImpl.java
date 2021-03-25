@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,8 @@ public class AdjustmentDaoImpl extends AbstractDao implements AdjustmentDao {
         List<Query> queries = adjustments.stream()
                 .map(
                         adjustmentData -> {
-                            AdjustmentDataRecord adjustmentDataRecord = getDslContext().newRecord(ADJUSTMENT_DATA, adjustmentData);
+                            AdjustmentDataRecord adjustmentDataRecord =
+                                    getDslContext().newRecord(ADJUSTMENT_DATA, adjustmentData);
                             adjustmentDataRecord.changed(true);
                             adjustmentDataRecord.changed(ADJUSTMENT_DATA.ID, adjustmentDataRecord.getId() != null);
                             return adjustmentDataRecord;
@@ -51,7 +53,8 @@ public class AdjustmentDaoImpl extends AbstractDao implements AdjustmentDao {
                         adjustmentDataRecord ->
                                 getDslContext().insertInto(ADJUSTMENT_DATA)
                                         .set(adjustmentDataRecord)
-                                        .onConflict(ADJUSTMENT_DATA.INVOICE_ID, ADJUSTMENT_DATA.PAYMENT_ID, ADJUSTMENT_DATA.ADJUSTMENT_ID)
+                                        .onConflict(ADJUSTMENT_DATA.INVOICE_ID, ADJUSTMENT_DATA.PAYMENT_ID,
+                                                ADJUSTMENT_DATA.ADJUSTMENT_ID)
                                         .doUpdate()
                                         .set(adjustmentDataRecord)
                                         .where(ADJUSTMENT_DATA.EVENT_ID.le(adjustmentDataRecord.getEventId()))

@@ -71,11 +71,13 @@ public abstract class ScopedBaseFunction<T, CT> extends BaseFunction<T, CT> {
             ScopedBaseParameters scopedParameters = super.checkParamsType(parameters, ScopedBaseParameters.class);
 
             if (scopedParameters.getShopId() != null && scopedParameters.getShopIds() != null) {
-                checkParamsResult(true, String.format("Need to specify only one parameter: %s or %s", SHOP_ID_PARAM, SHOP_IDS_PARAM));
+                checkParamsResult(true,
+                        String.format("Need to specify only one parameter: %s or %s", SHOP_ID_PARAM, SHOP_IDS_PARAM));
             }
 
-            if (!StringUtils.hasLength(scopedParameters.getMerchantId()) && (
-                    StringUtils.hasLength(scopedParameters.getShopId()) || !CollectionUtils.isEmpty(scopedParameters.getShopIds()))) {
+            if (!StringUtils.hasLength(scopedParameters.getMerchantId())
+                    && (StringUtils.hasLength(scopedParameters.getShopId())
+                    || !CollectionUtils.isEmpty(scopedParameters.getShopIds()))) {
                 checkParamsResult(true, SHOP_ID_PARAM, "when searching by shop_id/shop_ids, merchant_id must be set");
             }
         }

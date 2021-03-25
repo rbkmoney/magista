@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.0//EN"
+        "https://checkstyle.org/dtds/suppressions_1_0.dtd">
+
+<suppressions>
+    <suppress checks="MemberName"
+              files="DamselUtil.java"
+              lines="0-9999"/>
+    <suppress checks="ParameterName"
+              files="DamselUtil.java"
+              lines="0-9999"/>
+    <suppress checks="LineLength"
+              files="ChangeType.java"
+              lines="0-9999"/>
+    <suppress checks="LineLength"
+              files="AdjustmentInvoiceListenerTest.java"
+              lines="0-9999"/>
+    <suppress checks="LineLength"
+              files="InvoicingKafkaTest.java"
+              lines="0-9999"/>
+    <suppress checks="LineLength"
+              files="StatisticsQueryTest.java"
+              lines="0-9999"/>
+    <suppress checks="LineLength"
+              files="JsonQueryParserTest.java"
+              lines="0-9999"/>
+    <suppress checks="LineLength"
+              files="PaymentSearchQueryTest.java"
+              lines="0-9999"/>
+    <suppress checks="LineLength"
+              files="InvoiceSearchQueryTest.java"
+              lines="0-9999"/>
+    <suppress checks="LineLength"
+              files="EnrichedSearchQueryTest.java"
+              lines="0-9999"/>
+    <suppress checks="LineLength"
+              files="ChargebackSearchQueryTest.java"
+              lines="0-9999"/>
+    <suppress checks="LineLength"
+              files="RefundSearchQueryTest.java"
+              lines="0-9999"/>
+    <suppress checks="LineLength"
+              files="QueryBuilderImplTest.java"
+              lines="0-9999"/>
+    <suppress checks="ParameterName"
+              files="InvoicingKafkaTest.java"
+              lines="0-9999"/>
+</suppressions>
