@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  */
 public class DamselUtil {
 
-    public final static JsonProcessor jsonProcessor = new JsonProcessor();
+    public static final JsonProcessor jsonProcessor = new JsonProcessor();
 
     public static LocalDateTime getAdjustmentStatusCreatedAt(InvoicePaymentAdjustmentStatus adjustmentStatus) {
         switch (adjustmentStatus.getSetField()) {
@@ -72,7 +72,8 @@ public class DamselUtil {
         }
     }
 
-    public static long getAmount(List<FinalCashFlowPosting> finalCashFlowPostings, Predicate<FinalCashFlowPosting> predicate) {
+    public static long getAmount(List<FinalCashFlowPosting> finalCashFlowPostings,
+                                 Predicate<FinalCashFlowPosting> predicate) {
         return finalCashFlowPostings.stream()
                 .filter(predicate)
                 .mapToLong(posting -> posting.getVolume().getAmount())
@@ -122,7 +123,8 @@ public class DamselUtil {
         return jsonProcessor.process(jsonNode, new TBaseHandler<>(type));
     }
 
-    public static OperationFailure toOperationFailure(FailureClass failureClass, String failure, String failureDescription) {
+    public static OperationFailure toOperationFailure(FailureClass failureClass, String failure,
+                                                      String failureDescription) {
         switch (failureClass) {
             case operation_timeout:
                 return OperationFailure.operation_timeout(new OperationTimeout());
@@ -135,7 +137,8 @@ public class DamselUtil {
         }
     }
 
-    public static String toPayoutSummaryStatString(List<com.rbkmoney.damsel.payout_processing.PayoutSummaryItem> payoutSummaryItems) {
+    public static String toPayoutSummaryStatString(
+            List<com.rbkmoney.damsel.payout_processing.PayoutSummaryItem> payoutSummaryItems) {
         try {
             return new ObjectMapper().writeValueAsString(payoutSummaryItems.stream()
                     .map(

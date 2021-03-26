@@ -40,7 +40,8 @@ public class InvoiceService {
                         }
                         return invoiceData;
                     } catch (DaoException ex) {
-                        throw new StorageException(String.format("Failed to get invoice data, invoiceId='%s'", key), ex);
+                        throw new StorageException(String.format("Failed to get invoice data, invoiceId='%s'", key),
+                                ex);
                     }
                 }
         );
@@ -72,9 +73,12 @@ public class InvoiceService {
         try {
             invoiceDao.insert(invoiceCreatedEvents);
             invoiceDao.update(updatedInvoices);
-            log.info("Invoice events have been saved, batchSize={}, insertsCount={}, updatesCount={}", invoiceEvents.size(), invoiceCreatedEvents.size(), updatedInvoices.size());
+            log.info("Invoice events have been saved, batchSize={}, insertsCount={}, updatesCount={}",
+                    invoiceEvents.size(), invoiceCreatedEvents.size(), updatedInvoices.size());
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save invoice events, batchSize=%d, insertsCount=%d, updatesCount=%d", invoiceEvents.size(), invoiceCreatedEvents.size(), updatedInvoices.size()), ex);
+            throw new StorageException(
+                    String.format("Failed to save invoice events, batchSize=%d, insertsCount=%d, updatesCount=%d",
+                            invoiceEvents.size(), invoiceCreatedEvents.size(), updatedInvoices.size()), ex);
         }
     }
 

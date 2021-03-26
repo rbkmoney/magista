@@ -69,7 +69,8 @@ public class PayoutCreatedMapper implements PayoutMapper {
                     payoutData.setPayoutAccountInn(account.getInn());
                     LegalAgreement legalAgreement = account.getLegalAgreement();
                     payoutData.setPayoutAccountLegalAgreementId(legalAgreement.getLegalAgreementId());
-                    payoutData.setPayoutAccountLegalAgreementSignedAt(TypeUtil.stringToLocalDateTime(legalAgreement.getSignedAt()));
+                    payoutData.setPayoutAccountLegalAgreementSignedAt(
+                            TypeUtil.stringToLocalDateTime(legalAgreement.getSignedAt()));
                 } else if (payoutAccount.isSetInternationalPayoutAccount()) {
                     payoutData.setPayoutAccountType(PayoutAccountType.INTERNATIONAL_PAYOUT_ACCOUNT);
                     InternationalPayoutAccount account = payoutAccount.getInternationalPayoutAccount();
@@ -98,15 +99,19 @@ public class PayoutCreatedMapper implements PayoutMapper {
 
                     if (bankAccount.isSetCorrespondentAccount()) {
                         InternationalBankAccount correspondentAccount = bankAccount.getCorrespondentAccount();
-                        payoutData.setPayoutInternationalCorrespondentAccountBankAccount(correspondentAccount.getAccountHolder());
-                        payoutData.setPayoutInternationalCorrespondentAccountBankNumber(correspondentAccount.getNumber());
+                        payoutData.setPayoutInternationalCorrespondentAccountBankAccount(
+                                correspondentAccount.getAccountHolder());
+                        payoutData
+                                .setPayoutInternationalCorrespondentAccountBankNumber(correspondentAccount.getNumber());
                         payoutData.setPayoutInternationalCorrespondentAccountBankIban(correspondentAccount.getIban());
                         if (correspondentAccount.isSetBank()) {
                             InternationalBankDetails corrBankDetails = correspondentAccount.getBank();
                             payoutData.setPayoutInternationalCorrespondentAccountBankName(corrBankDetails.getName());
-                            payoutData.setPayoutInternationalCorrespondentAccountBankAddress(corrBankDetails.getAddress());
+                            payoutData.setPayoutInternationalCorrespondentAccountBankAddress(
+                                    corrBankDetails.getAddress());
                             payoutData.setPayoutInternationalCorrespondentAccountBankBic(corrBankDetails.getBic());
-                            payoutData.setPayoutInternationalCorrespondentAccountBankAbaRtn(corrBankDetails.getAbaRtn());
+                            payoutData
+                                    .setPayoutInternationalCorrespondentAccountBankAbaRtn(corrBankDetails.getAbaRtn());
                             payoutData.setPayoutInternationalCorrespondentAccountBankCountryCode(
                                     Optional.ofNullable(corrBankDetails.getCountry())
                                             .map(country -> country.toString())
@@ -117,7 +122,8 @@ public class PayoutCreatedMapper implements PayoutMapper {
 
                     LegalAgreement legalAgreement = account.getLegalAgreement();
                     payoutData.setPayoutAccountLegalAgreementId(legalAgreement.getLegalAgreementId());
-                    payoutData.setPayoutAccountLegalAgreementSignedAt(TypeUtil.stringToLocalDateTime(legalAgreement.getSignedAt()));
+                    payoutData.setPayoutAccountLegalAgreementSignedAt(
+                            TypeUtil.stringToLocalDateTime(legalAgreement.getSignedAt()));
                 }
             }
 

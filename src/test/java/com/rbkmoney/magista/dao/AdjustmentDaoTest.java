@@ -10,7 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.List;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ContextConfiguration(classes = {AdjustmentDaoImpl.class})
 public class AdjustmentDaoTest extends AbstractDaoTest {
@@ -24,7 +24,8 @@ public class AdjustmentDaoTest extends AbstractDaoTest {
 
         adjustmentDao.save(List.of(adjustment));
 
-        assertEquals(adjustment, adjustmentDao.get(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId()));
+        assertEquals(adjustment,
+                adjustmentDao.get(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId()));
     }
 
     @Test
@@ -38,7 +39,8 @@ public class AdjustmentDaoTest extends AbstractDaoTest {
         adjustmentDataWithPreviousEventId.setEventId(adjustmentData.getEventId() - 1);
 
         adjustmentDao.save(List.of(adjustmentDataWithPreviousEventId));
-        assertEquals(adjustmentData, adjustmentDao.get(adjustmentData.getInvoiceId(), adjustmentData.getPaymentId(), adjustmentData.getAdjustmentId()));
+        assertEquals(adjustmentData, adjustmentDao
+                .get(adjustmentData.getInvoiceId(), adjustmentData.getPaymentId(), adjustmentData.getAdjustmentId()));
     }
 
 }

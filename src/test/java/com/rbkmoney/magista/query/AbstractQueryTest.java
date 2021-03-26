@@ -48,7 +48,8 @@ public abstract class AbstractQueryTest extends AbstractDaoTest {
     @Before
     public void before() {
         QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao, searchDao, tokenGenService);
-        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
+        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(),
+                contextFactory);
     }
 
     @Configuration

@@ -10,7 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.List;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ContextConfiguration(classes = {RefundDaoImpl.class})
 public class RefundDaoTest extends AbstractDaoTest {
@@ -38,6 +38,7 @@ public class RefundDaoTest extends AbstractDaoTest {
         refundDataWithPreviousEventId.setEventId(refundData.getEventId() - 1);
 
         refundDao.save(List.of(refundDataWithPreviousEventId));
-        assertEquals(refundData, refundDao.get(refundData.getInvoiceId(), refundData.getPaymentId(), refundData.getRefundId()));
+        assertEquals(refundData,
+                refundDao.get(refundData.getInvoiceId(), refundData.getPaymentId(), refundData.getRefundId()));
     }
 }

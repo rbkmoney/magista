@@ -34,7 +34,8 @@ public class BeanUtil {
                         }
                     } catch (Throwable ex) {
                         throw new FatalBeanException(
-                                "Could not copy property '" + propertyDescriptor.getName() + "' from source to target", ex);
+                                "Could not copy property '" + propertyDescriptor.getName() + "' from source to target",
+                                ex);
                     }
                 }
             }

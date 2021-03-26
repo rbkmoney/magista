@@ -21,10 +21,12 @@ public class EnrichedSearchQueryTest extends AbstractQueryTest {
     @Test
     @Sql("classpath:data/sql/search/enriched_invoices_search_data.sql")
     public void testEnrichedPayments() {
-        String json = "{'query': {'enriched_payments': {'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
+        String json =
+                "{'query': {'enriched_payments': {'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
         assertEquals(4, statResponse.getData().getEnrichedInvoices().size());
-        assertEquals(3L, statResponse.getData().getEnrichedInvoices().stream().filter(enrichedStatInvoice -> enrichedStatInvoice.refunds.size() > 0).count());
+        assertEquals(3L, statResponse.getData().getEnrichedInvoices().stream()
+                .filter(enrichedStatInvoice -> enrichedStatInvoice.refunds.size() > 0).count());
         DamselUtil.toJson(statResponse);
     }
 
@@ -40,10 +42,12 @@ public class EnrichedSearchQueryTest extends AbstractQueryTest {
     @Test
     @Sql("classpath:data/sql/search/enriched_invoices_time_test.sql")
     public void testNewTimeRanges() {
-        String json = "{'query': {'enriched_payments': {'from_time': '3000-01-02T00:00:00Z','to_time': '3000-01-02T02:00:00Z'}}}";
+        String json =
+                "{'query': {'enriched_payments': {'from_time': '3000-01-02T00:00:00Z','to_time': '3000-01-02T02:00:00Z'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
         assertEquals(4, statResponse.getData().getEnrichedInvoices().size());
-        assertEquals(3L, statResponse.getData().getEnrichedInvoices().stream().filter(enrichedStatInvoice -> enrichedStatInvoice.refunds.size() > 0).count());
+        assertEquals(3L, statResponse.getData().getEnrichedInvoices().stream()
+                .filter(enrichedStatInvoice -> enrichedStatInvoice.refunds.size() > 0).count());
         DamselUtil.toJson(statResponse);
     }
 

@@ -25,27 +25,42 @@ import static com.rbkmoney.magista.query.impl.Parameters.*;
 /**
  * Created by vpankrashkin on 03.08.16.
  */
-public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvoice>, StatResponse> implements CompositeQuery<Map.Entry<Long, StatInvoice>, StatResponse> {
+public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvoice>, StatResponse>
+        implements CompositeQuery<Map.Entry<Long, StatInvoice>, StatResponse> {
 
     public static final String FUNC_NAME = "invoices";
 
     private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
-    private InvoicesFunction(Object descriptor, QueryParameters params, String continuationToken, CompositeQuery subquery) {
+    private InvoicesFunction(Object descriptor, QueryParameters params, String continuationToken,
+                             CompositeQuery subquery) {
         super(descriptor, params, FUNC_NAME, continuationToken);
         this.subquery = subquery;
     }
 
+    private static InvoicesFunction createInvoicesFunction(Object descriptor, QueryParameters queryParameters,
+                                                           String continuationToken,
+                                                           CompositeQuery<QueryResult, List<QueryResult>> subquery) {
+        InvoicesFunction invoicesFunction =
+                new InvoicesFunction(descriptor, queryParameters, continuationToken, subquery);
+        subquery.setParentQuery(invoicesFunction);
+        return invoicesFunction;
+    }
+
     @Override
-    public QueryResult<Map.Entry<Long, StatInvoice>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+    public QueryResult<Map.Entry<Long, StatInvoice>, StatResponse> execute(QueryContext context)
+            throws QueryExecutionException {
         QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
 
         return execute(context, collectedResults.getCollectedStream());
     }
 
     @Override
-    public QueryResult<Map.Entry<Long, StatInvoice>, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
-        QueryResult<Map.Entry<Long, StatInvoice>, List<Map.Entry<Long, StatInvoice>>> invoicesResult = (QueryResult<Map.Entry<Long, StatInvoice>, List<Map.Entry<Long, StatInvoice>>>) collectedResults.get(0);
+    public QueryResult<Map.Entry<Long, StatInvoice>, StatResponse> execute(QueryContext context,
+                                                                           List<QueryResult> collectedResults)
+            throws QueryExecutionException {
+        QueryResult<Map.Entry<Long, StatInvoice>, List<Map.Entry<Long, StatInvoice>>> invoicesResult =
+                (QueryResult<Map.Entry<Long, StatInvoice>, List<Map.Entry<Long, StatInvoice>>>) collectedResults.get(0);
 
         return new BaseQueryResult<>(
                 () -> invoicesResult.getDataStream(),
@@ -58,7 +73,8 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
                     StatResponse statResponse = new StatResponse(statResponseData);
 
                     List<Map.Entry<Long, StatInvoice>> invoiceStats = invoicesResult.getCollectedStream();
-                    if (!invoicesResult.getCollectedStream().isEmpty() && getQueryParameters().getSize() == invoiceStats.size()) {
+                    if (!invoicesResult.getCollectedStream().isEmpty()
+                            && getQueryParameters().getSize() == invoiceStats.size()) {
                         final String createdAt = invoiceStats.get(invoiceStats.size() - 1).getValue().getCreatedAt();
                         final String token = getContext(context)
                                 .getTokenGenService()
@@ -131,7 +147,8 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
             validateTimePeriod(paymentsParameters.getFromTime(), paymentsParameters.getToTime());
 
             if (paymentsParameters.getShopId() != null && paymentsParameters.getShopIds() != null) {
-                checkParamsResult(true, String.format("Need to specify only one parameter: %s or %s", SHOP_ID_PARAM, SHOP_IDS_PARAM));
+                checkParamsResult(true,
+                        String.format("Need to specify only one parameter: %s or %s", SHOP_ID_PARAM, SHOP_IDS_PARAM));
             }
         }
     }
@@ -139,10 +156,15 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
     public static class InvoicesParser extends AbstractQueryParser {
         private InvoicesValidator validator = new InvoicesValidator();
 
+        public static String getMainDescriptor() {
+            return FUNC_NAME;
+        }
+
         @Override
         public List<QueryPart> parseQuery(Map<String, Object> source, QueryPart parent) throws QueryParserException {
             Map<String, Object> funcSource = (Map) source.get(FUNC_NAME);
-            InvoicesParameters parameters = getValidatedParameters(funcSource, parent, InvoicesParameters::new, validator);
+            InvoicesParameters parameters =
+                    getValidatedParameters(funcSource, parent, InvoicesParameters::new, validator);
 
             return Stream.of(
                     new QueryPart(FUNC_NAME, parameters, parent)
@@ -156,33 +178,32 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
                     && RootQuery.RootParser.getMainDescriptor().equals(parent.getDescriptor())
                     && (source.get(FUNC_NAME) instanceof Map);
         }
-
-        public static String getMainDescriptor() {
-            return FUNC_NAME;
-        }
     }
-
 
     public static class InvoicesBuilder extends AbstractQueryBuilder {
         private InvoicesValidator validator = new InvoicesValidator();
 
         @Override
-        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(InvoicesParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,
+                                QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildSingleQuery(InvoicesParser.getMainDescriptor(), queryParts,
+                    queryPart -> createQuery(queryPart, continuationToken));
             validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 
         private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken)
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME,
+                            queryPart.getParameters(), continuationToken)
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
                     queryPart.getDescriptor(),
                     getParameters(queryPart.getParent()),
                     queries
             );
-            return createInvoicesFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken, compositeQuery);
+            return createInvoicesFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken,
+                    compositeQuery);
         }
 
         @Override
@@ -190,12 +211,6 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
             return getMatchedPartsStream(InvoicesParser.getMainDescriptor(), queryParts).findFirst().isPresent();
         }
 
-    }
-
-    private static InvoicesFunction createInvoicesFunction(Object descriptor, QueryParameters queryParameters, String continuationToken, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
-        InvoicesFunction invoicesFunction = new InvoicesFunction(descriptor, queryParameters, continuationToken, subquery);
-        subquery.setParentQuery(invoicesFunction);
-        return invoicesFunction;
     }
 
     private static class GetDataFunction extends PagedBaseFunction {
@@ -206,9 +221,11 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
         }
 
         @Override
-        public QueryResult<Map.Entry<Long, StatInvoice>, Collection<Map.Entry<Long, StatInvoice>>> execute(QueryContext context) throws QueryExecutionException {
+        public QueryResult<Map.Entry<Long, StatInvoice>, Collection<Map.Entry<Long, StatInvoice>>> execute(
+                QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
-            InvoicesParameters parameters = new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
+            InvoicesParameters parameters =
+                    new InvoicesParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Collection<Map.Entry<Long, StatInvoice>> result = functionContext.getSearchDao().getInvoices(
                         parameters,

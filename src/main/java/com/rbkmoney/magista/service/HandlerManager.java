@@ -11,7 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HandlerManager {
 
-    private final BatchHandler DEFAULT_BATCH_HANDLER = new UnsupportedBatchHandler();
+    private static final BatchHandler DEFAULT_BATCH_HANDLER = new UnsupportedBatchHandler();
 
     private final List<BatchHandler> handlers;
 

@@ -27,27 +27,42 @@ import static com.rbkmoney.magista.query.impl.Parameters.*;
 /**
  * Created by vpankrashkin on 03.08.16.
  */
-public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayment>, StatResponse> implements CompositeQuery<Map.Entry<Long, StatPayment>, StatResponse> {
+public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayment>, StatResponse>
+        implements CompositeQuery<Map.Entry<Long, StatPayment>, StatResponse> {
 
     public static final String FUNC_NAME = "payments";
 
     private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
-    private PaymentsFunction(Object descriptor, QueryParameters params, String continuationToken, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
+    private PaymentsFunction(Object descriptor, QueryParameters params, String continuationToken,
+                             CompositeQuery<QueryResult, List<QueryResult>> subquery) {
         super(descriptor, params, FUNC_NAME, continuationToken);
         this.subquery = subquery;
     }
 
+    private static PaymentsFunction createPaymentsFunction(Object descriptor, QueryParameters queryParameters,
+                                                           String continuationToken,
+                                                           CompositeQuery<QueryResult, List<QueryResult>> subquery) {
+        PaymentsFunction paymentsFunction =
+                new PaymentsFunction(descriptor, queryParameters, continuationToken, subquery);
+        subquery.setParentQuery(paymentsFunction);
+        return paymentsFunction;
+    }
+
     @Override
-    public QueryResult<Map.Entry<Long, StatPayment>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+    public QueryResult<Map.Entry<Long, StatPayment>, StatResponse> execute(QueryContext context)
+            throws QueryExecutionException {
         QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
 
         return execute(context, collectedResults.getCollectedStream());
     }
 
     @Override
-    public QueryResult<Map.Entry<Long, StatPayment>, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
-        QueryResult<Map.Entry<Long, StatPayment>, List<Map.Entry<Long, StatPayment>>> paymentsResult = (QueryResult<Map.Entry<Long, StatPayment>, List<Map.Entry<Long, StatPayment>>>) collectedResults.get(0);
+    public QueryResult<Map.Entry<Long, StatPayment>, StatResponse> execute(QueryContext context,
+                                                                           List<QueryResult> collectedResults)
+            throws QueryExecutionException {
+        QueryResult<Map.Entry<Long, StatPayment>, List<Map.Entry<Long, StatPayment>>> paymentsResult =
+                (QueryResult<Map.Entry<Long, StatPayment>, List<Map.Entry<Long, StatPayment>>>) collectedResults.get(0);
 
         return new BaseQueryResult<>(
                 () -> paymentsResult.getDataStream(),
@@ -264,13 +279,14 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
             boolean terminalMismatch = parameters.getPaymentBankCardTokenProvider() != null
                     && PaymentTool.bank_card != parameters.getPaymentMethod();
             if (bankCardMismatch || terminalMismatch) {
-                String provider = parameters.getPaymentTerminalProvider() != null ?
-                        PAYMENT_TERMINAL_PROVIDER_PARAM : PAYMENT_BANK_CARD_TOKEN_PROVIDER_PARAM;
+                String provider = parameters.getPaymentTerminalProvider() != null
+                        ? PAYMENT_TERMINAL_PROVIDER_PARAM : PAYMENT_BANK_CARD_TOKEN_PROVIDER_PARAM;
                 checkParamsResult(
                         true,
                         provider,
                         RootQuery.RootValidator.DEFAULT_ERR_MSG_STRING,
-                        String.format("Incorrect PaymentMethod %s and provider %s", parameters.getPaymentMethod(), provider)
+                        String.format("Incorrect PaymentMethod %s and provider %s", parameters.getPaymentMethod(),
+                                provider)
                 );
             }
         }
@@ -279,10 +295,15 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
     public static class PaymentsParser extends AbstractQueryParser {
         private PaymentsValidator validator = new PaymentsValidator();
 
+        public static String getMainDescriptor() {
+            return FUNC_NAME;
+        }
+
         @Override
         public List<QueryPart> parseQuery(Map<String, Object> source, QueryPart parent) throws QueryParserException {
             Map<String, Object> funcSource = (Map) source.get(FUNC_NAME);
-            PaymentsParameters parameters = getValidatedParameters(funcSource, parent, PaymentsParameters::new, validator);
+            PaymentsParameters parameters =
+                    getValidatedParameters(funcSource, parent, PaymentsParameters::new, validator);
 
             return Stream.of(
                     new QueryPart(FUNC_NAME, parameters, parent)
@@ -296,32 +317,32 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
                     && RootQuery.RootParser.getMainDescriptor().equals(parent.getDescriptor())
                     && (source.get(FUNC_NAME) instanceof Map);
         }
-
-        public static String getMainDescriptor() {
-            return FUNC_NAME;
-        }
     }
 
     public static class PaymentsBuilder extends AbstractQueryBuilder {
         private PaymentsValidator validator = new PaymentsValidator();
 
         @Override
-        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(PaymentsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,
+                                QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildSingleQuery(PaymentsParser.getMainDescriptor(), queryParts,
+                    queryPart -> createQuery(queryPart, continuationToken));
             validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 
         private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken)
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME,
+                            queryPart.getParameters(), continuationToken)
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
                     queryPart.getDescriptor(),
                     getParameters(queryPart.getParent()),
                     queries
             );
-            return createPaymentsFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken, compositeQuery);
+            return createPaymentsFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken,
+                    compositeQuery);
         }
 
         @Override
@@ -330,13 +351,8 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
         }
     }
 
-    private static PaymentsFunction createPaymentsFunction(Object descriptor, QueryParameters queryParameters, String continuationToken, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
-        PaymentsFunction paymentsFunction = new PaymentsFunction(descriptor, queryParameters, continuationToken, subquery);
-        subquery.setParentQuery(paymentsFunction);
-        return paymentsFunction;
-    }
-
-    private static class GetDataFunction extends PagedBaseFunction<Map.Entry<Long, StatPayment>, Collection<Map.Entry<Long, StatPayment>>> {
+    private static class GetDataFunction
+            extends PagedBaseFunction<Map.Entry<Long, StatPayment>, Collection<Map.Entry<Long, StatPayment>>> {
         private static final String FUNC_NAME = PaymentsFunction.FUNC_NAME + "_data";
 
         public GetDataFunction(Object descriptor, QueryParameters params, String continuationToken) {
@@ -344,9 +360,11 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
         }
 
         @Override
-        public QueryResult<Map.Entry<Long, StatPayment>, Collection<Map.Entry<Long, StatPayment>>> execute(QueryContext context) throws QueryExecutionException {
+        public QueryResult<Map.Entry<Long, StatPayment>, Collection<Map.Entry<Long, StatPayment>>> execute(
+                QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
-            PaymentsParameters parameters = new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
+            PaymentsParameters parameters =
+                    new PaymentsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Collection<Map.Entry<Long, StatPayment>> result = functionContext.getSearchDao().getPayments(
                         parameters,

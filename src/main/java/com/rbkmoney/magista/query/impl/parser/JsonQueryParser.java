@@ -22,6 +22,14 @@ public class JsonQueryParser implements QueryParser<String> {
 
     private final QueryParser<Map<String, Object>> queryPartParser;
 
+    public JsonQueryParser() {
+        this(new QueryParserImpl());
+    }
+
+    public JsonQueryParser(QueryParser<Map<String, Object>> queryPartParser) {
+        this.queryPartParser = queryPartParser;
+    }
+
     public static JsonQueryParser newWeakJsonQueryParser() {
         return new JsonQueryParser() {
             @Override
@@ -32,15 +40,6 @@ public class JsonQueryParser implements QueryParser<String> {
             }
         };
     }
-
-    public JsonQueryParser() {
-        this(new QueryParserImpl());
-    }
-
-    public JsonQueryParser(QueryParser<Map<String, Object>> queryPartParser) {
-        this.queryPartParser = queryPartParser;
-    }
-
 
     public List<QueryPart> parseQuery(String source) throws QueryParserException {
         return parseQuery(source, null);

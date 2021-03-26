@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomStreamOf;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ContextConfiguration(classes = {PaymentDaoImpl.class})
 public class PaymentDaoTest extends AbstractDaoTest {
@@ -101,7 +101,7 @@ public class PaymentDaoTest extends AbstractDaoTest {
         secondPaymentData.setPaymentFlow(PaymentFlow.hold);
         secondPaymentData.setPaymentHoldOnExpiration(OnHoldExpiration.cancel);
         secondPaymentData.setPaymentHoldUntil(LocalDateTime.now());
-        secondPaymentData.setPaymentContext(new byte[]{0, 1, 2});
+        secondPaymentData.setPaymentContext(new byte[] {0, 1, 2});
 
 
         List<PaymentData> payments = List.of(

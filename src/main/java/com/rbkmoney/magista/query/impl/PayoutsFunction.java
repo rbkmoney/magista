@@ -23,27 +23,41 @@ import java.util.stream.Stream;
 
 import static com.rbkmoney.magista.query.impl.Parameters.*;
 
-public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayout>, StatResponse> implements CompositeQuery<Map.Entry<Long, StatPayout>, StatResponse> {
+public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayout>, StatResponse>
+        implements CompositeQuery<Map.Entry<Long, StatPayout>, StatResponse> {
 
     public static final String FUNC_NAME = "payouts";
 
     private final CompositeQuery<QueryResult, List<QueryResult>> subquery;
 
-    private PayoutsFunction(Object descriptor, QueryParameters params, String continuationToken, CompositeQuery subquery) {
+    private PayoutsFunction(Object descriptor, QueryParameters params, String continuationToken,
+                            CompositeQuery subquery) {
         super(descriptor, params, FUNC_NAME, continuationToken);
         this.subquery = subquery;
     }
 
+    private static PayoutsFunction createPayoutsFunction(Object descriptor, QueryParameters queryParameters,
+                                                         String continuationToken,
+                                                         CompositeQuery<QueryResult, List<QueryResult>> subquery) {
+        PayoutsFunction payoutsFunction = new PayoutsFunction(descriptor, queryParameters, continuationToken, subquery);
+        subquery.setParentQuery(payoutsFunction);
+        return payoutsFunction;
+    }
+
     @Override
-    public QueryResult<Map.Entry<Long, StatPayout>, StatResponse> execute(QueryContext context) throws QueryExecutionException {
+    public QueryResult<Map.Entry<Long, StatPayout>, StatResponse> execute(QueryContext context)
+            throws QueryExecutionException {
         QueryResult<QueryResult, List<QueryResult>> collectedResults = subquery.execute(context);
 
         return execute(context, collectedResults.getCollectedStream());
     }
 
     @Override
-    public QueryResult<Map.Entry<Long, StatPayout>, StatResponse> execute(QueryContext context, List<QueryResult> collectedResults) throws QueryExecutionException {
-        QueryResult<Map.Entry<Long, StatPayout>, List<Map.Entry<Long, StatPayout>>> payoutsResult = (QueryResult<Map.Entry<Long, StatPayout>, List<Map.Entry<Long, StatPayout>>>) collectedResults.get(0);
+    public QueryResult<Map.Entry<Long, StatPayout>, StatResponse> execute(QueryContext context,
+                                                                          List<QueryResult> collectedResults)
+            throws QueryExecutionException {
+        QueryResult<Map.Entry<Long, StatPayout>, List<Map.Entry<Long, StatPayout>>> payoutsResult =
+                (QueryResult<Map.Entry<Long, StatPayout>, List<Map.Entry<Long, StatPayout>>>) collectedResults.get(0);
 
         return new BaseQueryResult<>(
                 () -> payoutsResult.getDataStream(),
@@ -135,10 +149,15 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
     public static class PayoutsParser extends AbstractQueryParser {
         private PayoutsValidator validator = new PayoutsValidator();
 
+        public static String getMainDescriptor() {
+            return FUNC_NAME;
+        }
+
         @Override
         public List<QueryPart> parseQuery(Map<String, Object> source, QueryPart parent) throws QueryParserException {
             Map<String, Object> funcSource = (Map) source.get(FUNC_NAME);
-            PayoutsParameters parameters = getValidatedParameters(funcSource, parent, PayoutsParameters::new, validator);
+            PayoutsParameters parameters =
+                    getValidatedParameters(funcSource, parent, PayoutsParameters::new, validator);
 
             return Stream.of(
                     new QueryPart(FUNC_NAME, parameters, parent)
@@ -152,32 +171,32 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
                     && RootQuery.RootParser.getMainDescriptor().equals(parent.getDescriptor())
                     && (source.get(FUNC_NAME) instanceof Map);
         }
-
-        public static String getMainDescriptor() {
-            return FUNC_NAME;
-        }
     }
 
     public static class PayoutsBuilder extends AbstractQueryBuilder {
         private PayoutsValidator validator = new PayoutsValidator();
 
         @Override
-        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(PayoutsParser.getMainDescriptor(), queryParts, queryPart -> createQuery(queryPart, continuationToken));
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,
+                                QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery = buildSingleQuery(PayoutsParser.getMainDescriptor(), queryParts,
+                    queryPart -> createQuery(queryPart, continuationToken));
             validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }
 
         private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
             List<Query> queries = Arrays.asList(
-                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME, queryPart.getParameters(), continuationToken)
+                    new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME,
+                            queryPart.getParameters(), continuationToken)
             );
             CompositeQuery<QueryResult, List<QueryResult>> compositeQuery = createCompositeQuery(
                     queryPart.getDescriptor(),
                     getParameters(queryPart.getParent()),
                     queries
             );
-            return createPayoutsFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken, compositeQuery);
+            return createPayoutsFunction(queryPart.getDescriptor(), queryPart.getParameters(), continuationToken,
+                    compositeQuery);
         }
 
         @Override
@@ -186,13 +205,8 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
         }
     }
 
-    private static PayoutsFunction createPayoutsFunction(Object descriptor, QueryParameters queryParameters, String continuationToken, CompositeQuery<QueryResult, List<QueryResult>> subquery) {
-        PayoutsFunction payoutsFunction = new PayoutsFunction(descriptor, queryParameters, continuationToken, subquery);
-        subquery.setParentQuery(payoutsFunction);
-        return payoutsFunction;
-    }
-
-    private static class GetDataFunction extends PagedBaseFunction<Map.Entry<Long, StatPayout>, Collection<Map.Entry<Long, StatPayout>>> {
+    private static class GetDataFunction
+            extends PagedBaseFunction<Map.Entry<Long, StatPayout>, Collection<Map.Entry<Long, StatPayout>>> {
         private static final String FUNC_NAME = PayoutsFunction.FUNC_NAME + "_data";
 
         public GetDataFunction(Object descriptor, QueryParameters params, String continuationToken) {
@@ -200,9 +214,11 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
         }
 
         @Override
-        public QueryResult<Map.Entry<Long, StatPayout>, Collection<Map.Entry<Long, StatPayout>>> execute(QueryContext context) throws QueryExecutionException {
+        public QueryResult<Map.Entry<Long, StatPayout>, Collection<Map.Entry<Long, StatPayout>>> execute(
+                QueryContext context) throws QueryExecutionException {
             FunctionQueryContext functionContext = getContext(context);
-            PayoutsParameters parameters = new PayoutsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
+            PayoutsParameters parameters =
+                    new PayoutsParameters(getQueryParameters(), getQueryParameters().getDerivedParameters());
             try {
                 Collection<Map.Entry<Long, StatPayout>> result = functionContext.getSearchDao().getPayouts(
                         parameters,

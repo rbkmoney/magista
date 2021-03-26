@@ -30,26 +30,23 @@ import java.time.Duration;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class AbstractIntegrationTest {
 
+    @ClassRule
+    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:11.4")
+            .withStartupTimeout(Duration.ofMinutes(5));
     protected QueryProcessorImpl queryProcessor;
-
     @Autowired
     private StatisticsDao statisticsDao;
-
     @Autowired
     private SearchDao searchDao;
-
     @Autowired
     private TokenGenService tokenGenService;
 
     @Before
     public void before() {
         QueryContextFactoryImpl contextFactory = new QueryContextFactoryImpl(statisticsDao, searchDao, tokenGenService);
-        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(), contextFactory);
+        queryProcessor = new QueryProcessorImpl(JsonQueryParser.newWeakJsonQueryParser(), new QueryBuilderImpl(),
+                contextFactory);
     }
-
-    @ClassRule
-    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:11.4")
-            .withStartupTimeout(Duration.ofMinutes(5));
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override

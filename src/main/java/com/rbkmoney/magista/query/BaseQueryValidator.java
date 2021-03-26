@@ -26,9 +26,11 @@ public abstract class BaseQueryValidator implements QueryValidator {
         }
     }
 
-    protected <T extends QueryParameters> T checkParamsType(QueryParameters parameters, Class<? extends QueryParameters> expectedType) {
+    protected <T extends QueryParameters> T checkParamsType(QueryParameters parameters,
+                                                            Class<? extends QueryParameters> expectedType) {
         if (!expectedType.isAssignableFrom(parameters.getClass())) {
-            checkParamsResult(true, "Parameters has wrong type:" + parameters.getClass() + ", expected: " + expectedType);
+            checkParamsResult(true,
+                    "Parameters has wrong type:" + parameters.getClass() + ", expected: " + expectedType);
         }
         return (T) parameters;
     }
@@ -47,8 +49,8 @@ public abstract class BaseQueryValidator implements QueryValidator {
 
     protected void checkParamsResult(boolean hasError, String fieldName, String msg, String additionalInfo) {
         if (hasError) {
-            checkParamsResult(hasError, "Validation failed for field: " + fieldName + ": " + msg
-                    + " (" + additionalInfo + ")");
+            checkParamsResult(hasError, "Validation failed for field: " + fieldName + ": " + msg +
+                    " (" + additionalInfo + ")");
         }
     }
 

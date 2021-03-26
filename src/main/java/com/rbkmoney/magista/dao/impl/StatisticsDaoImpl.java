@@ -12,6 +12,7 @@ import org.jooq.impl.SQLDataType;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,9 +32,12 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Collection<Map<String, String>> getPaymentsTurnoverStat(String merchantId, String shopId, LocalDateTime fromTime, LocalDateTime toTime, int splitInterval) {
+    public Collection<Map<String, String>> getPaymentsTurnoverStat(String merchantId, String shopId,
+                                                                   LocalDateTime fromTime, LocalDateTime toTime,
+                                                                   int splitInterval) {
         Field currencyCodeField = PAYMENT_DATA.PAYMENT_CURRENCY_CODE.as("currency_symbolic_code");
-        Field amountWithFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT.minus(PAYMENT_DATA.PAYMENT_FEE)).as("amount_with_fee");
+        Field amountWithFeeField =
+                DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT.minus(PAYMENT_DATA.PAYMENT_FEE)).as("amount_with_fee");
         Field amountWithoutFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT).as("amount_without_fee");
         Field spValField = buildSpValField(PAYMENT_DATA.PAYMENT_CREATED_AT, fromTime, splitInterval);
 
@@ -47,7 +51,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         appendDateTimeRangeConditions(
                                 PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(merchantId))
                                         .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId))
-                                        .and(PAYMENT_DATA.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
+                                        .and(PAYMENT_DATA.EVENT_TYPE
+                                                .eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
                                         .and(PAYMENT_DATA.PAYMENT_STATUS.in(InvoicePaymentStatus.captured)),
                                 PAYMENT_DATA.PAYMENT_CREATED_AT,
                                 fromTime,
@@ -69,11 +74,13 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Collection<Map<String, String>> getPaymentsGeoStat(String merchantId, String shopId, LocalDateTime fromTime, LocalDateTime toTime, int splitInterval) {
+    public Collection<Map<String, String>> getPaymentsGeoStat(String merchantId, String shopId, LocalDateTime fromTime,
+                                                              LocalDateTime toTime, int splitInterval) {
         Field countryIdField = PAYMENT_DATA.PAYMENT_COUNTRY_ID.as("country_id");
         Field cityIdField = PAYMENT_DATA.PAYMENT_CITY_ID.as("city_id");
         Field currencyCodeField = PAYMENT_DATA.PAYMENT_CURRENCY_CODE.as("currency_symbolic_code");
-        Field amountWithFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT.minus(PAYMENT_DATA.PAYMENT_FEE)).as("amount_with_fee");
+        Field amountWithFeeField =
+                DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT.minus(PAYMENT_DATA.PAYMENT_FEE)).as("amount_with_fee");
         Field amountWithoutFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT).as("amount_without_fee");
         Field spValField = buildSpValField(PAYMENT_DATA.PAYMENT_CREATED_AT, fromTime, splitInterval);
 
@@ -92,7 +99,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                         .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId))
                                         .and(PAYMENT_DATA.PAYMENT_COUNTRY_ID.isNotNull())
                                         .and(PAYMENT_DATA.PAYMENT_CITY_ID.isNotNull())
-                                        .and(PAYMENT_DATA.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
+                                        .and(PAYMENT_DATA.EVENT_TYPE
+                                                .eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
                                         .and(PAYMENT_DATA.PAYMENT_STATUS.in(InvoicePaymentStatus.captured)),
                                 PAYMENT_DATA.PAYMENT_CREATED_AT,
                                 fromTime,
@@ -118,7 +126,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Collection<Map<String, String>> getPaymentsConversionStat(String merchantId, String shopId, LocalDateTime fromTime, LocalDateTime toTime, int splitInterval) {
+    public Collection<Map<String, String>> getPaymentsConversionStat(String merchantId, String shopId,
+                                                                     LocalDateTime fromTime, LocalDateTime toTime,
+                                                                     int splitInterval) {
         Field totalCountField = DSL.sum(
                 DSL.when(PAYMENT_DATA.PAYMENT_STATUS.in(InvoicePaymentStatus.captured, InvoicePaymentStatus.failed), 1)
                         .otherwise(0)
@@ -138,8 +148,10 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         appendDateTimeRangeConditions(
                                 PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(merchantId))
                                         .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId))
-                                        .and(PAYMENT_DATA.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
-                                        .and(PAYMENT_DATA.PAYMENT_STATUS.in(InvoicePaymentStatus.captured, InvoicePaymentStatus.failed)),
+                                        .and(PAYMENT_DATA.EVENT_TYPE
+                                                .eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
+                                        .and(PAYMENT_DATA.PAYMENT_STATUS
+                                                .in(InvoicePaymentStatus.captured, InvoicePaymentStatus.failed)),
                                 PAYMENT_DATA.PAYMENT_CREATED_AT,
                                 fromTime,
                                 toTime
@@ -147,7 +159,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 ).groupBy(spValField)
                 .orderBy(spValField)
                 .asTable();
-        Field conversionField = countTable.field(successfulCountField).cast(SQLDataType.FLOAT).divide(DSL.greatest(countTable.field(totalCountField), 1)).as("conversion");
+        Field conversionField = countTable.field(successfulCountField).cast(SQLDataType.FLOAT)
+                .divide(DSL.greatest(countTable.field(totalCountField), 1)).as("conversion");
         Query query = getDslContext().select(
                 conversionField,
                 countTable.field(successfulCountField),
@@ -166,7 +179,9 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Collection<Map<String, String>> getCustomersRateStat(String merchantId, String shopId, LocalDateTime fromTime, LocalDateTime toTime, int splitInterval) {
+    public Collection<Map<String, String>> getCustomersRateStat(String merchantId, String shopId,
+                                                                LocalDateTime fromTime, LocalDateTime toTime,
+                                                                int splitInterval) {
         Field uniqCountField = DSL.count(PAYMENT_DATA.PAYMENT_FINGERPRINT).as("unic_count");
         Field spValField = buildSpValField(PAYMENT_DATA.PAYMENT_CREATED_AT, fromTime, splitInterval);
 
@@ -195,10 +210,13 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
     }
 
     @Override
-    public Collection<Map<String, String>> getPaymentsCardTypesStat(String merchantId, String shopId, LocalDateTime fromTime, LocalDateTime toTime, int splitInterval) {
+    public Collection<Map<String, String>> getPaymentsCardTypesStat(String merchantId, String shopId,
+                                                                    LocalDateTime fromTime, LocalDateTime toTime,
+                                                                    int splitInterval) {
         Field totalCountField = DSL.count(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM).as("total_count");
         Field paymentSystemField = PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.as("payment_system");
-        Field amountWithFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT.minus(PAYMENT_DATA.PAYMENT_FEE)).as("amount_with_fee");
+        Field amountWithFeeField =
+                DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT.minus(PAYMENT_DATA.PAYMENT_FEE)).as("amount_with_fee");
         Field amountWithoutFeeField = DSL.sum(PAYMENT_DATA.PAYMENT_AMOUNT).as("amount_without_fee");
         Field spValField = buildSpValField(PAYMENT_DATA.PAYMENT_CREATED_AT, fromTime, splitInterval);
 
@@ -214,7 +232,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                                 PAYMENT_DATA.PARTY_ID.eq(UUID.fromString(merchantId))
                                         .and(PAYMENT_DATA.PARTY_SHOP_ID.eq(shopId))
                                         .and(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.isNotNull())
-                                        .and(PAYMENT_DATA.EVENT_TYPE.eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
+                                        .and(PAYMENT_DATA.EVENT_TYPE
+                                                .eq(InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED))
                                         .and(PAYMENT_DATA.PAYMENT_STATUS.in(InvoicePaymentStatus.captured)),
                                 PAYMENT_DATA.PAYMENT_CREATED_AT,
                                 fromTime,

@@ -44,12 +44,12 @@ public class InvoiceListenerTest {
 
     @Test
     public void listenEmptyChanges() {
-        MachineEvent message = new MachineEvent();
-        List<MachineEvent> messages = List.of(message);
         Event event = new Event();
         EventPayload payload = new EventPayload();
         payload.setInvoiceChanges(new ArrayList<>());
         event.setPayload(payload);
+        MachineEvent message = new MachineEvent();
+        List<MachineEvent> messages = List.of(message);
         Mockito.when(eventParser.parseEvent(message)).thenReturn(payload);
 
         invoiceListener.handle(messages, ack);
@@ -67,19 +67,18 @@ public class InvoiceListenerTest {
 
     @Test
     public void listenChanges() {
-        MachineEvent message = new MachineEvent();
-        List<MachineEvent> messages = List.of(message);
         Event event = new Event();
         EventPayload payload = new EventPayload();
         ArrayList<InvoiceChange> invoiceChanges = new ArrayList<>();
         invoiceChanges.add(new InvoiceChange());
         payload.setInvoiceChanges(invoiceChanges);
         event.setPayload(payload);
+        MachineEvent message = new MachineEvent();
         Mockito.when(eventParser.parseEvent(message)).thenReturn(payload);
         Mockito.when(invoiceHandler.handle(any())).thenReturn(processor);
         Mockito.when(handlerManager.getHandler(any())).thenReturn(invoiceHandler);
 
-        invoiceListener.handle(messages, ack);
+        invoiceListener.handle(List.of(message), ack);
 
         Mockito.verify(invoiceHandler, Mockito.times(1)).handle(any());
         Mockito.verify(processor, Mockito.times(1)).execute();

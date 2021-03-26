@@ -36,13 +36,21 @@ public class SimpleConditionField<T> implements ConditionField<T, T> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         SimpleConditionField<?> that = (SimpleConditionField<?>) o;
 
-        if (!Objects.equals(field, that.field)) return false;
-        if (!Objects.equals(value, that.value)) return false;
+        if (!Objects.equals(field, that.field)) {
+            return false;
+        }
+        if (!Objects.equals(value, that.value)) {
+            return false;
+        }
         return comparator == that.comparator;
     }
 

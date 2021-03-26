@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.listener;
 
-import com.rbkmoney.damsel.domain.InvoicePaymentAdjustmentPending;
 import com.rbkmoney.damsel.domain.*;
+import com.rbkmoney.damsel.domain.InvoicePaymentAdjustmentPending;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.dao.AbstractDaoTest;
@@ -82,20 +82,28 @@ public class AdjustmentInvoiceListenerTest extends AbstractDaoTest {
                                         InvoicePaymentChangePayload.invoice_payment_adjustment_change(
                                                 new InvoicePaymentAdjustmentChange(
                                                         "adjustment_id",
-                                                        InvoicePaymentAdjustmentChangePayload.invoice_payment_adjustment_created(
-                                                                new InvoicePaymentAdjustmentCreated(
-                                                                        new InvoicePaymentAdjustment()
-                                                                                .setId("adjustment_id")
-                                                                                .setCreatedAt(Instant.now().toString())
-                                                                                .setDomainRevision(1)
-                                                                                .setStatus(InvoicePaymentAdjustmentStatus.pending(new InvoicePaymentAdjustmentPending()))
-                                                                                .setReason("reason")
-                                                                                .setPartyRevision(1)
-                                                                                .setNewCashFlow(Lists.emptyList())
-                                                                                .setOldCashFlowInverse(Lists.emptyList())
-                                                                                .setState(buildInvoicePaymentAdjustmentState())
+                                                        InvoicePaymentAdjustmentChangePayload
+                                                                .invoice_payment_adjustment_created(
+                                                                        new InvoicePaymentAdjustmentCreated(
+                                                                                new InvoicePaymentAdjustment()
+                                                                                        .setId("adjustment_id")
+                                                                                        .setCreatedAt(Instant.now()
+                                                                                                .toString())
+                                                                                        .setDomainRevision(1)
+                                                                                        .setStatus(
+                                                                                                InvoicePaymentAdjustmentStatus
+                                                                                                        .pending(
+                                                                                                                new InvoicePaymentAdjustmentPending()))
+                                                                                        .setReason("reason")
+                                                                                        .setPartyRevision(1)
+                                                                                        .setNewCashFlow(
+                                                                                                Lists.emptyList())
+                                                                                        .setOldCashFlowInverse(
+                                                                                                Lists.emptyList())
+                                                                                        .setState(
+                                                                                                buildInvoicePaymentAdjustmentState())
+                                                                        )
                                                                 )
-                                                        )
                                                 )
                                         )
                                 )
@@ -111,13 +119,16 @@ public class AdjustmentInvoiceListenerTest extends AbstractDaoTest {
                                         InvoicePaymentChangePayload.invoice_payment_adjustment_change(
                                                 new InvoicePaymentAdjustmentChange(
                                                         "adjustment_id",
-                                                        InvoicePaymentAdjustmentChangePayload.invoice_payment_adjustment_status_changed(
-                                                                new InvoicePaymentAdjustmentStatusChanged(
-                                                                        InvoicePaymentAdjustmentStatus.captured(
-                                                                                new InvoicePaymentAdjustmentCaptured(Instant.now().toString())
+                                                        InvoicePaymentAdjustmentChangePayload
+                                                                .invoice_payment_adjustment_status_changed(
+                                                                        new InvoicePaymentAdjustmentStatusChanged(
+                                                                                InvoicePaymentAdjustmentStatus.captured(
+                                                                                        new InvoicePaymentAdjustmentCaptured(
+                                                                                                Instant.now()
+                                                                                                        .toString())
+                                                                                )
                                                                         )
                                                                 )
-                                                        )
                                                 )
                                         )
                                 )
@@ -129,16 +140,18 @@ public class AdjustmentInvoiceListenerTest extends AbstractDaoTest {
         );
 
         adjustmentBatchHandler.handle(events).execute();
-        AdjustmentData adjustmentData = paymentAdjustmentService.getAdjustment("invoice_id", "payment_id", "adjustment_id");
+        AdjustmentData adjustmentData =
+                paymentAdjustmentService.getAdjustment("invoice_id", "payment_id", "adjustment_id");
         assertEquals(0L, (long) adjustmentData.getAdjustmentFee());
 
     }
 
     @NotNull
     private InvoicePaymentAdjustmentState buildInvoicePaymentAdjustmentState() {
-        InvoicePaymentAdjustmentState invoicePaymentAdjustmentState = new InvoicePaymentAdjustmentState();
-        InvoicePaymentAdjustmentStatusChangeState invoicePaymentAdjustmentStatusChangeState = new InvoicePaymentAdjustmentStatusChangeState();
-        InvoicePaymentAdjustmentStatusChange invoicePaymentAdjustmentStatusChange = new InvoicePaymentAdjustmentStatusChange();
+        InvoicePaymentAdjustmentStatusChangeState invoicePaymentAdjustmentStatusChangeState =
+                new InvoicePaymentAdjustmentStatusChangeState();
+        InvoicePaymentAdjustmentStatusChange invoicePaymentAdjustmentStatusChange =
+                new InvoicePaymentAdjustmentStatusChange();
         InvoicePaymentStatus invoicePaymentStatus = new InvoicePaymentStatus();
         invoicePaymentStatus.setFailed(
                 new InvoicePaymentFailed(
@@ -155,6 +168,7 @@ public class AdjustmentInvoiceListenerTest extends AbstractDaoTest {
         );
         invoicePaymentAdjustmentStatusChange.setTargetStatus(invoicePaymentStatus);
         invoicePaymentAdjustmentStatusChangeState.setScenario(invoicePaymentAdjustmentStatusChange);
+        InvoicePaymentAdjustmentState invoicePaymentAdjustmentState = new InvoicePaymentAdjustmentState();
         invoicePaymentAdjustmentState.setStatusChange(invoicePaymentAdjustmentStatusChangeState);
         return invoicePaymentAdjustmentState;
     }

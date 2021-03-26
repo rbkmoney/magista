@@ -85,8 +85,8 @@ public abstract class StatBaseFunction extends ScopedBaseFunction<Map<String, St
     }
 
     public static class StatBaseParser extends AbstractQueryParser {
-        private StatBaseValidator validator = new StatBaseValidator();
         private final String funcName;
+        private StatBaseValidator validator = new StatBaseValidator();
 
         public StatBaseParser(String funcName) {
             this.funcName = funcName;
@@ -95,7 +95,8 @@ public abstract class StatBaseFunction extends ScopedBaseFunction<Map<String, St
         @Override
         public List<QueryPart> parseQuery(Map<String, Object> source, QueryPart parent) throws QueryParserException {
             Map<String, Object> funcSource = (Map) source.get(funcName);
-            StatBaseParameters parameters = getValidatedParameters(funcSource, parent, StatBaseParameters::new, validator);
+            StatBaseParameters parameters =
+                    getValidatedParameters(funcSource, parent, StatBaseParameters::new, validator);
 
             return Stream.of(
                     new QueryPart(funcName, parameters, parent)
@@ -115,8 +116,10 @@ public abstract class StatBaseFunction extends ScopedBaseFunction<Map<String, St
         private StatBaseValidator validator = new StatBaseValidator();
 
         @Override
-        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken, QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
-            Query resultQuery = buildSingleQuery(getDescriptor(queryParts), queryParts, queryPart -> createQuery(queryPart));
+        public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,
+                                QueryPart parentQueryPart, QueryBuilder baseBuilder) throws QueryBuilderException {
+            Query resultQuery =
+                    buildSingleQuery(getDescriptor(queryParts), queryParts, queryPart -> createQuery(queryPart));
             validator.validateQuery(resultQuery, queryContext);
             return resultQuery;
         }

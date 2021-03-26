@@ -27,15 +27,20 @@ public class PaymentAdjustmentService {
 
     private final PaymentService paymentService;
 
-    public AdjustmentData getAdjustment(String invoiceId, String paymentId, String adjustmentId) throws StorageException {
+    public AdjustmentData getAdjustment(String invoiceId, String paymentId, String adjustmentId)
+            throws StorageException {
         try {
             AdjustmentData adjustment = adjustmentDao.get(invoiceId, paymentId, adjustmentId);
             if (adjustment == null) {
-                throw new NotFoundException(String.format("Adjustment not found, invoiceId='%s', paymentId='%s', adjustmentId='%s'", invoiceId, paymentId, adjustmentId));
+                throw new NotFoundException(
+                        String.format("Adjustment not found, invoiceId='%s', paymentId='%s', adjustmentId='%s'",
+                                invoiceId, paymentId, adjustmentId));
             }
             return adjustment;
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to get adjustment, invoiceId='%s', paymentId='%s', adjustmentId='%s'", invoiceId, paymentId, adjustmentId), ex);
+            throw new StorageException(
+                    String.format("Failed to get adjustment, invoiceId='%s', paymentId='%s', adjustmentId='%s'",
+                            invoiceId, paymentId, adjustmentId), ex);
         }
     }
 
@@ -47,50 +52,58 @@ public class PaymentAdjustmentService {
                 .map(adjustment -> {
                     switch (adjustment.getEventType()) {
                         case INVOICE_PAYMENT_ADJUSTMENT_CREATED:
-                            PaymentData paymentData = paymentService.getPaymentData(adjustment.getInvoiceId(), adjustment.getPaymentId());
+                            PaymentData paymentData =
+                                    paymentService.getPaymentData(adjustment.getInvoiceId(), adjustment.getPaymentId());
                             adjustment.setPartyId(paymentData.getPartyId().toString());
                             adjustment.setPartyShopId(paymentData.getPartyShopId());
                             return adjustment;
                         default:
                             AdjustmentData previousAdjustmentEvent = adjustmentDataCacheMap.computeIfAbsent(
-                                    adjustment.getInvoiceId() + adjustment.getPaymentId() + adjustment.getAdjustmentId(),
-                                    key -> getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(), adjustment.getAdjustmentId())
+                                    adjustment.getInvoiceId() + adjustment.getPaymentId() +
+                                            adjustment.getAdjustmentId(),
+                                    key -> getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(),
+                                            adjustment.getAdjustmentId())
                             );
                             BeanUtil.merge(previousAdjustmentEvent, adjustment);
                             return adjustment;
                     }
                 })
-                .peek(adjustmentData -> adjustmentDataCacheMap.put(adjustmentData.getInvoiceId() + adjustmentData.getPaymentId() + adjustmentData.getAdjustmentId(), adjustmentData))
+                .peek(adjustmentData -> adjustmentDataCacheMap
+                        .put(adjustmentData.getInvoiceId() + adjustmentData.getPaymentId() +
+                                adjustmentData.getAdjustmentId(), adjustmentData))
                 .collect(Collectors.toList());
 
         List<PaymentData> adjustedPaymentEvents = enrichedAdjustmentEvents.stream()
                 .filter(adjustmentData -> adjustmentData.getAdjustmentStatus() == AdjustmentStatus.captured)
                 .map(adjustmentData -> {
-                            PaymentData paymentData = new PaymentData();
-                            paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
-                            paymentData.setEventId(adjustmentData.getEventId());
-                            paymentData.setEventCreatedAt(adjustmentData.getEventCreatedAt());
-                            paymentData.setInvoiceId(adjustmentData.getInvoiceId());
-                            paymentData.setPaymentId(adjustmentData.getPaymentId());
-                            paymentData.setPaymentFee(adjustmentData.getAdjustmentFee());
-                            paymentData.setPaymentProviderFee(adjustmentData.getAdjustmentProviderFee());
-                            paymentData.setPaymentExternalFee(adjustmentData.getAdjustmentExternalFee());
-                            paymentData.setPaymentDomainRevision(adjustmentData.getAdjustmentDomainRevision());
-                            paymentData.setPaymentStatus(adjustmentData.getPaymentStatus()); // NPE
-                            paymentData.setPaymentOperationFailureClass(adjustmentData.getPaymentOperationFailureClass());
-                            paymentData.setPaymentExternalFailure(adjustmentData.getPaymentExternalFailure());
-                            paymentData.setPaymentExternalFailureReason(adjustmentData.getPaymentExternalFailureReason());
-                            return paymentData;
-                        }
-                )
-                .collect(Collectors.toList());
+                    PaymentData paymentData = new PaymentData();
+                    paymentData.setEventType(InvoiceEventType.INVOICE_PAYMENT_ADJUSTED);
+                    paymentData.setEventId(adjustmentData.getEventId());
+                    paymentData.setEventCreatedAt(adjustmentData.getEventCreatedAt());
+                    paymentData.setInvoiceId(adjustmentData.getInvoiceId());
+                    paymentData.setPaymentId(adjustmentData.getPaymentId());
+                    paymentData.setPaymentFee(adjustmentData.getAdjustmentFee());
+                    paymentData.setPaymentProviderFee(adjustmentData.getAdjustmentProviderFee());
+                    paymentData.setPaymentExternalFee(adjustmentData.getAdjustmentExternalFee());
+                    paymentData.setPaymentDomainRevision(adjustmentData.getAdjustmentDomainRevision());
+                    paymentData.setPaymentStatus(adjustmentData.getPaymentStatus()); // NPE
+                    paymentData.setPaymentOperationFailureClass(
+                            adjustmentData.getPaymentOperationFailureClass()
+                    );
+                    paymentData.setPaymentExternalFailure(adjustmentData.getPaymentExternalFailure());
+                    paymentData.setPaymentExternalFailureReason(
+                            adjustmentData.getPaymentExternalFailureReason()
+                    );
+                    return paymentData;
+                }).collect(Collectors.toList());
 
         try {
             adjustmentDao.save(enrichedAdjustmentEvents);
             paymentService.savePayments(adjustedPaymentEvents);
             log.info("Adjustment events have been saved, size={}", enrichedAdjustmentEvents.size());
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save adjustment events, size=%d", adjustments.size()), ex);
+            throw new StorageException(String.format("Failed to save adjustment events, size=%d", adjustments.size()),
+                    ex);
         }
     }
 

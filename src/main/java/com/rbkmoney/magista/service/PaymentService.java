@@ -34,11 +34,15 @@ public class PaymentService {
                     try {
                         PaymentData paymentData = paymentDao.get(key.getKey(), key.getValue());
                         if (paymentData == null) {
-                            throw new NotFoundException(String.format("Payment data not found, invoiceId='%s', paymentId='%s'", key.getKey(), key.getValue()));
+                            throw new NotFoundException(
+                                    String.format("Payment data not found, invoiceId='%s', paymentId='%s'",
+                                            key.getKey(), key.getValue()));
                         }
                         return paymentData;
                     } catch (DaoException ex) {
-                        throw new StorageException(String.format("Failed to get payment data, invoiceId='%s', paymentId='%s'", key.getKey(), key.getValue()), ex);
+                        throw new StorageException(
+                                String.format("Failed to get payment data, invoiceId='%s', paymentId='%s'",
+                                        key.getKey(), key.getValue()), ex);
                     }
                 }
         );
@@ -67,7 +71,8 @@ public class PaymentService {
                     }
                 })
                 .peek(payment -> paymentDataCacheMap.put(payment.getInvoiceId() + payment.getPaymentId(), payment))
-                .peek(payment -> paymentDataCache.put(new AbstractMap.SimpleEntry<>(payment.getInvoiceId(), payment.getPaymentId()), payment))
+                .peek(payment -> paymentDataCache
+                        .put(new AbstractMap.SimpleEntry<>(payment.getInvoiceId(), payment.getPaymentId()), payment))
                 .collect(Collectors.toList());
 
         List<PaymentData> paymentStartedEvents = enrichedPaymentEvents.stream()
@@ -79,9 +84,12 @@ public class PaymentService {
         try {
             paymentDao.insert(paymentStartedEvents);
             paymentDao.update(updatedPayments);
-            log.info("Payment events have been saved, batchSize={}, insertsCount={}, updatesCount={}", paymentEvents.size(), paymentStartedEvents.size(), updatedPayments.size());
+            log.info("Payment events have been saved, batchSize={}, insertsCount={}, updatesCount={}",
+                    paymentEvents.size(), paymentStartedEvents.size(), updatedPayments.size());
         } catch (DaoException ex) {
-            throw new StorageException(String.format("Failed to save payment events, batchSize=%d, insertsCount=%d, updatesCount=%d", paymentEvents.size(), paymentStartedEvents.size(), updatedPayments.size()), ex);
+            throw new StorageException(
+                    String.format("Failed to save payment events, batchSize=%d, insertsCount=%d, updatesCount=%d",
+                            paymentEvents.size(), paymentStartedEvents.size(), updatedPayments.size()), ex);
         }
     }
 

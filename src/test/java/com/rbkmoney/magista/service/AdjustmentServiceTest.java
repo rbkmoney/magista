@@ -83,7 +83,8 @@ public class AdjustmentServiceTest extends AbstractDaoTest {
         adjustmentData.setPaymentStatus(InvoicePaymentStatus.failed);
         paymentAdjustmentService.saveAdjustments(Collections.singletonList(adjustmentData));
 
-        PaymentData savedPaymentData = paymentService.getPaymentData(paymentData.getInvoiceId(), paymentData.getPaymentId());
+        PaymentData savedPaymentData =
+                paymentService.getPaymentData(paymentData.getInvoiceId(), paymentData.getPaymentId());
         Assert.assertEquals(adjustmentData.getPaymentStatus(), savedPaymentData.getPaymentStatus());
     }
 
@@ -106,7 +107,8 @@ public class AdjustmentServiceTest extends AbstractDaoTest {
         adjustmentData.setPaymentStatus(null);
         paymentAdjustmentService.saveAdjustments(Collections.singletonList(adjustmentData));
 
-        PaymentData savedPaymentData = paymentService.getPaymentData(paymentData.getInvoiceId(), paymentData.getPaymentId());
+        PaymentData savedPaymentData =
+                paymentService.getPaymentData(paymentData.getInvoiceId(), paymentData.getPaymentId());
         Assert.assertEquals(paymentData.getPaymentStatus(), savedPaymentData.getPaymentStatus());
     }
 

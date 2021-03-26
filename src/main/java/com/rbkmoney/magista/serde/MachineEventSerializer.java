@@ -11,7 +11,8 @@ import java.util.Map;
 @Slf4j
 public class MachineEventSerializer implements Serializer<SinkEvent> {
 
-    ThreadLocal<TSerializer> tSerializerThreadLocal = ThreadLocal.withInitial(() -> new TSerializer(new TBinaryProtocol.Factory()));
+    ThreadLocal<TSerializer> serializerThreadLocal =
+            ThreadLocal.withInitial(() -> new TSerializer(new TBinaryProtocol.Factory()));
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
@@ -22,7 +23,7 @@ public class MachineEventSerializer implements Serializer<SinkEvent> {
     public byte[] serialize(String topic, SinkEvent data) {
         byte[] retVal = null;
         try {
-            retVal = tSerializerThreadLocal.get().serialize(data);
+            retVal = serializerThreadLocal.get().serialize(data);
         } catch (Exception e) {
             log.error("Error when serialize machine event data: {} ", data, e);
         }

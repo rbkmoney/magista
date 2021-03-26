@@ -52,7 +52,8 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
         statPayment.setStatus(paymentStatus);
         statPayment.setPayer(MapperHelper.buildPayer(rs));
 
-        PaymentFlow paymentFlow = TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_FLOW.getName()), PaymentFlow.class);
+        PaymentFlow paymentFlow =
+                TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_FLOW.getName()), PaymentFlow.class);
 
         MapperHelper.buildStatPaymentFlow(rs, statPayment, paymentFlow);
 

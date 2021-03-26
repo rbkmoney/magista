@@ -21,7 +21,8 @@ public class QueryParserException extends QueryExecutionException {
         super(cause);
     }
 
-    public QueryParserException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public QueryParserException(String message, Throwable cause, boolean enableSuppression,
+                                boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

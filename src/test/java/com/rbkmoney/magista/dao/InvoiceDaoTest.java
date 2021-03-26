@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomStreamOf;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ContextConfiguration(classes = {InvoiceDaoImpl.class})
 public class InvoiceDaoTest extends AbstractDaoTest {

@@ -21,7 +21,8 @@ public class QueryBuilderException extends QueryProcessingException {
         super(cause);
     }
 
-    public QueryBuilderException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public QueryBuilderException(String message, Throwable cause, boolean enableSuppression,
+                                 boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

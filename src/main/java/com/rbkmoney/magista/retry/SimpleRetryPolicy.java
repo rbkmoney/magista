@@ -53,12 +53,6 @@ public class SimpleRetryPolicy implements RetryPolicy {
         ((SimpleRetryContext) context).registerThrowable(throwable);
     }
 
-    private static class SimpleRetryContext extends RetryContextSupport {
-        public SimpleRetryContext(RetryContext parent) {
-            super(parent);
-        }
-    }
-
     private boolean retryForException(Throwable ex) {
         return retryableClassifier.classify(ex);
     }
@@ -66,5 +60,11 @@ public class SimpleRetryPolicy implements RetryPolicy {
     @Override
     public String toString() {
         return ClassUtils.getShortName(getClass()) + "[maxAttempts=" + maxAttempts + "]";
+    }
+
+    private static class SimpleRetryContext extends RetryContextSupport {
+        public SimpleRetryContext(RetryContext parent) {
+            super(parent);
+        }
     }
 }

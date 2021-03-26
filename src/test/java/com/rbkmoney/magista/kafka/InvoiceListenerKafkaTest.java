@@ -27,7 +27,8 @@ import static org.mockito.ArgumentMatchers.any;
 
 @Slf4j
 @TestPropertySource(properties = "kafka.ssl.enable=false")
-@ContextConfiguration(classes = {KafkaConfig.class, KafkaAutoConfiguration.class, InvoiceListener.class, RetryConfig.class})
+@ContextConfiguration(classes = {KafkaConfig.class, KafkaAutoConfiguration.class, InvoiceListener.class,
+        RetryConfig.class})
 public class InvoiceListenerKafkaTest extends KafkaAbstractTest {
 
     @MockBean

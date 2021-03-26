@@ -41,7 +41,8 @@ public class ChargebackCreatedMapper implements ChargebackMapper {
         InvoicePaymentChargeback invoicePaymentChargeback = invoicePaymentChargebackCreated.getChargeback();
 
         chargeback.setChargebackId(invoicePaymentChargeback.getId());
-        chargeback.setChargebackStatus(TBaseUtil.unionFieldToEnum(invoicePaymentChargeback.getStatus(), ChargebackStatus.class));
+        chargeback.setChargebackStatus(
+                TBaseUtil.unionFieldToEnum(invoicePaymentChargeback.getStatus(), ChargebackStatus.class));
         chargeback.setChargebackCreatedAt(TypeUtil.stringToLocalDateTime(invoicePaymentChargeback.getCreatedAt()));
         chargeback.setChargebackAmount(invoicePaymentChargeback.getBody().getAmount());
         chargeback.setChargebackCurrencyCode(invoicePaymentChargeback.getBody().getCurrency().getSymbolicCode());
