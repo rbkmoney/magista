@@ -12,7 +12,7 @@ build('magista', 'java-maven') {
     def mvnArgs = '-DjvmArgs="-Xmx256m"'
     def serviceImage = "c0612d6052ac049496b72a23a04acb142035f249"
     def buildImage = "697fb14e7aba79a3297f035a80de7e4362f47a34"
-    def databaseHostName = null
+    def databaseHostName = "localhost"
 
     javaServicePipeline(serviceName, serviceImage, buildImage, databaseHostName, mvnArgs)
 }
