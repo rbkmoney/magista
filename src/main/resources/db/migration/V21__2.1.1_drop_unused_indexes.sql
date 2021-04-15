@@ -1,0 +1,5 @@
+DROP INDEX IF EXISTS payment_data_external_id_idx;
+DROP INDEX IF EXISTS payment_data_payment_approval_code_idx;
+DROP INDEX IF EXISTS payment_data_payment_tool_terminal_prov_by_created_date_idx;
+DROP INDEX IF EXISTS invoice_data_external_id_idx;
+DROP INDEX IF EXISTS invoice_event_invoice_amount_event_created_at_idx;
