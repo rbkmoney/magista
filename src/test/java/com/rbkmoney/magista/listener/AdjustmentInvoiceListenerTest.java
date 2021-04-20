@@ -14,7 +14,6 @@ import com.rbkmoney.magista.event.mapper.impl.AdjustmentStatusChangedMapper;
 import com.rbkmoney.magista.service.PaymentAdjustmentService;
 import com.rbkmoney.magista.service.PaymentService;
 import org.assertj.core.util.Lists;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +25,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import javax.validation.constraints.NotNull;
 
 import java.time.Instant;
 import java.util.List;
