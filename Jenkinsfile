@@ -12,7 +12,7 @@ build('magista', 'java-maven') {
     def mvnArgs = '-DjvmArgs="-Xmx256m"'
     //todo update serviceImage DON'T APPROVE IT
     def serviceImage = "c0612d6052ac049496b72a23a04acb142035f249"
-    def buildImage = "b186f1f1a65f94b5b5f4bce4dc07df79834d93d9"
+    def buildImage = "c4894d8c1f32255cb83cfd82c96183ff6a61d351"
 
     javaServicePipeline(serviceName, serviceImage, buildImage, mvnArgs)
 }
