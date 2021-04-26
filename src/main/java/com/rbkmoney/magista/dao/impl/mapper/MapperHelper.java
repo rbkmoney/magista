@@ -4,13 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.rbkmoney.damsel.domain.*;
-import com.rbkmoney.damsel.domain.BankCardTokenProvider;
-import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.damsel.merch_stat.BankCard;
 import com.rbkmoney.damsel.merch_stat.CryptoCurrency;
 import com.rbkmoney.damsel.merch_stat.CustomerPayer;
 import com.rbkmoney.damsel.merch_stat.DigitalWallet;
-import com.rbkmoney.damsel.merch_stat.DigitalWalletProvider;
 import com.rbkmoney.damsel.merch_stat.InternationalBankAccount;
 import com.rbkmoney.damsel.merch_stat.InternationalBankDetails;
 import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
@@ -47,12 +44,13 @@ import com.rbkmoney.damsel.merch_stat.PayoutType;
 import com.rbkmoney.damsel.merch_stat.RecurrentParentPayment;
 import com.rbkmoney.damsel.merch_stat.RecurrentPayer;
 import com.rbkmoney.damsel.merch_stat.RussianBankAccount;
-import com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider;
 import com.rbkmoney.damsel.merch_stat.Wallet;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.util.DamselUtil;
+import io.micrometer.core.instrument.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -116,15 +114,20 @@ public class MapperHelper {
             case bank_card:
                 BankCard bankCard = new BankCard(
                         rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN.getName()),
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()),
-                                BankCardPaymentSystem.class),
                         rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6.getName()),
                         rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4.getName())
                 );
-                bankCard.setTokenProvider(
+                bankCard.setPaymentSystem(
+                        new PaymentSystemRef(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()))
+                );
+                String tokenProvider = rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName());
+                if (StringUtils.isNotEmpty(tokenProvider)) {
+                    bankCard.setPaymentToken(new BankCardTokenServiceRef(tokenProvider));
+                }
+                bankCard.setTokenProviderDeprecated(
                         Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()))
                                 .map(bankCardTokenProvider -> TypeUtil
-                                        .toEnumField(bankCardTokenProvider, BankCardTokenProvider.class))
+                                        .toEnumField(bankCardTokenProvider, LegacyBankCardTokenProvider.class))
                                 .orElse(null)
                 );
                 return PaymentTool.bank_card(bankCard);
