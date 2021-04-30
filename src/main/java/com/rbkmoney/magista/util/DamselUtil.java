@@ -3,6 +3,8 @@ package com.rbkmoney.magista.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
+import com.rbkmoney.damsel.cash_flow.CashFlowTransaction;
+import com.rbkmoney.damsel.cash_flow.TransactionAccount;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.merch_stat.OperationFailure;
 import com.rbkmoney.damsel.merch_stat.OperationTimeout;
@@ -80,15 +82,33 @@ public class DamselUtil {
                 .sum();
     }
 
+    public static FeeType getFeeType(CashFlowTransaction cashFlowPosting) {
+        TransactionAccount source = cashFlowPosting.getSource().getTransactionAccount();
+        TransactionAccount destination = cashFlowPosting.getDestination().getTransactionAccount();
 
-    public static Map<FeeType, Long> getFees(List<FinalCashFlowPosting> finalCashFlowPostings) {
-        return finalCashFlowPostings.stream()
-                .collect(
-                        Collectors.groupingBy(
-                                DamselUtil::getFeeType,
-                                Collectors.summingLong(posting -> posting.getVolume().getAmount())
-                        )
-                );
+        if (source.isSetProvider() && source.getProvider().getAccountType() == ProviderCashFlowAccount.settlement
+                && destination.isSetMerchant()
+                && destination.getMerchant().getAccountType() == MerchantCashFlowAccount.settlement) {
+            return FeeType.AMOUNT;
+        }
+
+        if (source.isSetMerchant()
+                && source.getMerchant().getAccountType() == MerchantCashFlowAccount.settlement
+                && destination.isSetSystem()) {
+            return FeeType.FEE;
+        }
+
+        if (source.isSetSystem()
+                && destination.isSetExternal()) {
+            return FeeType.EXTERNAL_FEE;
+        }
+
+        if (source.isSetSystem()
+                && destination.isSetProvider()) {
+            return FeeType.PROVIDER_FEE;
+        }
+
+        return FeeType.UNKNOWN;
     }
 
     public static FeeType getFeeType(FinalCashFlowPosting cashFlowPosting) {
@@ -117,6 +137,26 @@ public class DamselUtil {
         }
 
         return FeeType.UNKNOWN;
+    }
+
+    public static Map<FeeType, Long> getCashFlowFees(List<CashFlowTransaction> finalCashFlowPostings) {
+        return finalCashFlowPostings.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                DamselUtil::getFeeType,
+                                Collectors.summingLong(posting -> posting.getVolume().getAmount())
+                        )
+                );
+    }
+
+    public static Map<FeeType, Long> getFees(List<FinalCashFlowPosting> finalCashFlowPostings) {
+        return finalCashFlowPostings.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                DamselUtil::getFeeType,
+                                Collectors.summingLong(posting -> posting.getVolume().getAmount())
+                        )
+                );
     }
 
     public static <T extends TBase> T jsonToTBase(JsonNode jsonNode, Class<T> type) throws IOException {
