@@ -23,4 +23,12 @@
         <level value="debug"/>
     </logger>
 
+    <logger name="org.springframework">
+        <level value="debug"/>
+    </logger>
+
+    <logger name="org.testcontainers">
+        <level value="debug"/>
+    </logger>
+
 </configuration>
