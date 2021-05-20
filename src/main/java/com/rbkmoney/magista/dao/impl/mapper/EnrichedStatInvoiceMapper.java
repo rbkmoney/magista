@@ -2,7 +2,7 @@ package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.merch_stat.EnrichedStatInvoice;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,7 +36,7 @@ public class EnrichedStatInvoiceMapper implements RowMapper<Map.Entry<Long, Enri
                 new EnrichedStatInvoice(
                         statInvoiceMapper.mapRow(resultSet, i).getValue(),
                         List.of(statPaymentMapper.mapRow(resultSet, i).getValue()),
-                        StringUtils.isEmpty(resultSet.getString(REFUND_DATA.REFUND_ID.getName()))
+                        ObjectUtils.isEmpty(resultSet.getString(REFUND_DATA.REFUND_ID.getName()))
                                 ? List.of() : List.of(statRefundMapper.mapRow(resultSet, i).getValue())
                 ));
     }
