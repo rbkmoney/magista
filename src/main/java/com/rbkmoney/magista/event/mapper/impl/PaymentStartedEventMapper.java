@@ -1,24 +1,27 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.base.Content;
-import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.damsel.domain.PaymentTool;
+import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.domain.enums.*;
-import com.rbkmoney.magista.domain.enums.BankCardTokenProvider;
 import com.rbkmoney.magista.domain.enums.OnHoldExpiration;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.mapper.PaymentMapper;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
+import com.rbkmoney.mamsel.DigitalWalletUtil;
+import com.rbkmoney.mamsel.MobileOperatorUtil;
+import com.rbkmoney.mamsel.TerminalPaymentUtil;
+import com.rbkmoney.mamsel.TokenProviderUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -175,14 +178,16 @@ public class PaymentStartedEventMapper implements PaymentMapper {
         );
         if (paymentTool.isSetPaymentTerminal()) {
             paymentData.setPaymentTerminalProvider(
-                    paymentTool.getPaymentTerminal().getTerminalType().toString()
+                    TerminalPaymentUtil.getTerminalPaymentProviderName(paymentTool.getPaymentTerminal())
             );
         }
 
         if (paymentTool.isSetDigitalWallet()) {
             DigitalWallet digitalWallet = paymentTool.getDigitalWallet();
+            String digitalWalletProviderName = DigitalWalletUtil
+                    .getDigitalWalletName(digitalWallet.getPaymentService(), digitalWallet.getProviderDeprecated());
             paymentData.setPaymentDigitalWalletId(digitalWallet.getId());
-            paymentData.setPaymentDigitalWalletProvider(digitalWallet.getProvider().toString());
+            paymentData.setPaymentDigitalWalletProvider(digitalWalletProviderName);
         }
 
         if (paymentTool.isSetBankCard()) {
@@ -191,11 +196,7 @@ public class PaymentStartedEventMapper implements PaymentMapper {
             paymentData.setPaymentBankCardSystem(bankCard.getPaymentSystem().toString());
             paymentData.setPaymentBankCardFirst6(bankCard.getBin());
             paymentData.setPaymentBankCardToken(bankCard.getToken());
-            if (bankCard.isSetTokenProvider()) {
-                paymentData.setPaymentBankCardTokenProvider(
-                        TypeUtil.toEnumField(bankCard.getTokenProvider().name(), BankCardTokenProvider.class)
-                );
-            }
+            paymentData.setPaymentBankCardTokenProvider(TokenProviderUtil.getTokenProviderName(bankCard));
         }
 
         if (paymentTool.isSetCryptoCurrency()) {
@@ -203,8 +204,8 @@ public class PaymentStartedEventMapper implements PaymentMapper {
         }
 
         if (paymentTool.isSetMobileCommerce()) {
-            MobileOperator mobileOperator = paymentTool.getMobileCommerce().getOperator();
-            paymentData.setPaymentMobileOperator(TypeUtil.toEnumField(mobileOperator.name(), MobileOperatorType.class));
+            String mobileOperatorName = MobileOperatorUtil.getMobileOperatorName(paymentTool.getMobileCommerce());
+            paymentData.setPaymentMobileOperator(mobileOperatorName);
             paymentData.setPaymentMobilePhoneCc(paymentTool.getMobileCommerce().getPhone().getCc());
             paymentData.setPaymentMobilePhoneCtn(paymentTool.getMobileCommerce().getPhone().getCtn());
         }
