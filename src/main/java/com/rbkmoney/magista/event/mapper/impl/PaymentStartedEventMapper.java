@@ -193,7 +193,7 @@ public class PaymentStartedEventMapper implements PaymentMapper {
         if (paymentTool.isSetBankCard()) {
             BankCard bankCard = paymentTool.getBankCard();
             paymentData.setPaymentBankCardLast4(bankCard.getLastDigits());
-            paymentData.setPaymentBankCardSystem(bankCard.getPaymentSystem().toString());
+            paymentData.setPaymentBankCardSystem(bankCard.getPaymentSystem().getId());
             paymentData.setPaymentBankCardFirst6(bankCard.getBin());
             paymentData.setPaymentBankCardToken(bankCard.getToken());
             paymentData.setPaymentBankCardTokenProvider(TokenProviderUtil.getTokenProviderName(bankCard));
