@@ -188,4 +188,11 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
         assertEquals(2, statResponse.getData().getInvoices().size());
     }
 
+    @Test
+    public void testSearchByBankCardTokenProvider() {
+        String json = "{'query': {'invoices': {'payment_token_provider': 'applepay'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(1, statResponse.getData().getInvoices().size());
+    }
+
 }

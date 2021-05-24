@@ -18,10 +18,7 @@ import com.rbkmoney.magista.event.mapper.PaymentMapper;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
-import com.rbkmoney.mamsel.DigitalWalletUtil;
-import com.rbkmoney.mamsel.MobileOperatorUtil;
-import com.rbkmoney.mamsel.TerminalPaymentUtil;
-import com.rbkmoney.mamsel.TokenProviderUtil;
+import com.rbkmoney.mamsel.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -193,7 +190,9 @@ public class PaymentStartedEventMapper implements PaymentMapper {
         if (paymentTool.isSetBankCard()) {
             BankCard bankCard = paymentTool.getBankCard();
             paymentData.setPaymentBankCardLast4(bankCard.getLastDigits());
-            paymentData.setPaymentBankCardSystem(bankCard.getPaymentSystem().getId());
+            String paymentSystemName = PaymentSystemUtil
+                    .getPaymentSystemName(bankCard.getPaymentSystem(), bankCard.getPaymentSystemDeprecated());
+            paymentData.setPaymentBankCardSystem(paymentSystemName);
             paymentData.setPaymentBankCardFirst6(bankCard.getBin());
             paymentData.setPaymentBankCardToken(bankCard.getToken());
             paymentData.setPaymentBankCardTokenProvider(TokenProviderUtil.getTokenProviderName(bankCard));
