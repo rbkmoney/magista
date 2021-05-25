@@ -13,6 +13,7 @@ import com.rbkmoney.magista.query.impl.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import javax.sql.DataSource;
 
@@ -90,9 +91,6 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         TypeUtil.toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
-                        parameters.getPaymentBankCardTokenProvider(),
-                        EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
@@ -111,8 +109,16 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS)
                 .addValue(PAYMENT_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS);
-
-        if (!paymentParameterSource.getConditionFields().isEmpty()) {
+        if (!ObjectUtils.isEmpty(parameters.getPaymentBankCardTokenProvider())) {
+            paymentParameterSource.addOrCondition(
+                    PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER
+                            .eq(parameters.getPaymentBankCardTokenProvider()),
+                    PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER_LEGACY.eq(
+                            toEnumField(parameters.getPaymentBankCardTokenProvider(),
+                                    com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class)));
+        }
+        if (!paymentParameterSource.getConditionFields().isEmpty()
+                || !paymentParameterSource.getOrConditions().isEmpty()) {
             condition = condition.and(
                     DSL.exists(
                             getDslContext().select(DSL.field("1")).from(PAYMENT_DATA)
@@ -376,7 +382,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
 
     private ConditionParameterSource preparePaymentsCondition(PaymentsFunction.PaymentsParameters parameters,
                                                               LocalDateTime whereTime) {
-        return new ConditionParameterSource()
+        ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
                 .addValue(
                         PAYMENT_DATA.PARTY_ID,
                         Optional.ofNullable(parameters.getMerchantId())
@@ -397,9 +403,6 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
-                        parameters.getPaymentBankCardTokenProvider(),
-                        EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
@@ -421,6 +424,15 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmountFrom(), GREATER_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmountTo(), LESS_OR_EQUAL)
                 .addValue(PAYMENT_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS);
+        if (!ObjectUtils.isEmpty(parameters.getPaymentBankCardTokenProvider())) {
+            conditionParameterSource.addOrCondition(
+                    PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER
+                            .eq(parameters.getPaymentBankCardTokenProvider()),
+                    PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER_LEGACY.eq(
+                            toEnumField(parameters.getPaymentBankCardTokenProvider(),
+                                    com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class)));
+        }
+        return conditionParameterSource;
     }
 
     /**
@@ -430,7 +442,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
      */
     private ConditionParameterSource prepareEnrichedPaymentsCondition(PaymentsFunction.PaymentsParameters parameters,
                                                                       LocalDateTime whereTime) {
-        return new ConditionParameterSource()
+        ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
                 .addValue(
                         PAYMENT_DATA.PARTY_ID,
                         Optional.ofNullable(parameters.getMerchantId())
@@ -449,9 +461,6 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
-                        parameters.getPaymentBankCardTokenProvider(),
-                        EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
@@ -469,6 +478,16 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS)
                 .addValue(PAYMENT_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS);
+        if (!ObjectUtils.isEmpty(parameters.getPaymentBankCardTokenProvider())) {
+            conditionParameterSource.addOrCondition(
+                    PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER
+                            .eq(parameters.getPaymentBankCardTokenProvider()),
+                    PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER_LEGACY.eq(
+                            toEnumField(parameters.getPaymentBankCardTokenProvider(),
+                                    com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class)));
+        }
+
+        return conditionParameterSource;
     }
 
     /**
