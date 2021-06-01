@@ -62,7 +62,7 @@ public class TestData {
 
             allocationTransaction.setAmount(new Cash(9000, new CurrencyRef("RUB")));
 
-            AllocationTransactionBody allocationTransactionBody = new AllocationTransactionBody();
+            AllocationTransactionBodyTotal allocationTransactionBody = new AllocationTransactionBodyTotal();
             AllocationTransactionTarget feeAllocationTransactionTarget = new AllocationTransactionTarget();
             AllocationTransactionTargetShop feeAllocationTransactionTargetShop =
                     enhancedRandom.nextObject(AllocationTransactionTargetShop.class);
@@ -70,7 +70,7 @@ public class TestData {
             allocationTransactionBody.setFeeTarget(feeAllocationTransactionTarget);
             allocationTransactionBody.setFeeAmount(new Cash(1000, new CurrencyRef("RUB")));
             allocationTransactionBody.setTotal(new Cash(10000, new CurrencyRef("RUB")));
-            allocationTransactionBody.setFee(new AllocationTransactionFee(new Rational(10, 1)));
+            allocationTransactionBody.setFee(new AllocationTransactionFeeShare(new Rational(10, 1)));
 
             allocationTransaction.setBody(allocationTransactionBody);
 

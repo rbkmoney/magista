@@ -33,7 +33,7 @@ public class AllocationRowMapper implements RowMapper<Map.Entry<String, Allocati
                         new CurrencyRef(rs.getString(ALLOCATION_TRANSACTION_DATA.CURRENCY.getName()))
                 )
         );
-        AllocationTransactionBody allocationTransactionBody = new AllocationTransactionBody();
+        AllocationTransactionBodyTotal allocationTransactionBody = new AllocationTransactionBodyTotal();
         allocationTransactionBody.setFeeAmount(
                 new Cash(
                         rs.getLong(ALLOCATION_TRANSACTION_DATA.FEE_AMOUNT.getName()),
@@ -54,7 +54,7 @@ public class AllocationRowMapper implements RowMapper<Map.Entry<String, Allocati
                 )
         );
         allocationTransactionBody.setFeeTarget(allocationBodyTransactionTarget);
-        AllocationTransactionFee allocationTransactionFee = new AllocationTransactionFee();
+        AllocationTransactionFeeShare allocationTransactionFee = new AllocationTransactionFeeShare();
         allocationTransactionFee.setParts(
                 new Rational(
                         rs.getLong(ALLOCATION_TRANSACTION_DATA.FEE_RATIONAL_P.getName()),

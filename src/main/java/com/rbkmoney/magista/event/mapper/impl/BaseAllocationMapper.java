@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.domain.AllocationTransaction;
-import com.rbkmoney.damsel.domain.AllocationTransactionBody;
+import com.rbkmoney.damsel.domain.AllocationTransactionBodyTotal;
 import com.rbkmoney.damsel.domain.AllocationTransactionDetails;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
@@ -26,7 +26,7 @@ public abstract class BaseAllocationMapper implements AllocationMapper {
         allocationData.setAmount(allocationTransaction.getAmount().getAmount());
         allocationData.setCurrency(allocationTransaction.getAmount().getCurrency().getSymbolicCode());
         if (allocationTransaction.isSetBody()) {
-            AllocationTransactionBody allocationTransactionBody = allocationTransaction.getBody();
+            AllocationTransactionBodyTotal allocationTransactionBody = allocationTransaction.getBody();
             if (allocationTransactionBody.getFeeTarget().isSetShop()) {
                 allocationData.setFeeTargetOwnerId(
                         allocationTransactionBody.getFeeTarget().getShop().getOwnerId()
