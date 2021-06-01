@@ -96,7 +96,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
-                        toEnumField(parameters.getPaymentBankCardTokenProvider(), BankCardTokenProvider.class),
+                        parameters.getPaymentBankCardTokenProvider(),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
@@ -428,8 +428,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
-                        toEnumField(parameters.getPaymentBankCardTokenProvider(),
-                                com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
+                        parameters.getPaymentBankCardTokenProvider(),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
@@ -481,8 +480,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER,
-                        toEnumField(parameters.getPaymentBankCardTokenProvider(),
-                                com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class),
+                        parameters.getPaymentBankCardTokenProvider(),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)

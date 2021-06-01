@@ -193,6 +193,13 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
     }
 
     @Test
+    public void testSearchByBankCardTokenProvider() {
+        String json = "{'query': {'invoices': {'payment_token_provider': 'applepay'}}}";
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertEquals(1, statResponse.getData().getInvoices().size());
+    }
+
+    @Test
     public void testSearchByInvoiceIdsWithAllocation() {
         String json = "{'query': {'invoices': {'invoice_ids': ['INVOICE_NEW_ID_4']}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));

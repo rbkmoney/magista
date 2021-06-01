@@ -21,6 +21,7 @@ import com.rbkmoney.magista.event.mapper.impl.*;
 import com.rbkmoney.magista.listener.InvoiceListener;
 import com.rbkmoney.magista.provider.GeoProvider;
 import com.rbkmoney.magista.service.*;
+import com.rbkmoney.magista.service.PaymentService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TBase;
