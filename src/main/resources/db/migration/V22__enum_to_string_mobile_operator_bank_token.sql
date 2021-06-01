@@ -1,7 +1,9 @@
 ALTER TABLE mst.payment_data
-    ALTER COLUMN payment_bank_card_token_provider TYPE VARCHAR USING payment_bank_card_token_provider::VARCHAR;
+    RENAME COLUMN payment_bank_card_token_provider TO payment_bank_card_token_provider_legacy;
 ALTER TABLE mst.payment_data
-    ALTER COLUMN payment_mobile_operator TYPE VARCHAR USING payment_mobile_operator::VARCHAR;
+    RENAME COLUMN payment_mobile_operator TO payment_mobile_operator_legacy;
 
-DROP TYPE mst.mobile_operator_type;
-DROP TYPE mst.bank_card_token_provider;
+ALTER TABLE mst.payment_data
+    ADD COLUMN payment_bank_card_token_provider CHARACTER VARYING;
+ALTER TABLE mst.payment_data
+    ADD COLUMN payment_mobile_operator CHARACTER VARYING;
