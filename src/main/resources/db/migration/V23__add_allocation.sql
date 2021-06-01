@@ -3,6 +3,9 @@ CREATE TYPE mst.rounding_method AS ENUM ('round_half_towards_zero', 'round_half_
 CREATE TABLE mst.allocation_transaction_data
 (
     id                  BIGSERIAL                   NOT NULL,
+    event_id            BIGINT                      NOT NULL,
+    event_type          mst.invoice_event_type      NOT NULL,
+    event_created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     invoice_id          CHARACTER VARYING           NOT NULL,
     allocation_id       CHARACTER VARYING           NOT NULL,
     target_owner_id     CHARACTER VARYING,
