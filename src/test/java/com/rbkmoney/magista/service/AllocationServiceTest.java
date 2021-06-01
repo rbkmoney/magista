@@ -45,8 +45,8 @@ public class AllocationServiceTest extends AbstractDaoTest {
                         .collect(Collectors.toList());
         allocationService.saveAllocations(allAllocationTransactions);
         List<AllocationTransactionData> foundedAllocationTrx = allocationDao.get("testInvoiceId");
-        assertTrue(allocationTransactionSec.size() == foundedAllocationTrx.size() &&
-                allocationTransactionSec.containsAll(foundedAllocationTrx)
+        assertTrue(allocationTransactionSec.size() == foundedAllocationTrx.size()
+                && allocationTransactionSec.containsAll(foundedAllocationTrx)
                 && foundedAllocationTrx.containsAll(allocationTransactionSec));
     }
 
