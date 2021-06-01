@@ -1,9 +1,11 @@
 package com.rbkmoney.magista.dao.impl.field;
 
 import org.jooq.Comparator;
+import org.jooq.Condition;
 import org.jooq.Field;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,8 +16,11 @@ public class ConditionParameterSource {
 
     private List<ConditionField> conditionFields;
 
+    private List<Condition> orConditions;
+
     public ConditionParameterSource() {
         this.conditionFields = new ArrayList<>();
+        this.orConditions = new ArrayList<>();
     }
 
     public <T> ConditionParameterSource addValue(Field<T> field, T value, Comparator comparator) {
@@ -34,8 +39,17 @@ public class ConditionParameterSource {
         return this;
     }
 
+    public ConditionParameterSource addOrCondition(Condition... condition) {
+        orConditions.addAll(Arrays.asList(condition));
+        return this;
+    }
+
     public List<ConditionField> getConditionFields() {
         return conditionFields;
+    }
+
+    public List<Condition> getOrConditions() {
+        return orConditions;
     }
 
     @Override

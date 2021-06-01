@@ -225,6 +225,12 @@ public abstract class AbstractDao extends NamedParameterJdbcDaoSupport {
                 condition = DSL.condition(operator, condition, buildCondition(field));
             }
         }
+        Optional<Condition> orCondition = conditionParameterSource.getOrConditions().stream().reduce(Condition::or);
+        if (orCondition.isPresent()) {
+            for (Condition parameterSourceCondition : conditionParameterSource.getOrConditions()) {
+                condition = DSL.condition(Operator.AND, condition, orCondition.get());
+            }
+        }
         return condition;
     }
 
