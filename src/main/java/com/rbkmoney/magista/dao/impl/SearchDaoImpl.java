@@ -12,9 +12,11 @@ import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.query.impl.*;
+import lombok.val;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import javax.sql.DataSource;
@@ -167,21 +169,32 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 allocationTransactions = fetch(allocationQuery, allocationDataRowMapper);
 
         if (!allocationTransactions.isEmpty()) {
-            Map<String, Set<AllocationTransaction>> allocationGroupedByInvoice = allocationTransactions.stream()
-                            .collect(Collectors.groupingBy(
-                                    Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
-                            ));
-            statInvoices = statInvoices.stream().peek(entry -> {
-                Set<AllocationTransaction> allocationTransactionSet = allocationGroupedByInvoice.get(
-                        entry.getValue().getId()
-                );
-                if (allocationTransactionSet != null && !allocationTransactionSet.isEmpty()) {
-                    entry.getValue().setAllocation(new Allocation(new ArrayList<>(allocationTransactionSet)));
-                }
-            }).collect(Collectors.toList());
+            statInvoices = fillAllocationTransactionsToInvoices(allocationTransactions, statInvoices);
         }
 
         return statInvoices;
+    }
+
+    private List<Map.Entry<Long, StatInvoice>> fillAllocationTransactionsToInvoices(
+            List<Map.Entry<String, AllocationTransaction>> allocationTransactions,
+            List<Map.Entry<Long, StatInvoice>> statInvoices
+    ) {
+        Map<String, Set<AllocationTransaction>> allocationGroupedByInvoice = allocationTransactions.stream()
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
+                ));
+        return statInvoices.stream().map(entry -> {
+            StatInvoice statInvoice = new StatInvoice(entry.getValue());
+
+            Set<AllocationTransaction> allocationTransactionSet = allocationGroupedByInvoice.get(
+                    entry.getValue().getId()
+            );
+            if (!CollectionUtils.isEmpty(allocationTransactionSet)) {
+                statInvoice.setAllocation(new Allocation(new ArrayList<>(allocationTransactionSet)));
+            }
+
+            return new AbstractMap.SimpleEntry<>(entry.getKey(), statInvoice);
+        }).collect(Collectors.toList());
     }
 
     @Override

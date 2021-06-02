@@ -1,10 +1,8 @@
 package com.rbkmoney.magista.service;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.rbkmoney.magista.dao.AllocationDao;
 import com.rbkmoney.magista.domain.tables.pojos.AllocationTransactionData;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.util.BeanUtil;
 import lombok.Data;

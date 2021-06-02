@@ -50,4 +50,18 @@ public class AllocationServiceTest extends AbstractDaoTest {
                 && foundedAllocationTrx.containsAll(allocationTransactionSec));
     }
 
+    @Test
+    public void getAllocation() {
+        List<AllocationTransactionData> allocationTransactions =
+                enhancedRandom.objects(AllocationTransactionData.class, 3)
+                        .peek(allocationTransactionData -> allocationTransactionData.setInvoiceId("testInvoiceId"))
+                        .collect(Collectors.toList());
+        allocationService.saveAllocations(allocationTransactions);
+        for (AllocationTransactionData allocationTransaction : allocationTransactions) {
+            AllocationTransactionData allocation = allocationService
+                    .getAllocation(allocationTransaction.getInvoiceId(), allocationTransaction.getAllocationId());
+            Assert.assertEquals(allocationTransaction, allocation);
+        }
+    }
+
 }
