@@ -27,7 +27,7 @@ public class AllocationService {
             return allocationDao.get(invoiceId, allocationId);
         } catch (DaoException ex) {
             throw new StorageException(
-                    String.format("Failed to get invoice data, invoiceId='%s';allocationId='%s'",
+                    String.format("Failed to get allocation data, invoiceId='%s';allocationId='%s'",
                             invoiceId, allocationId), ex);
         }
     }

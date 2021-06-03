@@ -59,3 +59,7 @@ values ('INVOICE_NEW_ID_4', 2, 'INVOICE_PAYMENT_STATUS_CHANGED', now() + interva
 
 insert into mst.allocation_transaction_data(invoice_id, event_id, event_type, event_created_at, allocation_id, target_owner_id, target_shop_id, amount, currency, fee_target_owner_id, fee_target_shop_id, fee_amount, fee_currency, fee_rational_p, fee_rational_q, fee_rounding_method, total_amount, total_currency, invoice_cart_json)
 values ('INVOICE_NEW_ID_4', 3, 'INVOICE_PAYMENT_REFUND_CREATED', now() + interval '10 minute', 'TEST_ALLOCATION_ID3', 'testOwnerId3', 'testShopId3', 8000, 'RUB', 'testFeeTargetOwnerId', 'testFeeTargetShopId', 1500, 'RUB', 15, 1, null, 9500, 'RUB', null);
+
+insert into mst.allocation_transaction_data(invoice_id, event_id, event_type, event_created_at, allocation_id, target_owner_id, target_shop_id, amount, currency, fee_target_owner_id, fee_target_shop_id, fee_amount, fee_currency, fee_rational_p, fee_rational_q, fee_rounding_method, total_amount, total_currency, invoice_cart_json)
+values ('INVOICE_ID_2', 4, 'INVOICE_CREATED', now() + interval '15 minute', 'TEST_ALLOCATION_ID5', 'testOwnerId3', 'testShopId3', 8000, 'RUB', 'testFeeTargetOwnerId', 'testFeeTargetShopId', 1500, 'RUB', 15, 1, null, 9500, 'RUB', null);
+

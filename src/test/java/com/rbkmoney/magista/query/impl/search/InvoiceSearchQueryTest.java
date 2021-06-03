@@ -201,8 +201,13 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
 
     @Test
     public void testSearchByInvoiceIdsWithAllocation() {
+        // Given
         String json = "{'query': {'invoices': {'invoice_ids': ['INVOICE_NEW_ID_4']}}}";
+
+        // When
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+
+        // Then
         assertEquals(1, statResponse.getData().getInvoices().size());
         Optional<StatInvoice> statInvoiceOptional = statResponse.getData().getInvoices().stream().findFirst();
         assertTrue(statInvoiceOptional.isPresent());
