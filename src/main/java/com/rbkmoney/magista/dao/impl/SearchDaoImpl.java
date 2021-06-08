@@ -1,27 +1,32 @@
 package com.rbkmoney.magista.dao.impl;
 
+import com.rbkmoney.damsel.domain.Allocation;
+import com.rbkmoney.damsel.domain.AllocationTransaction;
 import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.*;
-import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.query.impl.*;
+import lombok.val;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import javax.sql.DataSource;
-
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;
 import static com.rbkmoney.geck.common.util.TypeUtil.toEnumFields;
+import static com.rbkmoney.magista.domain.Tables.ALLOCATION_TRANSACTION_DATA;
 import static com.rbkmoney.magista.domain.tables.ChargebackData.CHARGEBACK_DATA;
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
@@ -39,6 +44,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     private final StatPayoutMapper statPayoutMapper;
     private final StatChargebackMapper statChargebackMapper;
     private final EnrichedStatInvoiceMapper enrichedStatInvoiceMapper;
+    private final AllocationRowMapper allocationDataRowMapper;
 
     public SearchDaoImpl(DataSource ds) {
         super(ds);
@@ -48,6 +54,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         statPayoutMapper = new StatPayoutMapper();
         statChargebackMapper = new StatChargebackMapper();
         enrichedStatInvoiceMapper = new EnrichedStatInvoiceMapper();
+        allocationDataRowMapper = new AllocationRowMapper();
     }
 
     @Override
@@ -146,12 +153,48 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
             );
         }
 
-        Query query = getDslContext()
+        Query invoiceQuery = getDslContext()
                 .selectFrom(INVOICE_DATA)
                 .where(condition)
                 .orderBy(INVOICE_DATA.INVOICE_CREATED_AT.desc())
                 .limit(limit);
-        return fetch(query, statInvoiceMapper);
+
+        List<Map.Entry<Long, StatInvoice>> statInvoices = fetch(invoiceQuery, statInvoiceMapper);
+
+        List<String> invoiceIds = statInvoices.stream()
+                .map(longStatInvoiceEntry -> longStatInvoiceEntry.getValue().getId()).collect(Collectors.toList());
+        Query allocationQuery = getDslContext().selectFrom(ALLOCATION_TRANSACTION_DATA)
+                .where(ALLOCATION_TRANSACTION_DATA.INVOICE_ID.in(invoiceIds));
+        List<Map.Entry<String, AllocationTransaction>>
+                allocationTransactions = fetch(allocationQuery, allocationDataRowMapper);
+
+        if (!allocationTransactions.isEmpty()) {
+            statInvoices = fillAllocationTransactionsToInvoices(allocationTransactions, statInvoices);
+        }
+
+        return statInvoices;
+    }
+
+    private List<Map.Entry<Long, StatInvoice>> fillAllocationTransactionsToInvoices(
+            List<Map.Entry<String, AllocationTransaction>> allocationTransactions,
+            List<Map.Entry<Long, StatInvoice>> statInvoices
+    ) {
+        Map<String, Set<AllocationTransaction>> allocationGroupedByInvoice = allocationTransactions.stream()
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
+                ));
+        return statInvoices.stream().map(entry -> {
+            StatInvoice statInvoice = new StatInvoice(entry.getValue());
+
+            Set<AllocationTransaction> allocationTransactionSet = allocationGroupedByInvoice.get(
+                    entry.getValue().getId()
+            );
+            if (!CollectionUtils.isEmpty(allocationTransactionSet)) {
+                statInvoice.setAllocation(new Allocation(new ArrayList<>(allocationTransactionSet)));
+            }
+
+            return new AbstractMap.SimpleEntry<>(entry.getKey(), statInvoice);
+        }).collect(Collectors.toList());
     }
 
     @Override
