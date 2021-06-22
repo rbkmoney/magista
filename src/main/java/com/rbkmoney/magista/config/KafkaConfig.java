@@ -1,5 +1,7 @@
 package com.rbkmoney.magista.config;
 
+import com.rbkmoney.magista.serde.PayoutEventDeserializer;
+import com.rbkmoney.payout.manager.Event;
 import com.rbkmoney.kafka.common.exception.handler.SeekToCurrentWithSleepBatchErrorHandler;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.config.properties.KafkaSslProperties;
@@ -82,19 +84,36 @@ public class KafkaConfig {
     }
 
     @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Event>> payoutContainerFactory(
+            KafkaSslProperties kafkaSslProperties) {
+        DefaultKafkaConsumerFactory<String, Event> kafkaConsumerFactory =
+                new DefaultKafkaConsumerFactory<>(consumerConfigs(kafkaSslProperties));
+        kafkaConsumerFactory.setValueDeserializer(new PayoutEventDeserializer());
+        ConcurrentKafkaListenerContainerFactory<String, Event> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        initFactory(kafkaConsumerFactory, concurrency, factory);
+        return factory;
+    }
+
+    @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, MachineEvent>>
             kafkaListenerContainerFactory(
                 ConsumerFactory<String, MachineEvent> consumerFactory
     ) {
         ConcurrentKafkaListenerContainerFactory<String, MachineEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
+        initFactory(consumerFactory, concurrency, factory);
+        return factory;
+    }
+
+    private <T> void initFactory(ConsumerFactory<String, T> consumerFactory,
+                                 int threadsNumber,
+                                 ConcurrentKafkaListenerContainerFactory<String, T> factory) {
         factory.setConsumerFactory(consumerFactory);
         factory.setBatchListener(true);
-        factory.getContainerProperties().setAckOnError(false);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         factory.setBatchErrorHandler(kafkaErrorHandler());
-        factory.setConcurrency(concurrency);
-        return factory;
+        factory.setConcurrency(threadsNumber);
     }
 
     public BatchErrorHandler kafkaErrorHandler() {

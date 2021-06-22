@@ -1,22 +1,18 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.dao.PayoutDao;
-import com.rbkmoney.magista.domain.tables.pojos.PayoutData;
+import com.rbkmoney.magista.domain.tables.pojos.Payout;
 import com.rbkmoney.magista.exception.DaoException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.util.BeanUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.rbkmoney.magista.domain.enums.PayoutEventType.PAYOUT_CREATED;
-
+@Slf4j
 @Service
 public class PayoutService {
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final PayoutDao payoutEventDao;
 
@@ -25,9 +21,9 @@ public class PayoutService {
         this.payoutEventDao = payoutEventDao;
     }
 
-    public PayoutData getPayoutData(String payoutId) throws NotFoundException {
+    public Payout getPayout(String payoutId) throws NotFoundException {
         try {
-            PayoutData payoutData = payoutEventDao.get(payoutId);
+            Payout payoutData = payoutEventDao.get(payoutId);
             if (payoutData == null) {
                 throw new NotFoundException(String.format("Payout not found, payoutId='%s'", payoutId));
             }
@@ -37,19 +33,27 @@ public class PayoutService {
         }
     }
 
-    public void savePayout(PayoutData payoutData) throws StorageException {
-        log.debug("Save payout, event='{}'", payoutData);
+    public void savePayout(Payout payout) throws StorageException {
+        log.debug("Save payout, event='{}'", payout);
         try {
-            if (payoutData.getEventType() != PAYOUT_CREATED) {
-                PayoutData previousPayoutData = getPayoutData(payoutData.getPayoutId());
-                BeanUtil.merge(previousPayoutData, payoutData);
-            }
-            payoutEventDao.save(payoutData);
-            log.info("Payout have been saved, event='{}'", payoutData);
+            payoutEventDao.save(payout);
+            log.info("Payout have been saved, event='{}'", payout);
         } catch (DaoException ex) {
-            String message = String.format("Failed to save payout, payout='%s'", payoutData);
+            String message = String.format("Failed to save payout, payout='%s'", payout);
             throw new StorageException(message, ex);
         }
     }
 
+    public void savePayoutChange(Payout payout) throws StorageException {
+        log.debug("Save payout change, event='{}'", payout);
+        try {
+            Payout previousPayout = getPayout(payout.getPayoutId());
+            BeanUtil.merge(previousPayout, payout);
+            payoutEventDao.save(payout);
+            log.info("Payout change have been saved, event='{}'", payout);
+        } catch (DaoException ex) {
+            String message = String.format("Failed to save payout, payout='%s'", payout);
+            throw new StorageException(message, ex);
+        }
+    }
 }
