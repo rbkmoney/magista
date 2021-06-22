@@ -33,6 +33,7 @@ public class PayoutCreatedMapper implements PayoutMapper {
             payout.setStatus(TBaseUtil.unionFieldToEnum(payoutSource.getStatus(), PayoutStatus.class));
             payout.setCreatedAt(TypeUtil.stringToLocalDateTime(payoutSource.getCreatedAt()));
 
+            payout.setPayoutToolId(payoutSource.getPayoutToolId());
             payout.setAmount(payoutSource.getAmount());
             payout.setFee(payoutSource.getFee());
             payout.setCurrencyCode(payoutSource.getCurrency().getSymbolicCode());
