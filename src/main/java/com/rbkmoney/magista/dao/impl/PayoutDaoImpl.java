@@ -35,9 +35,18 @@ public class PayoutDaoImpl extends AbstractDao implements PayoutDao {
         Query query = getDslContext().insertInto(PAYOUT)
                 .set(payoutRecord)
                 .onConflict(PAYOUT.PAYOUT_ID)
-                .doUpdate()
-                .set(payoutRecord);
-        executeOne(query);
+                .doNothing();
+        execute(query);
+    }
+
+    @Override
+    public void update(Payout payout) {
+        PayoutRecord payoutRecord = getDslContext().newRecord(PAYOUT, payout);
+        Query query = getDslContext().update(PAYOUT)
+                .set(payoutRecord)
+                .where(PAYOUT.PAYOUT_ID.eq(payout.getPayoutId()))
+                .and(PAYOUT.SEQUENCE_ID.lessThan(payout.getSequenceId()));
+        execute(query);
     }
 
 }

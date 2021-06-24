@@ -46,9 +46,4 @@ public class PayoutCreatedMapper implements PayoutMapper {
     public ChangeType getChangeType() {
         return ChangeType.PAYOUT_CREATED;
     }
-
-    @Override
-    public boolean accept(PayoutChange payoutChange) {
-        return payoutChange.isSetCreated();
-    }
 }

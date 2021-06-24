@@ -8,4 +8,6 @@ public interface PayoutDao {
 
     void save(Payout payout);
 
+    void update(Payout payout);
+
 }

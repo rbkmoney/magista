@@ -44,15 +44,13 @@ public class PayoutService {
         }
     }
 
-    public void savePayoutChange(Payout payout) throws StorageException {
-        log.debug("Save payout change, event='{}'", payout);
+    public void updatePayout(Payout payout) throws StorageException {
+        log.debug("Update payout, payout='{}'", payout);
         try {
-            Payout previousPayout = getPayout(payout.getPayoutId());
-            BeanUtil.merge(previousPayout, payout);
-            payoutEventDao.save(payout);
-            log.info("Payout change have been saved, event='{}'", payout);
+            payoutEventDao.update(payout);
+            log.info("Payout have been updated, payout='{}'", payout);
         } catch (DaoException ex) {
-            String message = String.format("Failed to save payout, payout='%s'", payout);
+            String message = String.format("Failed to update payout, payout='%s'", payout);
             throw new StorageException(message, ex);
         }
     }

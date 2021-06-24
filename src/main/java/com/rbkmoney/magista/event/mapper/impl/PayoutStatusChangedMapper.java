@@ -24,10 +24,9 @@ public class PayoutStatusChangedMapper implements PayoutMapper {
 
     @Override
     public Processor map(PayoutChange change, Event event) {
-        Payout payout = new Payout();
+        Payout payout = payoutEventService.getPayout(event.getPayoutId());
 
         payout.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-        payout.setPayoutId(event.getPayoutId());
         payout.setSequenceId(event.getSequenceId());
 
         PayoutStatusChanged statusChanged = change.getStatusChanged();
@@ -36,16 +35,11 @@ public class PayoutStatusChangedMapper implements PayoutMapper {
         if (statusChanged.getStatus().isSetCancelled()) {
             payout.setCancelledDetails(statusChanged.getStatus().getCancelled().getDetails());
         }
-        return () -> payoutEventService.savePayoutChange(payout);
+        return () -> payoutEventService.updatePayout(payout);
     }
 
     @Override
     public ChangeType getChangeType() {
         return ChangeType.PAYOUT_STATUS_CHANGED;
-    }
-
-    @Override
-    public boolean accept(PayoutChange payoutChange) {
-        return payoutChange.isSetStatusChanged();
     }
 }
