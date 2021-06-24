@@ -25,27 +25,30 @@ public class PayoutCreatedMapper implements PayoutMapper {
     public Processor map(PayoutChange change, Event event) {
         var payout = new com.rbkmoney.magista.domain.tables.pojos.Payout();
         payout.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-        payout.setPayoutId(event.getSource().getId());
+        payout.setPayoutId(event.getPayoutId());
+        payout.setSequenceId(event.getSequenceId());
 
-        if (change.isSetCreated()) {
-            Payout payoutSource = change.getCreated().getPayout();
-            payout.setPayoutId(payoutSource.getId());
-            payout.setStatus(TBaseUtil.unionFieldToEnum(payoutSource.getStatus(), PayoutStatus.class));
-            payout.setCreatedAt(TypeUtil.stringToLocalDateTime(payoutSource.getCreatedAt()));
+        Payout payoutSource = change.getCreated().getPayout();
+        payout.setStatus(TBaseUtil.unionFieldToEnum(payoutSource.getStatus(), PayoutStatus.class));
+        payout.setCreatedAt(TypeUtil.stringToLocalDateTime(payoutSource.getCreatedAt()));
 
-            payout.setPayoutToolId(payoutSource.getPayoutToolId());
-            payout.setAmount(payoutSource.getAmount());
-            payout.setFee(payoutSource.getFee());
-            payout.setCurrencyCode(payoutSource.getCurrency().getSymbolicCode());
+        payout.setPayoutToolId(payoutSource.getPayoutToolId());
+        payout.setAmount(payoutSource.getAmount());
+        payout.setFee(payoutSource.getFee());
+        payout.setCurrencyCode(payoutSource.getCurrency().getSymbolicCode());
 
-            payout.setPartyId(payoutSource.getPartyId());
-            payout.setShopId(payoutSource.getShopId());
-        }
+        payout.setPartyId(payoutSource.getPartyId());
+        payout.setShopId(payoutSource.getShopId());
         return () -> payoutEventService.savePayout(payout);
     }
 
     @Override
     public ChangeType getChangeType() {
         return ChangeType.PAYOUT_CREATED;
+    }
+
+    @Override
+    public boolean accept(PayoutChange payoutChange) {
+        return payoutChange.isSetCreated();
     }
 }

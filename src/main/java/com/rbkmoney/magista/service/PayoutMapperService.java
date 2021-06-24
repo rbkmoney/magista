@@ -2,7 +2,6 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.event.mapper.PayoutMapper;
 import com.rbkmoney.payout.manager.Event;
-import com.rbkmoney.payout.manager.EventPayload;
 import com.rbkmoney.payout.manager.PayoutChange;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,14 +24,9 @@ public class PayoutMapperService {
     }
 
     private void handleIfAccept(Event event) {
-        if (event.isSetPayload()) {
-            EventPayload eventPayload = event.getPayload();
-            for (int i = 0; i < eventPayload.getChanges().size(); i++) {
-                PayoutChange change = eventPayload.getChanges().get(i);
-                payoutMappers.stream()
-                        .filter(handler -> handler.accept(change))
-                        .forEach(handler -> handler.map(change, event));
-            }
-        }
+        PayoutChange change = event.getPayoutChange();
+        payoutMappers.stream()
+                .filter(handler -> handler.accept(change))
+                .forEach(handler -> handler.map(change, event));
     }
 }

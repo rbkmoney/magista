@@ -27,15 +27,14 @@ public class PayoutStatusChangedMapper implements PayoutMapper {
         Payout payout = new Payout();
 
         payout.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
-        payout.setPayoutId(event.getSource().getId());
+        payout.setPayoutId(event.getPayoutId());
+        payout.setSequenceId(event.getSequenceId());
 
-        if (change.isSetStatusChanged()) {
-            PayoutStatusChanged statusChanged = change.getStatusChanged();
-            payout.setStatus(TBaseUtil.unionFieldToEnum(statusChanged.getStatus(), PayoutStatus.class));
+        PayoutStatusChanged statusChanged = change.getStatusChanged();
+        payout.setStatus(TBaseUtil.unionFieldToEnum(statusChanged.getStatus(), PayoutStatus.class));
 
-            if (statusChanged.getStatus().isSetCancelled()) {
-                payout.setCancelledDetails(statusChanged.getStatus().getCancelled().getDetails());
-            }
+        if (statusChanged.getStatus().isSetCancelled()) {
+            payout.setCancelledDetails(statusChanged.getStatus().getCancelled().getDetails());
         }
         return () -> payoutEventService.savePayoutChange(payout);
     }
@@ -45,4 +44,8 @@ public class PayoutStatusChangedMapper implements PayoutMapper {
         return ChangeType.PAYOUT_STATUS_CHANGED;
     }
 
+    @Override
+    public boolean accept(PayoutChange payoutChange) {
+        return payoutChange.isSetStatusChanged();
+    }
 }

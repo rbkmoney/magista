@@ -3,6 +3,7 @@ create table if not exists mst.payout
     id               bigserial            not null,
     payout_id        varchar              not null,
     event_created_at timestamp            not null,
+    sequence_id      int                  not null,
     created_at       timestamp            not null,
     party_id         varchar              not null,
     shop_id          varchar              not null,
