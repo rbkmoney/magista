@@ -86,7 +86,7 @@ kafka:
     max-poll-records: 500
   topics:
     invoicing: mg-invoice-100-2
-    payout: mg-payout
+    payout: payout
   ssl:
     enabled: false
 
