@@ -27,7 +27,7 @@ public class PayoutDaoTest extends AbstractDaoTest {
 
     @Test
     public void insertUpdateAndFindPayoutEventTest() throws DaoException {
-        Payout payoutData = random(Payout.class);
+        Payout payoutData = EnhancedRandomBuilder.aNewEnhancedRandom().nextObject(Payout.class);
 
         payoutDao.save(payoutData);
 
@@ -35,7 +35,8 @@ public class PayoutDaoTest extends AbstractDaoTest {
 
         payoutData.setStatus(PayoutStatus.cancelled);
         payoutData.setCancelledDetails("kek");
-        payoutDao.save(payoutData);
+        payoutData.setSequenceId(payoutData.getSequenceId() + 1);
+        payoutDao.update(payoutData);
 
         assertEquals(payoutData, payoutDao.get(payoutData.getPayoutId()));
     }
@@ -54,15 +55,6 @@ public class PayoutDaoTest extends AbstractDaoTest {
         payoutData.setAmount(Long.MAX_VALUE);
         payoutDao.save(payoutData);
         payoutDao.get(payoutData.getPayoutId());
-    }
-
-    @Test
-    public void testUpdate() {
-        Payout payout = EnhancedRandomBuilder.aNewEnhancedRandom().nextObject(Payout.class);
-        payoutDao.save(payout);
-        payout.setSequenceId(payout.getSequenceId() + 1);
-        payoutDao.update(payout);
-        assertEquals(payout.getSequenceId(), payoutDao.get(payout.getPayoutId()).getSequenceId());
     }
 
     @Test
