@@ -46,6 +46,7 @@ public class PayoutDaoTest extends AbstractDaoTest {
         Payout payoutData = new Payout();
         payoutData.setPartyId(UUID.randomUUID().toString());
         payoutData.setEventCreatedAt(LocalDateTime.now());
+        payoutData.setSequenceId(random(Integer.class));
         payoutData.setShopId(random(String.class));
         payoutData.setPayoutId(random(String.class));
         payoutData.setPartyId(random(String.class));
