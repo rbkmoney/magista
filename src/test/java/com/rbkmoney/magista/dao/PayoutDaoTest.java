@@ -50,6 +50,7 @@ public class PayoutDaoTest extends AbstractDaoTest {
         payoutData.setShopId(random(String.class));
         payoutData.setPayoutId(random(String.class));
         payoutData.setPartyId(random(String.class));
+        payoutData.setPayoutToolId("hhhh");
         payoutData.setCurrencyCode("RUB");
         payoutData.setCreatedAt(LocalDateTime.now());
         payoutData.setStatus(PayoutStatus.paid);
