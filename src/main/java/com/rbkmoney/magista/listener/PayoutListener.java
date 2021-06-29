@@ -17,7 +17,7 @@ public class PayoutListener {
 
     private final PayoutMapperService payoutService;
 
-    @KafkaListener(topics = "${kafka.topics.payout}", containerFactory = "payoutContainerFactory")
+    @KafkaListener(topics = "${kafka.topics.pm-events-payout}", containerFactory = "payoutContainerFactory")
     public void handle(List<ConsumerRecord<String, Event>> messages, Acknowledgment ack) {
         log.info("Got machineEvent batch with size: {}", messages.size());
         payoutService.handleEvents(messages.stream()
