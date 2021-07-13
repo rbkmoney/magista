@@ -1,12 +1,9 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.base.Content;
-import com.rbkmoney.damsel.cash_flow.CashFlow;
-import com.rbkmoney.damsel.cash_flow.CashFlowTransaction;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain.InvoicePaymentStatus;
 import com.rbkmoney.damsel.domain.PaymentTool;
-import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentStarted;
 import com.rbkmoney.geck.common.util.TBaseUtil;
@@ -157,20 +154,11 @@ public class PaymentStartedEventMapper implements PaymentMapper {
             paymentData.setPaymentTerminalId(paymentRoute.getTerminal().getId());
         }
 
-        if (invoicePaymentStarted.isSetDeprecatedCashFlow()) {
-            List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentStarted.getDeprecatedCashFlow();
-            Map<FeeType, Long> fees = DamselUtil.getFees(finalCashFlowPostings);
-            paymentData.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
-            paymentData.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
-            paymentData.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
-        } else if (invoicePaymentStarted.isSetCashFlow()) {
-            CashFlow newCashFlow = invoicePaymentStarted.getCashFlow();
-            List<CashFlowTransaction> cashFlowTransactions = newCashFlow.getTransactions();
-            Map<FeeType, Long> fees = DamselUtil.getCashFlowFees(cashFlowTransactions);
-            paymentData.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
-            paymentData.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
-            paymentData.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
-        }
+        List<FinalCashFlowPosting> cashFlow = invoicePaymentStarted.getCashFlow();
+        Map<FeeType, Long> fees = DamselUtil.getFees(cashFlow);
+        paymentData.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
+        paymentData.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
+        paymentData.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
         paymentData.setExternalId(invoicePayment.getExternalId());
 
         return paymentData;

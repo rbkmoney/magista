@@ -30,7 +30,7 @@ import static com.rbkmoney.magista.domain.Tables.ALLOCATION_TRANSACTION_DATA;
 import static com.rbkmoney.magista.domain.tables.ChargebackData.CHARGEBACK_DATA;
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
-import static com.rbkmoney.magista.domain.tables.PayoutData.PAYOUT_DATA;
+import static com.rbkmoney.magista.domain.tables.Payout.PAYOUT;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 import static com.rbkmoney.magista.query.impl.Parameters.SHOP_ID_PARAM;
 import static org.jooq.Comparator.*;
@@ -277,33 +277,33 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
             LocalDateTime whereTime,
             int limit
     ) {
-        Query query = getDslContext().selectFrom(PAYOUT_DATA)
+        Query query = getDslContext().selectFrom(PAYOUT)
                 .where(
                         appendDateTimeRangeConditions(
                                 appendConditions(
                                         DSL.trueCondition(),
                                         Operator.AND,
                                         new ConditionParameterSource()
-                                                .addValue(PAYOUT_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
-                                                .addValue(PAYOUT_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                                                .addInConditionValue(PAYOUT_DATA.PARTY_SHOP_ID, parameters.getShopIds())
-                                                .addValue(PAYOUT_DATA.PAYOUT_ID, parameters.getPayoutId(), EQUALS)
-                                                .addValue(PAYOUT_DATA.PAYOUT_STATUS,
+                                                .addValue(PAYOUT.PARTY_ID, parameters.getMerchantId(), EQUALS)
+                                                .addValue(PAYOUT.SHOP_ID, parameters.getShopId(), EQUALS)
+                                                .addInConditionValue(PAYOUT.SHOP_ID, parameters.getShopIds())
+                                                .addValue(PAYOUT.PAYOUT_ID, parameters.getPayoutId(), EQUALS)
+                                                .addValue(PAYOUT.STATUS,
                                                         toEnumField(parameters.getPayoutStatus(), PayoutStatus.class),
                                                         EQUALS)
-                                                .addInConditionValue(PAYOUT_DATA.PAYOUT_STATUS,
+                                                .addInConditionValue(PAYOUT.STATUS,
                                                         toEnumFields(parameters.getPayoutStatuses(),
                                                                 PayoutStatus.class))
-                                                .addValue(PAYOUT_DATA.PAYOUT_TYPE,
-                                                        toEnumField(parameters.getPayoutType(), PayoutType.class),
+                                                .addValue(PAYOUT.PAYOUT_TOOL_TYPE,
+                                                        toEnumField(parameters.getPayoutType(), PayoutToolType.class),
                                                         EQUALS)
-                                                .addValue(PAYOUT_DATA.PAYOUT_CREATED_AT, whereTime, LESS)
+                                                .addValue(PAYOUT.CREATED_AT, whereTime, LESS)
                                 ),
-                                PAYOUT_DATA.PAYOUT_CREATED_AT,
+                                PAYOUT.CREATED_AT,
                                 fromTime,
                                 toTime
                         )
-                ).orderBy(PAYOUT_DATA.PAYOUT_CREATED_AT.desc())
+                ).orderBy(PAYOUT.CREATED_AT.desc())
                 .limit(limit);
 
         return fetch(query, statPayoutMapper);

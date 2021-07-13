@@ -1,7 +1,5 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
-import com.rbkmoney.damsel.cash_flow.CashFlow;
-import com.rbkmoney.damsel.cash_flow.CashFlowTransaction;
 import com.rbkmoney.damsel.domain.FinalCashFlowPosting;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
@@ -42,20 +40,12 @@ public class ChargebackCashFlowChangedMapper implements ChargebackMapper {
         InvoicePaymentChargebackCashFlowChanged invoicePaymentChargebackCashFlowChanged = invoicePaymentChargebackChange
                 .getPayload()
                 .getInvoicePaymentChargebackCashFlowChanged();
-        if (invoicePaymentChargebackCashFlowChanged.isSetDeprecatedCashFlow()) {
-            List<FinalCashFlowPosting> cashFlow = invoicePaymentChargebackCashFlowChanged.getDeprecatedCashFlow();
-            Map<FeeType, Long> fees = DamselUtil.getFees(cashFlow);
-            chargebackData.setChargebackFee(fees.getOrDefault(FeeType.FEE, 0L));
-            chargebackData.setChargebackProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
-            chargebackData.setChargebackExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
-        } else if (invoicePaymentChargebackCashFlowChanged.isSetCashFlow()) {
-            CashFlow cashFlow = invoicePaymentChargebackCashFlowChanged.getCashFlow();
-            List<CashFlowTransaction> cashFlowTransactions = cashFlow.getTransactions();
-            Map<FeeType, Long> fees = DamselUtil.getCashFlowFees(cashFlowTransactions);
-            chargebackData.setChargebackFee(fees.getOrDefault(FeeType.FEE, 0L));
-            chargebackData.setChargebackProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
-            chargebackData.setChargebackExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
-        }
+
+        List<FinalCashFlowPosting> cashFlow = invoicePaymentChargebackCashFlowChanged.getCashFlow();
+        Map<FeeType, Long> fees = DamselUtil.getFees(cashFlow);
+        chargebackData.setChargebackFee(fees.getOrDefault(FeeType.FEE, 0L));
+        chargebackData.setChargebackProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
+        chargebackData.setChargebackExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
 
         return chargebackData;
     }

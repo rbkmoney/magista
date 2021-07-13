@@ -48,5 +48,4 @@ public class PayoutDaoImpl extends AbstractDao implements PayoutDao {
                 .and(PAYOUT.SEQUENCE_ID.lessThan(payout.getSequenceId()));
         execute(query);
     }
-
 }
