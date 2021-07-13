@@ -1,7 +1,5 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
-import com.rbkmoney.damsel.cash_flow.CashFlow;
-import com.rbkmoney.damsel.cash_flow.CashFlowTransaction;
 import com.rbkmoney.damsel.domain.Cash;
 import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
@@ -19,7 +17,6 @@ import com.rbkmoney.magista.util.DamselUtil;
 import com.rbkmoney.magista.util.FeeType;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -63,18 +60,10 @@ public class RefundCreatedMapper implements RefundMapper {
         }
         refund.setRefundDomainRevision(invoicePaymentRefund.getDomainRevision());
 
-        if (invoicePaymentRefundCreated.isSetDeprecatedCashFlow()) {
-            Map<FeeType, Long> fees = DamselUtil.getFees(invoicePaymentRefundCreated.getDeprecatedCashFlow());
-            refund.setRefundFee(fees.getOrDefault(FeeType.FEE, 0L));
-            refund.setRefundProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
-            refund.setRefundExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
-        } else if (invoicePaymentRefundCreated.isSetCashFlow()) {
-            CashFlow cashFlow = invoicePaymentRefundCreated.getCashFlow();
-            List<CashFlowTransaction> cashFlowTransactions = cashFlow.getTransactions();
-            Map<FeeType, Long> fees = DamselUtil.getCashFlowFees(cashFlowTransactions);
-            refund.setRefundProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
-            refund.setRefundExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
-        }
+        Map<FeeType, Long> fees = DamselUtil.getFees(invoicePaymentRefundCreated.getCashFlow());
+        refund.setRefundFee(fees.getOrDefault(FeeType.FEE, 0L));
+        refund.setRefundProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
+        refund.setRefundExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
         refund.setExternalId(invoicePaymentRefund.getExternalId());
 
         return refund;

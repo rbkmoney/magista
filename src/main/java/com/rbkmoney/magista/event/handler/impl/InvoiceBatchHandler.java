@@ -2,21 +2,17 @@ package com.rbkmoney.magista.event.handler.impl;
 
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.domain.tables.pojos.AllocationTransactionData;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.handler.BatchHandler;
-import com.rbkmoney.magista.event.mapper.AllocationMapper;
 import com.rbkmoney.magista.event.mapper.InvoiceMapper;
-import com.rbkmoney.magista.event.mapper.Mapper;
-import com.rbkmoney.magista.event.mapper.impl.AllocationCreatedMapper;
-import com.rbkmoney.magista.service.AllocationService;
 import com.rbkmoney.magista.service.InvoiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,16 +21,13 @@ public class InvoiceBatchHandler implements BatchHandler<InvoiceChange, MachineE
 
     private final InvoiceService invoiceService;
     private final List<InvoiceMapper> mappers;
-    private final AllocationService allocationService;
-    private final AllocationCreatedMapper allocationCreatedMapper;
 
     @Override
-    @Transactional
     public Processor handle(List<Map.Entry<InvoiceChange, MachineEvent>> changes) {
         List<InvoiceData> invoiceEvents = changes.stream()
                 .map(changeWithParent -> {
                     InvoiceChange change = changeWithParent.getKey();
-                    for (InvoiceMapper invoiceMapper : mappers) {
+                    for (InvoiceMapper invoiceMapper : getMappers()) {
                         if (invoiceMapper.accept(change)) {
                             return invoiceMapper.map(changeWithParent.getKey(), changeWithParent.getValue());
                         }
@@ -43,33 +36,12 @@ public class InvoiceBatchHandler implements BatchHandler<InvoiceChange, MachineE
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        List<AllocationTransactionData> allocationTransactions = changes.stream()
-                .map(invoiceChangeMachineEventEntry -> {
-                    InvoiceChange invoiceChange = invoiceChangeMachineEventEntry.getKey();
-                    if (allocationCreatedMapper.accept(invoiceChange)) {
-                        return allocationCreatedMapper.map(
-                                invoiceChangeMachineEventEntry.getKey(),
-                                invoiceChangeMachineEventEntry.getValue()
-                        );
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
 
-        return () -> {
-            invoiceService.saveInvoices(invoiceEvents);
-            if (!allocationTransactions.isEmpty()) {
-                allocationService.saveAllocations(allocationTransactions);
-            }
-        };
+        return () -> invoiceService.saveInvoices(invoiceEvents);
     }
 
     @Override
-    public List<? extends Mapper> getMappers() {
-        List<Mapper> mappers = new ArrayList<>(this.mappers);
-        mappers.add(this.allocationCreatedMapper);
+    public List<InvoiceMapper> getMappers() {
         return mappers;
     }
 }
