@@ -3,6 +3,7 @@ package com.rbkmoney.magista.dao;
 import com.rbkmoney.magista.dao.impl.PayoutDaoImpl;
 import com.rbkmoney.magista.domain.enums.PayoutEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
+import com.rbkmoney.magista.domain.enums.PayoutToolType;
 import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.tables.pojos.Payout;
 import com.rbkmoney.magista.exception.DaoException;
@@ -55,6 +56,8 @@ public class PayoutDaoTest extends AbstractDaoTest {
         payoutData.setCreatedAt(LocalDateTime.now());
         payoutData.setStatus(PayoutStatus.paid);
         payoutData.setAmount(Long.MAX_VALUE);
+        payoutData.setPayoutToolId("ee");
+        payoutData.setPayoutToolType(PayoutToolType.wallet_info);
         payoutDao.save(payoutData);
         payoutDao.get(payoutData.getPayoutId());
     }
