@@ -324,7 +324,7 @@ public class MapperHelper {
                 bankDetails.setAddress(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_ADDRESS.getName()));
                 bankDetails.setCountry(
                         TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_COUNTRY_CODE.getName()),
-                                Residence.class));
+                                CountryCode.class));
                 internationalBankAccount.setBank(bankDetails);
 
                 InternationalBankAccount correspondentBankAccount = new InternationalBankAccount();
@@ -345,7 +345,7 @@ public class MapperHelper {
                         rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ABA_RTN.getName()));
                 correspondentBankDetails.setCountry(TypeUtil.toEnumField(rs.getString(
                         PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_COUNTRY_CODE.getName()),
-                        Residence.class));
+                        CountryCode.class));
                 correspondentBankAccount.setBank(correspondentBankDetails);
                 internationalBankAccount.setCorrespondentAccount(correspondentBankAccount);
 
