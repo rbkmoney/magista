@@ -103,7 +103,7 @@ public class InvoicingKafkaTest {
 
     @Before
     public void setup() {
-        mockTBaseProcessor = new MockTBaseProcessor(MockMode.ALL, 15, 1);
+        mockTBaseProcessor = new MockTBaseProcessor(MockMode.REQUIRED_ONLY, 15, 1);
         mockTBaseProcessor.addFieldHandler(timeFields.getKey(), timeFields.getValue());
 
         given(geoProvider.getLocationInfo(any()))
