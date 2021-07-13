@@ -80,6 +80,17 @@ public class DamselUtil {
                 .sum();
     }
 
+
+    public static Map<FeeType, Long> getFees(List<FinalCashFlowPosting> finalCashFlowPostings) {
+        return finalCashFlowPostings.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                DamselUtil::getFeeType,
+                                Collectors.summingLong(posting -> posting.getVolume().getAmount())
+                        )
+                );
+    }
+
     public static FeeType getFeeType(FinalCashFlowPosting cashFlowPosting) {
         CashFlowAccount source = cashFlowPosting.getSource().getAccountType();
         CashFlowAccount destination = cashFlowPosting.getDestination().getAccountType();
@@ -106,16 +117,6 @@ public class DamselUtil {
         }
 
         return FeeType.UNKNOWN;
-    }
-
-    public static Map<FeeType, Long> getFees(List<FinalCashFlowPosting> finalCashFlowPostings) {
-        return finalCashFlowPostings.stream()
-                .collect(
-                        Collectors.groupingBy(
-                                DamselUtil::getFeeType,
-                                Collectors.summingLong(posting -> posting.getVolume().getAmount())
-                        )
-                );
     }
 
     public static <T extends TBase> T jsonToTBase(JsonNode jsonNode, Class<T> type) throws IOException {

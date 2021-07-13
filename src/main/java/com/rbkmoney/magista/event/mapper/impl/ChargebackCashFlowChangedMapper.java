@@ -40,7 +40,6 @@ public class ChargebackCashFlowChangedMapper implements ChargebackMapper {
         InvoicePaymentChargebackCashFlowChanged invoicePaymentChargebackCashFlowChanged = invoicePaymentChargebackChange
                 .getPayload()
                 .getInvoicePaymentChargebackCashFlowChanged();
-
         List<FinalCashFlowPosting> cashFlow = invoicePaymentChargebackCashFlowChanged.getCashFlow();
         Map<FeeType, Long> fees = DamselUtil.getFees(cashFlow);
         chargebackData.setChargebackFee(fees.getOrDefault(FeeType.FEE, 0L));

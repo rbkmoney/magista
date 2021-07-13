@@ -2,38 +2,31 @@ package com.rbkmoney.magista.event.handler.impl;
 
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.domain.tables.pojos.AllocationTransactionData;
 import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.handler.BatchHandler;
-import com.rbkmoney.magista.event.mapper.Mapper;
 import com.rbkmoney.magista.event.mapper.RefundMapper;
-import com.rbkmoney.magista.event.mapper.impl.AllocationRefundCreateMapper;
-import com.rbkmoney.magista.service.AllocationService;
 import com.rbkmoney.magista.service.PaymentRefundService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class RefundBatchHandler implements BatchHandler<InvoiceChange, MachineEvent> {
-
     private final PaymentRefundService paymentRefundService;
     private final List<RefundMapper> mappers;
-    private final AllocationService allocationService;
-    private final AllocationRefundCreateMapper allocationRefundCreateMapper;
 
     @Override
-    @Transactional
     public Processor handle(List<Map.Entry<InvoiceChange, MachineEvent>> changes) {
         List<RefundData> refundEvents = changes.stream()
                 .map(changeWithParent -> {
                     InvoiceChange change = changeWithParent.getKey();
-                    for (RefundMapper refundMapper : mappers) {
+                    for (RefundMapper refundMapper : getMappers()) {
                         if (refundMapper.accept(change)) {
                             return refundMapper.map(changeWithParent.getKey(), changeWithParent.getValue());
                         }
@@ -42,33 +35,12 @@ public class RefundBatchHandler implements BatchHandler<InvoiceChange, MachineEv
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        List<AllocationTransactionData> allocationTransactions = changes.stream()
-                .map(invoiceChangeMachineEventEntry -> {
-                    InvoiceChange invoiceChange = invoiceChangeMachineEventEntry.getKey();
-                    if (allocationRefundCreateMapper.accept(invoiceChange)) {
-                        return allocationRefundCreateMapper.map(
-                                invoiceChangeMachineEventEntry.getKey(),
-                                invoiceChangeMachineEventEntry.getValue()
-                        );
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
 
-        return () -> {
-            paymentRefundService.saveRefunds(refundEvents);
-            if (!allocationTransactions.isEmpty()) {
-                allocationService.saveAllocations(allocationTransactions);
-            }
-        };
+        return () -> paymentRefundService.saveRefunds(refundEvents);
     }
 
     @Override
-    public List<? extends Mapper> getMappers() {
-        List<Mapper> mappers = new ArrayList<>(this.mappers);
-        mappers.add(this.allocationRefundCreateMapper);
+    public List<RefundMapper> getMappers() {
         return mappers;
     }
 }
