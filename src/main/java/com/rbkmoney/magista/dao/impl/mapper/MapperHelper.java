@@ -1,15 +1,10 @@
 package com.rbkmoney.magista.dao.impl.mapper;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.merch_stat.BankCard;
 import com.rbkmoney.damsel.merch_stat.CryptoCurrency;
 import com.rbkmoney.damsel.merch_stat.CustomerPayer;
 import com.rbkmoney.damsel.merch_stat.DigitalWallet;
-import com.rbkmoney.damsel.merch_stat.InternationalBankAccount;
-import com.rbkmoney.damsel.merch_stat.InternationalBankDetails;
 import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
 import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
 import com.rbkmoney.damsel.merch_stat.InvoicePaid;
@@ -40,11 +35,8 @@ import com.rbkmoney.damsel.merch_stat.PaymentResourcePayer;
 import com.rbkmoney.damsel.merch_stat.PaymentTerminal;
 import com.rbkmoney.damsel.merch_stat.PaymentTool;
 import com.rbkmoney.damsel.merch_stat.PayoutStatus;
-import com.rbkmoney.damsel.merch_stat.PayoutType;
 import com.rbkmoney.damsel.merch_stat.RecurrentParentPayment;
 import com.rbkmoney.damsel.merch_stat.RecurrentPayer;
-import com.rbkmoney.damsel.merch_stat.RussianBankAccount;
-import com.rbkmoney.damsel.merch_stat.Wallet;
 import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.*;
@@ -65,7 +57,7 @@ import java.util.Optional;
 import static com.rbkmoney.magista.domain.Tables.CHARGEBACK_DATA;
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
-import static com.rbkmoney.magista.domain.tables.PayoutData.PAYOUT_DATA;
+import static com.rbkmoney.magista.domain.tables.Payout.PAYOUT;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 import static com.rbkmoney.magista.util.DamselUtil.jsonToTBase;
 
@@ -282,104 +274,49 @@ public class MapperHelper {
         return paymentStatus;
     }
 
-    static PayoutType toPayoutType(ResultSet rs) throws SQLException {
-        com.rbkmoney.magista.domain.enums.PayoutType payoutType =
-                TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_TYPE.getName()),
-                        com.rbkmoney.magista.domain.enums.PayoutType.class);
+    static PayoutToolInfo toPayoutToolInfo(ResultSet rs) throws SQLException {
+        var payoutType = TypeUtil.toEnumField(rs.getString(PAYOUT.PAYOUT_TOOL_TYPE.getName()),
+                com.rbkmoney.magista.domain.enums.PayoutToolType.class);
         switch (payoutType) {
-            case bank_account:
-                return PayoutType.bank_account(toPayoutAccount(rs));
-            case wallet:
-                return PayoutType.wallet(new Wallet(rs.getString(PAYOUT_DATA.PAYOUT_WALLET_ID.getName())));
+            case russian_bank_account:
+                return PayoutToolInfo.russian_bank_account(new RussianBankAccount()
+                        .setAccount(rs.getString(PAYOUT.PAYOUT_TOOL_RUSSIAN_BANK_ACCOUNT_ACCOUNT.getName()))
+                        .setBankName(rs.getString(PAYOUT.PAYOUT_TOOL_RUSSIAN_BANK_ACCOUNT_BANK_NAME.getName()))
+                        .setBankBik(rs.getString(PAYOUT.PAYOUT_TOOL_RUSSIAN_BANK_ACCOUNT_BANK_BIK.getName()))
+                        .setBankPostAccount(
+                                rs.getString(PAYOUT.PAYOUT_TOOL_RUSSIAN_BANK_ACCOUNT_BANK_POST_ACCOUNT.getName()))
+                );
+            case international_bank_account:
+                return PayoutToolInfo.international_bank_account(new InternationalBankAccount()
+                        .setBank(new InternationalBankDetails()
+                                .setName(rs.getString(
+                                        PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_NAME.getName()))
+                                .setCountry(TypeUtil.toEnumField(
+                                        rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_NAME.getName()),
+                                        CountryCode.class))
+                                .setBic(rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_BIC.getName()))
+                                .setAddress(rs.getString(
+                                        PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_ADDRESS.getName()))
+                                .setAbaRtn(rs.getString(
+                                        PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_ABA_RTN.getName())))
+                        .setIban(rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_IBAN.getName()))
+                        .setNumber(rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_NUMBER.getName()))
+                        .setCorrespondentAccount(new InternationalBankAccount()
+                                .setNumber(rs.getString(
+                                        PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_CORR_ACCOUNT.getName())))
+                );
+            case wallet_info:
+                return PayoutToolInfo.wallet_info(new WalletInfo(rs.getString(PAYOUT.PAYOUT_TOOL_WALLET_ID.getName())));
+            case payment_institution_account:
+                return PayoutToolInfo.payment_institution_account(new PaymentInstitutionAccount());
             default:
                 throw new NotFoundException(String.format("Payout type '%s' not found", payoutType));
         }
     }
 
-    static PayoutAccount toPayoutAccount(ResultSet rs) throws SQLException {
-        PayoutAccountType payoutAccountType =
-                TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_TYPE.getName()), PayoutAccountType.class);
-        switch (payoutAccountType) {
-            case RUSSIAN_PAYOUT_ACCOUNT:
-                RussianBankAccount russianBankAccount = new RussianBankAccount();
-                russianBankAccount.setAccount(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_ID.getName()));
-                russianBankAccount.setBankBik(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_LOCAL_CODE.getName()));
-                russianBankAccount.setBankPostAccount(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_CORR_ID.getName()));
-                russianBankAccount.setBankName(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_NAME.getName()));
-
-                RussianPayoutAccount russianPayoutAccount = new RussianPayoutAccount();
-                russianPayoutAccount.setBankAccount(russianBankAccount);
-                russianPayoutAccount.setInn(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_INN.getName()));
-                russianPayoutAccount.setPurpose(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_PURPOSE.getName()));
-                return PayoutAccount.russian_payout_account(russianPayoutAccount);
-            case INTERNATIONAL_PAYOUT_ACCOUNT:
-                InternationalBankAccount internationalBankAccount = new InternationalBankAccount();
-                internationalBankAccount.setAccountHolder(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_ID.getName()));
-                internationalBankAccount.setIban(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_IBAN.getName()));
-
-                InternationalBankDetails bankDetails = new InternationalBankDetails();
-                bankDetails.setName(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_NAME.getName()));
-                bankDetails.setBic(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_BIC.getName()));
-                bankDetails.setAbaRtn(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_ABA_RTN.getName()));
-                bankDetails.setAddress(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_ADDRESS.getName()));
-                bankDetails.setCountry(
-                        TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_BANK_COUNTRY_CODE.getName()),
-                                CountryCode.class));
-                internationalBankAccount.setBank(bankDetails);
-
-                InternationalBankAccount correspondentBankAccount = new InternationalBankAccount();
-                correspondentBankAccount.setAccountHolder(
-                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ACCOUNT.getName()));
-                correspondentBankAccount.setNumber(
-                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_NUMBER.getName()));
-                correspondentBankAccount.setIban(
-                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_IBAN.getName()));
-                InternationalBankDetails correspondentBankDetails = new InternationalBankDetails();
-                correspondentBankDetails.setName(
-                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_NAME.getName()));
-                correspondentBankDetails.setBic(rs
-                        .getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_BIC.getName()));
-                correspondentBankDetails.setAddress(
-                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ADDRESS.getName()));
-                correspondentBankDetails.setAbaRtn(
-                        rs.getString(PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_ABA_RTN.getName()));
-                correspondentBankDetails.setCountry(TypeUtil.toEnumField(rs.getString(
-                        PAYOUT_DATA.PAYOUT_INTERNATIONAL_CORRESPONDENT_ACCOUNT_BANK_COUNTRY_CODE.getName()),
-                        CountryCode.class));
-                correspondentBankAccount.setBank(correspondentBankDetails);
-                internationalBankAccount.setCorrespondentAccount(correspondentBankAccount);
-
-                InternationalPayoutAccount internationalPayoutAccount = new InternationalPayoutAccount();
-                internationalPayoutAccount.setBankAccount(internationalBankAccount);
-                internationalPayoutAccount.setPurpose(rs.getString(PAYOUT_DATA.PAYOUT_ACCOUNT_PURPOSE.getName()));
-                return PayoutAccount.international_payout_account(internationalPayoutAccount);
-            default:
-                throw new NotFoundException(String.format("Payout account type '%s' not found", payoutAccountType));
-        }
-    }
-
-    static List<PayoutSummaryItem> toPayoutSummary(ResultSet rs, ObjectMapper objectMapper) throws SQLException {
-        String payoutSummaryString = rs.getString(PAYOUT_DATA.PAYOUT_SUMMARY.getName());
-        if (payoutSummaryString == null) {
-            return null;
-        }
-
-        List<PayoutSummaryItem> payoutSummaryItems = new ArrayList<>();
-        try {
-            for (JsonNode jsonNode : objectMapper.readTree(payoutSummaryString)) {
-                PayoutSummaryItem payoutSummaryItem = jsonToTBase(jsonNode, PayoutSummaryItem.class);
-                payoutSummaryItems.add(payoutSummaryItem);
-            }
-        } catch (IOException ex) {
-            throw new RuntimeJsonMappingException(ex.getMessage());
-        }
-        return payoutSummaryItems;
-    }
-
     static PayoutStatus toPayoutStatus(ResultSet rs) throws SQLException {
-        com.rbkmoney.magista.domain.enums.PayoutStatus payoutStatus =
-                TypeUtil.toEnumField(rs.getString(PAYOUT_DATA.PAYOUT_STATUS.getName()),
-                        com.rbkmoney.magista.domain.enums.PayoutStatus.class);
+        var payoutStatus = TypeUtil.toEnumField(rs.getString(PAYOUT.STATUS.getName()),
+                com.rbkmoney.magista.domain.enums.PayoutStatus.class);
         switch (payoutStatus) {
             case unpaid:
                 return PayoutStatus.unpaid(new PayoutUnpaid());
@@ -387,7 +324,7 @@ public class MapperHelper {
                 return PayoutStatus.paid(new PayoutPaid());
             case cancelled:
                 return PayoutStatus
-                        .cancelled(new PayoutCancelled(rs.getString(PAYOUT_DATA.PAYOUT_CANCEL_DETAILS.getName())));
+                        .cancelled(new PayoutCancelled(rs.getString(PAYOUT.CANCELLED_DETAILS.getName())));
             case confirmed:
                 return PayoutStatus.confirmed(new PayoutConfirmed());
             default:

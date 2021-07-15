@@ -74,12 +74,13 @@ management:
     web:
       exposure:
         include: health,info,prometheus
-
+service:
+  partyManagement:
+    url: http://hellgate:8022/v1/processing/partymgmt
+    networkTimeout: 5000
 kafka:
   bootstrap-servers: kenny-kafka1.bst1.rbkmoney.net:9092
   client-id: magista
-  invoice:
-    topic: mg-invoice-100-2
   consumer:
     group-id: magista-group-1
     enable-auto-commit: false
@@ -88,6 +89,7 @@ kafka:
     max-poll-records: 500
   topics:
     invoicing: mg-invoice-100-2
+    pm-events-payout: pm-events-payout
   ssl:
     enabled: false
 
