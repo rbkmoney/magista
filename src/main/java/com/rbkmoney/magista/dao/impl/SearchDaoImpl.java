@@ -240,21 +240,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                 appendConditions(
                                         DSL.trueCondition(),
                                         Operator.AND,
-                                        new ConditionParameterSource()
-                                                .addValue(PAYOUT.PARTY_ID, parameters.getMerchantId(), EQUALS)
-                                                .addValue(PAYOUT.SHOP_ID, parameters.getShopId(), EQUALS)
-                                                .addInConditionValue(PAYOUT.SHOP_ID, parameters.getShopIds())
-                                                .addValue(PAYOUT.PAYOUT_ID, parameters.getPayoutId(), EQUALS)
-                                                .addValue(PAYOUT.STATUS,
-                                                        toEnumField(parameters.getPayoutStatus(), PayoutStatus.class),
-                                                        EQUALS)
-                                                .addInConditionValue(PAYOUT.STATUS,
-                                                        toEnumFields(parameters.getPayoutStatuses(),
-                                                                PayoutStatus.class))
-                                                .addValue(PAYOUT.PAYOUT_TOOL_TYPE,
-                                                        toEnumField(parameters.getPayoutType(), PayoutToolType.class),
-                                                        EQUALS)
-                                                .addValue(PAYOUT.CREATED_AT, whereTime, LESS)
+                                        preparePayoutCondition(parameters, whereTime)
                                 ),
                                 PAYOUT.CREATED_AT,
                                 fromTime,
@@ -264,6 +250,38 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .limit(limit);
 
         return fetch(query, statPayoutMapper);
+    }
+
+    private ConditionParameterSource preparePayoutCondition(PayoutsFunction.PayoutsParameters parameters,
+                                                            LocalDateTime whereTime) {
+        ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
+                .addValue(PAYOUT.PARTY_ID, parameters.getMerchantId(), EQUALS)
+                .addValue(PAYOUT.SHOP_ID, parameters.getShopId(), EQUALS)
+                .addInConditionValue(PAYOUT.SHOP_ID, parameters.getShopIds())
+                .addValue(PAYOUT.PAYOUT_ID, parameters.getPayoutId(), EQUALS)
+                .addValue(PAYOUT.STATUS,
+                        toEnumField(parameters.getPayoutStatus(), PayoutStatus.class),
+                        EQUALS)
+                .addInConditionValue(PAYOUT.STATUS,
+                        toEnumFields(parameters.getPayoutStatuses(),
+                                PayoutStatus.class))
+                .addValue(PAYOUT.CREATED_AT, whereTime, LESS);
+        switch (parameters.getPayoutType()) {
+            case "bank_account":
+                conditionParameterSource.addOrCondition(
+                        PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.russian_bank_account),
+                        PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.international_bank_account));
+                break;
+            case "wallet_info":
+            case "payment_institution_account":
+                conditionParameterSource.addValue(PAYOUT.PAYOUT_TOOL_TYPE,
+                        toEnumField(parameters.getPayoutType(), PayoutToolType.class),
+                        EQUALS);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown payout_type " + parameters.getPayoutType());
+        }
+        return conditionParameterSource;
     }
 
     @Override
