@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -53,12 +52,8 @@ public class InvoiceTemplateListener implements MessageListener {
                         entry -> handlerManager.getHandler(entry.getKey()),
                         LinkedHashMap::new,
                         Collectors.toList()))
-                .forEach((handler, entries) -> {
-                            if (handler != null) {
-                                Processor processor = handler.handle(entries);
-                                processor.execute();
-                            }
-                        }
-                );
+                .entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .forEach(entry -> entry.getKey().handle(entry.getValue()).execute());
     }
 }

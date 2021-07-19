@@ -161,48 +161,31 @@ public class InvoiceListenerTest {
         invoicePaymentCaptureParams.setReason("test reason");
         Cash invoiceCartCash = new Cash(10L, new CurrencyRef("RUB"));
         InvoiceCart invoiceCart = new InvoiceCart()
-                .setLines(Collections.singletonList(new InvoiceLine("test prod", 1, invoiceCartCash, new HashMap<>())));
+                .setLines(
+                        Collections.singletonList(
+                                new InvoiceLine("test prod", 1, invoiceCartCash, new HashMap<>())));
         invoicePaymentCaptureParams.setCart(invoiceCart);
         invoicePaymentCaptureParams.setCash(new Cash(5L, new CurrencyRef("USD")));
 
         EventPayload eventPayload = EventPayload.invoice_changes(
                 Arrays.asList(
                         InvoiceChange.invoice_created(
-                                new InvoiceCreated(invoice)
-                        ),
+                                new InvoiceCreated(invoice)),
                         InvoiceChange.invoice_status_changed(
-                                new InvoiceStatusChanged(InvoiceStatus.paid(new InvoicePaid()))
-                        ),
+                                new InvoiceStatusChanged(InvoiceStatus.paid(new InvoicePaid()))),
                         InvoiceChange.invoice_payment_change(
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_started(
-                                                new InvoicePaymentStarted(payment)
-                                        )
-                                )
-                        ),
+                                                new InvoicePaymentStarted(payment)))),
                         InvoiceChange.invoice_payment_change(
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_status_changed(
                                                 new InvoicePaymentStatusChanged(
-                                                        InvoicePaymentStatus.captured(new InvoicePaymentCaptured())
-                                                )
-                                        )
-                                )
-                        ),
+                                                        InvoicePaymentStatus.captured(new InvoicePaymentCaptured()))))),
                         InvoiceChange.invoice_payment_change(
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_refund_change(
-                                                new InvoicePaymentRefundChange(
-                                                        invoicePaymentRefund.getId(),
-                                                        InvoicePaymentRefundChangePayload
-                                                                .invoice_payment_refund_created(
-                                                                        new InvoicePaymentRefundCreated(
-                                                                                invoicePaymentRefund, new ArrayList<>())
-                                                                )
-                                                )
-                                        )
-                                )
-                        ),
+                                                getInvoicePaymentRefundChange(invoicePaymentRefund)))),
                         InvoiceChange.invoice_payment_change(
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_refund_change(
@@ -210,17 +193,7 @@ public class InvoiceListenerTest {
                                                         invoicePaymentRefund.getId(),
                                                         InvoicePaymentRefundChangePayload
                                                                 .invoice_payment_refund_status_changed(
-                                                                        new InvoicePaymentRefundStatusChanged(
-                                                                                InvoicePaymentRefundStatus.succeeded(
-                                                                                        new InvoicePaymentRefundSucceeded()
-                                                                                )
-                                                                        )
-                                                                )
-                                                )
-
-                                        )
-                                )
-                        ),
+                                                                        getInvoicePaymentRefundStatusChanged()))))),
                         InvoiceChange.invoice_payment_change(
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_adjustment_change(
@@ -229,12 +202,7 @@ public class InvoiceListenerTest {
                                                         InvoicePaymentAdjustmentChangePayload
                                                                 .invoice_payment_adjustment_created(
                                                                         new InvoicePaymentAdjustmentCreated(
-                                                                                invoicePaymentAdjustment)
-                                                                )
-                                                )
-                                        )
-                                )
-                        ),
+                                                                                invoicePaymentAdjustment)))))),
                         InvoiceChange.invoice_payment_change(
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_adjustment_change(
@@ -242,18 +210,7 @@ public class InvoiceListenerTest {
                                                         invoicePaymentAdjustment.getId(),
                                                         InvoicePaymentAdjustmentChangePayload
                                                                 .invoice_payment_adjustment_status_changed(
-                                                                        new InvoicePaymentAdjustmentStatusChanged(
-                                                                                InvoicePaymentAdjustmentStatus.captured(
-                                                                                        new InvoicePaymentAdjustmentCaptured(
-                                                                                                Instant.now().toString()
-                                                                                        )
-                                                                                )
-                                                                        )
-                                                                )
-                                                )
-                                        )
-                                )
-                        ),
+                                                                        getInvoicePaymentAdjustmentStatusChanged()))))),
                         InvoiceChange.invoice_payment_change(
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_session_change(
@@ -261,29 +218,18 @@ public class InvoiceListenerTest {
                                                         TargetInvoicePaymentStatus
                                                                 .processed(new InvoicePaymentProcessed()),
                                                         SessionChangePayload
-                                                                .session_transaction_bound(sessionTransactionBound)
-                                                )
-                                        )
-                                )
-                        ),
+                                                                .session_transaction_bound(sessionTransactionBound))))),
                         InvoiceChange.invoice_payment_change(
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_capture_started(
                                                 new InvoicePaymentCaptureStarted(
-                                                        invoicePaymentCaptureParams
-                                                )
-                                        ))
-                        ),
+                                                        invoicePaymentCaptureParams)))),
                         InvoiceChange.invoice_payment_change(
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_chargeback_change(
                                                 new InvoicePaymentChargebackChange(
                                                         "testId",
-                                                        TestData.buildInvoiceChargebackChangePayload())
-                                        ))
-                        )
-                )
-        );
+                                                        TestData.buildInvoiceChargebackChangePayload()))))));
         message.setData(Value.bin(toByteArray(eventPayload)));
 
         invoiceListener.handle(Arrays.asList(message), null);
@@ -295,13 +241,35 @@ public class InvoiceListenerTest {
         verify(paymentChargebackService).saveChargeback(any());
     }
 
-    @SneakyThrows
-    public <T extends TBase> T fillTBaseObject(T tBase, Class<T> type) {
-        return mockTBaseProcessor.process(tBase, new TBaseHandler<>(type));
+    private InvoicePaymentRefundChange getInvoicePaymentRefundChange(InvoicePaymentRefund invoicePaymentRefund) {
+        return new InvoicePaymentRefundChange(
+                invoicePaymentRefund.getId(),
+                InvoicePaymentRefundChangePayload
+                        .invoice_payment_refund_created(
+                                new InvoicePaymentRefundCreated(
+                                        invoicePaymentRefund, new ArrayList<>())));
+    }
+
+    private InvoicePaymentRefundStatusChanged getInvoicePaymentRefundStatusChanged() {
+        return new InvoicePaymentRefundStatusChanged(
+                InvoicePaymentRefundStatus.succeeded(
+                        new InvoicePaymentRefundSucceeded()));
+    }
+
+    private InvoicePaymentAdjustmentStatusChanged getInvoicePaymentAdjustmentStatusChanged() {
+        return new InvoicePaymentAdjustmentStatusChanged(
+                InvoicePaymentAdjustmentStatus.captured(
+                        new InvoicePaymentAdjustmentCaptured(
+                                Instant.now().toString())));
     }
 
     @SneakyThrows
-    public byte[] toByteArray(TBase tBase) {
-        return new TSerializer(new TBinaryProtocol.Factory()).serialize(tBase);
+    public <T extends TBase> T fillTBaseObject(T data, Class<T> type) {
+        return mockTBaseProcessor.process(data, new TBaseHandler<>(type));
+    }
+
+    @SneakyThrows
+    public byte[] toByteArray(TBase data) {
+        return new TSerializer(new TBinaryProtocol.Factory()).serialize(data);
     }
 }
