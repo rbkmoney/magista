@@ -2,18 +2,18 @@ package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.query.AbstractQueryTest;
+import com.rbkmoney.magista.config.AbstractQueryConfig;
 import com.rbkmoney.magista.util.DamselUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Transactional
 @Sql("classpath:data/sql/search/refund_search_data.sql")
-public class RefundSearchQueryTest extends AbstractQueryTest {
+public class RefundSearchQueryTest extends AbstractQueryConfig {
 
     @Test
     public void testRefunds() {

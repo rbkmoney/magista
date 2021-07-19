@@ -1,11 +1,10 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.dao.impl.PaymentDaoImpl;
+import com.rbkmoney.magista.config.AbstractDaoConfig;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -14,12 +13,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static io.github.benas.randombeans.api.EnhancedRandom.randomStreamOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ContextConfiguration(classes = {PaymentDaoImpl.class})
-public class PaymentDaoTest extends AbstractDaoTest {
+public class PaymentDaoTest extends AbstractDaoConfig {
 
     @Autowired
     private PaymentDao paymentDao;
@@ -101,7 +97,7 @@ public class PaymentDaoTest extends AbstractDaoTest {
         secondPaymentData.setPaymentFlow(PaymentFlow.hold);
         secondPaymentData.setPaymentHoldOnExpiration(OnHoldExpiration.cancel);
         secondPaymentData.setPaymentHoldUntil(LocalDateTime.now());
-        secondPaymentData.setPaymentContext(new byte[] {0, 1, 2});
+        secondPaymentData.setPaymentContext(new byte[]{0, 1, 2});
 
 
         List<PaymentData> payments = List.of(

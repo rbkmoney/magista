@@ -1,31 +1,26 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.magista.dao.AbstractDaoTest;
+import com.rbkmoney.magista.config.AbstractDaoConfig;
 import com.rbkmoney.magista.dao.ChargebackDao;
-import com.rbkmoney.magista.dao.impl.ChargebackDaoImpl;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.ChargebackData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static io.github.benas.randombeans.api.EnhancedRandom.randomStreamOf;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@ContextConfiguration(classes = {PaymentChargebackService.class, ChargebackDaoImpl.class})
-public class ChargebackServiceTest extends AbstractDaoTest {
+public class ChargebackServiceTest extends AbstractDaoConfig {
 
     @Autowired
     public PaymentChargebackService paymentChargebackService;
@@ -36,7 +31,7 @@ public class ChargebackServiceTest extends AbstractDaoTest {
     @SpyBean
     public ChargebackDao chargebackDao;
 
-    @Before
+    @BeforeEach
     public void setup() {
         given(paymentService.getPaymentData(any(), any()))
                 .willReturn(random(PaymentData.class));
@@ -58,8 +53,6 @@ public class ChargebackServiceTest extends AbstractDaoTest {
         verify(chargebackDao, times(1)).save(anyList());
         verify(chargebackDao).save(captor.capture());
         List<ChargebackData> enrichedChargebackData = captor.getValue();
-        Assert.assertEquals(chargebackList.size(), enrichedChargebackData.size());
-
+        assertEquals(chargebackList.size(), enrichedChargebackData.size());
     }
-
 }

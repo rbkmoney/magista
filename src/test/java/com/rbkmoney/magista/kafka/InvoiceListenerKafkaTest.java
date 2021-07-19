@@ -4,41 +4,34 @@ import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import com.rbkmoney.machinegun.msgpack.Value;
-import com.rbkmoney.magista.config.KafkaConfig;
-import com.rbkmoney.magista.config.RetryConfig;
+import com.rbkmoney.magista.config.AbstractKafkaConfig;
 import com.rbkmoney.magista.converter.SourceEventParser;
-import com.rbkmoney.magista.listener.InvoiceListener;
 import com.rbkmoney.magista.service.HandlerManager;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-import static java.util.Collections.EMPTY_LIST;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@Slf4j
-@TestPropertySource(properties = "kafka.ssl.enable=false")
-@ContextConfiguration(classes = {KafkaConfig.class, KafkaAutoConfiguration.class, InvoiceListener.class,
-        RetryConfig.class})
-public class InvoiceListenerKafkaTest extends KafkaAbstractTest {
+public class InvoiceListenerKafkaTest extends AbstractKafkaConfig {
 
     @MockBean
-    HandlerManager handlerManager;
+    private HandlerManager handlerManager;
+
     @MockBean
-    SourceEventParser eventParser;
+    private SourceEventParser eventParser;
+
+    @Autowired
+    private KafkaTemplate<String, SinkEvent> transactionKafkaTemplate;
 
     @Test
     public void listenEmptyChanges() throws InterruptedException {
-        Producer<String, SinkEvent> producer = createProducer();
         MachineEvent message = new MachineEvent();
         Value data = new Value();
         data.setBin(new byte[0]);
@@ -49,19 +42,14 @@ public class InvoiceListenerKafkaTest extends KafkaAbstractTest {
         message.setData(data);
         SinkEvent sinkEvent = new SinkEvent();
         sinkEvent.setEvent(message);
-        Mockito.when(eventParser.parseEvent(any())).thenReturn(EventPayload.invoice_changes(EMPTY_LIST));
-
-        ProducerRecord<String, SinkEvent> producerRecord = new ProducerRecord<>(topic,
-                null, sinkEvent);
-        try {
-            producer.send(producerRecord).get();
-        } catch (Exception e) {
-            log.error("KafkaAbstractTest initialize e: ", e);
-        }
-        producer.close();
-
+        when(eventParser.parseEvent(any())).thenReturn(EventPayload.invoice_changes(List.of()));
+        transactionKafkaTemplate.send(invoicingTopic, sinkEvent);
         Thread.sleep(1000L);
-        Mockito.verify(eventParser, Mockito.times(1)).parseEvent(any());
+        verify(eventParser, times(1)).parseEvent(any());
+        reset(eventParser);
+        when(eventParser.parseEvent(any())).thenReturn(EventPayload.invoice_template_changes(List.of()));
+        transactionKafkaTemplate.send(invoiceTemplateTopic, sinkEvent);
+        Thread.sleep(1000L);
+        verify(eventParser, times(1)).parseEvent(any());
     }
-
 }

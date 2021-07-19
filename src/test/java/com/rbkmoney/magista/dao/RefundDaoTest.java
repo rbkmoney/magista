@@ -1,22 +1,19 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.dao.impl.RefundDaoImpl;
+import com.rbkmoney.magista.config.AbstractDaoConfig;
 import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.exception.DaoException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
 
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ContextConfiguration(classes = {RefundDaoImpl.class})
-public class RefundDaoTest extends AbstractDaoTest {
+public class RefundDaoTest extends AbstractDaoConfig {
 
     @Autowired
-    RefundDao refundDao;
+    private RefundDao refundDao;
 
     @Test
     public void insertAndFindRefundEventTest() throws DaoException {

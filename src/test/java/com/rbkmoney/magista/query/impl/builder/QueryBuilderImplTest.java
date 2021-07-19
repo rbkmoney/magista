@@ -24,9 +24,9 @@ import static org.mockito.Mockito.when;
 public class QueryBuilderImplTest {
     JsonQueryParser parser = JsonQueryParser.newWeakJsonQueryParser();
 
-    private QueryBuilder builder = new QueryBuilderImpl();
+    private final QueryBuilder builder = new QueryBuilderImpl();
 
-    private FunctionQueryContext queryContext;
+    private final FunctionQueryContext queryContext;
 
     public QueryBuilderImplTest() {
         TokenGenProperties tokenGenPropertiesMock = mock(TokenGenProperties.class);

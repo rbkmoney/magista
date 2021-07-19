@@ -2,19 +2,19 @@ package com.rbkmoney.magista.query.impl.statistics;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.query.AbstractQueryTest;
+import com.rbkmoney.magista.config.AbstractQueryConfig;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
-public class StatisticsQueryTest extends AbstractQueryTest {
+public class StatisticsQueryTest extends AbstractQueryConfig {
 
     @Test
     @Sql("classpath:data/sql/statistics/payments_geo_stat_data.sql")
@@ -94,7 +94,7 @@ public class StatisticsQueryTest extends AbstractQueryTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     @Sql("classpath:data/sql/statistics/payments_conversion_stat_data.sql")
     public void testPaymentsConversionStat() {
         String json =
