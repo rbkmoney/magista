@@ -1,87 +1,307 @@
 package com.rbkmoney.magista.listener;
 
-import com.rbkmoney.damsel.payment_processing.Event;
-import com.rbkmoney.damsel.payment_processing.EventPayload;
-import com.rbkmoney.damsel.payment_processing.InvoiceChange;
+import com.rbkmoney.damsel.domain.Invoice;
+import com.rbkmoney.damsel.domain.InvoicePayment;
+import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
+import com.rbkmoney.damsel.domain.*;
+import com.rbkmoney.damsel.geo_ip.LocationInfo;
+import com.rbkmoney.damsel.payment_processing.*;
+import com.rbkmoney.geck.serializer.kit.mock.FieldHandler;
+import com.rbkmoney.geck.serializer.kit.mock.MockMode;
+import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
+import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
+import com.rbkmoney.machinegun.msgpack.Value;
+import com.rbkmoney.magista.TestData;
+import com.rbkmoney.magista.converter.BinaryConverterImpl;
 import com.rbkmoney.magista.converter.SourceEventParser;
-import com.rbkmoney.magista.event.Processor;
-import com.rbkmoney.magista.event.handler.impl.InvoiceBatchHandler;
-import com.rbkmoney.magista.exception.ParseException;
-import com.rbkmoney.magista.service.HandlerManager;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.springframework.kafka.support.Acknowledgment;
+import com.rbkmoney.magista.event.handler.impl.*;
+import com.rbkmoney.magista.event.mapper.impl.*;
+import com.rbkmoney.magista.provider.GeoProvider;
+import com.rbkmoney.magista.service.PaymentService;
+import com.rbkmoney.magista.service.*;
+import lombok.SneakyThrows;
+import org.apache.thrift.TBase;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
+@SpringBootTest
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+        InvoiceListener.class,
+        HandlerManager.class,
+        SourceEventParser.class,
+        BinaryConverterImpl.class,
+        InvoiceBatchHandler.class,
+        InvoiceCreatedEventMapper.class,
+        InvoiceStatusChangedEventMapper.class,
+        PaymentBatchHandler.class,
+        PaymentStartedEventMapper.class,
+        PaymentStatusChangedEventMapper.class,
+        PaymentTransactionBoundMapper.class,
+        RefundBatchHandler.class,
+        RefundCreatedMapper.class,
+        RefundStatusChangedMapper.class,
+        AdjustmentBatchHandler.class,
+        AdjustmentCreatedMapper.class,
+        AdjustmentStatusChangedMapper.class,
+        ChargebackBatchHandler.class,
+        ChargebackCreatedMapper.class,
+})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class InvoiceListenerTest {
 
-    @Mock
-    private HandlerManager handlerManager;
-    @Mock
-    private InvoiceBatchHandler invoiceHandler;
-    @Mock
-    private Processor processor;
-    @Mock
-    private SourceEventParser eventParser;
-    @Mock
-    private Acknowledgment ack;
+    public static final String SOURCE_ID = "source_id";
+    public static final String SOURCE_NS = "source_ns";
+    private static final Map.Entry<FieldHandler, String[]> timeFields = Map.entry(
+            structHandler -> structHandler.value(Instant.now().toString()),
+            new String[]{"created_at", "at", "due"}
+    );
 
+    @Autowired
     private InvoiceListener invoiceListener;
 
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-        invoiceListener = new InvoiceListener(handlerManager, eventParser);
+    @MockBean
+    private GeoProvider geoProvider;
+
+    @MockBean
+    private InvoiceService invoiceService;
+
+    @MockBean
+    private PaymentService paymentService;
+
+    @MockBean
+    private PaymentRefundService paymentRefundService;
+
+    @MockBean
+    private PaymentAdjustmentService paymentAdjustmentService;
+
+    @MockBean
+    private PaymentChargebackService paymentChargebackService;
+
+    private MockTBaseProcessor mockTBaseProcessor;
+
+    @BeforeEach
+    public void setup() {
+        mockTBaseProcessor = new MockTBaseProcessor(MockMode.ALL, 20, 1);
+        mockTBaseProcessor.addFieldHandler(timeFields.getKey(), timeFields.getValue());
+
+        given(geoProvider.getLocationInfo(any()))
+                .willReturn(new LocationInfo(-1, -1));
     }
 
     @Test
-    public void listenEmptyChanges() {
-        Event event = new Event();
-        EventPayload payload = new EventPayload();
-        payload.setInvoiceChanges(new ArrayList<>());
-        event.setPayload(payload);
+    public void listenPaymentChanges() {
         MachineEvent message = new MachineEvent();
-        List<MachineEvent> messages = List.of(message);
-        Mockito.when(eventParser.parseEvent(message)).thenReturn(payload);
+        message.setCreatedAt(Instant.now().toString());
+        message.setEventId(1L);
+        message.setSourceNs(SOURCE_NS);
+        message.setSourceId(SOURCE_ID);
 
-        invoiceListener.handle(messages, ack);
+        Invoice invoice = new Invoice()
+                .setId(SOURCE_ID)
+                .setOwnerId(UUID.randomUUID().toString())
+                .setCreatedAt(Instant.now().toString())
+                .setDue(Instant.now().toString());
+        invoice = fillTBaseObject(invoice, Invoice.class);
 
-        Mockito.verify(processor, Mockito.times(0)).execute();
+        InvoicePayment payment = new InvoicePayment()
+                .setId(SOURCE_ID)
+                .setOwnerId(UUID.randomUUID().toString())
+                .setFlow(InvoicePaymentFlow.instant(new InvoicePaymentFlowInstant()))
+                .setPayer(
+                        Payer.payment_resource(
+                                new PaymentResourcePayer().setResource(
+                                        new DisposablePaymentResource().setPaymentTool(
+                                                PaymentTool.bank_card(new BankCard()
+                                                )
+                                        )
+                                )
+                        )
+                )
+                .setCreatedAt(Instant.now().toString());
+        payment = fillTBaseObject(payment, InvoicePayment.class);
+
+        InvoicePaymentRefund invoicePaymentRefund = new InvoicePaymentRefund()
+                .setCreatedAt(Instant.now().toString());
+        invoicePaymentRefund = fillTBaseObject(invoicePaymentRefund, InvoicePaymentRefund.class);
+
+        InvoicePaymentAdjustment invoicePaymentAdjustment = new InvoicePaymentAdjustment()
+                .setCreatedAt(Instant.now().toString());
+        invoicePaymentAdjustment = fillTBaseObject(invoicePaymentAdjustment, InvoicePaymentAdjustment.class);
+
+        TransactionInfo transactionInfo = new TransactionInfo();
+        transactionInfo.setId("3542543");
+        transactionInfo.setExtra(Collections.emptyMap());
+        AdditionalTransactionInfo additionalTransactionInfo = new AdditionalTransactionInfo();
+        additionalTransactionInfo.setRrn("5436");
+        additionalTransactionInfo.setApprovalCode("4326");
+        transactionInfo.setAdditionalInfo(additionalTransactionInfo);
+
+        SessionTransactionBound sessionTransactionBound = new SessionTransactionBound();
+        sessionTransactionBound.setTrx(transactionInfo);
+
+        InvoicePaymentCaptureParams invoicePaymentCaptureParams = new InvoicePaymentCaptureParams();
+        invoicePaymentCaptureParams.setReason("test reason");
+        Cash invoiceCartCash = new Cash(10L, new CurrencyRef("RUB"));
+        InvoiceCart invoiceCart = new InvoiceCart()
+                .setLines(Collections.singletonList(new InvoiceLine("test prod", 1, invoiceCartCash, new HashMap<>())));
+        invoicePaymentCaptureParams.setCart(invoiceCart);
+        invoicePaymentCaptureParams.setCash(new Cash(5L, new CurrencyRef("USD")));
+
+        EventPayload eventPayload = EventPayload.invoice_changes(
+                Arrays.asList(
+                        InvoiceChange.invoice_created(
+                                new InvoiceCreated(invoice)
+                        ),
+                        InvoiceChange.invoice_status_changed(
+                                new InvoiceStatusChanged(InvoiceStatus.paid(new InvoicePaid()))
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_started(
+                                                new InvoicePaymentStarted(payment)
+                                        )
+                                )
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_status_changed(
+                                                new InvoicePaymentStatusChanged(
+                                                        InvoicePaymentStatus.captured(new InvoicePaymentCaptured())
+                                                )
+                                        )
+                                )
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_refund_change(
+                                                new InvoicePaymentRefundChange(
+                                                        invoicePaymentRefund.getId(),
+                                                        InvoicePaymentRefundChangePayload
+                                                                .invoice_payment_refund_created(
+                                                                        new InvoicePaymentRefundCreated(
+                                                                                invoicePaymentRefund, new ArrayList<>())
+                                                                )
+                                                )
+                                        )
+                                )
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_refund_change(
+                                                new InvoicePaymentRefundChange(
+                                                        invoicePaymentRefund.getId(),
+                                                        InvoicePaymentRefundChangePayload
+                                                                .invoice_payment_refund_status_changed(
+                                                                        new InvoicePaymentRefundStatusChanged(
+                                                                                InvoicePaymentRefundStatus.succeeded(
+                                                                                        new InvoicePaymentRefundSucceeded()
+                                                                                )
+                                                                        )
+                                                                )
+                                                )
+
+                                        )
+                                )
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_adjustment_change(
+                                                new InvoicePaymentAdjustmentChange(
+                                                        invoicePaymentAdjustment.getId(),
+                                                        InvoicePaymentAdjustmentChangePayload
+                                                                .invoice_payment_adjustment_created(
+                                                                        new InvoicePaymentAdjustmentCreated(
+                                                                                invoicePaymentAdjustment)
+                                                                )
+                                                )
+                                        )
+                                )
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_adjustment_change(
+                                                new InvoicePaymentAdjustmentChange(
+                                                        invoicePaymentAdjustment.getId(),
+                                                        InvoicePaymentAdjustmentChangePayload
+                                                                .invoice_payment_adjustment_status_changed(
+                                                                        new InvoicePaymentAdjustmentStatusChanged(
+                                                                                InvoicePaymentAdjustmentStatus.captured(
+                                                                                        new InvoicePaymentAdjustmentCaptured(
+                                                                                                Instant.now().toString()
+                                                                                        )
+                                                                                )
+                                                                        )
+                                                                )
+                                                )
+                                        )
+                                )
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_session_change(
+                                                new InvoicePaymentSessionChange(
+                                                        TargetInvoicePaymentStatus
+                                                                .processed(new InvoicePaymentProcessed()),
+                                                        SessionChangePayload
+                                                                .session_transaction_bound(sessionTransactionBound)
+                                                )
+                                        )
+                                )
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_capture_started(
+                                                new InvoicePaymentCaptureStarted(
+                                                        invoicePaymentCaptureParams
+                                                )
+                                        ))
+                        ),
+                        InvoiceChange.invoice_payment_change(
+                                new InvoicePaymentChange(payment.getId(),
+                                        InvoicePaymentChangePayload.invoice_payment_chargeback_change(
+                                                new InvoicePaymentChargebackChange(
+                                                        "testId",
+                                                        TestData.buildInvoiceChargebackChangePayload())
+                                        ))
+                        )
+                )
+        );
+        message.setData(Value.bin(toByteArray(eventPayload)));
+
+        invoiceListener.handle(Arrays.asList(message), null);
+
+        verify(invoiceService).saveInvoices(any());
+        verify(paymentService).savePayments(any());
+        verify(paymentRefundService).saveRefunds(any());
+        verify(paymentAdjustmentService).saveAdjustments(any());
+        verify(paymentChargebackService).saveChargeback(any());
     }
 
-    @Test(expected = ParseException.class)
-    public void listenEmptyException() {
-        MachineEvent message = new MachineEvent();
-        List<MachineEvent> messages = List.of(message);
-        Mockito.when(eventParser.parseEvent(message)).thenThrow(new ParseException());
-        invoiceListener.handle(messages, ack);
+    @SneakyThrows
+    public <T extends TBase> T fillTBaseObject(T tBase, Class<T> type) {
+        return mockTBaseProcessor.process(tBase, new TBaseHandler<>(type));
     }
 
-    @Test
-    public void listenChanges() {
-        Event event = new Event();
-        EventPayload payload = new EventPayload();
-        ArrayList<InvoiceChange> invoiceChanges = new ArrayList<>();
-        invoiceChanges.add(new InvoiceChange());
-        payload.setInvoiceChanges(invoiceChanges);
-        event.setPayload(payload);
-        MachineEvent message = new MachineEvent();
-        Mockito.when(eventParser.parseEvent(message)).thenReturn(payload);
-        Mockito.when(invoiceHandler.handle(any())).thenReturn(processor);
-        Mockito.when(handlerManager.getHandler(any())).thenReturn(invoiceHandler);
-
-        invoiceListener.handle(List.of(message), ack);
-
-        Mockito.verify(invoiceHandler, Mockito.times(1)).handle(any());
-        Mockito.verify(processor, Mockito.times(1)).execute();
+    @SneakyThrows
+    public byte[] toByteArray(TBase tBase) {
+        return new TSerializer(new TBinaryProtocol.Factory()).serialize(tBase);
     }
-
 }

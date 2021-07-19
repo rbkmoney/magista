@@ -13,6 +13,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.util.stream.Stream;
+
+import static io.github.benas.randombeans.EnhancedRandomBuilder.aNewEnhancedRandom;
+
 @SpringBootTest
 @Testcontainers
 @ContextConfiguration(
@@ -51,5 +55,13 @@ public abstract class AbstractDaoConfig {
                     "payouter.pooling.enabled=false")
                     .applyTo(configurableApplicationContext);
         }
+    }
+
+    public <T> T random(Class<T> type) {
+        return aNewEnhancedRandom().nextObject(type);
+    }
+
+    public <T> Stream<T> randomStreamOf(int amount, Class<T> type) {
+        return aNewEnhancedRandom().objects(type, amount);
     }
 }

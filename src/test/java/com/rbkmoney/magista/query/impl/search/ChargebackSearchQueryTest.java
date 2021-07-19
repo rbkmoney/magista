@@ -2,16 +2,16 @@ package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.query.AbstractQueryTest;
+import com.rbkmoney.magista.config.AbstractQueryConfig;
 import com.rbkmoney.magista.util.DamselUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
-public class ChargebackSearchQueryTest extends AbstractQueryTest {
+public class ChargebackSearchQueryTest extends AbstractQueryConfig {
 
     @Test
     @Sql("classpath:data/sql/search/chargeback_search_data.sql")

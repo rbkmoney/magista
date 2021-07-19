@@ -4,12 +4,12 @@ import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.config.AbstractQueryConfig;
 import com.rbkmoney.magista.exception.BadTokenException;
-import com.rbkmoney.magista.query.AbstractQueryTest;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.service.TokenGenService;
 import com.rbkmoney.magista.util.DamselUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
-public class InvoiceSearchQueryTest extends AbstractQueryTest {
+public class InvoiceSearchQueryTest extends AbstractQueryConfig {
 
     @Autowired
     private TokenGenService tokenGenService;
@@ -35,10 +35,12 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
         DamselUtil.toJson(statResponse);
     }
 
-    @Test(expected = QueryParserException.class)
+    @Test
     public void testWhenSizeOverflow() {
         String json = "{'query': {'invoices': {'size': 1001}}}";
-        queryProcessor.processQuery(new StatRequest(json));
+        assertThrows(
+                QueryParserException.class,
+                () -> queryProcessor.processQuery(new StatRequest(json)));
     }
 
     @Test
@@ -70,13 +72,15 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
         assertNull(statResponse.getContinuationToken());
     }
 
-    @Test(expected = BadTokenException.class)
+    @Test
     public void testBadToken() {
         String json =
                 "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatRequest statRequest = new StatRequest(json);
         statRequest.setContinuationToken("3gOc9TNJDkE1dOoK5oy6bJvgShunXxk2rTZuCn3SBts=1560155771740");
-        queryProcessor.processQuery(statRequest);
+        assertThrows(
+                BadTokenException.class,
+                () -> queryProcessor.processQuery(statRequest));
     }
 
     @Test
@@ -168,17 +172,21 @@ public class InvoiceSearchQueryTest extends AbstractQueryTest {
         assertEquals(2, statResponse.getData().getInvoices().size());
     }
 
-    @Test(expected = QueryParserException.class)
+    @Test
     public void testDuplicateShopIdParam() {
         String json =
                 "{'query': {'invoices': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': 'SHOP_ID', 'shop_ids': ['SHOP_ID']}}}";
-        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertThrows(
+                QueryParserException.class,
+                () -> queryProcessor.processQuery(new StatRequest(json)));
     }
 
-    @Test(expected = QueryParserException.class)
+    @Test
     public void testShopIdsWithoutMerchantId() {
         String json = "{'query': {'invoices': {'shop_ids': ['SHOP_ID']}}}";
-        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+        assertThrows(
+                QueryParserException.class,
+                () -> queryProcessor.processQuery(new StatRequest(json)));
     }
 
     @Test

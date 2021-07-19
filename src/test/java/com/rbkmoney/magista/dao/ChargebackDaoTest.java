@@ -1,28 +1,24 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.dao.impl.ChargebackDaoImpl;
+import com.rbkmoney.magista.config.AbstractDaoConfig;
 import com.rbkmoney.magista.domain.tables.pojos.ChargebackData;
-import io.github.benas.randombeans.api.EnhancedRandom;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Collections;
 import java.util.List;
 
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ContextConfiguration(classes = {ChargebackDaoImpl.class})
-public class ChargebackDaoTest extends AbstractDaoTest {
+public class ChargebackDaoTest extends AbstractDaoConfig {
 
     @Autowired
     private ChargebackDao chargebackDao;
 
     @Test
     public void saveAndGet() {
-        ChargebackData chargebackData = EnhancedRandom.random(ChargebackData.class);
+        ChargebackData chargebackData = random(ChargebackData.class);
 
         chargebackDao.save(Collections.singletonList(chargebackData));
 
