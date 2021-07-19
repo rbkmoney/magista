@@ -14,7 +14,6 @@ import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -38,14 +37,19 @@ public class ProcessingService {
     @Value("${payouter.handler.timeout}")
     private int payoutHandlerTimeout;
 
+    @Value("${payouter.pooling.enabled}")
+    private Boolean poolingEnabled;
+
     @EventListener(ApplicationReadyEvent.class)
     public void start() {
-        PayoutEventFlow newPayoutEventFlow =
-                new PayoutEventFlow(mappers, payoutEventPublisherBuilder, payoutHandlerThreadPoolSize,
-                        payoutHandlerQueueLimit, payoutHandlerTimeout);
-        if (payoutEventFlow.compareAndSet(null, newPayoutEventFlow)) {
-            Optional<Long> lastEventId = getLastPayoutEventId();
-            newPayoutEventFlow.start(lastEventId);
+        if (poolingEnabled) {
+            PayoutEventFlow newPayoutEventFlow =
+                    new PayoutEventFlow(mappers, payoutEventPublisherBuilder, payoutHandlerThreadPoolSize,
+                            payoutHandlerQueueLimit, payoutHandlerTimeout);
+            if (payoutEventFlow.compareAndSet(null, newPayoutEventFlow)) {
+                Optional<Long> lastEventId = getLastPayoutEventId();
+                newPayoutEventFlow.start(lastEventId);
+            }
         }
     }
 
@@ -59,10 +63,12 @@ public class ProcessingService {
 
     @PreDestroy
     public void stop() {
-        if (payoutEventFlow.get() != null) {
-            payoutEventFlow.getAndSet(null).stop();
+        if (poolingEnabled) {
+            if (payoutEventFlow.get() != null) {
+                payoutEventFlow.getAndSet(null).stop();
+            }
+            kafkaListenerEndpointRegistry.stop();
         }
-        kafkaListenerEndpointRegistry.stop();
     }
 
 }

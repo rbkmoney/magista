@@ -17,14 +17,13 @@ import java.util.stream.Collectors;
 import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithMachineEventValues;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class InvoiceListener implements MessageListener {
 
     private final HandlerManager handlerManager;
     private final SourceEventParser eventParser;
 
-    @KafkaListener(topics = "${kafka.topics.invoicing}", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "${kafka.topics.invoicing.name}", containerFactory = "kafkaListenerContainerFactory")
     public void listen(List<ConsumerRecord<String, MachineEvent>> messages, Acknowledgment ack) {
         List<MachineEvent> machineEvents = messages.stream()
                 .map(ConsumerRecord::value)

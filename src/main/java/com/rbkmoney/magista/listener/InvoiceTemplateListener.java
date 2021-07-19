@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithMachineEventValues;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class InvoiceTemplateListener implements MessageListener {
 

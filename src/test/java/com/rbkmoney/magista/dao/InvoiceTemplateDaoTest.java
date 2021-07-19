@@ -1,19 +1,17 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.dao.impl.InvoiceTemplateDaoImpl;
+import com.rbkmoney.magista.config.AbstractDaoConfig;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceTemplate;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Collections;
 
 import static io.github.benas.randombeans.EnhancedRandomBuilder.aNewEnhancedRandom;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ContextConfiguration(classes = {InvoiceTemplateDaoImpl.class})
-public class InvoiceTemplateDaoTest extends AbstractDaoTest {
+public class InvoiceTemplateDaoTest extends AbstractDaoConfig {
 
     @Autowired
     private InvoiceTemplateDao invoiceTemplateDao;
@@ -23,7 +21,7 @@ public class InvoiceTemplateDaoTest extends AbstractDaoTest {
         InvoiceTemplate expected = aNewEnhancedRandom().nextObject(InvoiceTemplate.class);
         invoiceTemplateDao.save(Collections.singletonList(expected));
         InvoiceTemplate actual = invoiceTemplateDao.get(expected.getInvoiceId(), expected.getInvoiceTemplateId());
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test

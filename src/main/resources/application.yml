@@ -29,6 +29,7 @@ payouter:
     querySize: 100
     maxPoolSize: 1
     delay: 5000
+    enabled: false
   handler:
     queue:
       limit: 100
@@ -78,8 +79,6 @@ management:
 kafka:
   bootstrap-servers: kenny-kafka1.bst1.rbkmoney.net:9092
   client-id: magista
-  invoice:
-    topic: mg-invoice-100-2
   consumer:
     group-id: magista-group-1
     enable-auto-commit: false
@@ -87,7 +86,14 @@ kafka:
     concurrency: 1
     max-poll-records: 500
   topics:
-    invoicing: mg-invoice-100-2
+    invoicing:
+      name: mg-invoice-100-2
+      consume:
+        enabled: false
+    invoice-template:
+      name: mg-events-invoice-template
+      consume:
+        enabled: false
   ssl:
     enabled: false
 

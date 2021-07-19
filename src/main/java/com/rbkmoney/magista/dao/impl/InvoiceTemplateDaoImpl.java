@@ -7,6 +7,7 @@ import com.rbkmoney.magista.domain.tables.records.InvoiceTemplateRecord;
 import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Query;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceTemplate.INVOICE_TEMPLATE;
 
+@Component
 public class InvoiceTemplateDaoImpl extends AbstractDao implements InvoiceTemplateDao {
 
     private final RowMapper<InvoiceTemplate> invoiceTemplateRowMapper;

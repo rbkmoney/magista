@@ -36,8 +36,8 @@ public abstract class KafkaAbstractTest {
     @ClassRule
     public static KafkaContainer kafka = new KafkaContainer(CONFLUENT_PLATFORM_VERSION).withEmbeddedZookeeper();
 
-    @Value("${kafka.topics.invoicing}")
-    public String topic;
+    @Value("${kafka.topics.invoicing.name}")
+    public String invoicingTopic;
 
     public static Producer<String, SinkEvent> createProducer() {
         Properties props = new Properties();
