@@ -4,6 +4,7 @@ import com.rbkmoney.magista.dao.InvoiceTemplateDao;
 import com.rbkmoney.magista.dao.impl.mapper.RecordRowMapper;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceTemplate;
 import com.rbkmoney.magista.domain.tables.records.InvoiceTemplateRecord;
+import com.rbkmoney.magista.exception.DaoException;
 import org.jooq.Query;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -23,7 +24,7 @@ public class InvoiceTemplateDaoImpl extends AbstractDao implements InvoiceTempla
     }
 
     @Override
-    public InvoiceTemplate get(String invoiceId, String invoiceTemplateId) {
+    public InvoiceTemplate get(String invoiceId, String invoiceTemplateId) throws DaoException {
         Query query = getDslContext().selectFrom(INVOICE_TEMPLATE)
                 .where(INVOICE_TEMPLATE.INVOICE_ID.eq(invoiceId)
                         .and(INVOICE_TEMPLATE.INVOICE_TEMPLATE_ID.eq(invoiceTemplateId)));
@@ -31,7 +32,7 @@ public class InvoiceTemplateDaoImpl extends AbstractDao implements InvoiceTempla
     }
 
     @Override
-    public void save(List<InvoiceTemplate> invoiceTemplates) {
+    public void save(List<InvoiceTemplate> invoiceTemplates) throws DaoException {
         List<Query> queries = invoiceTemplates.stream()
                 .map(this::buildInvoiceTemplateRecord)
                 .map(invoiceTemplateRecord ->
