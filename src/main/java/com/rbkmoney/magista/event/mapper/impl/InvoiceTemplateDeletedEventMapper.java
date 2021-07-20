@@ -14,16 +14,16 @@ import org.springframework.stereotype.Component;
 public class InvoiceTemplateDeletedEventMapper implements InvoiceTemplateMapper {
 
     @Override
+    public ChangeType getChangeType() {
+        return ChangeType.INVOICE_TEMPLATE_DELETED;
+    }
+
+    @Override
     public InvoiceTemplate map(InvoiceTemplateChange change, MachineEvent machineEvent) {
         InvoiceTemplate invoiceTemplate = new InvoiceTemplate();
         invoiceTemplate.setEventId(machineEvent.getEventId());
         invoiceTemplate.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         invoiceTemplate.setEventType(InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED);
         return invoiceTemplate;
-    }
-
-    @Override
-    public ChangeType getChangeType() {
-        return ChangeType.INVOICE_TEMPLATE_DELETED;
     }
 }

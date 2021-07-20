@@ -7,27 +7,55 @@ import com.rbkmoney.magista.domain.enums.InvoiceTemplateEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceTemplate;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.mapper.InvoiceTemplateMapper;
+import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+
+import static com.rbkmoney.magista.util.LifetimeIntervalThriftUtil.getInvoiceValidUntil;
 
 @Component
 public class InvoiceTemplateCreatedEventMapper implements InvoiceTemplateMapper {
 
     @Override
+    public ChangeType getChangeType() {
+        return ChangeType.INVOICE_TEMPLATE_CREATED;
+    }
+
+    @Override
     public InvoiceTemplate map(InvoiceTemplateChange change, MachineEvent machineEvent) {
         InvoiceTemplate invoiceTemplate = new InvoiceTemplate();
         invoiceTemplate.setEventId(machineEvent.getEventId());
-        invoiceTemplate.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
+        var eventCreatedAt = TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt());
+        invoiceTemplate.setEventCreatedAt(eventCreatedAt);
         invoiceTemplate.setEventType(InvoiceTemplateEventType.INVOICE_TEMPLATE_CREATED);
         var invoiceTemplateThrift = change.getInvoiceTemplateCreated().getInvoiceTemplate();
         invoiceTemplate.setInvoiceTemplateId(invoiceTemplateThrift.getId());
         invoiceTemplate.setInvoiceId(machineEvent.getSourceId());
         invoiceTemplate.setPartyId(invoiceTemplateThrift.getOwnerId());
         invoiceTemplate.setPartyShopId(invoiceTemplateThrift.getShopId());
+        invoiceTemplate.setInvoiceValidUntil(
+                getInvoiceValidUntil(
+                        eventCreatedAt,
+                        invoiceTemplateThrift.getInvoiceLifetime()));
+        invoiceTemplate.setProduct(invoiceTemplateThrift.getProduct());
+        invoiceTemplate.setDescription(invoiceTemplateThrift.getDescription());
+        var details = invoiceTemplateThrift.getDetails();
+        switch (details.getSetField()) {
+            case CART:
+                invoiceTemplate.setInvoiceDetailsCartJson(DamselUtil.toJsonString(details.getCart()));
+                break;
+            case PRODUCT:
+                invoiceTemplate.setInvoiceDetailsProductJson(DamselUtil.toJsonString(details.getProduct()));
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown field parameter, details=" + details);
+        }
+        if (invoiceTemplateThrift.isSetContext()) {
+            var content = invoiceTemplateThrift.getContext();
+            invoiceTemplate.setInvoiceContextType(content.getType());
+            invoiceTemplate.setInvoiceContextData(content.getData());
+        }
         return invoiceTemplate;
-    }
-
-    @Override
-    public ChangeType getChangeType() {
-        return ChangeType.INVOICE_TEMPLATE_CREATED;
     }
 }
