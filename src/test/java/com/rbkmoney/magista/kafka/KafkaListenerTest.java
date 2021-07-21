@@ -22,9 +22,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,9 +34,10 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
@@ -57,12 +56,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@RunWith(SpringRunner.class)
 @ContextConfiguration(
         classes = MagistaApplication.class,
         initializers = {
                 KafkaListenerTest.KafkaInitializer.class,
                 KafkaListenerTest.PostgresInitializer.class})
+@Testcontainers
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource("classpath:application.yml")
 @Slf4j
@@ -96,14 +95,14 @@ public class KafkaListenerTest {
     @Value("${kafka.bootstrap-servers}")
     public String bootstrapServers;
 
-    @ClassRule
+    @Container
     public static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
             DockerImageName
                     .parse(CONFLUENT_IMAGE_NAME)
                     .withTag(CONFLUENT_PLATFORM_VERSION))
             .withEmbeddedZookeeper();
 
-    @ClassRule
+    @Container
     @SuppressWarnings("rawtypes")
     public static final PostgreSQLContainer POSTGRESQL_CONTAINER = new PostgreSQLContainer(
             DockerImageName
@@ -132,7 +131,6 @@ public class KafkaListenerTest {
             initTopic(
                     environment.getProperty("kafka.topics.pm-events-payout.id"),
                     PayoutEventDeserializer.class);
-            KAFKA_CONTAINER.start();
         }
 
         private <T> void initTopic(String topicName, Class clazz) {
