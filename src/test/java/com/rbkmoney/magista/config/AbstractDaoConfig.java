@@ -1,7 +1,6 @@
 package com.rbkmoney.magista.config;
 
 import com.rbkmoney.magista.MagistaApplication;
-import org.junit.jupiter.api.Disabled;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -25,7 +24,6 @@ import static io.github.benas.randombeans.EnhancedRandomBuilder.aNewEnhancedRand
         initializers = AbstractDaoConfig.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource("classpath:application.yml")
-@Disabled
 public abstract class AbstractDaoConfig {
 
     private static final String POSTGRESQL_IMAGE_NAME = "postgres";

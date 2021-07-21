@@ -22,7 +22,9 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.jupiter.api.Test;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,10 +36,9 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
@@ -56,13 +57,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@RunWith(SpringRunner.class)
 @ContextConfiguration(
         classes = MagistaApplication.class,
         initializers = {
                 KafkaListenerTest.KafkaInitializer.class,
                 KafkaListenerTest.PostgresInitializer.class})
-@Testcontainers
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource("classpath:application.yml")
 @Slf4j
 public class KafkaListenerTest {
@@ -85,7 +86,7 @@ public class KafkaListenerTest {
     private static final String PRODUCER_CLIENT_ID = "producer-service-test-" + UUID.randomUUID();
     private static final String INIT_TOPIC_CONSUMER_GROUP_ID = "init-topic-consumer-test-" + UUID.randomUUID();
     private static final String CONFLUENT_IMAGE_NAME = "confluentinc/cp-kafka";
-    private static final String CONFLUENT_PLATFORM_VERSION = "6.2.0";
+    private static final String CONFLUENT_PLATFORM_VERSION = "5.0.1";
     private static final String POSTGRESQL_IMAGE_NAME = "postgres";
     private static final String POSTGRESQL_VERSION = "11.4";
 
@@ -95,14 +96,14 @@ public class KafkaListenerTest {
     @Value("${kafka.bootstrap-servers}")
     public String bootstrapServers;
 
-    @Container
+    @ClassRule
     public static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
             DockerImageName
                     .parse(CONFLUENT_IMAGE_NAME)
                     .withTag(CONFLUENT_PLATFORM_VERSION))
             .withEmbeddedZookeeper();
 
-    @Container
+    @ClassRule
     @SuppressWarnings("rawtypes")
     public static final PostgreSQLContainer POSTGRESQL_CONTAINER = new PostgreSQLContainer(
             DockerImageName
@@ -131,6 +132,7 @@ public class KafkaListenerTest {
             initTopic(
                     environment.getProperty("kafka.topics.pm-events-payout.id"),
                     PayoutEventDeserializer.class);
+            KAFKA_CONTAINER.start();
         }
 
         private <T> void initTopic(String topicName, Class clazz) {
@@ -228,7 +230,7 @@ public class KafkaListenerTest {
         sinkEvent.setEvent(message);
         when(eventParser.parseEvent(any())).thenReturn(EventPayload.invoice_changes(List.of()));
         produce(invoicingTopicName, sinkEvent);
-        Thread.sleep(1000L);
+        Thread.sleep(3000L);
         verify(eventParser, times(1)).parseEvent(any());
     }
 
@@ -246,7 +248,7 @@ public class KafkaListenerTest {
         sinkEvent.setEvent(message);
         when(eventParser.parseEvent(any())).thenReturn(EventPayload.invoice_template_changes(List.of()));
         produce(invoiceTemplateTopicName, sinkEvent);
-        Thread.sleep(1000L);
+        Thread.sleep(3000L);
         verify(eventParser, times(1)).parseEvent(any());
     }
 
@@ -272,6 +274,6 @@ public class KafkaListenerTest {
         event.setPayoutChange(PayoutChange.created(new PayoutCreated(payout)));
         event.setPayout(payout);
         producePayout(payoutTopicName, event);
-        Thread.sleep(1000L);
+        Thread.sleep(3000L);
     }
 }
