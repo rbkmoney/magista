@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.rbkmoney</groupId>
         <artifactId>service-parent-pom</artifactId>
-        <version>1.2.9</version>
+        <version>1.2.10</version>
     </parent>
 
     <groupId>com.rbkmoney.magista</groupId>
@@ -156,6 +156,11 @@
                     <artifactId>filter</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>payout-manager-proto</artifactId>
+            <version>1.17-8aa3eb8</version>
         </dependency>
 
         <!--Test libs-->

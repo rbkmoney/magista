@@ -10,8 +10,6 @@ import com.rbkmoney.magista.event.mapper.InvoiceTemplateMapper;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 import static com.rbkmoney.magista.util.LifetimeIntervalThriftUtil.getInvoiceValidUntil;
 
 @Component
@@ -33,7 +31,7 @@ public class InvoiceTemplateCreatedEventMapper implements InvoiceTemplateMapper 
         invoiceTemplate.setInvoiceTemplateId(invoiceTemplateThrift.getId());
         invoiceTemplate.setInvoiceId(machineEvent.getSourceId());
         invoiceTemplate.setPartyId(invoiceTemplateThrift.getOwnerId());
-        invoiceTemplate.setPartyShopId(invoiceTemplateThrift.getShopId());
+        invoiceTemplate.setShopId(invoiceTemplateThrift.getShopId());
         invoiceTemplate.setInvoiceValidUntil(
                 getInvoiceValidUntil(
                         eventCreatedAt,

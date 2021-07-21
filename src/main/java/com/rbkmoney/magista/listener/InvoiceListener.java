@@ -2,66 +2,77 @@ package com.rbkmoney.magista.listener;
 
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
+import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.service.HandlerManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithMachineEventValues;
+import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithSinkEventValues;
 
 @Slf4j
+@Service
 @RequiredArgsConstructor
-public class InvoiceListener implements MessageListener {
+public class InvoiceListener {
 
     private final HandlerManager handlerManager;
     private final SourceEventParser eventParser;
 
-    @KafkaListener(topics = "${kafka.topics.invoicing.name}", containerFactory = "kafkaListenerContainerFactory")
-    public void listen(List<ConsumerRecord<String, MachineEvent>> messages, Acknowledgment ack) {
-        List<MachineEvent> machineEvents = messages.stream()
-                .map(ConsumerRecord::value)
-                .collect(Collectors.toList());
+    @Value("${kafka.consumer.throttling-timeout-ms}")
+    private int throttlingTimeout;
 
-        handle(machineEvents, ack);
+    @KafkaListener(
+            autoStartup = "${kafka.topics.invoicing.consume.enabled}",
+            topics = "${kafka.topics.invoicing.id}",
+            containerFactory = "invoicingListenerContainerFactory")
+    public void listen(
+            List<ConsumerRecord<String, SinkEvent>> batch,
+            Acknowledgment ack) throws InterruptedException {
+        log.info("InvoiceListener listen offsets, size={}, {}",
+                batch.size(), toSummaryStringWithSinkEventValues(batch));
+        List<MachineEvent> machineEvents = batch.stream()
+                .map(ConsumerRecord::value)
+                .map(SinkEvent::getEvent)
+                .collect(Collectors.toList());
+        handleMessages(machineEvents);
         ack.acknowledge();
-        log.info("Records have been committed, size={}, {}", messages.size(),
-                toSummaryStringWithMachineEventValues(messages));
+        log.info("InvoiceListener Records have been committed, size={}, {}",
+                batch.size(), toSummaryStringWithSinkEventValues(batch));
     }
 
-    @Override
-    public void handle(List<MachineEvent> machineEvents, Acknowledgment ack) {
-        machineEvents.stream()
-                .map(machineEvent -> Map.entry(eventParser.parseEvent(machineEvent), machineEvent))
-                .filter(entry -> entry.getKey().isSetInvoiceChanges())
-                .map(entry -> {
-                    List<Map.Entry<InvoiceChange, MachineEvent>> invoiceChangesWithMachineEvent = new ArrayList<>();
-                    for (InvoiceChange invoiceChange : entry.getKey().getInvoiceChanges()) {
-                        invoiceChangesWithMachineEvent.add(Map.entry(invoiceChange, entry.getValue()));
-                    }
-                    return invoiceChangesWithMachineEvent;
-                })
-                .flatMap(List::stream)
-                .sorted(Comparator.comparingLong(o -> o.getValue().getEventId()))
-                .collect(
-                        Collectors.groupingBy(
-                                entry -> handlerManager.getHandler(entry.getKey()),
-                                LinkedHashMap::new,
-                                Collectors.toList()
-                        )
-                )
-                .forEach(
-                        (handler, invoiceChangesWithMachineEvent) -> {
-                            if (handler != null) {
-                                handler.handle(invoiceChangesWithMachineEvent).execute();
-                            }
+    public void handleMessages(List<MachineEvent> machineEvents) throws InterruptedException {
+        try {
+            machineEvents.stream()
+                    .map(machineEvent -> Map.entry(eventParser.parseEvent(machineEvent), machineEvent))
+                    .filter(entry -> entry.getKey().isSetInvoiceChanges())
+                    .map(entry -> {
+                        var invoiceChangesWithMachineEvent = new ArrayList<Map.Entry<InvoiceChange, MachineEvent>>();
+                        for (InvoiceChange invoiceChange : entry.getKey().getInvoiceChanges()) {
+                            invoiceChangesWithMachineEvent.add(Map.entry(invoiceChange, entry.getValue()));
                         }
-                );
+                        return invoiceChangesWithMachineEvent;
+                    })
+                    .flatMap(List::stream)
+                    .sorted(Comparator.comparingLong(o -> o.getValue().getEventId()))
+                    .collect(Collectors.groupingBy(
+                            entry -> handlerManager.getHandler(entry.getKey()),
+                            LinkedHashMap::new,
+                            Collectors.toList()))
+                    .entrySet().stream()
+                    .filter(entry -> entry.getKey() != null)
+                    .forEach(entry -> entry.getKey().handle(entry.getValue()).execute());
+        } catch (Exception e) {
+            log.error("Error when InvoiceListener listen e: ", e);
+            Thread.sleep(throttlingTimeout);
+            throw e;
+        }
     }
 }

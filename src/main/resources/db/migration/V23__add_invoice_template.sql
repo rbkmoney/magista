@@ -9,7 +9,7 @@ CREATE TABLE mst.invoice_template
     invoice_template_id          CHARACTER VARYING               NOT NULL,
     invoice_id                   CHARACTER VARYING               NOT NULL,
     party_id                     CHARACTER VARYING               NOT NULL,
-    party_shop_id                CHARACTER VARYING               NOT NULL,
+    shop_id                      CHARACTER VARYING               NOT NULL,
     invoice_valid_until          TIMESTAMP WITHOUT TIME ZONE     NOT NULL,
     product                      CHARACTER VARYING               NOT NULL,
     description                  CHARACTER VARYING,

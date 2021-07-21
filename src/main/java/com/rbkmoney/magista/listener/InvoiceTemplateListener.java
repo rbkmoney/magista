@@ -2,58 +2,77 @@ package com.rbkmoney.magista.listener;
 
 import com.rbkmoney.damsel.payment_processing.InvoiceTemplateChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
+import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import com.rbkmoney.magista.converter.SourceEventParser;
-import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.service.HandlerManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithMachineEventValues;
+import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithSinkEventValues;
 
 @Slf4j
+@Service
 @RequiredArgsConstructor
-public class InvoiceTemplateListener implements MessageListener {
+public class InvoiceTemplateListener {
 
     private final HandlerManager handlerManager;
     private final SourceEventParser eventParser;
 
-    @KafkaListener(topics = "${kafka.topics.invoice-template.name}", containerFactory = "kafkaListenerContainerFactory")
-    public void listen(List<ConsumerRecord<String, MachineEvent>> messages, Acknowledgment ack) {
-        List<MachineEvent> machineEvents = messages.stream()
+    @Value("${kafka.consumer.throttling-timeout-ms}")
+    private int throttlingTimeout;
+
+    @KafkaListener(
+            autoStartup = "${kafka.topics.invoice-template.consume.enabled}",
+            topics = "${kafka.topics.invoice-template.id}",
+            containerFactory = "invoiceTemplateListenerContainerFactory")
+    public void listen(
+            List<ConsumerRecord<String, SinkEvent>> batch,
+            Acknowledgment ack) throws InterruptedException {
+        log.info("InvoiceTemplateListener listen offsets, size={}, {}",
+                batch.size(), toSummaryStringWithSinkEventValues(batch));
+        List<MachineEvent> machineEvents = batch.stream()
                 .map(ConsumerRecord::value)
+                .map(SinkEvent::getEvent)
                 .collect(Collectors.toList());
-        handle(machineEvents, ack);
+        handleMessages(machineEvents);
         ack.acknowledge();
-        log.info("Records have been committed, size={}, {}", messages.size(),
-                toSummaryStringWithMachineEventValues(messages));
+        log.info("InvoiceTemplateListener Records have been committed, size={}, {}",
+                batch.size(), toSummaryStringWithSinkEventValues(batch));
     }
 
-    @Override
-    public void handle(List<MachineEvent> machineEvents, Acknowledgment ack) {
-        machineEvents.stream()
-                .map(machineEvent -> Map.entry(eventParser.parseEvent(machineEvent), machineEvent))
-                .filter(entry -> entry.getKey().isSetInvoiceTemplateChanges())
-                .map(entry -> {
-                    var entries = new ArrayList<Map.Entry<InvoiceTemplateChange, MachineEvent>>();
-                    for (InvoiceTemplateChange change : entry.getKey().getInvoiceTemplateChanges()) {
-                        entries.add(Map.entry(change, entry.getValue()));
-                    }
-                    return entries;
-                })
-                .flatMap(List::stream)
-                .sorted(Comparator.comparingLong(o -> o.getValue().getEventId()))
-                .collect(Collectors.groupingBy(
-                        entry -> handlerManager.getHandler(entry.getKey()),
-                        LinkedHashMap::new,
-                        Collectors.toList()))
-                .entrySet().stream()
-                .filter(entry -> entry.getKey() != null)
-                .forEach(entry -> entry.getKey().handle(entry.getValue()).execute());
+    public void handleMessages(List<MachineEvent> machineEvents) throws InterruptedException {
+        try {
+            machineEvents.stream()
+                    .map(machineEvent -> Map.entry(eventParser.parseEvent(machineEvent), machineEvent))
+                    .filter(entry -> entry.getKey().isSetInvoiceTemplateChanges())
+                    .map(entry -> {
+                        var entries = new ArrayList<Map.Entry<InvoiceTemplateChange, MachineEvent>>();
+                        for (InvoiceTemplateChange change : entry.getKey().getInvoiceTemplateChanges()) {
+                            entries.add(Map.entry(change, entry.getValue()));
+                        }
+                        return entries;
+                    })
+                    .flatMap(List::stream)
+                    .sorted(Comparator.comparingLong(o -> o.getValue().getEventId()))
+                    .collect(Collectors.groupingBy(
+                            entry -> handlerManager.getHandler(entry.getKey()),
+                            LinkedHashMap::new,
+                            Collectors.toList()))
+                    .entrySet().stream()
+                    .filter(entry -> entry.getKey() != null)
+                    .forEach(entry -> entry.getKey().handle(entry.getValue()).execute());
+        } catch (Exception e) {
+            log.error("Error when InvoiceTemplateListener listen e: ", e);
+            Thread.sleep(throttlingTimeout);
+            throw e;
+        }
     }
 }

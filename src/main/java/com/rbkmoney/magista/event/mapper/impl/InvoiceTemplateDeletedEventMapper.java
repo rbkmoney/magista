@@ -1,7 +1,6 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.payment_processing.InvoiceTemplateChange;
-import com.rbkmoney.damsel.payment_processing.InvoiceTemplateUpdateParams;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.domain.enums.InvoiceTemplateEventType;

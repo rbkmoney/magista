@@ -107,7 +107,7 @@ public class InvoiceListenerTest {
     }
 
     @Test
-    public void listenPaymentChanges() {
+    public void listenPaymentChanges() throws Exception {
         MachineEvent message = new MachineEvent();
         message.setCreatedAt(Instant.now().toString());
         message.setEventId(1L);
@@ -232,7 +232,7 @@ public class InvoiceListenerTest {
                                                         TestData.buildInvoiceChargebackChangePayload()))))));
         message.setData(Value.bin(toByteArray(eventPayload)));
 
-        invoiceListener.handle(Arrays.asList(message), null);
+        invoiceListener.handleMessages(Arrays.asList(message));
 
         verify(invoiceService).saveInvoices(any());
         verify(paymentService).savePayments(any());

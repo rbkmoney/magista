@@ -30,7 +30,7 @@ public abstract class AbstractDaoConfig {
     private static final String POSTGRESQL_VERSION = "11.4";
 
     @Container
-    public static final PostgreSQLContainer POSTGRE_SQL_CONTAINER = new PostgreSQLContainer(
+    public static final PostgreSQLContainer POSTGRESQL_CONTAINER = new PostgreSQLContainer(
             DockerImageName
                     .parse(POSTGRESQL_IMAGE_NAME)
                     .withTag(POSTGRESQL_VERSION));
@@ -40,15 +40,15 @@ public abstract class AbstractDaoConfig {
         @Override
         public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
             TestPropertyValues.of(
-                    "spring.datasource.url=" + POSTGRE_SQL_CONTAINER.getJdbcUrl(),
-                    "spring.datasource.username=" + POSTGRE_SQL_CONTAINER.getUsername(),
-                    "spring.datasource.password=" + POSTGRE_SQL_CONTAINER.getPassword(),
-                    "spring.flyway.url=" + POSTGRE_SQL_CONTAINER.getJdbcUrl(),
-                    "spring.flyway.user=" + POSTGRE_SQL_CONTAINER.getUsername(),
-                    "spring.flyway.password=" + POSTGRE_SQL_CONTAINER.getPassword(),
-                    "flyway.url=" + POSTGRE_SQL_CONTAINER.getJdbcUrl(),
-                    "flyway.user=" + POSTGRE_SQL_CONTAINER.getUsername(),
-                    "flyway.password=" + POSTGRE_SQL_CONTAINER.getPassword(),
+                    "spring.datasource.url=" + POSTGRESQL_CONTAINER.getJdbcUrl(),
+                    "spring.datasource.username=" + POSTGRESQL_CONTAINER.getUsername(),
+                    "spring.datasource.password=" + POSTGRESQL_CONTAINER.getPassword(),
+                    "spring.flyway.url=" + POSTGRESQL_CONTAINER.getJdbcUrl(),
+                    "spring.flyway.user=" + POSTGRESQL_CONTAINER.getUsername(),
+                    "spring.flyway.password=" + POSTGRESQL_CONTAINER.getPassword(),
+                    "flyway.url=" + POSTGRESQL_CONTAINER.getJdbcUrl(),
+                    "flyway.user=" + POSTGRESQL_CONTAINER.getUsername(),
+                    "flyway.password=" + POSTGRESQL_CONTAINER.getPassword(),
                     "token-gen.key=" + "jXnZr4u7x!A%D*G-KaPvSgVkYp3s5v8t/B?E(H+MbQeThWmZq4t7w9z$C&F)J@Nc",
                     "cache.invoiceData.size=10000",
                     "cache.paymentData.size=10000",
@@ -57,11 +57,11 @@ public abstract class AbstractDaoConfig {
         }
     }
 
-    public <T> T random(Class<T> type) {
-        return aNewEnhancedRandom().nextObject(type);
+    public static <T> T random(Class<T> type, String... excludedFields) {
+        return aNewEnhancedRandom().nextObject(type, excludedFields);
     }
 
-    public <T> Stream<T> randomStreamOf(int amount, Class<T> type) {
-        return aNewEnhancedRandom().objects(type, amount);
+    public static <T> Stream<T> randomStreamOf(int amount, Class<T> type, String... excludedFields) {
+        return aNewEnhancedRandom().objects(type, amount, excludedFields);
     }
 }

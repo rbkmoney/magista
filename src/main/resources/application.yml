@@ -81,19 +81,28 @@ kafka:
   client-id: magista
   consumer:
     group-id: magista-group-1
-    enable-auto-commit: false
-    auto-offset-reset: earliest
-    concurrency: 1
-    max-poll-records: 500
+    max-poll-interval-ms: 60000
+    max-session-timeout-ms: 60000
+    throttling-timeout-ms: 1000
   topics:
     invoicing:
-      name: mg-invoice-100-2
+      id: mg-invoice-100-2
       consume:
         enabled: false
+        max-poll-records: 500
+        concurrency: 1
     invoice-template:
-      name: mg-events-invoice-template
+      id: mg-events-invoice-template
       consume:
         enabled: false
+        max-poll-records: 50
+        concurrency: 1
+    pm-events-payout:
+      id: pm-events-payout
+      consume:
+        enabled: false
+        max-poll-records: 50
+        concurrency: 1
   ssl:
     enabled: false
 

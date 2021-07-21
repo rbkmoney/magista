@@ -12,7 +12,6 @@ import org.jooq.impl.SQLDataType;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;

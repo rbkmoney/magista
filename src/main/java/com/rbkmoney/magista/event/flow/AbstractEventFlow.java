@@ -29,7 +29,7 @@ public abstract class AbstractEventFlow {
     private final Thread eventSaverThread;
     private final long timeout;
 
-    private AtomicBoolean isRun = new AtomicBoolean(false);
+    private final AtomicBoolean isRun = new AtomicBoolean(false);
 
     public AbstractEventFlow(String name, List<? extends Mapper> mappers,
                              DefaultPollingEventPublisherBuilder defaultPollingEventPublisherBuilder,
@@ -44,7 +44,7 @@ public abstract class AbstractEventFlow {
                     return EventAction.CONTINUE;
                 }).build();
         this.executorService = Executors.newFixedThreadPool(threadPoolSize, new ThreadFactory() {
-            AtomicInteger counter = new AtomicInteger();
+            final AtomicInteger counter = new AtomicInteger();
 
             @Override
             public Thread newThread(Runnable r) {

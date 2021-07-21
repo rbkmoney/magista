@@ -5,10 +5,10 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.*;
-import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
+import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.query.impl.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import javax.sql.DataSource;
-
 import java.time.LocalDateTime;
 import java.util.*;
 

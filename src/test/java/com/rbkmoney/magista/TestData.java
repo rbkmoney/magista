@@ -4,11 +4,12 @@ import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChargebackChangePayload;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChargebackCreated;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import io.github.benas.randombeans.api.EnhancedRandom;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+
+import static com.rbkmoney.magista.config.AbstractDaoConfig.random;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TestData {
@@ -24,7 +25,7 @@ public class TestData {
     }
 
     public static InvoicePaymentChargeback buildChargebackCreate() {
-        InvoicePaymentChargeback invoicePaymentChargeback = EnhancedRandom.random(
+        InvoicePaymentChargeback invoicePaymentChargeback = random(
                 InvoicePaymentChargeback.class, "status", "reason", "stage", "created_at", "context");
         invoicePaymentChargeback
                 .setStatus(InvoicePaymentChargebackStatus.accepted(new InvoicePaymentChargebackAccepted()));

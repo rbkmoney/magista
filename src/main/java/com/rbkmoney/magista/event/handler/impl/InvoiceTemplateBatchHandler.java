@@ -1,13 +1,10 @@
 package com.rbkmoney.magista.event.handler.impl;
 
-import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.damsel.payment_processing.InvoiceTemplateChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceTemplate;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.handler.BatchHandler;
-import com.rbkmoney.magista.event.mapper.InvoiceMapper;
 import com.rbkmoney.magista.event.mapper.InvoiceTemplateMapper;
 import com.rbkmoney.magista.service.InvoiceTemplateService;
 import lombok.RequiredArgsConstructor;

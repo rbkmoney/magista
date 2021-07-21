@@ -8,19 +8,11 @@
     </root>
 
     <logger name="com.rbkmoney.magista">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
 
-    <logger name="org.springframework.jdbc.core.JdbcTemplate">
-        <level value="debug"/>
-    </logger>
-
-    <logger name="org.springframework.jdbc.core.StatementCreatorUtils">
-        <level value="debug"/>
-    </logger>
-
-    <logger name="org.springframework.jdbc.support.JdbcAccessor">
-        <level value="debug"/>
+    <logger name="org.apache.kafka">
+        <level value="warn"/>
     </logger>
 
 </configuration>
