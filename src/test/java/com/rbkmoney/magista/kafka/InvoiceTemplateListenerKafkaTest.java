@@ -17,9 +17,9 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class InvoiceListenerKafkaTest extends AbstractKafkaConfig {
+public class InvoiceTemplateListenerKafkaTest extends AbstractKafkaConfig {
 
-    @Value("${kafka.topics.invoicing.id}")
+    @Value("${kafka.topics.invoice-template.id}")
     private String topicName;
 
     @MockBean
@@ -29,7 +29,7 @@ public class InvoiceListenerKafkaTest extends AbstractKafkaConfig {
     private SourceEventParser eventParser;
 
     @Test
-    public void shouldInvoicingSinkEventListen() throws InterruptedException {
+    public void shouldInvoiceTemplateSinkEventListen() throws InterruptedException {
         var message = new MachineEvent();
         message.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         message.setEventId(1L);
@@ -40,7 +40,7 @@ public class InvoiceListenerKafkaTest extends AbstractKafkaConfig {
         message.setData(data);
         var sinkEvent = new SinkEvent();
         sinkEvent.setEvent(message);
-        when(eventParser.parseEvent(any())).thenReturn(EventPayload.invoice_changes(List.of()));
+        when(eventParser.parseEvent(any())).thenReturn(EventPayload.invoice_template_changes(List.of()));
         produce(topicName, sinkEvent);
         Thread.sleep(1000L);
         verify(eventParser, times(1)).parseEvent(any());
