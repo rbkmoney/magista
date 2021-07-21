@@ -48,7 +48,7 @@ public abstract class AbstractKafkaConfig extends AbstractDaoConfig {
 
     private static final String PRODUCER_CLIENT_ID = "producer-service-test-" + UUID.randomUUID();
     private static final String CONFLUENT_IMAGE_NAME = "confluentinc/cp-kafka";
-    private static final String CONFLUENT_PLATFORM_VERSION = "latest";
+    private static final String CONFLUENT_PLATFORM_VERSION = "5.0.1";
 
     @Container
     public static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
