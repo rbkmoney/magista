@@ -9,7 +9,12 @@ import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.service.HandlerManager;
 import com.rbkmoney.payout.manager.*;
 import com.rbkmoney.payout.manager.domain.CurrencyRef;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -22,6 +27,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class KafkaListenerTest extends AbstractKafkaConfig {
 
     @Value("${kafka.topics.invoicing.id}")
@@ -38,6 +44,22 @@ public class KafkaListenerTest extends AbstractKafkaConfig {
 
     @MockBean
     private SourceEventParser eventParser;
+
+    private AutoCloseable mocks;
+
+    private Object[] preparedMocks;
+
+    @BeforeEach
+    public void init() {
+        mocks = MockitoAnnotations.openMocks(this);
+        preparedMocks = new Object[] {handlerManager, eventParser};
+    }
+
+    @AfterEach
+    public void clean() throws Exception {
+        verifyNoMoreInteractions(preparedMocks);
+        mocks.close();
+    }
 
     @Test
     public void shouldInvoicingSinkEventListen() throws InterruptedException {

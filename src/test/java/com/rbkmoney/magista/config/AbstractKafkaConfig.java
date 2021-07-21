@@ -48,7 +48,7 @@ public abstract class AbstractKafkaConfig extends AbstractDaoConfig {
 
     private static final String PRODUCER_CLIENT_ID = "producer-service-test-" + UUID.randomUUID();
     private static final String CONFLUENT_IMAGE_NAME = "confluentinc/cp-kafka";
-    private static final String CONFLUENT_PLATFORM_VERSION = "5.0.1";
+    private static final String CONFLUENT_PLATFORM_VERSION = "6.1.2";
 
     @Container
     public static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
@@ -81,6 +81,7 @@ public abstract class AbstractKafkaConfig extends AbstractDaoConfig {
             initTopic(
                     environment.getProperty("kafka.topics.pm-events-payout.id"),
                     PayoutEventDeserializer.class);
+            KAFKA_CONTAINER.start();
         }
 
         private <T> void initTopic(String topicName, Class clazz) {
