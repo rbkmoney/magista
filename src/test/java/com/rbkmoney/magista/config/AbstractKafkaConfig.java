@@ -3,8 +3,10 @@ package com.rbkmoney.magista.config;
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import com.rbkmoney.magista.MagistaApplication;
+import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.serde.PayoutEventDeserializer;
 import com.rbkmoney.magista.serde.SinkEventDeserializer;
+import com.rbkmoney.magista.service.HandlerManager;
 import com.rbkmoney.payout.manager.Event;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -16,14 +18,19 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -38,6 +45,7 @@ import static org.apache.kafka.clients.consumer.OffsetResetStrategy.EARLIEST;
 
 @SpringBootTest
 @Testcontainers
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = MagistaApplication.class,
         initializers = AbstractKafkaConfig.Initializer.class)
@@ -48,7 +56,18 @@ public abstract class AbstractKafkaConfig extends AbstractDaoConfig {
 
     private static final String PRODUCER_CLIENT_ID = "producer-service-test-" + UUID.randomUUID();
     private static final String CONFLUENT_IMAGE_NAME = "confluentinc/cp-kafka";
-    private static final String CONFLUENT_PLATFORM_VERSION = "6.1.2";
+    private static final String CONFLUENT_PLATFORM_VERSION = "6.2.0";
+
+    @MockBean
+    public HandlerManager handlerManager;
+
+    @MockBean
+    public SourceEventParser eventParser;
+
+    @AfterEach
+    public void tearDown() {
+        Mockito.reset(handlerManager, eventParser);
+    }
 
     @Container
     public static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
@@ -81,7 +100,6 @@ public abstract class AbstractKafkaConfig extends AbstractDaoConfig {
             initTopic(
                     environment.getProperty("kafka.topics.pm-events-payout.id"),
                     PayoutEventDeserializer.class);
-            KAFKA_CONTAINER.start();
         }
 
         private <T> void initTopic(String topicName, Class clazz) {

@@ -27,7 +27,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 public class KafkaListenerTest extends AbstractKafkaConfig {
 
     @Value("${kafka.topics.invoicing.id}")
@@ -38,28 +37,6 @@ public class KafkaListenerTest extends AbstractKafkaConfig {
 
     @Value("${kafka.topics.pm-events-payout.id}")
     private String payoutTopicName;
-
-    @MockBean
-    private HandlerManager handlerManager;
-
-    @MockBean
-    private SourceEventParser eventParser;
-
-    private AutoCloseable mocks;
-
-    private Object[] preparedMocks;
-
-    @BeforeEach
-    public void init() {
-        mocks = MockitoAnnotations.openMocks(this);
-        preparedMocks = new Object[] {handlerManager, eventParser};
-    }
-
-    @AfterEach
-    public void clean() throws Exception {
-        verifyNoMoreInteractions(preparedMocks);
-        mocks.close();
-    }
 
     @Test
     public void shouldInvoicingSinkEventListen() throws InterruptedException {

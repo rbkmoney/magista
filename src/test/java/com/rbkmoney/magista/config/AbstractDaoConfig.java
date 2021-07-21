@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.config;
 
 import com.rbkmoney.magista.MagistaApplication;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -8,6 +9,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -19,6 +21,7 @@ import static io.github.benas.randombeans.EnhancedRandomBuilder.aNewEnhancedRand
 
 @SpringBootTest
 @Testcontainers
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = MagistaApplication.class,
         initializers = AbstractDaoConfig.Initializer.class)
