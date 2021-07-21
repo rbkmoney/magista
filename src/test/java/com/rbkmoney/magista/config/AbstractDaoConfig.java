@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.config;
 
 import com.rbkmoney.magista.MagistaApplication;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -9,7 +9,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -21,18 +20,19 @@ import static io.github.benas.randombeans.EnhancedRandomBuilder.aNewEnhancedRand
 
 @SpringBootTest
 @Testcontainers
-@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = MagistaApplication.class,
         initializers = AbstractDaoConfig.Initializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource("classpath:application.yml")
+@Disabled
 public abstract class AbstractDaoConfig {
 
     private static final String POSTGRESQL_IMAGE_NAME = "postgres";
     private static final String POSTGRESQL_VERSION = "11.4";
 
     @Container
+    @SuppressWarnings("rawtypes")
     public static final PostgreSQLContainer POSTGRESQL_CONTAINER = new PostgreSQLContainer(
             DockerImageName
                     .parse(POSTGRESQL_IMAGE_NAME)

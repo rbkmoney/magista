@@ -3,10 +3,8 @@ package com.rbkmoney.magista.config;
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import com.rbkmoney.magista.MagistaApplication;
-import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.serde.PayoutEventDeserializer;
 import com.rbkmoney.magista.serde.SinkEventDeserializer;
-import com.rbkmoney.magista.service.HandlerManager;
 import com.rbkmoney.payout.manager.Event;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -18,20 +16,18 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -40,34 +36,35 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+import static io.github.benas.randombeans.EnhancedRandomBuilder.aNewEnhancedRandom;
 import static org.apache.kafka.clients.consumer.OffsetResetStrategy.EARLIEST;
 
-@SpringBootTest
-@Testcontainers
-@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(
         classes = MagistaApplication.class,
-        initializers = AbstractKafkaConfig.Initializer.class)
+        initializers = {
+                AbstractKafkaConfig.KafkaInitializer.class,
+                AbstractKafkaConfig.PostgresInitializer.class})
+@Testcontainers
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestPropertySource("classpath:application.yml")
 @Slf4j
-public abstract class AbstractKafkaConfig extends AbstractDaoConfig {
+public abstract class AbstractKafkaConfig {
 
     private static final String PRODUCER_CLIENT_ID = "producer-service-test-" + UUID.randomUUID();
+    private static final String INIT_TOPIC_CONSUMER_GROUP_ID = "init-topic-consumer-test-" + UUID.randomUUID();
     private static final String CONFLUENT_IMAGE_NAME = "confluentinc/cp-kafka";
     private static final String CONFLUENT_PLATFORM_VERSION = "6.2.0";
+    private static final String POSTGRESQL_IMAGE_NAME = "postgres";
+    private static final String POSTGRESQL_VERSION = "11.4";
 
-    @MockBean
-    public HandlerManager handlerManager;
+    @LocalServerPort
+    public int port;
 
-    @MockBean
-    public SourceEventParser eventParser;
-
-    @AfterEach
-    public void tearDown() {
-        Mockito.reset(handlerManager, eventParser);
-    }
+    @Value("${kafka.bootstrap-servers}")
+    public String bootstrapServers;
 
     @Container
     public static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
@@ -76,9 +73,14 @@ public abstract class AbstractKafkaConfig extends AbstractDaoConfig {
                     .withTag(CONFLUENT_PLATFORM_VERSION))
             .withEmbeddedZookeeper();
 
-    public static class Initializer extends ConfigDataApplicationContextInitializer {
+    @Container
+    @SuppressWarnings("rawtypes")
+    public static final PostgreSQLContainer POSTGRESQL_CONTAINER = new PostgreSQLContainer(
+            DockerImageName
+                    .parse(POSTGRESQL_IMAGE_NAME)
+                    .withTag(POSTGRESQL_VERSION));
 
-        private static final String CONSUMER_GROUP_ID = "init-topic-consumer-test-" + UUID.randomUUID();
+    public static class KafkaInitializer extends ConfigDataApplicationContextInitializer {
 
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
@@ -111,19 +113,41 @@ public abstract class AbstractKafkaConfig extends AbstractDaoConfig {
                 log.error("Error when init topic '{}' e:", topicName, e);
             }
         }
+    }
 
-        private <T> Consumer<String, T> createConsumer(Class clazz) {
-            Properties props = new Properties();
-            props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_CONTAINER.getBootstrapServers());
-            props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-            props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, clazz);
-            props.put(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_GROUP_ID);
-            props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST.name().toLowerCase());
-            return new KafkaConsumer<>(props);
+    public static class PostgresInitializer extends ConfigDataApplicationContextInitializer {
+
+        @Override
+        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
+            TestPropertyValues.of(
+                    "spring.datasource.url=" + POSTGRESQL_CONTAINER.getJdbcUrl(),
+                    "spring.datasource.username=" + POSTGRESQL_CONTAINER.getUsername(),
+                    "spring.datasource.password=" + POSTGRESQL_CONTAINER.getPassword(),
+                    "spring.flyway.url=" + POSTGRESQL_CONTAINER.getJdbcUrl(),
+                    "spring.flyway.user=" + POSTGRESQL_CONTAINER.getUsername(),
+                    "spring.flyway.password=" + POSTGRESQL_CONTAINER.getPassword(),
+                    "flyway.url=" + POSTGRESQL_CONTAINER.getJdbcUrl(),
+                    "flyway.user=" + POSTGRESQL_CONTAINER.getUsername(),
+                    "flyway.password=" + POSTGRESQL_CONTAINER.getPassword(),
+                    "token-gen.key=" + "jXnZr4u7x!A%D*G-KaPvSgVkYp3s5v8t/B?E(H+MbQeThWmZq4t7w9z$C&F)J@Nc",
+                    "cache.invoiceData.size=10000",
+                    "cache.paymentData.size=10000",
+                    "payouter.pooling.enabled=false")
+                    .applyTo(configurableApplicationContext);
         }
     }
 
-    protected void producePayout(String topicName, Event event) {
+    public static <T> Consumer<String, T> createConsumer(Class clazz) {
+        Properties props = new Properties();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_CONTAINER.getBootstrapServers());
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, clazz);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, INIT_TOPIC_CONSUMER_GROUP_ID);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST.name().toLowerCase());
+        return new KafkaConsumer<>(props);
+    }
+
+    public void producePayout(String topicName, Event event) {
         try (Producer<String, Event> producer = createProducer()) {
             var producerRecord = new ProducerRecord<>(topicName, event.getPayoutId(), event);
             producer.send(producerRecord).get();
@@ -133,7 +157,7 @@ public abstract class AbstractKafkaConfig extends AbstractDaoConfig {
         }
     }
 
-    protected void produce(String topicName, SinkEvent sinkEvent) {
+    public void produce(String topicName, SinkEvent sinkEvent) {
         try (Producer<String, SinkEvent> producer = createProducer()) {
             var sourceId = sinkEvent.getEvent().getSourceId();
             var producerRecord = new ProducerRecord<>(topicName, sourceId, sinkEvent);
@@ -144,12 +168,20 @@ public abstract class AbstractKafkaConfig extends AbstractDaoConfig {
         }
     }
 
-    private <T> Producer<String, T> createProducer() {
+    public static <T> Producer<String, T> createProducer() {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_CONTAINER.getBootstrapServers());
         props.put(ProducerConfig.CLIENT_ID_CONFIG, PRODUCER_CLIENT_ID);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ThriftSerializer.class.getName());
         return new KafkaProducer<>(props);
+    }
+
+    public static <T> T random(Class<T> type, String... excludedFields) {
+        return aNewEnhancedRandom().nextObject(type, excludedFields);
+    }
+
+    public static <T> Stream<T> randomStreamOf(int amount, Class<T> type, String... excludedFields) {
+        return aNewEnhancedRandom().objects(type, amount, excludedFields);
     }
 }
