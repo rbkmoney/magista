@@ -8,7 +8,6 @@ import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -16,7 +15,6 @@ import static com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider.euroset;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Transactional
 public class PaymentSearchQueryTest extends AbstractQueryConfig {
 
     @Test

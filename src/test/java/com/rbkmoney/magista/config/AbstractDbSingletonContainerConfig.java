@@ -6,6 +6,8 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public abstract class AbstractDbSingletonContainerConfig {
 
     private static final String POSTGRESQL_IMAGE_NAME = "postgres";
@@ -17,7 +19,13 @@ public abstract class AbstractDbSingletonContainerConfig {
                     .withTag(POSTGRESQL_VERSION));
 
     static {
+        startDbContainer();
+    }
+
+    private static void startDbContainer() {
         Startables.deepStart(Stream.of(POSTGRESQL_CONTAINER))
                 .join();
+        assertThat(POSTGRESQL_CONTAINER.isRunning())
+                .isTrue();
     }
 }

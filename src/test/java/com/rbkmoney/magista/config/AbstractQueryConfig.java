@@ -14,14 +14,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest
-@Testcontainers
 @ContextConfiguration(
         classes = MagistaApplication.class,
-        initializers = AbstractQueryConfig.Initializer.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+        initializers = AbstractDaoConfig.Initializer.class)
+@DirtiesContext
 @TestPropertySource("classpath:application.yml")
 public abstract class AbstractQueryConfig extends AbstractDaoConfig {
 

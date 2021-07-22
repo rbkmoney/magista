@@ -5,7 +5,11 @@ import com.rbkmoney.magista.config.AbstractKafkaAndDaoConfig;
 import com.rbkmoney.payout.manager.*;
 import com.rbkmoney.payout.manager.domain.CurrencyRef;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -17,8 +21,14 @@ public class PayoutListenerTest extends AbstractKafkaAndDaoConfig {
     @Value("${kafka.topics.pm-events-payout.id}")
     private String payoutTopicName;
 
+    @Autowired
+    private KafkaTemplate<String, Event> payoutProducer;
+
+    @Captor
+    private ArgumentCaptor<Event> arg;
+
     @Test
-    public void shouldPayoutEventListen() throws InterruptedException {
+    public void shouldPayoutEventListen() {
         Event event = new Event();
         event.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         event.setPayoutId("payout_id");
@@ -38,7 +48,11 @@ public class PayoutListenerTest extends AbstractKafkaAndDaoConfig {
         payout.setPayoutId("payout_id");
         event.setPayoutChange(PayoutChange.created(new PayoutCreated(payout)));
         event.setPayout(payout);
-        producePayout(payoutTopicName, event);
-        Thread.sleep(3000L);
+        payoutProducer.send(payoutTopicName, event)
+                .completable()
+                .join();
+//        verify(eventParser, timeout(3000).times(1)).parseEvent(arg.capture());
+//        assertThat(arg.getValue())
+//          .isEqualTo(message);
     }
 }

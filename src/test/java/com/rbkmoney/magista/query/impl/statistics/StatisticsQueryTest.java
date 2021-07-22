@@ -9,11 +9,9 @@ import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Transactional
 public class StatisticsQueryTest extends AbstractQueryConfig {
 
     @Test

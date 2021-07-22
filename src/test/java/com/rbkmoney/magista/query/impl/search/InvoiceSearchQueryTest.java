@@ -12,14 +12,12 @@ import com.rbkmoney.magista.util.DamselUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Transactional
 @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
 public class InvoiceSearchQueryTest extends AbstractQueryConfig {
 

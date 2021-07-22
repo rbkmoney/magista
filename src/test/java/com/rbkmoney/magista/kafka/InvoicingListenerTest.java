@@ -7,13 +7,18 @@ import com.rbkmoney.magista.config.AbstractKafkaAndDaoConfig;
 import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.service.HandlerManager;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -28,8 +33,14 @@ public class InvoicingListenerTest extends AbstractKafkaAndDaoConfig {
     @MockBean
     private SourceEventParser eventParser;
 
+    @Autowired
+    private KafkaTemplate<String, SinkEvent> sinkEventProducer;
+
+    @Captor
+    private ArgumentCaptor<MachineEvent> arg;
+
     @Test
-    public void shouldInvoicingSinkEventListen() throws InterruptedException {
+    public void shouldInvoicingSinkEventListen() {
         var message = new MachineEvent();
         message.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         message.setEventId(1L);
@@ -41,8 +52,11 @@ public class InvoicingListenerTest extends AbstractKafkaAndDaoConfig {
         var sinkEvent = new SinkEvent();
         sinkEvent.setEvent(message);
         when(eventParser.parseEvent(any())).thenReturn(EventPayload.invoice_changes(List.of()));
-        produce(invoicingTopicName, sinkEvent);
-        Thread.sleep(3000L);
-        verify(eventParser, times(1)).parseEvent(any());
+        sinkEventProducer.send(invoicingTopicName, sinkEvent)
+                .completable()
+                .join();
+        verify(eventParser, timeout(3000).times(1)).parseEvent(arg.capture());
+        assertThat(arg.getValue())
+                .isEqualTo(message);
     }
 }

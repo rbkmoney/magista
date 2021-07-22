@@ -6,12 +6,10 @@ import com.rbkmoney.magista.config.AbstractQueryConfig;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Transactional
 @Sql("classpath:data/sql/search/refund_search_data.sql")
 public class RefundSearchQueryTest extends AbstractQueryConfig {
 

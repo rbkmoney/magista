@@ -38,16 +38,17 @@ public abstract class AbstractKafkaSingletonContainerConfig extends AbstractDbSi
             .withEmbeddedZookeeper();
 
     static {
-        startContainer();
+        startKafkaContainer();
         var topics = loadActualTopicNamesFromYmlProperties();
         createTopics(topics);
-        parseAndCheckCreatedTopicsFromContainer(topics);
+        parseAndCheckCreatedTopicsFromKafkaContainer(topics);
     }
 
-    private static void startContainer() {
+    private static void startKafkaContainer() {
         Startables.deepStart(Stream.of(KAFKA_CONTAINER))
                 .join();
-        assertThat(KAFKA_CONTAINER.isRunning()).isTrue();
+        assertThat(KAFKA_CONTAINER.isRunning())
+                .isTrue();
     }
 
     private static List<String> loadActualTopicNamesFromYmlProperties() {
@@ -65,19 +66,20 @@ public abstract class AbstractKafkaSingletonContainerConfig extends AbstractDbSi
                     .peek(newTopic -> log.info(newTopic.toString()))
                     .collect(Collectors.toList());
             var topicsResult = admin.createTopics(newTopics);
-            // wait until everyone is created
+            // wait until everyone is created or timeout
             topicsResult.all().get(30, TimeUnit.SECONDS);
         } catch (ExecutionException | InterruptedException | TimeoutException ex) {
             throw new KafkaStartingException("Error when topic creating, ", ex);
         }
     }
 
-    private static void parseAndCheckCreatedTopicsFromContainer(List<String> topics) {
+    private static void parseAndCheckCreatedTopicsFromKafkaContainer(List<String> topics) {
         try {
             var showCreatedTopics = "/usr/bin/kafka-topics --bootstrap-server=localhost:9092 --list";
             var stdout = KAFKA_CONTAINER.execInContainer("/bin/sh", "-c", showCreatedTopics)
                     .getStdout();
-            assertThat(stdout).contains(topics);
+            assertThat(stdout)
+                    .contains(topics);
         } catch (IOException | InterruptedException ex) {
             throw new KafkaStartingException("Error when execInContainer, ", ex);
         }
@@ -85,9 +87,9 @@ public abstract class AbstractKafkaSingletonContainerConfig extends AbstractDbSi
 
     private static Properties loadYmlProperties(String path) {
         try {
-            var resource = new ClassPathResource(path, AbstractKafkaSingletonContainerConfig.class.getClassLoader());
+            var classLoader = AbstractKafkaSingletonContainerConfig.class.getClassLoader();
             var properties = new Properties();
-            properties.putAll(getSources(resource));
+            properties.putAll(getSources(new ClassPathResource(path, classLoader)));
             return properties;
         } catch (IOException ex) {
             throw new KafkaStartingException("Error when loading properties, ", ex);
@@ -106,7 +108,7 @@ public abstract class AbstractKafkaSingletonContainerConfig extends AbstractDbSi
     }
 
     private static AdminClient createAdminClient() {
-        Properties properties = new Properties();
+        var properties = new Properties();
         properties.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_CONTAINER.getBootstrapServers());
         return AdminClient.create(properties);
     }
