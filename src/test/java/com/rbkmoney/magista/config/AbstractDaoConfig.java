@@ -22,7 +22,7 @@ import static io.github.benas.randombeans.EnhancedRandomBuilder.aNewEnhancedRand
 @ContextConfiguration(
         classes = MagistaApplication.class,
         initializers = AbstractDaoConfig.Initializer.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@DirtiesContext
 @TestPropertySource("classpath:application.yml")
 public abstract class AbstractDaoConfig {
 
@@ -30,8 +30,7 @@ public abstract class AbstractDaoConfig {
     private static final String POSTGRESQL_VERSION = "11.4";
 
     @Container
-    @SuppressWarnings("rawtypes")
-    public static final PostgreSQLContainer POSTGRESQL_CONTAINER = new PostgreSQLContainer(
+    public static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER = new PostgreSQLContainer<>(
             DockerImageName
                     .parse(POSTGRESQL_IMAGE_NAME)
                     .withTag(POSTGRESQL_VERSION));
