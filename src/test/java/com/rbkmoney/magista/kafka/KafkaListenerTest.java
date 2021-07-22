@@ -28,7 +28,6 @@ import org.springframework.boot.test.context.ConfigDataApplicationContextInitial
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
@@ -55,7 +54,7 @@ import static org.apache.kafka.clients.consumer.OffsetResetStrategy.EARLIEST;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @ContextConfiguration(
         classes = MagistaApplication.class,
         initializers = {
@@ -77,10 +76,10 @@ public class KafkaListenerTest {
     private String payoutTopicName;
 
     @MockBean
-    public HandlerManager handlerManager;
+    private HandlerManager handlerManager;
 
     @MockBean
-    public SourceEventParser eventParser;
+    private SourceEventParser eventParser;
 
     private static final String PRODUCER_CLIENT_ID = "producer-service-test-" + UUID.randomUUID();
     private static final String INIT_TOPIC_CONSUMER_GROUP_ID = "init-topic-consumer-test-" + UUID.randomUUID();
@@ -89,14 +88,8 @@ public class KafkaListenerTest {
     private static final String POSTGRESQL_IMAGE_NAME = "postgres";
     private static final String POSTGRESQL_VERSION = "11.4";
 
-    @LocalServerPort
-    public int port;
-
-    @Value("${kafka.bootstrap-servers}")
-    public String bootstrapServers;
-
     @Container
-    public static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
+    private static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
             DockerImageName
                     .parse(CONFLUENT_IMAGE_NAME)
                     .withTag(CONFLUENT_PLATFORM_VERSION))
@@ -104,7 +97,7 @@ public class KafkaListenerTest {
 
     @Container
     @SuppressWarnings("rawtypes")
-    public static final PostgreSQLContainer POSTGRESQL_CONTAINER = new PostgreSQLContainer(
+    private static final PostgreSQLContainer POSTGRESQL_CONTAINER = new PostgreSQLContainer(
             DockerImageName
                     .parse(POSTGRESQL_IMAGE_NAME)
                     .withTag(POSTGRESQL_VERSION));
@@ -142,6 +135,16 @@ public class KafkaListenerTest {
                 log.error("Error when init topic '{}' e:", topicName, e);
             }
         }
+
+        private <T> Consumer<String, T> createConsumer(Class clazz) {
+            Properties props = new Properties();
+            props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_CONTAINER.getBootstrapServers());
+            props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+            props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, clazz);
+            props.put(ConsumerConfig.GROUP_ID_CONFIG, INIT_TOPIC_CONSUMER_GROUP_ID);
+            props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST.name().toLowerCase());
+            return new KafkaConsumer<>(props);
+        }
     }
 
     public static class PostgresInitializer extends ConfigDataApplicationContextInitializer {
@@ -166,17 +169,7 @@ public class KafkaListenerTest {
         }
     }
 
-    public static <T> Consumer<String, T> createConsumer(Class clazz) {
-        Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_CONTAINER.getBootstrapServers());
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, clazz);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, INIT_TOPIC_CONSUMER_GROUP_ID);
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST.name().toLowerCase());
-        return new KafkaConsumer<>(props);
-    }
-
-    public void producePayout(String topicName, Event event) {
+    private void producePayout(String topicName, Event event) {
         try (Producer<String, Event> producer = createProducer()) {
             var producerRecord = new ProducerRecord<>(topicName, event.getPayoutId(), event);
             producer.send(producerRecord).get();
@@ -186,7 +179,7 @@ public class KafkaListenerTest {
         }
     }
 
-    public void produce(String topicName, SinkEvent sinkEvent) {
+    private void produce(String topicName, SinkEvent sinkEvent) {
         try (Producer<String, SinkEvent> producer = createProducer()) {
             var sourceId = sinkEvent.getEvent().getSourceId();
             var producerRecord = new ProducerRecord<>(topicName, sourceId, sinkEvent);
@@ -197,7 +190,7 @@ public class KafkaListenerTest {
         }
     }
 
-    public static <T> Producer<String, T> createProducer() {
+    private <T> Producer<String, T> createProducer() {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_CONTAINER.getBootstrapServers());
         props.put(ProducerConfig.CLIENT_ID_CONFIG, PRODUCER_CLIENT_ID);
