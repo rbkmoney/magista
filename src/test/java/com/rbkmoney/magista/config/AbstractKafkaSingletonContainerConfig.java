@@ -74,7 +74,7 @@ public abstract class AbstractKafkaSingletonContainerConfig extends AbstractDbSi
 
     private static void parseAndCheckCreatedTopicsFromKafkaContainer(List<String> topics) {
         try {
-            var showCreatedTopics = "/usr/bin/kafka-topics --bootstrap-server=localhost:9092 --list";
+            var showCreatedTopics = "/usr/bin/kafka-topics --bootstrap-server=0.0.0.0:9092 --list";
             var stdout = KAFKA_CONTAINER.execInContainer("/bin/sh", "-c", showCreatedTopics)
                     .getStdout();
             assertThat(stdout)

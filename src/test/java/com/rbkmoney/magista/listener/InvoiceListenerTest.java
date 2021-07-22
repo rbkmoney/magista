@@ -41,7 +41,7 @@ import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ContextConfiguration(classes = {
-        InvoiceListener.class,
+        InvoicingListener.class,
         HandlerManager.class,
         SourceEventParser.class,
         BinaryConverterImpl.class,
@@ -72,7 +72,7 @@ public class InvoiceListenerTest {
     );
 
     @Autowired
-    private InvoiceListener invoiceListener;
+    private InvoicingListener invoicingListener;
 
     @MockBean
     private GeoProvider geoProvider;
@@ -224,7 +224,7 @@ public class InvoiceListenerTest {
                                                         TestData.buildInvoiceChargebackChangePayload()))))));
         message.setData(Value.bin(toByteArray(eventPayload)));
 
-        invoiceListener.handleMessages(Arrays.asList(message));
+        invoicingListener.handleMessages(Arrays.asList(message));
 
         verify(invoiceService).saveInvoices(any());
         verify(paymentService).savePayments(any());
@@ -257,7 +257,7 @@ public class InvoiceListenerTest {
 
     @SneakyThrows
     private <T extends TBase<?, ?>> T fillTBaseObject(T data, Class<T> type) {
-        MockTBaseProcessor mockTBaseProcessor = new MockTBaseProcessor(MockMode.ALL, 20, 1);
+        MockTBaseProcessor mockTBaseProcessor = new MockTBaseProcessor(MockMode.REQUIRED_ONLY, 25, 1);
         mockTBaseProcessor.addFieldHandler(timeFields.getKey(), timeFields.getValue());
         return mockTBaseProcessor.process(data, new TBaseHandler<>(type));
     }
