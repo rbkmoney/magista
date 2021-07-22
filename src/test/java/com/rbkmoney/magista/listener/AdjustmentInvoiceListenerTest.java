@@ -14,19 +14,22 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import static com.rbkmoney.magista.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doAnswer;
 
-@TestPropertySource(properties = {"cache.invoiceData.size=10", "cache.paymentData.size=10"})
+@SpringBootTest(properties = {
+        "cache.invoiceData.size=10",
+        "cache.paymentData.size=10"})
 public class AdjustmentInvoiceListenerTest extends AbstractDaoConfig {
 
     @Autowired

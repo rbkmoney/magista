@@ -26,13 +26,11 @@ import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Instant;
 import java.util.*;
@@ -42,7 +40,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
         InvoiceListener.class,
         HandlerManager.class,
@@ -67,8 +64,8 @@ import static org.mockito.Mockito.verify;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class InvoiceListenerTest {
 
-    public static final String SOURCE_ID = "source_id";
-    public static final String SOURCE_NS = "source_ns";
+    private static final String SOURCE_ID = "source_id";
+    private static final String SOURCE_NS = "source_ns";
     private static final Map.Entry<FieldHandler, String[]> timeFields = Map.entry(
             structHandler -> structHandler.value(Instant.now().toString()),
             new String[]{"created_at", "at", "due"}
@@ -95,13 +92,8 @@ public class InvoiceListenerTest {
     @MockBean
     private PaymentChargebackService paymentChargebackService;
 
-    private MockTBaseProcessor mockTBaseProcessor;
-
     @BeforeEach
     public void setup() {
-        mockTBaseProcessor = new MockTBaseProcessor(MockMode.ALL, 20, 1);
-        mockTBaseProcessor.addFieldHandler(timeFields.getKey(), timeFields.getValue());
-
         given(geoProvider.getLocationInfo(any()))
                 .willReturn(new LocationInfo(-1, -1));
     }
@@ -264,12 +256,14 @@ public class InvoiceListenerTest {
     }
 
     @SneakyThrows
-    public <T extends TBase> T fillTBaseObject(T data, Class<T> type) {
+    private <T extends TBase<?, ?>> T fillTBaseObject(T data, Class<T> type) {
+        MockTBaseProcessor mockTBaseProcessor = new MockTBaseProcessor(MockMode.ALL, 20, 1);
+        mockTBaseProcessor.addFieldHandler(timeFields.getKey(), timeFields.getValue());
         return mockTBaseProcessor.process(data, new TBaseHandler<>(type));
     }
 
     @SneakyThrows
-    public byte[] toByteArray(TBase data) {
+    public byte[] toByteArray(TBase<?, ?> data) {
         return new TSerializer(new TBinaryProtocol.Factory()).serialize(data);
     }
 }

@@ -9,6 +9,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.rbkmoney.magista.util.RandomBeans.random;
+import static com.rbkmoney.magista.util.RandomBeans.randomStreamOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InvoiceDaoTest extends AbstractDaoConfig {
