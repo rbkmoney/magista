@@ -75,6 +75,9 @@ public class KafkaListenerTest {
     @Value("${kafka.topics.pm-events-payout.id}")
     private String payoutTopicName;
 
+    @Value("${kafka.bootstrap-servers}")
+    public String bootstrapServers;
+
     @MockBean
     private HandlerManager handlerManager;
 
