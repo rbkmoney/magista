@@ -5,14 +5,10 @@ import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import com.rbkmoney.magista.MagistaApplication;
 import com.rbkmoney.payout.manager.Event;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,12 +20,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.util.Collections;
 import java.util.Properties;
 import java.util.UUID;
-
-import static org.apache.kafka.clients.consumer.OffsetResetStrategy.EARLIEST;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(
@@ -44,7 +36,6 @@ import static org.apache.kafka.clients.consumer.OffsetResetStrategy.EARLIEST;
 public abstract class AbstractKafkaAndDaoConfig extends AbstractKafkaSingletonContainerConfig {
 
     private static final String PRODUCER_CLIENT_ID = "producer-service-test-" + UUID.randomUUID();
-    private static final String INIT_TOPIC_CONSUMER_GROUP_ID = "init-topic-consumer-test-" + UUID.randomUUID();
 
     @LocalServerPort
     public int port;
@@ -61,36 +52,6 @@ public abstract class AbstractKafkaAndDaoConfig extends AbstractKafkaSingletonCo
                     "kafka.topics.pm-events-payout.consume.enabled=true",
                     "kafka.state.cache.size=0")
                     .applyTo(applicationContext);
-//            ConfigurableEnvironment environment = applicationContext.getEnvironment();
-//            initTopic(
-//                    environment.getProperty("kafka.topics.invoicing.id"),
-//                    SinkEventDeserializer.class);
-//            initTopic(
-//                    environment.getProperty("kafka.topics.invoice-template.id"),
-//                    SinkEventDeserializer.class);
-//            initTopic(
-//                    environment.getProperty("kafka.topics.pm-events-payout.id"),
-//                    PayoutEventDeserializer.class);
-        }
-
-        private <T> void initTopic(String topicName, Class<?> clazz) {
-            try (Consumer<String, T> consumer = createConsumer(clazz)) {
-                consumer.subscribe(Collections.singletonList(topicName));
-                consumer.poll(Duration.ofMillis(500L));
-                log.info("Init topic '{}'", topicName);
-            } catch (Exception e) {
-                log.error("Error when init topic '{}' e:", topicName, e);
-            }
-        }
-
-        private <T> Consumer<String, T> createConsumer(Class<?> clazz) {
-            Properties props = new Properties();
-            props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_CONTAINER.getBootstrapServers());
-            props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-            props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, clazz);
-            props.put(ConsumerConfig.GROUP_ID_CONFIG, INIT_TOPIC_CONSUMER_GROUP_ID);
-            props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST.name().toLowerCase());
-            return new KafkaConsumer<>(props);
         }
     }
 

@@ -1,22 +1,30 @@
 package com.rbkmoney.magista.config;
 
 import com.rbkmoney.magista.exception.KafkaStartingException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.CreateTopicsResult;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.boot.env.YamlPropertySourceLoader;
+import org.springframework.boot.origin.OriginTrackedValue;
+import org.springframework.core.io.ClassPathResource;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 public abstract class AbstractKafkaSingletonContainerConfig extends AbstractDbSingletonContainerConfig {
 
     private static final String CONFLUENT_IMAGE_NAME = "confluentinc/cp-kafka";
@@ -30,36 +38,71 @@ public abstract class AbstractKafkaSingletonContainerConfig extends AbstractDbSi
             .withEmbeddedZookeeper();
 
     static {
+        startContainer();
+        var topics = loadActualTopicNamesFromYmlProperties();
+        createTopics(topics);
+        parseAndCheckCreatedTopicsFromContainer(topics);
+    }
+
+    private static void startContainer() {
         Startables.deepStart(Stream.of(KAFKA_CONTAINER))
                 .join();
         assertThat(KAFKA_CONTAINER.isRunning()).isTrue();
-        createTopics("mg-invoice-100-2", "mg-events-invoice-template", "pm-events-payout");
-        String topicCommand = "/usr/bin/kafka-topics --bootstrap-server=localhost:9092 --list";
-        String stdout = null;
-        try {
-            stdout = KAFKA_CONTAINER.execInContainer("/bin/sh", "-c", topicCommand)
-                    .getStdout();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        assertThat(stdout).contains("mg-events-invoice-template");
     }
 
-    private static void createTopics(String... topics) {
-        var newTopics = Stream.of(topics)
-                .map(topic -> new NewTopic(topic, 1, (short) 1))
-                .collect(Collectors.toList());
+    private static List<String> loadActualTopicNamesFromYmlProperties() {
+        var properties = loadYmlProperties("application.yml");
+        return List.of(
+                properties.getProperty("kafka.topics.invoicing.id"),
+                properties.getProperty("kafka.topics.invoice-template.id"),
+                properties.getProperty("kafka.topics.pm-events-payout.id"));
+    }
+
+    private static void createTopics(List<String> topics) {
         try (var admin = createAdminClient()) {
-            CreateTopicsResult topicsResult = admin.createTopics(newTopics);
-            long countCreatedTopics = topicsResult.values().entrySet().stream().map(entry -> {
-                try {
-                    return entry.getValue().get();
-                } catch (InterruptedException | ExecutionException ex) {
-                    throw new KafkaStartingException("Error when topic creating, ", ex);
-                }
-            }).count();
-            assertThat(newTopics.size()).isEqualTo(countCreatedTopics);
+            var newTopics = topics.stream()
+                    .map(topic -> new NewTopic(topic, 1, (short) 1))
+                    .peek(newTopic -> log.info(newTopic.toString()))
+                    .collect(Collectors.toList());
+            var topicsResult = admin.createTopics(newTopics);
+            // wait until everyone is created
+            topicsResult.all().get(30, TimeUnit.SECONDS);
+        } catch (ExecutionException | InterruptedException | TimeoutException ex) {
+            throw new KafkaStartingException("Error when topic creating, ", ex);
         }
+    }
+
+    private static void parseAndCheckCreatedTopicsFromContainer(List<String> topics) {
+        try {
+            var showCreatedTopics = "/usr/bin/kafka-topics --bootstrap-server=localhost:9092 --list";
+            var stdout = KAFKA_CONTAINER.execInContainer("/bin/sh", "-c", showCreatedTopics)
+                    .getStdout();
+            assertThat(stdout).contains(topics);
+        } catch (IOException | InterruptedException ex) {
+            throw new KafkaStartingException("Error when execInContainer, ", ex);
+        }
+    }
+
+    private static Properties loadYmlProperties(String path) {
+        try {
+            var resource = new ClassPathResource(path, AbstractKafkaSingletonContainerConfig.class.getClassLoader());
+            var properties = new Properties();
+            properties.putAll(getSources(resource));
+            return properties;
+        } catch (IOException ex) {
+            throw new KafkaStartingException("Error when loading properties, ", ex);
+        }
+    }
+
+    private static Map<String, Object> getSources(ClassPathResource resource) throws IOException {
+        //noinspection unchecked
+        return ((Map<String, OriginTrackedValue>) new YamlPropertySourceLoader()
+                .load(resource.getFilename(), resource)
+                .get(0)
+                .getSource())
+                .entrySet().stream()
+                .map(entry -> Map.entry(entry.getKey(), entry.getValue().getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private static AdminClient createAdminClient() {
