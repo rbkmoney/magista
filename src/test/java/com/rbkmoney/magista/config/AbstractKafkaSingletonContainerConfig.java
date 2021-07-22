@@ -28,8 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public abstract class AbstractKafkaSingletonContainerConfig extends AbstractDbSingletonContainerConfig {
 
     private static final String CONFLUENT_IMAGE_NAME = "confluentinc/cp-kafka";
-    //    private static final String CONFLUENT_PLATFORM_VERSION = "5.0.1";
-    private static final String CONFLUENT_PLATFORM_VERSION = "6.2.0";
+    private static final String CONFLUENT_PLATFORM_VERSION = "5.0.1";
 
     public static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
             DockerImageName
