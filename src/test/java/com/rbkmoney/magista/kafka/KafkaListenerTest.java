@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.ConfigDataApplicationContextInitial
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
@@ -54,7 +55,7 @@ import static org.apache.kafka.clients.consumer.OffsetResetStrategy.EARLIEST;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(
         classes = MagistaApplication.class,
         initializers = {
@@ -74,6 +75,12 @@ public class KafkaListenerTest {
 
     @Value("${kafka.topics.pm-events-payout.id}")
     private String payoutTopicName;
+
+//    @Value("${kafka.bootstrap-servers}")
+//    public String bootstrapServers;
+
+    @LocalServerPort
+    public int port;
 
     @MockBean
     private HandlerManager handlerManager;
