@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.kafka;
 
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.config.AbstractKafkaAndDaoConfig;
+import com.rbkmoney.magista.config.PostgresqlKafkaMagistaIntegrationTest;
 import com.rbkmoney.payout.manager.*;
 import com.rbkmoney.payout.manager.domain.CurrencyRef;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 
-public class PayoutListenerTest extends AbstractKafkaAndDaoConfig {
+@PostgresqlKafkaMagistaIntegrationTest
+public class PayoutListenerTest {
 
     @Value("${kafka.topics.pm-events-payout.id}")
     private String payoutTopicName;

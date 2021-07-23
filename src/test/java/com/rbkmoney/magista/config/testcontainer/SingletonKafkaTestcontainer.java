@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.config;
+package com.rbkmoney.magista.config.testcontainer;
 
 import com.rbkmoney.magista.exception.KafkaStartingException;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-public abstract class AbstractKafkaSingletonContainerConfig extends AbstractDbSingletonContainerConfig {
+public class SingletonKafkaTestcontainer {
 
     private static final String CONFLUENT_IMAGE_NAME = "confluentinc/cp-kafka";
     private static final String CONFLUENT_PLATFORM_VERSION = "6.2.0";
@@ -86,7 +86,7 @@ public abstract class AbstractKafkaSingletonContainerConfig extends AbstractDbSi
 
     private static Properties loadYmlProperties(String path) {
         try {
-            var classLoader = AbstractKafkaSingletonContainerConfig.class.getClassLoader();
+            var classLoader = SingletonKafkaTestcontainer.class.getClassLoader();
             var properties = new Properties();
             properties.putAll(getSources(new ClassPathResource(path, classLoader)));
             return properties;

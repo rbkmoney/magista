@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.magista.config.AbstractDaoConfig;
+import com.rbkmoney.magista.config.PostgresqlMagistaIntegrationTest;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
@@ -18,7 +18,8 @@ import static com.rbkmoney.magista.util.RandomBeans.random;
 import static com.rbkmoney.magista.util.RandomBeans.randomStreamOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AdjustmentServiceTest extends AbstractDaoConfig {
+@PostgresqlMagistaIntegrationTest
+public class AdjustmentServiceTest {
 
     @Autowired
     public PaymentAdjustmentService paymentAdjustmentService;

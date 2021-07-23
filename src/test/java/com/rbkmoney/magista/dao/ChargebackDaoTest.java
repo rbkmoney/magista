@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.config.AbstractDaoConfig;
+import com.rbkmoney.magista.config.PostgresqlMagistaIntegrationTest;
 import com.rbkmoney.magista.domain.tables.pojos.ChargebackData;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,8 @@ import java.util.List;
 import static com.rbkmoney.magista.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ChargebackDaoTest extends AbstractDaoConfig {
+@PostgresqlMagistaIntegrationTest
+public class ChargebackDaoTest {
 
     @Autowired
     private ChargebackDao chargebackDao;

@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.magista.config.AbstractDaoConfig;
+import com.rbkmoney.magista.config.PostgresqlMagistaIntegrationTest;
 import com.rbkmoney.magista.dao.ChargebackDao;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.ChargebackData;
@@ -22,7 +22,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-public class ChargebackServiceTest extends AbstractDaoConfig {
+@PostgresqlMagistaIntegrationTest
+public class ChargebackServiceTest {
 
     @Autowired
     public PaymentChargebackService paymentChargebackService;

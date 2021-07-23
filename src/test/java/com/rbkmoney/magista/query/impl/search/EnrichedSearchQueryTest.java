@@ -2,9 +2,13 @@ package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.config.AbstractQueryConfig;
+import com.rbkmoney.magista.config.PostgresqlMagistaIntegrationTest;
+import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
+import com.rbkmoney.magista.query.QueryProcessor;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,7 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author n.pospolita
  */
-public class EnrichedSearchQueryTest extends AbstractQueryConfig {
+@PostgresqlMagistaIntegrationTest
+@Import(QueryProcessorConfig.class)
+public class EnrichedSearchQueryTest {
+
+    @Autowired
+    private QueryProcessor<StatRequest, StatResponse> queryProcessor;
 
     @Test
     @Sql("classpath:data/sql/search/enriched_invoices_search_data.sql")

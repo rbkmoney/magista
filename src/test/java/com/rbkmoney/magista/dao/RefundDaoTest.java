@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.config.AbstractDaoConfig;
+import com.rbkmoney.magista.config.PostgresqlMagistaIntegrationTest;
 import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.exception.DaoException;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,8 @@ import java.util.List;
 import static com.rbkmoney.magista.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RefundDaoTest extends AbstractDaoConfig {
+@PostgresqlMagistaIntegrationTest
+public class RefundDaoTest {
 
     @Autowired
     private RefundDao refundDao;

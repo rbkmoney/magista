@@ -4,7 +4,7 @@ import com.rbkmoney.damsel.domain.InvoicePaymentAdjustmentPending;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.config.AbstractDaoConfig;
+import com.rbkmoney.magista.config.PostgresqlMagistaIntegrationTest;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.handler.impl.AdjustmentBatchHandler;
@@ -27,10 +27,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doAnswer;
 
+@PostgresqlMagistaIntegrationTest
 @SpringBootTest(properties = {
         "cache.invoiceData.size=10",
         "cache.paymentData.size=10"})
-public class AdjustmentInvoiceListenerTest extends AbstractDaoConfig {
+public class AdjustmentInvoiceListenerTest {
 
     @Autowired
     private AdjustmentBatchHandler adjustmentBatchHandler;

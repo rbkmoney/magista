@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.config.AbstractDaoConfig;
+import com.rbkmoney.magista.config.PostgresqlMagistaIntegrationTest;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,8 @@ import static com.rbkmoney.magista.util.RandomBeans.random;
 import static com.rbkmoney.magista.util.RandomBeans.randomStreamOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PaymentDaoTest extends AbstractDaoConfig {
+@PostgresqlMagistaIntegrationTest
+public class PaymentDaoTest {
 
     @Autowired
     private PaymentDao paymentDao;

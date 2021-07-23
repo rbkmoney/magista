@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.config.AbstractDaoConfig;
+import com.rbkmoney.magista.config.PostgresqlMagistaIntegrationTest;
 import com.rbkmoney.magista.domain.enums.PayoutEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
@@ -15,7 +15,8 @@ import java.util.UUID;
 import static com.rbkmoney.magista.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PayoutDaoTest extends AbstractDaoConfig {
+@PostgresqlMagistaIntegrationTest
+public class PayoutDaoTest {
 
     @Autowired
     private PayoutDao payoutDao;
