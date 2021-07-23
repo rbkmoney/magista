@@ -21,13 +21,13 @@ public class InvoiceTemplateService {
 
     private final InvoiceTemplateDao invoiceTemplateDao;
 
-    public InvoiceTemplate get(String invoiceId, String invoiceTemplateId) {
-        InvoiceTemplate invoiceTemplate = getInvoiceTemplate(invoiceId, invoiceTemplateId);
+    public InvoiceTemplate get(String invoiceTemplateId) {
+        InvoiceTemplate invoiceTemplate = getInvoiceTemplate(invoiceTemplateId);
         if (invoiceTemplate == null) {
-            throw getNotFoundException(invoiceId, invoiceTemplateId);
+            throw getNotFoundException(invoiceTemplateId);
         }
         if (invoiceTemplate.getEventType() == InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED) {
-            throw getInvoiceTemplateDeletedException(invoiceId, invoiceTemplateId);
+            throw getInvoiceTemplateAlreadyDeletedException(invoiceTemplateId);
         }
         return invoiceTemplate;
     }
@@ -37,27 +37,26 @@ public class InvoiceTemplateService {
         Map<String, InvoiceTemplate> invoiceTemplatesMap = new HashMap<>();
         List<InvoiceTemplate> enriched = invoiceTemplates.stream()
                 .map(current -> {
-                    String invoiceId = current.getInvoiceId();
                     String invoiceTemplateId = current.getInvoiceTemplateId();
                     InvoiceTemplate previous = invoiceTemplatesMap.computeIfAbsent(
-                            invoiceId + invoiceTemplateId,
-                            key -> getInvoiceTemplate(invoiceId, invoiceTemplateId));
+                            invoiceTemplateId,
+                            key -> getInvoiceTemplate(invoiceTemplateId));
                     if (previous == null) {
                         if (current.getEventType() == InvoiceTemplateEventType.INVOICE_TEMPLATE_CREATED) {
                             return current;
                         } else {
-                            throw getNotFoundException(invoiceId, invoiceTemplateId);
+                            throw getNotFoundException(invoiceTemplateId);
                         }
                     } else {
                         if (current.getEventType() == InvoiceTemplateEventType.INVOICE_TEMPLATE_CREATED) {
-                            throw new InvoiceTemplateCreatedException(
+                            throw new InvoiceTemplateAlreadyCreatedException(
                                     String.format(
                                             "InvoiceTemplate in status INVOICE_TEMPLATE_CREATED, " +
                                                     "but InvoiceTemplate is exist with" +
-                                                    "invoiceId='%s', invoiceTemplateId='%s'",
-                                            invoiceId, invoiceTemplateId));
+                                                    "invoiceTemplateId='%s'",
+                                            invoiceTemplateId));
                         } else if (previous.getEventType() == InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED) {
-                            throw getInvoiceTemplateDeletedException(invoiceId, invoiceTemplateId);
+                            throw getInvoiceTemplateAlreadyDeletedException(invoiceTemplateId);
                         } else {
                             BeanUtil.merge(previous, current);
                             return current;
@@ -65,43 +64,42 @@ public class InvoiceTemplateService {
                     }
                 })
                 .peek(invoiceTemplate -> invoiceTemplatesMap.put(
-                        invoiceTemplate.getInvoiceId() + invoiceTemplate.getInvoiceTemplateId(),
+                        invoiceTemplate.getInvoiceTemplateId(),
                         invoiceTemplate))
                 .collect(Collectors.toList());
 
         try {
             invoiceTemplateDao.save(enriched);
-            log.info("Chargeback events have been saved, size={}", enriched.size());
+            log.info("InvoiceTemplate events have been saved, size={}", enriched.size());
         } catch (DaoException ex) {
             throw new StorageException(
                     String.format("Failed to save chargeback events, size=%d", enriched.size()), ex);
         }
     }
 
-    private InvoiceTemplate getInvoiceTemplate(String invoiceId, String invoiceTemplateId) {
+    private InvoiceTemplate getInvoiceTemplate(String invoiceTemplateId) {
         try {
-            return invoiceTemplateDao.get(invoiceId, invoiceTemplateId);
+            return invoiceTemplateDao.get(invoiceTemplateId);
         } catch (DaoException ex) {
             throw new StorageException(
-                    String.format("Failed to get InvoiceTemplate, invoiceId='%s', invoiceTemplateId='%s'",
-                            invoiceId, invoiceTemplateId),
+                    String.format("Failed to get InvoiceTemplate, invoiceTemplateId='%s'",
+                            invoiceTemplateId),
                     ex);
         }
     }
 
-    private NotFoundException getNotFoundException(String invoiceId, String invoiceTemplateId) {
+    private NotFoundException getNotFoundException(String invoiceTemplateId) {
         return new NotFoundException(
-                String.format("InvoiceTemplate not found, invoiceId='%s', invoiceTemplateId='%s'",
-                        invoiceId, invoiceTemplateId));
+                String.format("InvoiceTemplate not found, invoiceTemplateId='%s'",
+                        invoiceTemplateId));
     }
 
-    private InvoiceTemplateDeletedException getInvoiceTemplateDeletedException(
-            String invoiceId,
+    private InvoiceTemplateAlreadyDeletedException getInvoiceTemplateAlreadyDeletedException(
             String invoiceTemplateId) {
-        return new InvoiceTemplateDeletedException(
+        return new InvoiceTemplateAlreadyDeletedException(
                 String.format(
                         "'Get' operation for InvoiceTemplate in status INVOICE_TEMPLATE_DELETED, " +
-                                "invoiceId='%s', invoiceTemplateId='%s'",
-                        invoiceId, invoiceTemplateId));
+                                "invoiceTemplateId='%s'",
+                        invoiceTemplateId));
     }
 }

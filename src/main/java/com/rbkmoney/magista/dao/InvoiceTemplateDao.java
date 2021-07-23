@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface InvoiceTemplateDao {
 
-    InvoiceTemplate get(String invoiceId, String invoiceTemplateId) throws DaoException;
+    InvoiceTemplate get(String invoiceTemplateId) throws DaoException;
 
     void save(List<InvoiceTemplate> invoiceTemplates) throws DaoException;
 

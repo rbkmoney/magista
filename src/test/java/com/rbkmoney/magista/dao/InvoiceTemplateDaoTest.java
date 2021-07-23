@@ -20,7 +20,7 @@ public class InvoiceTemplateDaoTest extends AbstractDaoConfig {
         Class<InvoiceTemplate> type = InvoiceTemplate.class;
         InvoiceTemplate expected = random(type);
         invoiceTemplateDao.save(Collections.singletonList(expected));
-        InvoiceTemplate actual = invoiceTemplateDao.get(expected.getInvoiceId(), expected.getInvoiceTemplateId());
+        InvoiceTemplate actual = invoiceTemplateDao.get(expected.getInvoiceTemplateId());
         assertEquals(expected, actual);
     }
 
@@ -32,7 +32,7 @@ public class InvoiceTemplateDaoTest extends AbstractDaoConfig {
         InvoiceTemplate invoiceTemplateWithPreviousEventId = new InvoiceTemplate(expected);
         invoiceTemplateWithPreviousEventId.setEventId(expected.getEventId() - 1);
         invoiceTemplateDao.save(Collections.singletonList(invoiceTemplateWithPreviousEventId));
-        InvoiceTemplate actual = invoiceTemplateDao.get(expected.getInvoiceId(), expected.getInvoiceTemplateId());
+        InvoiceTemplate actual = invoiceTemplateDao.get(expected.getInvoiceTemplateId());
         assertEquals(expected, actual);
     }
 }

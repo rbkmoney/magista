@@ -27,6 +27,7 @@ public class InvoiceTemplateUpdatedEventMapper implements InvoiceTemplateMapper 
         var eventCreatedAt = TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt());
         invoiceTemplate.setEventCreatedAt(eventCreatedAt);
         invoiceTemplate.setEventType(InvoiceTemplateEventType.INVOICE_TEMPLATE_UPDATED);
+        invoiceTemplate.setInvoiceTemplateId(machineEvent.getSourceId());
         var updateParams = change.getInvoiceTemplateUpdated().getDiff();
         if (updateParams.isSetInvoiceLifetime()) {
             invoiceTemplate.setInvoiceValidUntil(

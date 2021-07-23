@@ -26,10 +26,9 @@ public class InvoiceTemplateDaoImpl extends AbstractDao implements InvoiceTempla
     }
 
     @Override
-    public InvoiceTemplate get(String invoiceId, String invoiceTemplateId) throws DaoException {
+    public InvoiceTemplate get(String invoiceTemplateId) throws DaoException {
         Query query = getDslContext().selectFrom(INVOICE_TEMPLATE)
-                .where(INVOICE_TEMPLATE.INVOICE_ID.eq(invoiceId)
-                        .and(INVOICE_TEMPLATE.INVOICE_TEMPLATE_ID.eq(invoiceTemplateId)));
+                .where(INVOICE_TEMPLATE.INVOICE_TEMPLATE_ID.eq(invoiceTemplateId));
         return fetchOne(query, invoiceTemplateRowMapper);
     }
 
@@ -40,10 +39,10 @@ public class InvoiceTemplateDaoImpl extends AbstractDao implements InvoiceTempla
                 .map(invoiceTemplateRecord ->
                         getDslContext().insertInto(INVOICE_TEMPLATE)
                                 .set(invoiceTemplateRecord)
-                                .onConflict(INVOICE_TEMPLATE.INVOICE_ID, INVOICE_TEMPLATE.INVOICE_TEMPLATE_ID)
+                                .onConflict(INVOICE_TEMPLATE.INVOICE_TEMPLATE_ID)
                                 .doUpdate()
                                 .set(invoiceTemplateRecord)
-                                .where(INVOICE_TEMPLATE.EVENT_ID.le(invoiceTemplateRecord.getEventId())))
+                                .where(INVOICE_TEMPLATE.EVENT_ID.lessOrEqual(invoiceTemplateRecord.getEventId())))
                 .collect(Collectors.toList());
         batchExecute(queries);
     }
