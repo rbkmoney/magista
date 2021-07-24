@@ -2,7 +2,7 @@ package com.rbkmoney.magista.config;
 
 import com.rbkmoney.magista.MagistaApplication;
 import com.rbkmoney.magista.config.initializer.CommonPropertiesInitializer;
-import com.rbkmoney.magista.config.initializer.PostgresqlTestcontainerAndPropertiesInitializer;
+import com.rbkmoney.magista.config.initializer.PostgresqlTestcontainerPropertiesInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
         classes = MagistaApplication.class,
         initializers = {
                 CommonPropertiesInitializer.class,
-                PostgresqlTestcontainerAndPropertiesInitializer.class})
+                PostgresqlTestcontainerPropertiesInitializer.class})
 @TestPropertySource("classpath:application.yml")
 @DirtiesContext
 @Transactional

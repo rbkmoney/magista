@@ -2,8 +2,8 @@ package com.rbkmoney.magista.config;
 
 import com.rbkmoney.magista.MagistaApplication;
 import com.rbkmoney.magista.config.initializer.CommonPropertiesInitializer;
-import com.rbkmoney.magista.config.initializer.KafkaTestcontainerAndPropertiesInitializer;
-import com.rbkmoney.magista.config.initializer.PostgresqlTestcontainerAndPropertiesInitializer;
+import com.rbkmoney.magista.config.initializer.KafkaTestcontainerPropertiesInitializer;
+import com.rbkmoney.magista.config.initializer.PostgresqlTestcontainerPropertiesInitializer;
 import com.rbkmoney.magista.config.testconfiguration.KafkaProducerConfig;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -25,8 +25,8 @@ import java.lang.annotation.Target;
                 KafkaProducerConfig.class},
         initializers = {
                 CommonPropertiesInitializer.class,
-                PostgresqlTestcontainerAndPropertiesInitializer.class,
-                KafkaTestcontainerAndPropertiesInitializer.class})
+                PostgresqlTestcontainerPropertiesInitializer.class,
+                KafkaTestcontainerPropertiesInitializer.class})
 @TestPropertySource("classpath:application.yml")
 @DirtiesContext
 @Transactional

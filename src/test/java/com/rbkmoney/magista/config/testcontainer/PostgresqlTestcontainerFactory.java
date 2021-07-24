@@ -19,8 +19,8 @@ public class PostgresqlTestcontainerFactory {
 
     private PostgreSQLContainer<?> postgreSqlContainer;
 
-    public static PostgreSQLContainer<?> getPostgresqlContainer() {
-        return instance().getOrCreatePostgresqlContainer();
+    public static PostgreSQLContainer<?> container() {
+        return instance().getOrInitAndStartContainer();
     }
 
     private static PostgresqlTestcontainerFactory instance() {
@@ -28,7 +28,7 @@ public class PostgresqlTestcontainerFactory {
     }
 
     @Synchronized
-    private PostgreSQLContainer<?> getOrCreatePostgresqlContainer() {
+    private PostgreSQLContainer<?> getOrInitAndStartContainer() {
         if (postgreSqlContainer != null) {
             return postgreSqlContainer;
         }
@@ -36,12 +36,16 @@ public class PostgresqlTestcontainerFactory {
                 DockerImageName
                         .parse(POSTGRESQL_IMAGE_NAME)
                         .withTag(POSTGRESQL_VERSION));
+        startContainer(container);
+        postgreSqlContainer = container;
+        return postgreSqlContainer;
+    }
+
+    private void startContainer(PostgreSQLContainer<?> container) {
         Startables.deepStart(Stream.of(container))
                 .join();
         assertThat(container.isRunning())
                 .isTrue();
-        postgreSqlContainer = container;
-        return postgreSqlContainer;
     }
 
     private static class SingletonHolder {

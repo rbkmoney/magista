@@ -4,14 +4,14 @@ import org.springframework.boot.test.context.ConfigDataApplicationContextInitial
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import static com.rbkmoney.magista.config.testcontainer.SingletonKafkaTestcontainer.KAFKA_CONTAINER;
+import static com.rbkmoney.magista.config.testcontainer.KafkaTestcontainerFactory.container;
 
-public class KafkaTestcontainerAndPropertiesInitializer extends ConfigDataApplicationContextInitializer {
+public class KafkaTestcontainerPropertiesInitializer extends ConfigDataApplicationContextInitializer {
 
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
         TestPropertyValues.of(
-                "kafka.bootstrap-servers=" + KAFKA_CONTAINER.getBootstrapServers(),
+                "kafka.bootstrap-servers=" + container().getBootstrapServers(),
                 "kafka.ssl.enabled=false",
                 "kafka.topics.invoicing.consume.enabled=true",
                 "kafka.topics.invoice-template.consume.enabled=true",
