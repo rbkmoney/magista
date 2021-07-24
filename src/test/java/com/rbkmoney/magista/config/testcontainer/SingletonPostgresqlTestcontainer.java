@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.config.testcontainer;
 
-import lombok.Builder;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
@@ -9,7 +8,6 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Builder
 public class SingletonPostgresqlTestcontainer {
 
     private static final String POSTGRESQL_IMAGE_NAME = "postgres";
