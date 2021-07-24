@@ -20,10 +20,10 @@ public class SingletonPostgresqlTestcontainer {
                     .withTag(POSTGRESQL_VERSION));
 
     static {
-        startDbContainer();
+        startPostgresqlContainer();
     }
 
-    private static void startDbContainer() {
+    private static void startPostgresqlContainer() {
         Startables.deepStart(Stream.of(POSTGRESQL_CONTAINER))
                 .join();
         assertThat(POSTGRESQL_CONTAINER.isRunning())
