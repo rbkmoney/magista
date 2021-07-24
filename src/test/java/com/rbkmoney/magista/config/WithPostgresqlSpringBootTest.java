@@ -24,5 +24,5 @@ import java.lang.annotation.*;
 @TestPropertySource("classpath:application.yml")
 @DirtiesContext
 @Transactional
-public @interface PostgresqlMagistaIntegrationTest {
+public @interface WithPostgresqlSpringBootTest {
 }

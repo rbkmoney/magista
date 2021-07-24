@@ -3,7 +3,7 @@ package com.rbkmoney.magista.kafka;
 import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;
-import com.rbkmoney.magista.config.PostgresqlKafkaMagistaIntegrationTest;
+import com.rbkmoney.magista.config.WithKafkaWithPostgresqlSpringBootTest;
 import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.service.HandlerManager;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@PostgresqlKafkaMagistaIntegrationTest
+@WithKafkaWithPostgresqlSpringBootTest
 public class InvoicingListenerTest {
 
     @Value("${kafka.topics.invoicing.id}")

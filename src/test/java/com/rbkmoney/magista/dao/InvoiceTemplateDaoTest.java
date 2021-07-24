@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.config.PostgresqlMagistaIntegrationTest;
+import com.rbkmoney.magista.config.WithPostgresqlSpringBootTest;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceTemplate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import java.util.Collections;
 import static com.rbkmoney.magista.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@PostgresqlMagistaIntegrationTest
+@WithPostgresqlSpringBootTest
 public class InvoiceTemplateDaoTest {
 
     @Autowired

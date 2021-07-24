@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.magista.config.PostgresqlMagistaIntegrationTest;
+import com.rbkmoney.magista.config.WithPostgresqlSpringBootTest;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.RefundData;
@@ -17,7 +17,7 @@ import static com.rbkmoney.magista.util.RandomBeans.randomStreamOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-@PostgresqlMagistaIntegrationTest
+@WithPostgresqlSpringBootTest
 public class RefundServiceTest {
 
     @Autowired

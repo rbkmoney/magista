@@ -2,7 +2,7 @@ package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.config.PostgresqlMagistaIntegrationTest;
+import com.rbkmoney.magista.config.WithPostgresqlSpringBootTest;
 import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
 import com.rbkmoney.magista.query.QueryProcessor;
 import com.rbkmoney.magista.util.DamselUtil;
@@ -13,7 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@PostgresqlMagistaIntegrationTest
+@WithPostgresqlSpringBootTest
 @Import(QueryProcessorConfig.class)
 public class ChargebackSearchQueryTest {
 
