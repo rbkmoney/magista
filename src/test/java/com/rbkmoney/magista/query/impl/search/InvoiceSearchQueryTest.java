@@ -4,7 +4,7 @@ import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.config.WithPostgresqlSpringBootTest;
+import com.rbkmoney.magista.config.WithPostgresqlSpringBootITest;
 import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.QueryProcessor;
@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@WithPostgresqlSpringBootTest
+@WithPostgresqlSpringBootITest
 @Import(QueryProcessorConfig.class)
 @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
 public class InvoiceSearchQueryTest {

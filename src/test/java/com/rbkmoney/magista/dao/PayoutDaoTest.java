@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.config.WithPostgresqlSpringBootTest;
+import com.rbkmoney.magista.config.WithPostgresqlSpringBootITest;
 import com.rbkmoney.magista.domain.enums.PayoutEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
@@ -15,7 +15,7 @@ import java.util.UUID;
 import static com.rbkmoney.magista.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@WithPostgresqlSpringBootTest
+@WithPostgresqlSpringBootITest
 public class PayoutDaoTest {
 
     @Autowired

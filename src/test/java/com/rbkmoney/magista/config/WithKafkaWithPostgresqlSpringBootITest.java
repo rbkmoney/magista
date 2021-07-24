@@ -29,5 +29,5 @@ import java.lang.annotation.*;
 @TestPropertySource("classpath:application.yml")
 @DirtiesContext
 @Transactional
-public @interface WithKafkaWithPostgresqlSpringBootTest {
+public @interface WithKafkaWithPostgresqlSpringBootITest {
 }
