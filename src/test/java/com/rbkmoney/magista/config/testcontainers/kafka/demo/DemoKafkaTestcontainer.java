@@ -14,6 +14,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @KafkaTestcontainer(
         properties = "kafka.topics.invoicing.consume.enabled=true",
-        topicKeys = "kafka.topics.invoicing.id")
+        topicsKeys = "kafka.topics.invoicing.id")
 public @interface DemoKafkaTestcontainer {
 }

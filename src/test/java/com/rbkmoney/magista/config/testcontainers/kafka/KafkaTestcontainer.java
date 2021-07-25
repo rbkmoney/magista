@@ -20,9 +20,9 @@ public @interface KafkaTestcontainer {
     String[] properties() default {};
 
     /**
-     * topicKeys = {"kafka.topics.invoicing.id",...}
+     * topicsKeys = {"kafka.topics.invoicing.id",...}
      */
-    String[] topicKeys();
+    String[] topicsKeys();
 
     enum InstanceMode {
         SINGLETON,

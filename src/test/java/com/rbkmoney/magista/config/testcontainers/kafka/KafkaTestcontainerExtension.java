@@ -93,7 +93,7 @@ public class KafkaTestcontainerExtension
 
     private void startContainer(KafkaTestcontainer kafkaTestcontainer, KafkaContainer container) {
         startContainer(container);
-        var topics = loadFromSpringApplicationPropertiesFile(List.of(kafkaTestcontainer.topicKeys()))
+        var topics = loadFromSpringApplicationPropertiesFile(List.of(kafkaTestcontainer.topicsKeys()))
                 .values().stream()
                 .map(String::valueOf)
                 .collect(Collectors.toList());

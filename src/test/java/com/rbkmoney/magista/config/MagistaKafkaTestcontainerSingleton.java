@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
                 "kafka.topics.invoice-template.consume.enabled=true",
                 "kafka.topics.pm-events-payout.consume.enabled=true",
                 "kafka.state.cache.size=0"},
-        topicKeys = {
+        topicsKeys = {
                 "kafka.topics.invoicing.id",
                 "kafka.topics.invoice-template.id",
                 "kafka.topics.pm-events-payout.id"})
