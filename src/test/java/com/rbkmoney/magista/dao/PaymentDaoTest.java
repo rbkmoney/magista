@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.config.WithPostgresqlSpringBootITest;
+import com.rbkmoney.magista.config.testcontainers.postgresql.WithPostgresqlSingletonSpringBootITest;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import static com.rbkmoney.magista.util.RandomBeans.random;
 import static com.rbkmoney.magista.util.RandomBeans.randomStreamOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@WithPostgresqlSpringBootITest
+@WithPostgresqlSingletonSpringBootITest
 public class PaymentDaoTest {
 
     @Autowired

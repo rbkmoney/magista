@@ -4,7 +4,7 @@ import org.springframework.boot.test.context.ConfigDataApplicationContextInitial
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class CommonPropertiesInitializer extends ConfigDataApplicationContextInitializer {
+public class ApplicationPropertiesInitializer extends ConfigDataApplicationContextInitializer {
 
     @Override
     public void initialize(ConfigurableApplicationContext configurableApplicationContext) {

@@ -1,0 +1,7 @@
+# Spring Test ContextCustomizerFactories
+org.springframework.test.context.ContextCustomizerFactory=\
+com.rbkmoney.magista.config.testcontainers.postgresql.PostgresqlTestcontainerExtension.PostgresqlTestcontainerContextCustomizerFactory,\
+com.rbkmoney.magista.config.testcontainers.kafka.KafkaTestcontainerExtension.KafkaTestcontainerContextCustomizerFactory
+# Application Context Initializers
+org.springframework.context.ApplicationContextInitializer=\
+com.rbkmoney.magista.config.initializer.ApplicationPropertiesInitializer

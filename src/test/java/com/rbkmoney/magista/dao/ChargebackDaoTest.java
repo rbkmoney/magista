@@ -1,8 +1,7 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.config.WithPostgresqlSpringBootITest;
+import com.rbkmoney.magista.config.testcontainers.postgresql.WithPostgresqlSingletonSpringBootITest;
 import com.rbkmoney.magista.domain.tables.pojos.ChargebackData;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,7 +11,7 @@ import java.util.List;
 import static com.rbkmoney.magista.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@WithPostgresqlSpringBootITest
+@WithPostgresqlSingletonSpringBootITest
 public class ChargebackDaoTest {
 
     @Autowired
@@ -26,7 +25,7 @@ public class ChargebackDaoTest {
 
         ChargebackData chargeback = chargebackDao
                 .get(chargebackData.getInvoiceId(), chargebackData.getPaymentId(), chargebackData.getChargebackId());
-        Assert.assertEquals(chargebackData, chargeback);
+        assertEquals(chargebackData, chargeback);
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.config;
+package com.rbkmoney.magista.config.testcontainers.util;
 
 import com.rbkmoney.magista.exception.IoException;
 import com.rbkmoney.magista.exception.NoSuchFileException;
@@ -20,6 +20,10 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SpringApplicationPropertiesLoader {
+
+    public static String loadStringValueFromSpringApplicationPropertiesFile(String key) {
+        return String.valueOf(loadFromSpringApplicationPropertiesFile(List.of(key)).get(key));
+    }
 
     public static Properties loadFromSpringApplicationPropertiesFile(List<String> keys) {
         var fileProperties = loadPropertiesByFile();

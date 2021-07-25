@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.magista.config.WithPostgresqlSpringBootITest;
+import com.rbkmoney.magista.config.testcontainers.postgresql.WithPostgresqlSingletonSpringBootITest;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
@@ -18,7 +18,7 @@ import static com.rbkmoney.magista.util.RandomBeans.random;
 import static com.rbkmoney.magista.util.RandomBeans.randomStreamOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@WithPostgresqlSpringBootITest
+@WithPostgresqlSingletonSpringBootITest
 public class AdjustmentServiceTest {
 
     @Autowired

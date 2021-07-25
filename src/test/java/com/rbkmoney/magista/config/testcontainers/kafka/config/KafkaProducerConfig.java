@@ -1,4 +1,4 @@
-package com.rbkmoney.magista.config.testconfiguration;
+package com.rbkmoney.magista.config.testcontainers.kafka.config;
 
 import com.rbkmoney.kafka.common.serialization.ThriftSerializer;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;

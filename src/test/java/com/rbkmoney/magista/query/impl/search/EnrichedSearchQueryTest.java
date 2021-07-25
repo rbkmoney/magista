@@ -2,8 +2,8 @@ package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.config.WithPostgresqlSpringBootITest;
 import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
+import com.rbkmoney.magista.config.testcontainers.postgresql.WithPostgresqlSingletonSpringBootITest;
 import com.rbkmoney.magista.query.QueryProcessor;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author n.pospolita
  */
-@WithPostgresqlSpringBootITest
+@WithPostgresqlSingletonSpringBootITest
 @Import(QueryProcessorConfig.class)
 public class EnrichedSearchQueryTest {
 

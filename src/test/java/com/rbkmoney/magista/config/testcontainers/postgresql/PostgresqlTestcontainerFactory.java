@@ -1,26 +1,27 @@
-package com.rbkmoney.magista.config.testcontainer;
+package com.rbkmoney.magista.config.testcontainers.postgresql;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.rbkmoney.magista.config.testcontainers.util.SpringApplicationPropertiesLoader.loadStringValueFromSpringApplicationPropertiesFile;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PostgresqlTestcontainerFactory {
 
     private static final String POSTGRESQL_IMAGE_NAME = "postgres";
-    private static final String POSTGRESQL_VERSION = "11.4";
+    private static final String TAG_PROPERTY = "testcontainers.postgresql.tag";
 
     private PostgreSQLContainer<?> postgreSqlContainer;
 
     public static PostgreSQLContainer<?> container() {
-        return instance().getOrInitAndStartContainer();
+        return instance().create();
+    }
+
+    public static PostgreSQLContainer<?> singletonContainer() {
+        return instance().getOrCreateSingletonContainer();
     }
 
     private static PostgresqlTestcontainerFactory instance() {
@@ -28,24 +29,19 @@ public class PostgresqlTestcontainerFactory {
     }
 
     @Synchronized
-    private PostgreSQLContainer<?> getOrInitAndStartContainer() {
+    private PostgreSQLContainer<?> getOrCreateSingletonContainer() {
         if (postgreSqlContainer != null) {
             return postgreSqlContainer;
         }
-        PostgreSQLContainer<?> container = new PostgreSQLContainer<>(
-                DockerImageName
-                        .parse(POSTGRESQL_IMAGE_NAME)
-                        .withTag(POSTGRESQL_VERSION));
-        startContainer(container);
-        postgreSqlContainer = container;
+        postgreSqlContainer = create();
         return postgreSqlContainer;
     }
 
-    private void startContainer(PostgreSQLContainer<?> container) {
-        Startables.deepStart(Stream.of(container))
-                .join();
-        assertThat(container.isRunning())
-                .isTrue();
+    private PostgreSQLContainer<?> create() {
+        return new PostgreSQLContainer<>(
+                DockerImageName
+                        .parse(POSTGRESQL_IMAGE_NAME)
+                        .withTag(loadStringValueFromSpringApplicationPropertiesFile(TAG_PROPERTY)));
     }
 
     private static class SingletonHolder {

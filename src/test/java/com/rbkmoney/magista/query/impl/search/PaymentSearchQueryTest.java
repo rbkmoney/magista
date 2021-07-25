@@ -2,8 +2,8 @@ package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.config.WithPostgresqlSpringBootITest;
 import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
+import com.rbkmoney.magista.config.testcontainers.postgresql.WithPostgresqlSingletonSpringBootITest;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.QueryProcessor;
 import com.rbkmoney.magista.query.parser.QueryParserException;
@@ -19,7 +19,7 @@ import static com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider.euroset;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
-@WithPostgresqlSpringBootITest
+@WithPostgresqlSingletonSpringBootITest
 @Import(QueryProcessorConfig.class)
 public class PaymentSearchQueryTest {
 

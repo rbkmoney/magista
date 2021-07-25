@@ -1,6 +1,5 @@
-package com.rbkmoney.magista.config.testcontainer;
+package com.rbkmoney.magista.config.testcontainers.postgresql;
 
-import com.rbkmoney.magista.config.PostgresqlTestcontainer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -28,13 +27,13 @@ public class PostgresqlTestcontainerExtension
 
     @Override
     public void postProcessTestInstance(Object testInstance, ExtensionContext context) {
-        Optional<PostgresqlTestcontainer> annotation = findCurrentAnnotation(context);
+        var annotation = findCurrentAnnotation(context);
         if (annotation.isEmpty()) {
             return;
         }
-        PostgresqlTestcontainer postgresqlTestcontainer = annotation.get();
+        var postgresqlTestcontainer = annotation.get();
         if (postgresqlTestcontainer.instanceMode() == PostgresqlTestcontainer.InstanceMode.SINGLETON) {
-            PostgreSQLContainer<?> container = PostgresqlTestcontainerFactory.singletonContainer();
+            var container = PostgresqlTestcontainerFactory.singletonContainer();
             if (!container.isRunning()) {
                 startContainer(container);
             }
@@ -44,13 +43,13 @@ public class PostgresqlTestcontainerExtension
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        Optional<PostgresqlTestcontainer> annotation = findCurrentAnnotation(context);
+        var annotation = findCurrentAnnotation(context);
         if (annotation.isEmpty()) {
             return;
         }
-        PostgresqlTestcontainer postgresqlTestcontainer = annotation.get();
+        var postgresqlTestcontainer = annotation.get();
         if (postgresqlTestcontainer.instanceMode() == PostgresqlTestcontainer.InstanceMode.DEFAULT) {
-            PostgreSQLContainer<?> container = PostgresqlTestcontainerFactory.container();
+            var container = PostgresqlTestcontainerFactory.container();
             if (!container.isRunning()) {
                 startContainer(container);
             }
@@ -60,28 +59,28 @@ public class PostgresqlTestcontainerExtension
 
     @Override
     public void afterAll(ExtensionContext context) {
-        Optional<PostgresqlTestcontainer> annotation = findCurrentAnnotation(context);
+        var annotation = findCurrentAnnotation(context);
         if (annotation.isEmpty()) {
             return;
         }
-        PostgresqlTestcontainer postgresqlTestcontainer = annotation.get();
+        var postgresqlTestcontainer = annotation.get();
         if (postgresqlTestcontainer.instanceMode() == PostgresqlTestcontainer.InstanceMode.DEFAULT) {
-            PostgreSQLContainer<?> container = THREAD_CONTAINER.get();
+            var container = THREAD_CONTAINER.get();
             if (container != null && container.isRunning()) {
                 container.stop();
             }
         }
     }
 
-    private static Optional<PostgresqlTestcontainer> findCurrentAnnotation(ExtensionContext context) {
-        return AnnotationSupport.findAnnotation(context.getElement(), PostgresqlTestcontainer.class);
-    }
-
     private static Optional<PostgresqlTestcontainer> findCurrentAnnotation(Class<?> testClass) {
         return AnnotationSupport.findAnnotation(testClass, PostgresqlTestcontainer.class);
     }
 
-    private static void startContainer(PostgreSQLContainer<?> container) {
+    private Optional<PostgresqlTestcontainer> findCurrentAnnotation(ExtensionContext context) {
+        return AnnotationSupport.findAnnotation(context.getElement(), PostgresqlTestcontainer.class);
+    }
+
+    private void startContainer(PostgreSQLContainer<?> container) {
         Startables.deepStart(Stream.of(container))
                 .join();
         assertThat(container.isRunning())
