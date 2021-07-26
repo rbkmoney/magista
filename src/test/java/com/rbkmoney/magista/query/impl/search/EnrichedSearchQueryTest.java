@@ -2,21 +2,28 @@ package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.query.AbstractQueryTest;
+import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
+import com.rbkmoney.magista.query.QueryProcessor;
 import com.rbkmoney.magista.util.DamselUtil;
-import org.junit.Test;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * merchant OKKO-specific, in general shouldn't be touched
  *
  * @author n.pospolita
  */
-@Transactional
-public class EnrichedSearchQueryTest extends AbstractQueryTest {
+@WithPostgresqlSingletonSpringBootITest
+@Import(QueryProcessorConfig.class)
+public class EnrichedSearchQueryTest {
+
+    @Autowired
+    private QueryProcessor<StatRequest, StatResponse> queryProcessor;
 
     @Test
     @Sql("classpath:data/sql/search/enriched_invoices_search_data.sql")

@@ -2,23 +2,29 @@ package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
 import com.rbkmoney.magista.exception.BadTokenException;
-import com.rbkmoney.magista.query.AbstractQueryTest;
+import com.rbkmoney.magista.query.QueryProcessor;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.util.DamselUtil;
-import org.junit.Assert;
-import org.junit.Test;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
 import static com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider.euroset;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@Transactional
-public class PaymentSearchQueryTest extends AbstractQueryTest {
+@WithPostgresqlSingletonSpringBootITest
+@Import(QueryProcessorConfig.class)
+public class PaymentSearchQueryTest {
+
+    @Autowired
+    private QueryProcessor<StatRequest, StatResponse> queryProcessor;
 
     @Test
     @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")
@@ -66,10 +72,12 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
         assertEquals(3, statResponse.getData().getPayments().size());
     }
 
-    @Test(expected = QueryParserException.class)
+    @Test
     public void testWhenSizeOverflow() {
         String json = "{'query': {'payments': {'size': 1001}}}";
-        queryProcessor.processQuery(new StatRequest(json));
+        assertThrows(
+                QueryParserException.class,
+                () -> queryProcessor.processQuery(new StatRequest(json)));
     }
 
     @Test
@@ -145,13 +153,15 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
         assertNull(statResponse.getContinuationToken());
     }
 
-    @Test(expected = BadTokenException.class)
+    @Test
     public void testBadToken() {
         String json =
                 "{'query': {'payments': {'merchant_id': 'db79ad6c-a507-43ed-9ecf-3bbd88475b32','shop_id': '6789','from_time': '2016-10-25T15:45:20Z','to_time': '3018-10-25T18:10:10Z'}}}";
         StatRequest statRequest = new StatRequest(json);
         statRequest.setContinuationToken("3gOc9TNJDkE1dOoK5oy6bJvgShunXxk2rTZuCn3SBts=1560155771740");
-        queryProcessor.processQuery(statRequest);
+        assertThrows(
+                BadTokenException.class,
+                () -> queryProcessor.processQuery(statRequest));
     }
 
     @Test
@@ -164,7 +174,7 @@ public class PaymentSearchQueryTest extends AbstractQueryTest {
         Instant instant = Instant.MAX;
         for (StatPayment statPayment : statResponse.getData().getPayments()) {
             Instant statInstant = Instant.from(TypeUtil.stringToTemporal(statPayment.getCreatedAt()));
-            Assert.assertTrue(statInstant.isBefore(instant));
+            assertTrue(statInstant.isBefore(instant));
             instant = statInstant;
         }
         DamselUtil.toJson(statResponse);

@@ -122,9 +122,9 @@ public class MapperHelper {
                 );
                 bankCard.setPaymentSystemDeprecated(
                         Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()))
-                            .map(bankCardSystem ->
-                                    TypeUtil.toEnumField(bankCardSystem, LegacyBankCardPaymentSystem.class))
-                            .orElse(null)
+                                .map(bankCardSystem ->
+                                        TypeUtil.toEnumField(bankCardSystem, LegacyBankCardPaymentSystem.class))
+                                .orElse(null)
                 );
                 String tokenProvider = rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName());
                 if (StringUtils.isNotEmpty(tokenProvider)) {

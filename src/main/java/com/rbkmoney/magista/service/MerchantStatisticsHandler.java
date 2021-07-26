@@ -15,7 +15,7 @@ import java.util.Arrays;
 @Slf4j
 public class MerchantStatisticsHandler implements StatisticsServletIface {
 
-    private QueryProcessor<StatRequest, StatResponse> queryProcessor;
+    private final QueryProcessor<StatRequest, StatResponse> queryProcessor;
 
     public MerchantStatisticsHandler(QueryProcessor<StatRequest, StatResponse> queryProcessor) {
         this.queryProcessor = queryProcessor;

@@ -1,34 +1,31 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.dao.impl.ChargebackDaoImpl;
 import com.rbkmoney.magista.domain.tables.pojos.ChargebackData;
-import io.github.benas.randombeans.api.EnhancedRandom;
-import org.junit.Assert;
-import org.junit.Test;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Collections;
 import java.util.List;
 
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
+import static com.rbkmoney.magista.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ContextConfiguration(classes = {ChargebackDaoImpl.class})
-public class ChargebackDaoTest extends AbstractDaoTest {
+@WithPostgresqlSingletonSpringBootITest
+public class ChargebackDaoTest {
 
     @Autowired
     private ChargebackDao chargebackDao;
 
     @Test
     public void saveAndGet() {
-        ChargebackData chargebackData = EnhancedRandom.random(ChargebackData.class);
+        ChargebackData chargebackData = random(ChargebackData.class);
 
         chargebackDao.save(Collections.singletonList(chargebackData));
 
         ChargebackData chargeback = chargebackDao
                 .get(chargebackData.getInvoiceId(), chargebackData.getPaymentId(), chargebackData.getChargebackId());
-        Assert.assertEquals(chargebackData, chargeback);
+        assertEquals(chargebackData, chargeback);
     }
 
     @Test

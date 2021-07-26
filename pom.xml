@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.rbkmoney</groupId>
         <artifactId>service-parent-pom</artifactId>
-        <version>1.2.9</version>
+        <version>1.2.10</version>
     </parent>
 
     <groupId>com.rbkmoney.magista</groupId>
@@ -156,17 +156,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>payout-manager-proto</artifactId>
+            <version>1.17-8aa3eb8</version>
+        </dependency>
 
         <!--Test libs-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>1.14.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -176,15 +175,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>kafka</artifactId>
-            <version>1.14.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams-test-utils</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>testcontainers-annotations</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 
@@ -308,7 +306,7 @@
             <plugin>
                 <groupId>com.rbkmoney.maven.plugins</groupId>
                 <artifactId>pg-embedded-plugin</artifactId>
-                <version>1.6</version>
+                <version>1.7</version>
                 <configuration>
                     <port>${db.port}</port>
                     <dbName>${db.name}</dbName>

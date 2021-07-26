@@ -86,7 +86,7 @@ public abstract class StatBaseFunction extends ScopedBaseFunction<Map<String, St
 
     public static class StatBaseParser extends AbstractQueryParser {
         private final String funcName;
-        private StatBaseValidator validator = new StatBaseValidator();
+        private final StatBaseValidator validator = new StatBaseValidator();
 
         public StatBaseParser(String funcName) {
             this.funcName = funcName;
@@ -113,7 +113,7 @@ public abstract class StatBaseFunction extends ScopedBaseFunction<Map<String, St
     }
 
     public abstract static class StatBaseBuilder extends AbstractQueryBuilder {
-        private StatBaseValidator validator = new StatBaseValidator();
+        private final StatBaseValidator validator = new StatBaseValidator();
 
         @Override
         public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,

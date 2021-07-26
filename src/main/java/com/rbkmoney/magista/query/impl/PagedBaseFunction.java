@@ -18,7 +18,7 @@ public abstract class PagedBaseFunction<T, CT> extends ScopedBaseFunction<T, CT>
 
     public static final int MAX_SIZE_VALUE = 1000;
 
-    private String continuationToken;
+    private final String continuationToken;
 
     public PagedBaseFunction(Object descriptor, QueryParameters params, String name, String continuationToken) {
         super(descriptor, params, name);

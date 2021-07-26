@@ -1,26 +1,25 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.dao.impl.PayoutDaoImpl;
 import com.rbkmoney.magista.domain.enums.PayoutEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.tables.pojos.PayoutData;
 import com.rbkmoney.magista.exception.DaoException;
-import org.junit.Test;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
+import static com.rbkmoney.magista.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ContextConfiguration(classes = {PayoutDaoImpl.class})
-public class PayoutDaoTest extends AbstractDaoTest {
+@WithPostgresqlSingletonSpringBootITest
+public class PayoutDaoTest {
 
     @Autowired
-    PayoutDao payoutDao;
+    private PayoutDao payoutDao;
 
     @Test
     public void insertUpdateAndFindPayoutEventTest() throws DaoException {
