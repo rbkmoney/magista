@@ -27,9 +27,8 @@ public class InvoiceTemplateCreatedEventMapper implements InvoiceTemplateMapper 
         var eventCreatedAt = TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt());
         invoiceTemplate.setEventCreatedAt(eventCreatedAt);
         invoiceTemplate.setEventType(InvoiceTemplateEventType.INVOICE_TEMPLATE_CREATED);
+        invoiceTemplate.setInvoiceTemplateId(machineEvent.getSourceId());
         var invoiceTemplateThrift = change.getInvoiceTemplateCreated().getInvoiceTemplate();
-        invoiceTemplate.setInvoiceTemplateId(invoiceTemplateThrift.getId());
-        invoiceTemplate.setInvoiceId(machineEvent.getSourceId());
         invoiceTemplate.setPartyId(invoiceTemplateThrift.getOwnerId());
         invoiceTemplate.setShopId(invoiceTemplateThrift.getShopId());
         invoiceTemplate.setInvoiceValidUntil(

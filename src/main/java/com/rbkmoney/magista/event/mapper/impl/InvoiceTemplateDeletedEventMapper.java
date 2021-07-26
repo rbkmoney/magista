@@ -23,6 +23,7 @@ public class InvoiceTemplateDeletedEventMapper implements InvoiceTemplateMapper 
         invoiceTemplate.setEventId(machineEvent.getEventId());
         invoiceTemplate.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         invoiceTemplate.setEventType(InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED);
+        invoiceTemplate.setInvoiceTemplateId(machineEvent.getSourceId());
         return invoiceTemplate;
     }
 }
