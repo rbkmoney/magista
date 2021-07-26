@@ -1,9 +1,9 @@
 package com.rbkmoney.magista.kafka;
 
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.config.MagistaSpringBootITest;
 import com.rbkmoney.payout.manager.*;
 import com.rbkmoney.payout.manager.domain.CurrencyRef;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 
-//@MagistaSpringBootITest
-@Disabled
+@MagistaSpringBootITest
 public class PayoutListenerTest {
 
     @Value("${kafka.topics.pm-events-payout.id}")
