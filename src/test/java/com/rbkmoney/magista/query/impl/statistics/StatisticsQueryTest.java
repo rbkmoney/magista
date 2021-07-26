@@ -2,17 +2,26 @@ package com.rbkmoney.magista.query.impl.statistics;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.config.AbstractQueryConfig;
+import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
+import com.rbkmoney.magista.query.QueryProcessor;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class StatisticsQueryTest extends AbstractQueryConfig {
+@WithPostgresqlSingletonSpringBootITest
+@Import(QueryProcessorConfig.class)
+public class StatisticsQueryTest {
+
+    @Autowired
+    private QueryProcessor<StatRequest, StatResponse> queryProcessor;
 
     @Test
     @Sql("classpath:data/sql/statistics/payments_geo_stat_data.sql")

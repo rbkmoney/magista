@@ -1,8 +1,8 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.config.AbstractDaoConfig;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.exception.DaoException;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,7 +11,8 @@ import java.util.List;
 import static com.rbkmoney.magista.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AdjustmentDaoTest extends AbstractDaoConfig {
+@WithPostgresqlSingletonSpringBootITest
+public class AdjustmentDaoTest {
 
     @Autowired
     private AdjustmentDao adjustmentDao;

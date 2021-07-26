@@ -6,12 +6,7 @@ import com.rbkmoney.damsel.domain.InvoicePaymentRefund;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.geo_ip.LocationInfo;
 import com.rbkmoney.damsel.payment_processing.*;
-import com.rbkmoney.geck.serializer.kit.mock.FieldHandler;
-import com.rbkmoney.geck.serializer.kit.mock.MockMode;
-import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
-import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.machinegun.msgpack.Value;
 import com.rbkmoney.magista.TestData;
 import com.rbkmoney.magista.converter.BinaryConverterImpl;
 import com.rbkmoney.magista.converter.SourceEventParser;
@@ -20,10 +15,6 @@ import com.rbkmoney.magista.event.mapper.impl.*;
 import com.rbkmoney.magista.provider.GeoProvider;
 import com.rbkmoney.magista.service.PaymentService;
 import com.rbkmoney.magista.service.*;
-import lombok.SneakyThrows;
-import org.apache.thrift.TBase;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +26,8 @@ import org.springframework.test.context.ContextConfiguration;
 import java.time.Instant;
 import java.util.*;
 
+import static com.rbkmoney.magista.util.ThriftUtil.fillThriftObject;
+import static com.rbkmoney.magista.util.ThriftUtil.toByteArray;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -66,10 +59,6 @@ public class InvoiceListenerTest {
 
     private static final String SOURCE_ID = "source_id";
     private static final String SOURCE_NS = "source_ns";
-    private static final Map.Entry<FieldHandler, String[]> timeFields = Map.entry(
-            structHandler -> structHandler.value(Instant.now().toString()),
-            new String[]{"created_at", "at", "due"}
-    );
 
     @Autowired
     private InvoicingListener invoicingListener;
@@ -111,7 +100,7 @@ public class InvoiceListenerTest {
                 .setOwnerId(UUID.randomUUID().toString())
                 .setCreatedAt(Instant.now().toString())
                 .setDue(Instant.now().toString());
-        invoice = fillTBaseObject(invoice, Invoice.class);
+        invoice = fillThriftObject(invoice, Invoice.class);
 
         InvoicePayment payment = new InvoicePayment()
                 .setId(SOURCE_ID)
@@ -128,15 +117,15 @@ public class InvoiceListenerTest {
                         )
                 )
                 .setCreatedAt(Instant.now().toString());
-        payment = fillTBaseObject(payment, InvoicePayment.class);
+        payment = fillThriftObject(payment, InvoicePayment.class);
 
         InvoicePaymentRefund invoicePaymentRefund = new InvoicePaymentRefund()
                 .setCreatedAt(Instant.now().toString());
-        invoicePaymentRefund = fillTBaseObject(invoicePaymentRefund, InvoicePaymentRefund.class);
+        invoicePaymentRefund = fillThriftObject(invoicePaymentRefund, InvoicePaymentRefund.class);
 
         InvoicePaymentAdjustment invoicePaymentAdjustment = new InvoicePaymentAdjustment()
                 .setCreatedAt(Instant.now().toString());
-        invoicePaymentAdjustment = fillTBaseObject(invoicePaymentAdjustment, InvoicePaymentAdjustment.class);
+        invoicePaymentAdjustment = fillThriftObject(invoicePaymentAdjustment, InvoicePaymentAdjustment.class);
 
         TransactionInfo transactionInfo = new TransactionInfo();
         transactionInfo.setId("3542543");
@@ -222,7 +211,7 @@ public class InvoiceListenerTest {
                                                 new InvoicePaymentChargebackChange(
                                                         "testId",
                                                         TestData.buildInvoiceChargebackChangePayload()))))));
-        message.setData(Value.bin(toByteArray(eventPayload)));
+        message.setData(toByteArray(eventPayload));
 
         invoicingListener.handleMessages(Arrays.asList(message));
 
@@ -253,17 +242,5 @@ public class InvoiceListenerTest {
                 InvoicePaymentAdjustmentStatus.captured(
                         new InvoicePaymentAdjustmentCaptured(
                                 Instant.now().toString())));
-    }
-
-    @SneakyThrows
-    private <T extends TBase<?, ?>> T fillTBaseObject(T data, Class<T> type) {
-        MockTBaseProcessor mockTBaseProcessor = new MockTBaseProcessor(MockMode.REQUIRED_ONLY, 25, 1);
-        mockTBaseProcessor.addFieldHandler(timeFields.getKey(), timeFields.getValue());
-        return mockTBaseProcessor.process(data, new TBaseHandler<>(type));
-    }
-
-    @SneakyThrows
-    public byte[] toByteArray(TBase<?, ?> data) {
-        return new TSerializer(new TBinaryProtocol.Factory()).serialize(data);
     }
 }
