@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.config;
 
-import com.rbkmoney.magista.config.testcontainers.kafka.KafkaTestcontainer;
+import com.rbkmoney.testcontainers.annotations.kafka.KafkaTestcontainer;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
