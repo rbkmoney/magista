@@ -3,7 +3,7 @@ package com.rbkmoney.magista.kafka;
 import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;
-import com.rbkmoney.magista.config.AbstractKafkaAndDaoConfig;
+import com.rbkmoney.magista.config.MagistaSpringBootITest;
 import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.service.HandlerManager;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class InvoiceTemplateListenerTest extends AbstractKafkaAndDaoConfig {
+@MagistaSpringBootITest
+public class InvoiceTemplateListenerTest {
 
     @Value("${kafka.topics.invoice-template.id}")
     private String invoiceTemplateTopicName;
@@ -34,7 +35,7 @@ public class InvoiceTemplateListenerTest extends AbstractKafkaAndDaoConfig {
     private SourceEventParser eventParser;
 
     @Autowired
-    private KafkaTemplate<String, SinkEvent> sinkEventProducer;
+    private KafkaTemplate<String, SinkEvent> testSinkEventProducer;
 
     @Captor
     private ArgumentCaptor<MachineEvent> arg;
@@ -52,7 +53,7 @@ public class InvoiceTemplateListenerTest extends AbstractKafkaAndDaoConfig {
         var sinkEvent = new SinkEvent();
         sinkEvent.setEvent(message);
         when(eventParser.parseEvent(any())).thenReturn(EventPayload.invoice_template_changes(List.of()));
-        sinkEventProducer.send(invoiceTemplateTopicName, sinkEvent)
+        testSinkEventProducer.send(invoiceTemplateTopicName, sinkEvent)
                 .completable()
                 .join();
         verify(eventParser, timeout(3000).times(1)).parseEvent(arg.capture());

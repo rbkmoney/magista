@@ -2,16 +2,25 @@ package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.config.AbstractQueryConfig;
+import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
+import com.rbkmoney.magista.query.QueryProcessor;
 import com.rbkmoney.magista.util.DamselUtil;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@WithPostgresqlSingletonSpringBootITest
+@Import(QueryProcessorConfig.class)
 @Sql("classpath:data/sql/search/refund_search_data.sql")
-public class RefundSearchQueryTest extends AbstractQueryConfig {
+public class RefundSearchQueryTest {
+
+    @Autowired
+    private QueryProcessor<StatRequest, StatResponse> queryProcessor;
 
     @Test
     public void testRefunds() {

@@ -1,9 +1,9 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.magista.config.AbstractDaoConfig;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.RefundData;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,8 @@ import static com.rbkmoney.magista.util.RandomBeans.randomStreamOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-public class RefundServiceTest extends AbstractDaoConfig {
+@WithPostgresqlSingletonSpringBootITest
+public class RefundServiceTest {
 
     @Autowired
     public PaymentRefundService paymentRefundService;
