@@ -1,12 +1,12 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.magista.config.AbstractDaoConfig;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,9 +14,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.rbkmoney.magista.util.RandomBeans.random;
+import static com.rbkmoney.magista.util.RandomBeans.randomStreamOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AdjustmentServiceTest extends AbstractDaoConfig {
+@WithPostgresqlSingletonSpringBootITest
+public class AdjustmentServiceTest {
 
     @Autowired
     public PaymentAdjustmentService paymentAdjustmentService;

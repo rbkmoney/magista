@@ -2,13 +2,16 @@ package com.rbkmoney.magista.query.impl.search;
 
 import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.config.AbstractQueryConfig;
+import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
 import com.rbkmoney.magista.exception.BadTokenException;
+import com.rbkmoney.magista.query.QueryProcessor;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.util.DamselUtil;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -16,8 +19,12 @@ import static com.rbkmoney.damsel.merch_stat.TerminalPaymentProvider.euroset;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Transactional
-public class PaymentSearchQueryTest extends AbstractQueryConfig {
+@WithPostgresqlSingletonSpringBootITest
+@Import(QueryProcessorConfig.class)
+public class PaymentSearchQueryTest {
+
+    @Autowired
+    private QueryProcessor<StatRequest, StatResponse> queryProcessor;
 
     @Test
     @Sql("classpath:data/sql/search/invoice_and_payment_search_data.sql")

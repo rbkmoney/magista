@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
-import static com.rbkmoney.magista.config.AbstractDaoConfig.random;
+import static com.rbkmoney.magista.util.RandomBeans.random;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TestData {

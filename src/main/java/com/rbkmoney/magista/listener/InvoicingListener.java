@@ -21,7 +21,7 @@ import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithSinkEven
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class InvoiceListener {
+public class InvoicingListener {
 
     private final HandlerManager handlerManager;
     private final SourceEventParser eventParser;
@@ -36,7 +36,7 @@ public class InvoiceListener {
     public void listen(
             List<ConsumerRecord<String, SinkEvent>> batch,
             Acknowledgment ack) throws InterruptedException {
-        log.info("InvoiceListener listen offsets, size={}, {}",
+        log.info("InvoicingListener listen offsets, size={}, {}",
                 batch.size(), toSummaryStringWithSinkEventValues(batch));
         List<MachineEvent> machineEvents = batch.stream()
                 .map(ConsumerRecord::value)
@@ -44,7 +44,7 @@ public class InvoiceListener {
                 .collect(Collectors.toList());
         handleMessages(machineEvents);
         ack.acknowledge();
-        log.info("InvoiceListener Records have been committed, size={}, {}",
+        log.info("InvoicingListener Records have been committed, size={}, {}",
                 batch.size(), toSummaryStringWithSinkEventValues(batch));
     }
 
@@ -54,11 +54,11 @@ public class InvoiceListener {
                     .map(machineEvent -> Map.entry(eventParser.parseEvent(machineEvent), machineEvent))
                     .filter(entry -> entry.getKey().isSetInvoiceChanges())
                     .map(entry -> {
-                        var invoiceChangesWithMachineEvent = new ArrayList<Map.Entry<InvoiceChange, MachineEvent>>();
+                        var entries = new ArrayList<Map.Entry<InvoiceChange, MachineEvent>>();
                         for (InvoiceChange invoiceChange : entry.getKey().getInvoiceChanges()) {
-                            invoiceChangesWithMachineEvent.add(Map.entry(invoiceChange, entry.getValue()));
+                            entries.add(Map.entry(invoiceChange, entry.getValue()));
                         }
-                        return invoiceChangesWithMachineEvent;
+                        return entries;
                     })
                     .flatMap(List::stream)
                     .sorted(Comparator.comparingLong(o -> o.getValue().getEventId()))
@@ -70,7 +70,7 @@ public class InvoiceListener {
                     .filter(entry -> entry.getKey() != null)
                     .forEach(entry -> entry.getKey().handle(entry.getValue()).execute());
         } catch (Exception e) {
-            log.error("Error when InvoiceListener listen e: ", e);
+            log.error("Error when InvoicingListener listen e: ", e);
             Thread.sleep(throttlingTimeout);
             throw e;
         }

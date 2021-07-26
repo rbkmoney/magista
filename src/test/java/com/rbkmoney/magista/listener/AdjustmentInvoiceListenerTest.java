@@ -4,30 +4,34 @@ import com.rbkmoney.damsel.domain.InvoicePaymentAdjustmentPending;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.config.AbstractDaoConfig;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.handler.impl.AdjustmentBatchHandler;
 import com.rbkmoney.magista.service.PaymentAdjustmentService;
 import com.rbkmoney.magista.service.PaymentService;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import static com.rbkmoney.magista.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doAnswer;
 
-@TestPropertySource(properties = {"cache.invoiceData.size=10", "cache.paymentData.size=10"})
-public class AdjustmentInvoiceListenerTest extends AbstractDaoConfig {
+@WithPostgresqlSingletonSpringBootITest
+@SpringBootTest(properties = {
+        "cache.invoiceData.size=10",
+        "cache.paymentData.size=10"})
+public class AdjustmentInvoiceListenerTest {
 
     @Autowired
     private AdjustmentBatchHandler adjustmentBatchHandler;
