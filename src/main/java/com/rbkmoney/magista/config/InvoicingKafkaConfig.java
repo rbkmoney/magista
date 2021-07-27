@@ -35,7 +35,7 @@ public class InvoicingKafkaConfig {
     @Value("${kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-//    @Bean
+    //    @Bean
     public Map<String, Object> consumerConfigs(KafkaSslProperties kafkaSslProperties) {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -73,8 +73,8 @@ public class InvoicingKafkaConfig {
     }
 
     //    @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, MachineEvent>>
-    invoicingListenerContainerFactory(
+    @SuppressWarnings({"checkstyle:linelength"})
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, MachineEvent>> invoicingListenerContainerFactory(
             ConsumerFactory<String, MachineEvent> consumerFactory) {
         ConcurrentKafkaListenerContainerFactory<String, MachineEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
