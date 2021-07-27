@@ -64,20 +64,6 @@ public class KafkaConfig {
     private int payoutConcurrency;
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, SinkEvent> invoicingListenerContainerFactory(
-            KafkaSslProperties kafkaSslProperties) {
-        var containerFactory = new ConcurrentKafkaListenerContainerFactory<String, SinkEvent>();
-        configureContainerFactory(
-                containerFactory,
-                new SinkEventDeserializer(),
-                clientId,
-                invoicingMaxPollRecords,
-                kafkaSslProperties);
-        containerFactory.setConcurrency(invoicingConcurrency);
-        return containerFactory;
-    }
-
-    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, SinkEvent> invoiceTemplateListenerContainerFactory(
             KafkaSslProperties kafkaSslProperties) {
         var containerFactory = new ConcurrentKafkaListenerContainerFactory<String, SinkEvent>();
