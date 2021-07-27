@@ -1,9 +1,9 @@
 package com.rbkmoney.magista.config;
 
 import com.rbkmoney.kafka.common.exception.handler.SeekToCurrentWithSleepBatchErrorHandler;
-import com.rbkmoney.machinegun.eventsink.SinkEvent;
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.config.properties.KafkaSslProperties;
-import com.rbkmoney.magista.serde.SinkEventDeserializer;
+import com.rbkmoney.magista.serde.MachineEventDeserializer;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.config.SslConfigs;
@@ -14,9 +14,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.BatchErrorHandler;
+import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 
 import java.io.File;
@@ -39,7 +41,7 @@ public class InvoicingKafkaConfig {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SinkEventDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, MachineEventDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.CLIENT_ID_CONFIG, clientId);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
@@ -66,15 +68,16 @@ public class InvoicingKafkaConfig {
         }
     }
 
-    @Bean
-    public ConsumerFactory<String, SinkEvent> consumerFactory(KafkaSslProperties kafkaSslProperties) {
+    //    @Bean
+    public ConsumerFactory<String, MachineEvent> consumerFactory(KafkaSslProperties kafkaSslProperties) {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(kafkaSslProperties));
     }
 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, SinkEvent> invoicingListenerContainerFactory(
-            ConsumerFactory<String, SinkEvent> consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, SinkEvent> factory =
+    //    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, MachineEvent>>
+    invoicingListenerContainerFactory(
+            ConsumerFactory<String, MachineEvent> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, MachineEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setBatchListener(true);

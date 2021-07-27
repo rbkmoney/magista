@@ -1,7 +1,9 @@
 package com.rbkmoney.magista.config;
 
+import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import com.rbkmoney.magista.config.properties.KafkaSslProperties;
+import com.rbkmoney.magista.serde.MachineEventDeserializer;
 import com.rbkmoney.magista.serde.PayoutEventDeserializer;
 import com.rbkmoney.magista.serde.SinkEventDeserializer;
 import com.rbkmoney.payout.manager.Event;
@@ -62,6 +64,20 @@ public class KafkaConfig {
 
     @Value("${kafka.topics.pm-events-payout.consume.concurrency}")
     private int payoutConcurrency;
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, MachineEvent> invoicingListenerContainerFactory(
+            KafkaSslProperties kafkaSslProperties) {
+        var containerFactory = new ConcurrentKafkaListenerContainerFactory<String, MachineEvent>();
+        configureContainerFactory(
+                containerFactory,
+                new MachineEventDeserializer(),
+                clientId,
+                invoicingMaxPollRecords,
+                kafkaSslProperties);
+        containerFactory.setConcurrency(invoicingConcurrency);
+        return containerFactory;
+    }
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, SinkEvent> invoiceTemplateListenerContainerFactory(
