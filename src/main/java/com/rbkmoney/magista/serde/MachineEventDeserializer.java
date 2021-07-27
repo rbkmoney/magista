@@ -26,6 +26,6 @@ public class MachineEventDeserializer extends AbstractThriftDeserializer<Machine
 
     @Override
     public void close() {
-        thriftDeserializer.remove();
+        deserializerThreadLocal.remove();
     }
 }
