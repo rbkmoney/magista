@@ -83,13 +83,17 @@ public class InvoiceTemplateServiceTest {
     @Test
     public void shouldSkipDuplicatesWhenSequenceIdIsLessThanSequenceIdInStorage() throws Exception {
         String invoiceTemplateId = "invoiceTemplateId";
-        invoiceTemplateListener.handleMessages(
-                getEvents(invoiceTemplateId, 1, getCreated(getInvoiceTemplate(getCart()))));
-        invoiceTemplateListener.handleMessages(
-                getEvents(invoiceTemplateId, 1, getCreated(getInvoiceTemplate(getCart()))));
+        MachineEvent message = getEvent(
+                invoiceTemplateId,
+                1,
+                List.of(
+                        getCreated(getInvoiceTemplate(getCart())),
+                        getCreated(getInvoiceTemplate(getCart()))));
+        invoiceTemplateListener.handleMessages(List.of(message));
         InvoiceTemplateChange lastUpdated = getUpdated(getParams(getCart()));
         invoiceTemplateListener.handleMessages(
                 getEvents(invoiceTemplateId, 2, lastUpdated));
+        // skip this
         invoiceTemplateListener.handleMessages(
                 getEvents(invoiceTemplateId, 1, getUpdated(getParams(getCart()))));
         assertThat(invoiceTemplateService.get(invoiceTemplateId).getInvoiceContextType())
@@ -97,37 +101,28 @@ public class InvoiceTemplateServiceTest {
     }
 
     @Test
-    public void shouldReWriteOnDuplicateWhenSequenceIdIsEqualsWithSequenceIdInStorage() throws Exception {
-        String invoiceTemplateId = "invoiceTemplateId";
-        invoiceTemplateListener.handleMessages(
-                getEvents(invoiceTemplateId, 1, getCreated(getInvoiceTemplate(getCart()))));
-        InvoiceTemplateChange created = getCreated(getInvoiceTemplate(getCart()));
-        invoiceTemplateListener.handleMessages(
-                getEvents(invoiceTemplateId, 1, created));
-        assertThat(invoiceTemplateService.get(invoiceTemplateId).getInvoiceContextType())
-                .isEqualTo(created.getInvoiceTemplateCreated().getInvoiceTemplate().getContext().getType());
-        invoiceTemplateListener.handleMessages(
-                getEvents(invoiceTemplateId, 1, getDeleted()));
-        assertThat(invoiceTemplateService.get(invoiceTemplateId).getEventType())
-                .isEqualTo(InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED);
-    }
-
-    @Test
     public void shouldLolReWriteByProtocolOpportunityAndWillBeFine() throws Exception {
         String invoiceTemplateId = "invoiceTemplateId";
-        // 1) write created
-        invoiceTemplateListener.handleMessages(
-                getEvents(invoiceTemplateId, 1, getCreated(getInvoiceTemplate(getCart()))));
-        InvoiceTemplateChange lastUpdated = getUpdated(getParams(getCart()));
-        // 1) write updated
-        invoiceTemplateListener.handleMessages(
-                getEvents(invoiceTemplateId, 1, lastUpdated));
-        assertThat(invoiceTemplateService.get(invoiceTemplateId).getInvoiceContextType())
-                .isEqualTo(lastUpdated.getInvoiceTemplateUpdated().getDiff().getContext().getType());
-        InvoiceTemplateChange created = getCreated(getInvoiceTemplate(getCart()));
+        MachineEvent message = getEvent(
+                invoiceTemplateId,
+                1,
+                List.of(
+                        getCreated(getInvoiceTemplate(getCart())),
+                        getUpdated(getParams(getCart())),
+                        getCreated(getInvoiceTemplate(getCart()))));
         // 1) rewrite created again after updated ???
-        invoiceTemplateListener.handleMessages(
-                getEvents(invoiceTemplateId, 1, created));
+        invoiceTemplateListener.handleMessages(List.of(message));
+        InvoiceTemplateChange created = getCreated(getInvoiceTemplate(getCart()));
+        // 1) rewrite created again after updated (twice) ???
+        message = getEvent(
+                invoiceTemplateId,
+                1,
+                List.of(
+                        getCreated(getInvoiceTemplate(getCart())),
+                        getUpdated(getParams(getCart())),
+                        created));
+        // 1) write created
+        invoiceTemplateListener.handleMessages(List.of(message));
         assertThat(invoiceTemplateService.get(invoiceTemplateId).getInvoiceContextType())
                 .isEqualTo(created.getInvoiceTemplateCreated().getInvoiceTemplate().getContext().getType());
     }
