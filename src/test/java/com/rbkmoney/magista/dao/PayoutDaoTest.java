@@ -4,11 +4,6 @@ import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.PayoutToolType;
 import com.rbkmoney.magista.domain.tables.pojos.Payout;
 import com.rbkmoney.magista.exception.DaoException;
-<<<<<<<<< Temporary merge branch 1
-import io.github.benas.randombeans.EnhancedRandomBuilder;
-import io.github.benas.randombeans.api.EnhancedRandom;
-import org.junit.Test;
-=========
 import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import io.github.benas.randombeans.EnhancedRandomBuilder;
 import org.junit.jupiter.api.Test;
