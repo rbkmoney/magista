@@ -81,17 +81,40 @@ service:
 kafka:
   bootstrap-servers: kenny-kafka1.bst1.rbkmoney.net:9092
   client-id: magista
+  invoice:
+    topic: mg-invoice-100-2
   consumer:
     group-id: magista-group-1
-    enable-auto-commit: false
-    auto-offset-reset: earliest
-    concurrency: 1
-    max-poll-records: 500
+    max-poll-interval-ms: 60000
+    max-session-timeout-ms: 60000
+    throttling-timeout-ms: 1000
   topics:
-    invoicing: mg-invoice-100-2
-    pm-events-payout: pm-events-payout
+    invoicing:
+      id: mg-invoice-100-2
+      consume:
+        enabled: false
+        max-poll-records: 500
+        concurrency: 1
+    invoice-template:
+      id: mg-events-invoice-template
+      consume:
+        enabled: false
+        max-poll-records: 50
+        concurrency: 1
+    pm-events-payout:
+      id: pm-events-payout
+      consume:
+        enabled: false
+        max-poll-records: 50
+        concurrency: 1
   ssl:
     enabled: false
 
 token-gen:
   key: jXnZr4u7x!A%D*G-KaPvSgVkYp3s5v8t/B?E(H+MbQeThWmZq4t7w9z$C&F)J@Nc
+
+testcontainers:
+  postgresql:
+    tag: '11.4'
+  kafka:
+    tag: '6.2.0'

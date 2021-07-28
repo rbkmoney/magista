@@ -161,7 +161,7 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
     }
 
     public static class RefundsParser extends AbstractQueryParser {
-        private RefundsValidator validator = new RefundsValidator();
+        private final RefundsValidator validator = new RefundsValidator();
 
         public static String getMainDescriptor() {
             return FUNC_NAME;
@@ -188,7 +188,7 @@ public class RefundsFunction extends PagedBaseFunction<Map.Entry<Long, StatRefun
     }
 
     public static class RefundsBuilder extends AbstractQueryBuilder {
-        private RefundsValidator validator = new RefundsValidator();
+        private final RefundsValidator validator = new RefundsValidator();
 
         @Override
         public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,

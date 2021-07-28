@@ -147,7 +147,7 @@ public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, 
     }
 
     public static class EnrichedPaymentsBuilder extends AbstractQueryBuilder {
-        private PaymentsFunction.PaymentsValidator validator = new PaymentsFunction.PaymentsValidator();
+        private final PaymentsFunction.PaymentsValidator validator = new PaymentsFunction.PaymentsValidator();
 
         @Override
         public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,
@@ -180,7 +180,7 @@ public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, 
     }
 
     public static class EnrichedPaymentsParser extends AbstractQueryParser {
-        private PaymentsFunction.PaymentsValidator validator = new PaymentsFunction.PaymentsValidator();
+        private final PaymentsFunction.PaymentsValidator validator = new PaymentsFunction.PaymentsValidator();
 
         public static String getMainDescriptor() {
             return FUNC_NAME;

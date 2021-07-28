@@ -7,11 +7,10 @@ import com.rbkmoney.magista.domain.enums.PayoutToolType;
 import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.tables.pojos.Payout;
 import com.rbkmoney.magista.exception.DaoException;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
+import org.junit.jupiter.api.Test;
 import io.github.benas.randombeans.EnhancedRandomBuilder;
-import io.github.benas.randombeans.api.EnhancedRandom;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -20,11 +19,11 @@ import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-@ContextConfiguration(classes = {PayoutDaoImpl.class})
-public class PayoutDaoTest extends AbstractDaoTest {
+@WithPostgresqlSingletonSpringBootITest
+public class PayoutDaoTest {
 
     @Autowired
-    PayoutDao payoutDao;
+    private PayoutDao payoutDao;
 
     @Test
     public void insertUpdateAndFindPayoutEventTest() throws DaoException {

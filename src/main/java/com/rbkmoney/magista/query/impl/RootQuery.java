@@ -86,7 +86,7 @@ public class RootQuery extends BaseQuery {
     }
 
     public static class RootParser extends AbstractQueryParser {
-        private RootValidator validator = new RootValidator();
+        private final RootValidator validator = new RootValidator();
 
         public static String getMainDescriptor() {
             return QUERY_PARAMETER;
@@ -109,7 +109,7 @@ public class RootQuery extends BaseQuery {
     }
 
     public static class RootBuilder extends AbstractQueryBuilder {
-        private RootValidator validator = new RootValidator();
+        private final RootValidator validator = new RootValidator();
 
         @Override
         public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,
