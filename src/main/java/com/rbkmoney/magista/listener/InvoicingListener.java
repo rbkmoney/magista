@@ -2,7 +2,6 @@ package com.rbkmoney.magista.listener;
 
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import com.rbkmoney.magista.converter.SourceEventParser;
 import com.rbkmoney.magista.service.HandlerManager;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithSinkEventValues;
+import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithMachineEventValues;
 
 @Slf4j
 @Service
@@ -34,18 +33,17 @@ public class InvoicingListener {
             topics = "${kafka.topics.invoicing.id}",
             containerFactory = "invoicingListenerContainerFactory")
     public void listen(
-            List<ConsumerRecord<String, SinkEvent>> batch,
+            List<ConsumerRecord<String, MachineEvent>> batch,
             Acknowledgment ack) throws InterruptedException {
         log.info("InvoicingListener listen offsets, size={}, {}",
-                batch.size(), toSummaryStringWithSinkEventValues(batch));
+                batch.size(), toSummaryStringWithMachineEventValues(batch));
         List<MachineEvent> machineEvents = batch.stream()
                 .map(ConsumerRecord::value)
-                .map(SinkEvent::getEvent)
                 .collect(Collectors.toList());
         handleMessages(machineEvents);
         ack.acknowledge();
         log.info("InvoicingListener Records have been committed, size={}, {}",
-                batch.size(), toSummaryStringWithSinkEventValues(batch));
+                batch.size(), toSummaryStringWithMachineEventValues(batch));
     }
 
     public void handleMessages(List<MachineEvent> machineEvents) throws InterruptedException {
