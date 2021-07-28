@@ -29,7 +29,6 @@ payouter:
     querySize: 100
     maxPoolSize: 1
     delay: 5000
-    enabled: false
   handler:
     queue:
       limit: 100
@@ -82,6 +81,8 @@ service:
 kafka:
   bootstrap-servers: kenny-kafka1.bst1.rbkmoney.net:9092
   client-id: magista
+  invoice:
+    topic: mg-invoice-100-2
   consumer:
     group-id: magista-group-1
     max-poll-interval-ms: 60000
