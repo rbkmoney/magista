@@ -1,21 +1,20 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.dao.impl.InvoiceDaoImpl;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
-import org.junit.Test;
+import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static io.github.benas.randombeans.api.EnhancedRandom.randomStreamOf;
+import static com.rbkmoney.magista.util.RandomBeans.random;
+import static com.rbkmoney.magista.util.RandomBeans.randomStreamOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ContextConfiguration(classes = {InvoiceDaoImpl.class})
-public class InvoiceDaoTest extends AbstractDaoTest {
+@WithPostgresqlSingletonSpringBootITest
+public class InvoiceDaoTest {
 
     @Autowired
     private InvoiceDao invoiceDao;

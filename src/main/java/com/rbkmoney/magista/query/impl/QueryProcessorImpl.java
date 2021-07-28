@@ -13,9 +13,9 @@ import com.rbkmoney.magista.query.parser.QueryPart;
 import java.util.List;
 
 public class QueryProcessorImpl implements QueryProcessor<StatRequest, StatResponse> {
-    private QueryParser<String> sourceParser;
-    private QueryBuilder queryBuilder;
-    private QueryContextFactory queryContextFactory;
+    private final QueryParser<String> sourceParser;
+    private final QueryBuilder queryBuilder;
+    private final QueryContextFactory queryContextFactory;
 
     public QueryProcessorImpl(QueryContextFactory queryContextFactory) {
         this(new JsonQueryParser(), new QueryBuilderImpl(), queryContextFactory);

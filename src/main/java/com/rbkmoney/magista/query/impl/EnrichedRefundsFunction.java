@@ -137,7 +137,7 @@ public class EnrichedRefundsFunction extends PagedBaseFunction<Map.Entry<Long, E
     }
 
     public static class EnrichedRefundsParser extends AbstractQueryParser {
-        private RefundsFunction.RefundsValidator validator = new RefundsFunction.RefundsValidator();
+        private final RefundsFunction.RefundsValidator validator = new RefundsFunction.RefundsValidator();
 
         public static String getMainDescriptor() {
             return FUNC_NAME;
@@ -163,7 +163,7 @@ public class EnrichedRefundsFunction extends PagedBaseFunction<Map.Entry<Long, E
     }
 
     public static class EnrichedRefundsBuilder extends AbstractQueryBuilder {
-        private RefundsFunction.RefundsValidator validator = new RefundsFunction.RefundsValidator();
+        private final RefundsFunction.RefundsValidator validator = new RefundsFunction.RefundsValidator();
 
         @Override
         public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,

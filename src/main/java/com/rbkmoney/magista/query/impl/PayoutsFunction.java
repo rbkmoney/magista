@@ -147,7 +147,7 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
     }
 
     public static class PayoutsParser extends AbstractQueryParser {
-        private PayoutsValidator validator = new PayoutsValidator();
+        private final PayoutsValidator validator = new PayoutsValidator();
 
         public static String getMainDescriptor() {
             return FUNC_NAME;
@@ -174,7 +174,7 @@ public class PayoutsFunction extends PagedBaseFunction<Map.Entry<Long, StatPayou
     }
 
     public static class PayoutsBuilder extends AbstractQueryBuilder {
-        private PayoutsValidator validator = new PayoutsValidator();
+        private final PayoutsValidator validator = new PayoutsValidator();
 
         @Override
         public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,

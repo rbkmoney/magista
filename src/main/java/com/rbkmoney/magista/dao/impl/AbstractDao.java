@@ -19,7 +19,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import javax.sql.DataSource;
-
 import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;

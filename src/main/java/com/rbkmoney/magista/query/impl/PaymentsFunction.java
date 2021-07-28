@@ -293,7 +293,7 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
     }
 
     public static class PaymentsParser extends AbstractQueryParser {
-        private PaymentsValidator validator = new PaymentsValidator();
+        private final PaymentsValidator validator = new PaymentsValidator();
 
         public static String getMainDescriptor() {
             return FUNC_NAME;
@@ -320,7 +320,7 @@ public class PaymentsFunction extends PagedBaseFunction<Map.Entry<Long, StatPaym
     }
 
     public static class PaymentsBuilder extends AbstractQueryBuilder {
-        private PaymentsValidator validator = new PaymentsValidator();
+        private final PaymentsValidator validator = new PaymentsValidator();
 
         @Override
         public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,
