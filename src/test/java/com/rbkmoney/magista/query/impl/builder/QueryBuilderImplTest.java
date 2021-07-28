@@ -9,12 +9,12 @@ import com.rbkmoney.magista.query.impl.RootQuery;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.service.TokenGenService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,11 +46,12 @@ public class QueryBuilderImplTest {
         query.getDescriptor();
     }
 
-    @Test(expected = QueryBuilderException.class)
+    @Test
     public void testNoFunctionParse() {
         String json = "{'query': {'payments_geo_stat1': {}}}";
-        Query query = buildQuery(json);
-        fail("no functions in oot query, should not reach this point");
+        assertThrows(
+                QueryBuilderException.class,
+                () -> buildQuery(json));
     }
 
     @Test

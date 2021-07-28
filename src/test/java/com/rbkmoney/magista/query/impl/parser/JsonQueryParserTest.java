@@ -4,12 +4,14 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.query.impl.*;
 import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Created by vpankrashkin on 26.08.16.
@@ -28,11 +30,12 @@ public class JsonQueryParserTest {
 
     }
 
-    @Test(expected = QueryParserException.class)
+    @Test
     public void testNoQueryParse() {
         String json = "{'query1': {'invoices': {}}}";
-        List<QueryPart> queryParts = parser.parseQuery(json);
-        fail("no root query, should not reach this point");
+        assertThrows(
+                QueryParserException.class,
+                () -> parser.parseQuery(json));
     }
 
     @Test
@@ -97,11 +100,13 @@ public class JsonQueryParserTest {
 
     }
 
-    @Test(expected = QueryParserException.class)
+    @Test
     public void testPaymentsPanParseError() {
         String json =
                 "{'query': {'payments': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B', 'payment_last4':'12**12!','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
-        parser.parseQuery(json);
+        assertThrows(
+                QueryParserException.class,
+                () -> parser.parseQuery(json));
     }
 
     @Test
@@ -111,11 +116,13 @@ public class JsonQueryParserTest {
         parser.parseQuery(json);
     }
 
-    @Test(expected = QueryParserException.class)
+    @Test
     public void testWithoutMerchantButWithShopId() {
         String json =
                 "{'query': {'payments': {'shop_id':'C','invoice_id':'A','payment_id':'B', 'payment_pan_mask':'12**12','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T01:12:00Z'}}}";
-        parser.parseQuery(json);
+        assertThrows(
+                QueryParserException.class,
+                () -> parser.parseQuery(json));
     }
 
     @Test
@@ -241,11 +248,13 @@ public class JsonQueryParserTest {
         assertEquals((Integer) 2, parameters.getSize());
     }
 
-    @Test(expected = QueryParserException.class)
+    @Test
     public void testInvoicesTimeParseError() {
         String json =
                 "{'query': {'invoices': {'merchant_id': '1','shop_id': '2','invoice_id':'A','payment_id':'B','from_time': '2016-03-22T00:12:00Z','to_time': '2016-03-22T00:00:00Z'}}}";
-        parser.parseQuery(json);
+        assertThrows(
+                QueryParserException.class,
+                () -> parser.parseQuery(json));
     }
 
     @Test
