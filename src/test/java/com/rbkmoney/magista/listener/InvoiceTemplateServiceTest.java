@@ -116,12 +116,11 @@ public class InvoiceTemplateServiceTest {
         // 1) rewrite created again after updated (twice) ???
         message = getEvent(
                 invoiceTemplateId,
-                1,
+                2,
                 List.of(
                         getCreated(getInvoiceTemplate(getCart())),
                         getUpdated(getParams(getCart())),
                         created));
-        // 1) write created
         invoiceTemplateListener.handleMessages(List.of(message));
         assertThat(invoiceTemplateService.get(invoiceTemplateId).getInvoiceContextType())
                 .isEqualTo(created.getInvoiceTemplateCreated().getInvoiceTemplate().getContext().getType());
