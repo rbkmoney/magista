@@ -101,29 +101,25 @@ public class InvoiceTemplateServiceTest {
     }
 
     @Test
-    public void shouldLolReWriteByProtocolOpportunityAndWillBeFine() throws Exception {
+    public void shouldReWriteDuplicatesByProtocolOpportunityAndWillBeFine() throws Exception {
         String invoiceTemplateId = "invoiceTemplateId";
         MachineEvent message = getEvent(
                 invoiceTemplateId,
                 1,
                 List.of(
                         getCreated(getInvoiceTemplate(getCart())),
-                        getUpdated(getParams(getCart())),
-                        getCreated(getInvoiceTemplate(getCart()))));
-        // 1) rewrite created again after updated ???
+                        getUpdated(getParams(getCart()))));
         invoiceTemplateListener.handleMessages(List.of(message));
-        InvoiceTemplateChange created = getCreated(getInvoiceTemplate(getCart()));
-        // 1) rewrite created again after updated (twice) ???
+        InvoiceTemplateChange updated = getUpdated(getParams(getCart()));
         message = getEvent(
                 invoiceTemplateId,
                 2,
                 List.of(
                         getCreated(getInvoiceTemplate(getCart())),
-                        getUpdated(getParams(getCart())),
-                        created));
+                        updated));
         invoiceTemplateListener.handleMessages(List.of(message));
         assertThat(invoiceTemplateService.get(invoiceTemplateId).getInvoiceContextType())
-                .isEqualTo(created.getInvoiceTemplateCreated().getInvoiceTemplate().getContext().getType());
+                .isEqualTo(updated.getInvoiceTemplateUpdated().getDiff().getContext().getType());
     }
 
     private List<MachineEvent> getEvents(
