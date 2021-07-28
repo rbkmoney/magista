@@ -4,7 +4,7 @@ import com.rbkmoney.magista.config.properties.TokenGenProperties;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.QueryParameters;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -97,7 +98,7 @@ public class TokenGenServiceTest {
 
     }
 
-    @Test(expected = BadTokenException.class)
+    @Test
     public void invalidTokenTest() {
         final Map<String, Object> parameters = new HashMap<>();
         parameters.put("test", 64);
@@ -105,7 +106,9 @@ public class TokenGenServiceTest {
         derivedParameters.put("test_2", 64);
         final QueryParameters queryParameters =
                 new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
-        tokenGenService.validToken(queryParameters, "2019-08-07T16:26:39.611932Z");
+        assertThrows(
+                BadTokenException.class,
+                () -> tokenGenService.validToken(queryParameters, "2019-08-07T16:26:39.611932Z"));
     }
 
     @Test
