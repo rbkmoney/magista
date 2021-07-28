@@ -5,7 +5,7 @@ import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.msgpack.Value;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.exception.InvoiceTemplateAlreadyDeletedException;
+import com.rbkmoney.magista.domain.enums.InvoiceTemplateEventType;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.service.InvoiceTemplateService;
 import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
@@ -51,9 +51,8 @@ public class InvoiceTemplateServiceTest {
         invoiceTemplateListener.handleMessages(List.of(message));
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, TABLE_NAME))
                 .isEqualTo(1);
-        assertThrows(
-                InvoiceTemplateAlreadyDeletedException.class,
-                () -> invoiceTemplateService.get(invoiceTemplateId));
+        assertThat(invoiceTemplateService.get(invoiceTemplateId).getEventType())
+                .isEqualTo(InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED);
     }
 
     @Test
@@ -109,9 +108,8 @@ public class InvoiceTemplateServiceTest {
                 .isEqualTo(created.getInvoiceTemplateCreated().getInvoiceTemplate().getContext().getType());
         invoiceTemplateListener.handleMessages(
                 getEvents(invoiceTemplateId, 1, getDeleted()));
-        assertThrows(
-                InvoiceTemplateAlreadyDeletedException.class,
-                () -> invoiceTemplateService.get(invoiceTemplateId));
+        assertThat(invoiceTemplateService.get(invoiceTemplateId).getEventType())
+                .isEqualTo(InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED);
     }
 
     @Test

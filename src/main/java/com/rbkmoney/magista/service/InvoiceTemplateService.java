@@ -4,7 +4,6 @@ import com.rbkmoney.magista.dao.InvoiceTemplateDao;
 import com.rbkmoney.magista.domain.enums.InvoiceTemplateEventType;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceTemplate;
 import com.rbkmoney.magista.exception.DaoException;
-import com.rbkmoney.magista.exception.InvoiceTemplateAlreadyDeletedException;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.exception.StorageException;
 import com.rbkmoney.magista.util.BeanUtil;
@@ -30,13 +29,6 @@ public class InvoiceTemplateService {
             if (invoiceTemplate == null) {
                 throw new NotFoundException(
                         String.format("InvoiceTemplate not found, invoiceTemplateId='%s'",
-                                invoiceTemplateId));
-            }
-            if (invoiceTemplate.getEventType() == InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED) {
-                throw new InvoiceTemplateAlreadyDeletedException(
-                        String.format(
-                                "'Get' operation for InvoiceTemplate in status INVOICE_TEMPLATE_DELETED, " +
-                                        "invoiceTemplateId='%s'",
                                 invoiceTemplateId));
             }
             return invoiceTemplate;
