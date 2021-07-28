@@ -113,7 +113,7 @@ public class InvoiceTemplateServiceTest {
         InvoiceTemplateChange updated = getUpdated(getParams(getCart()));
         message = getEvent(
                 invoiceTemplateId,
-                2,
+                1,
                 List.of(
                         getCreated(getInvoiceTemplate(getCart())),
                         updated));
