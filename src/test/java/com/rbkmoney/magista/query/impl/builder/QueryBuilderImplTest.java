@@ -3,10 +3,10 @@ package com.rbkmoney.magista.query.impl.builder;
 import com.rbkmoney.magista.config.properties.TokenGenProperties;
 import com.rbkmoney.magista.query.Query;
 import com.rbkmoney.magista.query.builder.QueryBuilder;
+import com.rbkmoney.magista.query.builder.QueryBuilderException;
 import com.rbkmoney.magista.query.impl.FunctionQueryContext;
 import com.rbkmoney.magista.query.impl.RootQuery;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
-import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 import com.rbkmoney.magista.service.TokenGenService;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ public class QueryBuilderImplTest {
     public void testNoFunctionParse() {
         String json = "{'query': {'payments_geo_stat1': {}}}";
         assertThrows(
-                QueryParserException.class,
+                QueryBuilderException.class,
                 () -> buildQuery(json));
     }
 
