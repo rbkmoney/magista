@@ -43,8 +43,7 @@ public class PayoutListener {
 
     public void handleMessages(List<Event> events) throws InterruptedException {
         try {
-            events.forEach(event -> {
-            });
+            payoutService.handleEvents(events);
         } catch (Exception e) {
             log.error("Error when PayoutListener listen e: ", e);
             Thread.sleep(throttlingTimeout);
