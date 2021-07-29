@@ -23,18 +23,6 @@ db:
   skip:
     validation: true
 
-payouter:
-  pooling:
-    url: http://payouter:8022/repo
-    querySize: 100
-    maxPoolSize: 1
-    delay: 5000
-  handler:
-    queue:
-      limit: 100
-    threadPoolSize: 2
-    timeout: 500
-
 columbus:
   url: http://columbus:8022/repo
 
