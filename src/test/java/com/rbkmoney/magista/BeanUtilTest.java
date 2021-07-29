@@ -2,7 +2,7 @@ package com.rbkmoney.magista;
 
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.util.BeanUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static org.junit.Assert.assertNull;

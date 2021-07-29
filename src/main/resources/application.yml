@@ -81,8 +81,6 @@ service:
 kafka:
   bootstrap-servers: kenny-kafka1.bst1.rbkmoney.net:9092
   client-id: magista
-  invoice:
-    topic: mg-invoice-100-2
   consumer:
     group-id: magista-group-1
     max-poll-interval-ms: 60000
