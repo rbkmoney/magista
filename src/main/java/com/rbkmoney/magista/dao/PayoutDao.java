@@ -1,11 +1,13 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.domain.tables.pojos.PayoutData;
+import com.rbkmoney.magista.domain.tables.pojos.Payout;
 
 public interface PayoutDao {
 
-    PayoutData get(String payoutId);
+    Payout get(String payoutId);
 
-    void save(PayoutData payoutData);
+    void save(Payout payout);
+
+    void update(Payout payout);
 
 }

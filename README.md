@@ -157,9 +157,9 @@
 - `payout_id`
 - `from_time`
 - `to_time`
-- `payout_status` - статус выплаты, имена берем из thrift-интерфейса **payout_processing.PayoutStatus**, к примеру: `confirmed`
+- `payout_status` - статус выплаты, имена берем из thrift-интерфейса **payout-manager-proto.PayoutStatus**, к примеру: `confirmed`
 - `payout_statuses` - список статусов выплаты, имена берем из thrift-интерфейса **payout_processing.PayoutStatus**, к примеру: `["confirmed", "paid"]`
-- `payout_type` - тип выплаты, имена берем из thrift-интерфейса **payout_processing.PayoutType**, к примеру: `payout_card`
+- `payout_type` - тип выплаты, имена берем из thrift-интерфейса **domain.PayoutToolInfo**, к примеру: `russian_bank_account`
 
 ##### `payments` 
 Выборка по платежам. Параметры:

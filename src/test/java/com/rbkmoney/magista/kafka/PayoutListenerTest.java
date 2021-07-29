@@ -2,6 +2,7 @@ package com.rbkmoney.magista.kafka;
 
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.config.MagistaSpringBootITest;
+import com.rbkmoney.magista.service.PayoutMapperService;
 import com.rbkmoney.payout.manager.*;
 import com.rbkmoney.payout.manager.domain.CurrencyRef;
 import org.junit.jupiter.api.Test;
@@ -9,12 +10,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.List;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 
 @MagistaSpringBootITest
 public class PayoutListenerTest {
@@ -22,11 +29,14 @@ public class PayoutListenerTest {
     @Value("${kafka.topics.pm-events-payout.id}")
     private String payoutTopicName;
 
+    @MockBean
+    private PayoutMapperService payoutService;
+
     @Autowired
     private KafkaTemplate<String, Event> testPayoutProducer;
 
     @Captor
-    private ArgumentCaptor<Event> arg;
+    private ArgumentCaptor<List<Event>> arg;
 
     @Test
     public void shouldPayoutEventListen() {
@@ -52,8 +62,8 @@ public class PayoutListenerTest {
         testPayoutProducer.send(payoutTopicName, event)
                 .completable()
                 .join();
-//        verify(eventParser, timeout(3000).times(1)).parseEvent(arg.capture());
-//        assertThat(arg.getValue())
-//          .isEqualTo(message);
+        verify(payoutService, timeout(3000).times(1)).handleEvents(arg.capture());
+        assertThat(arg.getValue().get(0))
+                .isEqualTo(event);
     }
 }

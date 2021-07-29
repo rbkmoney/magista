@@ -1,17 +1,16 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
-import com.rbkmoney.damsel.payout_processing.Event;
-import com.rbkmoney.damsel.payout_processing.PayoutChange;
-import com.rbkmoney.damsel.payout_processing.PayoutStatusChanged;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.domain.enums.PayoutEventType;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
-import com.rbkmoney.magista.domain.tables.pojos.PayoutData;
+import com.rbkmoney.magista.domain.tables.pojos.Payout;
 import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.mapper.PayoutMapper;
 import com.rbkmoney.magista.service.PayoutService;
+import com.rbkmoney.payout.manager.Event;
+import com.rbkmoney.payout.manager.PayoutChange;
+import com.rbkmoney.payout.manager.PayoutStatusChanged;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,35 +24,22 @@ public class PayoutStatusChangedMapper implements PayoutMapper {
 
     @Override
     public Processor map(PayoutChange change, Event event) {
-        PayoutData payoutData = new PayoutData();
+        Payout payout = payoutEventService.getPayout(event.getPayoutId());
 
-        payoutData.setEventId(event.getId());
-        payoutData.setEventCreatedAt(
-                TypeUtil.stringToLocalDateTime(event.getCreatedAt())
-        );
-        payoutData.setPayoutId(event.getSource().getPayoutId());
+        payout.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
+        payout.setSequenceId(event.getSequenceId());
 
-        if (change.isSetPayoutStatusChanged()) {
-            payoutData.setEventType(PayoutEventType.PAYOUT_STATUS_CHANGED);
+        PayoutStatusChanged statusChanged = change.getStatusChanged();
+        payout.setStatus(TBaseUtil.unionFieldToEnum(statusChanged.getStatus(), PayoutStatus.class));
 
-            PayoutStatusChanged statusChanged = change.getPayoutStatusChanged();
-
-            payoutData.setPayoutStatus(
-                    TBaseUtil.unionFieldToEnum(statusChanged.getStatus(), PayoutStatus.class)
-            );
-
-            if (statusChanged.getStatus().isSetCancelled()) {
-                payoutData.setPayoutCancelDetails(
-                        statusChanged.getStatus().getCancelled().getDetails()
-                );
-            }
+        if (statusChanged.getStatus().isSetCancelled()) {
+            payout.setCancelledDetails(statusChanged.getStatus().getCancelled().getDetails());
         }
-        return () -> payoutEventService.savePayout(payoutData);
+        return () -> payoutEventService.updatePayout(payout);
     }
 
     @Override
     public ChangeType getChangeType() {
         return ChangeType.PAYOUT_STATUS_CHANGED;
     }
-
 }
