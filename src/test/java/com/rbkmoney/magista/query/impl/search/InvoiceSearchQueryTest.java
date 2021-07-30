@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.query.impl.search;
 
+import com.rbkmoney.damsel.domain.AllocationTransaction;
 import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
@@ -18,6 +19,8 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -207,6 +210,40 @@ public class InvoiceSearchQueryTest {
         String json = "{'query': {'invoices': {'payment_token_provider': 'applepay'}}}";
         StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
         assertEquals(1, statResponse.getData().getInvoices().size());
+    }
+
+    @Test
+    public void testSearchByInvoiceIdsWithAllocation() {
+        // Given
+        String json = "{'query': {'invoices': {'invoice_ids': ['INVOICE_NEW_ID_4']}}}";
+
+        // When
+        StatResponse statResponse = queryProcessor.processQuery(new StatRequest(json));
+
+        // Then
+        assertEquals(1, statResponse.getData().getInvoices().size());
+        Optional<StatInvoice> statInvoiceOptional = statResponse.getData().getInvoices().stream().findFirst();
+        assertTrue(statInvoiceOptional.isPresent());
+        List<AllocationTransaction> allocationTransactions = statInvoiceOptional.get().getAllocation().getTransactions();
+        assertEquals(3, allocationTransactions.size());
+        Optional<AllocationTransaction> foundedAllocationOptional = allocationTransactions.stream()
+                .filter(allocationTransaction -> allocationTransaction.getId().equals("TEST_ALLOCATION_ID3"))
+                .findFirst();
+        assertTrue(foundedAllocationOptional.isPresent());
+        AllocationTransaction allocationTransaction = foundedAllocationOptional.get();
+        assertEquals("TEST_ALLOCATION_ID3", allocationTransaction.getId());
+        assertEquals("testOwnerId3", allocationTransaction.getTarget().getShop().getOwnerId());
+        assertEquals("testShopId3", allocationTransaction.getTarget().getShop().getShopId());
+        assertEquals(8000L, allocationTransaction.getAmount().getAmount());
+        assertEquals("RUB", allocationTransaction.getAmount().getCurrency().getSymbolicCode());
+        assertEquals("testFeeTargetOwnerId", allocationTransaction.getBody().getFeeTarget().getShop().getOwnerId());
+        assertEquals("testFeeTargetShopId", allocationTransaction.getBody().getFeeTarget().getShop().getShopId());
+        assertEquals(1500, allocationTransaction.getBody().getFeeAmount().getAmount());
+        assertEquals("RUB", allocationTransaction.getBody().getFeeAmount().getCurrency().getSymbolicCode());
+        assertEquals(15, allocationTransaction.getBody().getFee().getParts().getP());
+        assertEquals(1, allocationTransaction.getBody().getFee().getParts().getQ());
+        assertEquals(9500, allocationTransaction.getBody().getTotal().getAmount());
+        assertEquals("RUB", allocationTransaction.getBody().getTotal().getCurrency().getSymbolicCode());
     }
 
 }

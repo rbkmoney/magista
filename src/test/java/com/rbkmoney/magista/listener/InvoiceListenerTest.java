@@ -10,6 +10,8 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.TestData;
 import com.rbkmoney.magista.converter.BinaryConverterImpl;
 import com.rbkmoney.magista.converter.SourceEventParser;
+import com.rbkmoney.magista.dao.impl.AllocationDaoImpl;
+import com.rbkmoney.magista.dao.impl.mapper.AllocationRowMapper;
 import com.rbkmoney.magista.event.handler.impl.*;
 import com.rbkmoney.magista.event.mapper.impl.*;
 import com.rbkmoney.magista.provider.GeoProvider;
@@ -53,6 +55,10 @@ import static org.mockito.Mockito.verify;
         AdjustmentStatusChangedMapper.class,
         ChargebackBatchHandler.class,
         ChargebackCreatedMapper.class,
+        AllocationCreatedMapper.class,
+        AllocationCapturedMapper.class,
+        AllocationRefundCreateMapper.class,
+        AllocationRowMapper.class
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class InvoiceListenerTest {
@@ -80,6 +86,9 @@ public class InvoiceListenerTest {
 
     @MockBean
     private PaymentChargebackService paymentChargebackService;
+
+    @MockBean
+    private AllocationService allocationService;
 
     @BeforeEach
     public void setup() {
