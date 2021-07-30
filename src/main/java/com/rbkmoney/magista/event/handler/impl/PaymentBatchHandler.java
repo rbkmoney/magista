@@ -6,7 +6,6 @@ import com.rbkmoney.magista.domain.tables.pojos.AllocationTransactionData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.event.Processor;
 import com.rbkmoney.magista.event.handler.BatchHandler;
-import com.rbkmoney.magista.event.mapper.AllocationMapper;
 import com.rbkmoney.magista.event.mapper.Mapper;
 import com.rbkmoney.magista.event.mapper.PaymentMapper;
 import com.rbkmoney.magista.event.mapper.impl.AllocationCapturedMapper;

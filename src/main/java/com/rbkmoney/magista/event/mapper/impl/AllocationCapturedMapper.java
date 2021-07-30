@@ -22,13 +22,15 @@ public class AllocationCapturedMapper extends BaseAllocationMapper {
         InvoicePaymentStatusChanged invoicePaymentStatusChanged =
                 invoicePaymentChange.getPayload().getInvoicePaymentStatusChanged();
         Allocation allocation = invoicePaymentStatusChanged.getStatus().getCaptured().getAllocation();
+        String paymentId = invoicePaymentChange.getId();
 
         return allocation.getTransactions().stream()
                 .map(allocationTransaction ->
                         mapAllocationTransaction(
                                 machineEvent,
                                 InvoiceEventType.INVOICE_PAYMENT_STATUS_CHANGED,
-                                allocationTransaction))
+                                allocationTransaction,
+                                paymentId))
                 .collect(Collectors.toList());
     }
 

@@ -23,7 +23,8 @@ public class AllocationCreatedMapper extends BaseAllocationMapper {
                         mapAllocationTransaction(
                                 machineEvent,
                                 InvoiceEventType.INVOICE_CREATED,
-                                allocationTransaction
+                                allocationTransaction,
+                                null
                         )
                 )
                 .collect(Collectors.toList());
