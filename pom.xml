@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.rbkmoney</groupId>
         <artifactId>service-parent-pom</artifactId>
-        <version>1.2.12</version>
+        <version>1.2.13</version>
     </parent>
 
     <groupId>com.rbkmoney.magista</groupId>
@@ -108,6 +108,10 @@
             <artifactId>damsel</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.rbkmoney.woody</groupId>
+            <artifactId>woody-thrift</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>mamsel</artifactId>
         </dependency>
@@ -166,7 +170,8 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>testcontainers-annotations</artifactId>
-            <version>1.0.2</version>
+            <version>1.1.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

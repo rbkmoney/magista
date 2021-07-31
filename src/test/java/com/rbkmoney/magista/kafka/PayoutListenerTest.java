@@ -5,13 +5,14 @@ import com.rbkmoney.magista.config.MagistaSpringBootITest;
 import com.rbkmoney.magista.service.PayoutMapperService;
 import com.rbkmoney.payout.manager.*;
 import com.rbkmoney.payout.manager.domain.CurrencyRef;
+import com.rbkmoney.testcontainers.annotations.kafka.config.KafkaProducer;
+import org.apache.thrift.TBase;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -33,7 +34,7 @@ public class PayoutListenerTest {
     private PayoutMapperService payoutService;
 
     @Autowired
-    private KafkaTemplate<String, Event> testPayoutProducer;
+    private KafkaProducer<TBase<?, ?>> testThriftKafkaProducer;
 
     @Captor
     private ArgumentCaptor<List<Event>> arg;
@@ -59,9 +60,7 @@ public class PayoutListenerTest {
         payout.setPayoutId("payout_id");
         event.setPayoutChange(PayoutChange.created(new PayoutCreated(payout)));
         event.setPayout(payout);
-        testPayoutProducer.send(payoutTopicName, event)
-                .completable()
-                .join();
+        testThriftKafkaProducer.send(payoutTopicName, event);
         verify(payoutService, timeout(3000).times(1)).handleEvents(arg.capture());
         assertThat(arg.getValue().get(0))
                 .isEqualTo(event);
