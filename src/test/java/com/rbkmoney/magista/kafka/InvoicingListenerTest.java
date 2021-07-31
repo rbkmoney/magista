@@ -55,7 +55,7 @@ public class InvoicingListenerTest {
         sinkEvent.setEvent(message);
         when(eventParser.parseEvent(any())).thenReturn(EventPayload.invoice_changes(List.of()));
         testThriftKafkaProducer.send(invoicingTopicName, sinkEvent);
-        verify(eventParser, timeout(3000).times(1)).parseEvent(arg.capture());
+        verify(eventParser, timeout(5000).times(1)).parseEvent(arg.capture());
         assertThat(arg.getValue())
                 .isEqualTo(message);
     }
