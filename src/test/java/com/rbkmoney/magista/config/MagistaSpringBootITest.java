@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.config;
 
+import com.rbkmoney.testcontainers.annotations.KafkaSpringBootTest;
 import com.rbkmoney.testcontainers.annotations.postgresql.PostgresqlTestcontainerSingleton;
-import com.rbkmoney.testcontainers.annotations.spring.boot.test.context.KafkaProducerSpringBootTest;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @PostgresqlTestcontainerSingleton
 @MagistaKafkaTestcontainerSingleton
-@KafkaProducerSpringBootTest
+@KafkaSpringBootTest
 public @interface MagistaSpringBootITest {
 }
