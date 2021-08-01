@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.kafka;
 
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.config.MagistaSpringBootITest;
+import com.rbkmoney.magista.config.KafkaPostgresqlSpringBootITest;
 import com.rbkmoney.magista.service.PayoutMapperService;
 import com.rbkmoney.payout.manager.*;
 import com.rbkmoney.payout.manager.domain.CurrencyRef;
@@ -24,7 +24,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
-@MagistaSpringBootITest
+@KafkaPostgresqlSpringBootITest
 public class PayoutListenerTest {
 
     @Value("${kafka.topics.pm-events-payout.id}")
