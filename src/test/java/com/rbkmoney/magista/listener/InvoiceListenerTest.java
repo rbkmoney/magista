@@ -26,8 +26,8 @@ import org.springframework.test.context.ContextConfiguration;
 import java.time.Instant;
 import java.util.*;
 
-import static com.rbkmoney.magista.util.ThriftUtil.fillThriftObject;
-import static com.rbkmoney.magista.util.ThriftUtil.toByteArray;
+import static com.rbkmoney.testcontainers.annotations.util.ThriftUtil.fillThriftObject;
+import static com.rbkmoney.testcontainers.annotations.util.ThriftUtil.toByteArray;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;

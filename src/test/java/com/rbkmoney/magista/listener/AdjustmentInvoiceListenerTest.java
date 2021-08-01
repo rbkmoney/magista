@@ -21,7 +21,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-import static com.rbkmoney.magista.util.RandomBeans.random;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;

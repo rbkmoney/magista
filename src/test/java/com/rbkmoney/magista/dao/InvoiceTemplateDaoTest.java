@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 
-import static com.rbkmoney.magista.util.RandomBeans.random;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PostgresqlSpringBootITest

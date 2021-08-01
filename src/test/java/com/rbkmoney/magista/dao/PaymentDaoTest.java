@@ -13,8 +13,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbkmoney.magista.util.RandomBeans.random;
-import static com.rbkmoney.magista.util.RandomBeans.randomStreamOf;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.random;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.randomStreamOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PostgresqlSpringBootITest
