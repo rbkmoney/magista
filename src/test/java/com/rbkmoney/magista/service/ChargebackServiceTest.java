@@ -1,10 +1,10 @@
 package com.rbkmoney.magista.service;
 
+import com.rbkmoney.magista.config.PostgresqlSpringBootITest;
 import com.rbkmoney.magista.dao.ChargebackDao;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.ChargebackData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
-import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -15,14 +15,14 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.rbkmoney.magista.util.RandomBeans.random;
-import static com.rbkmoney.magista.util.RandomBeans.randomStreamOf;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.random;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.randomStreamOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@WithPostgresqlSingletonSpringBootITest
+@PostgresqlSpringBootITest
 public class ChargebackServiceTest {
 
     @Autowired
