@@ -23,19 +23,6 @@ db:
   skip:
     validation: true
 
-payouter:
-  pooling:
-    url: http://payouter:8022/repo
-    querySize: 100
-    maxPoolSize: 1
-    delay: 5000
-    enabled: false
-  handler:
-    queue:
-      limit: 100
-    threadPoolSize: 2
-    timeout: 500
-
 columbus:
   url: http://columbus:8022/repo
 
@@ -75,7 +62,10 @@ management:
     web:
       exposure:
         include: health,info,prometheus
-
+service:
+  partyManagement:
+    url: http://hellgate:8022/v1/processing/partymgmt
+    networkTimeout: 5000
 kafka:
   bootstrap-servers: kenny-kafka1.bst1.rbkmoney.net:9092
   client-id: magista

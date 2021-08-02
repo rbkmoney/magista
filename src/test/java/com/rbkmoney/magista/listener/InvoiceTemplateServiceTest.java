@@ -5,8 +5,7 @@ import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.msgpack.Value;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
-import com.rbkmoney.magista.exception.InvoiceTemplateAlreadyCreatedException;
-import com.rbkmoney.magista.exception.InvoiceTemplateAlreadyDeletedException;
+import com.rbkmoney.magista.domain.enums.InvoiceTemplateEventType;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.service.InvoiceTemplateService;
 import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
@@ -44,6 +43,7 @@ public class InvoiceTemplateServiceTest {
         String invoiceTemplateId = "invoiceTemplateId";
         MachineEvent message = getEvent(
                 invoiceTemplateId,
+                1,
                 List.of(
                         getCreated(getInvoiceTemplate(getCart())),
                         getUpdated(getParams(getCart())),
@@ -51,111 +51,99 @@ public class InvoiceTemplateServiceTest {
         invoiceTemplateListener.handleMessages(List.of(message));
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, TABLE_NAME))
                 .isEqualTo(1);
-        assertThrows(
-                InvoiceTemplateAlreadyDeletedException.class,
-                () -> invoiceTemplateService.get(invoiceTemplateId));
+        assertThat(invoiceTemplateService.get(invoiceTemplateId).getEventType())
+                .isEqualTo(InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED);
     }
 
     @Test
-    public void shouldThrowNotFoundException() throws InterruptedException {
-        String notSavedId = "invoiceTemplateId";
+    public void shouldNotFound() {
         assertThrows(
                 NotFoundException.class,
-                () -> invoiceTemplateService.get(notSavedId));
+                () -> invoiceTemplateService.get("invoiceTemplateId"));
+    }
+
+    @Test
+    public void shouldUpdateData() throws Exception {
         String savedId = "invoiceTemplateId1";
         invoiceTemplateListener.handleMessages(
-                getEvents(savedId, getCreated(getInvoiceTemplate(getCart()))));
-        assertThat(invoiceTemplateService.get(savedId)).isNotNull();
-        assertThrows(
-                NotFoundException.class,
-                () -> invoiceTemplateListener.handleMessages(
-                        getEvents(notSavedId, getUpdated(getParams(getCart())))));
+                getEvents(savedId, 1, getCreated(getInvoiceTemplate(getCart()))));
         invoiceTemplateListener.handleMessages(
-                getEvents(savedId, getUpdated(getParams(getCart()))));
-        assertThrows(
-                NotFoundException.class,
-                () -> invoiceTemplateListener.handleMessages(
-                        getEvents(notSavedId, getDeleted())));
+                getEvents(savedId, 2, getUpdated(getParams(getCart()))));
         invoiceTemplateListener.handleMessages(
-                getEvents(savedId, getDeleted()));
-        assertThrows(
-                InvoiceTemplateAlreadyDeletedException.class,
-                () -> invoiceTemplateService.get(savedId));
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenAlreadyCreated() throws Exception {
-        String alreadyCreatedId = "invoiceTemplateId1";
-        invoiceTemplateListener.handleMessages(List.of(
-                getEvent(alreadyCreatedId, getCreated(getInvoiceTemplate(getCart()))),
-                getEvent("invoiceTemplateId2", getCreated(getInvoiceTemplate(getCart()))),
-                getEvent("invoiceTemplateId3", getCreated(getInvoiceTemplate(getCart())))));
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, TABLE_NAME))
-                .isEqualTo(3);
-        assertThat(invoiceTemplateService.get("invoiceTemplateId2")).isNotNull();
-        assertThrows(
-                InvoiceTemplateAlreadyCreatedException.class,
-                () -> invoiceTemplateListener.handleMessages(
-                        getEvents(alreadyCreatedId, getCreated(getInvoiceTemplate(getCart())))));
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenAlreadyUpdated() throws Exception {
-        String alreadyDeletedId = "invoiceTemplateId2";
-        invoiceTemplateListener.handleMessages(List.of(
-                getEvent("invoiceTemplateId1", getCreated(getInvoiceTemplate(getCart()))),
-                getEvent(alreadyDeletedId, getCreated(getInvoiceTemplate(getCart()))),
-                getEvent("invoiceTemplateId3", getCreated(getInvoiceTemplate(getCart())))));
-        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, TABLE_NAME))
-                .isEqualTo(3);
-        assertThat(invoiceTemplateService.get("invoiceTemplateId2")).isNotNull();
+                getEvents(savedId, 3, getUpdated(getParams(getCart()))));
         invoiceTemplateListener.handleMessages(
-                getEvents(alreadyDeletedId, getDeleted()));
-        assertThrows(
-                InvoiceTemplateAlreadyCreatedException.class,
-                () -> invoiceTemplateListener.handleMessages(
-                        getEvents(alreadyDeletedId, getCreated(getInvoiceTemplate(getCart())))));
-        assertThrows(
-                InvoiceTemplateAlreadyDeletedException.class,
-                () -> invoiceTemplateListener.handleMessages(
-                        getEvents(alreadyDeletedId, getUpdated(getParams(getProduct())))));
-        assertThrows(
-                InvoiceTemplateAlreadyDeletedException.class,
-                () -> invoiceTemplateListener.handleMessages(
-                        getEvents(alreadyDeletedId, getDeleted())));
-    }
-
-    @Test
-    public void shouldUpdateData() throws InterruptedException {
-        String savedId = "invoiceTemplateId1";
-        invoiceTemplateListener.handleMessages(
-                getEvents(savedId, getCreated(getInvoiceTemplate(getCart()))));
-        invoiceTemplateListener.handleMessages(
-                getEvents(savedId, getUpdated(getParams(getCart()))));
-        invoiceTemplateListener.handleMessages(
-                getEvents(savedId, getUpdated(getParams(getCart()))));
-        invoiceTemplateListener.handleMessages(
-                getEvents(savedId, getUpdated(getParams(getCart()))));
+                getEvents(savedId, 4, getUpdated(getParams(getCart()))));
         InvoiceTemplateChange lastUpdated = getUpdated(getParams(getCart()));
         invoiceTemplateListener.handleMessages(
-                getEvents(savedId, lastUpdated));
+                getEvents(savedId, 5, lastUpdated));
         assertThat(invoiceTemplateService.get(savedId).getInvoiceContextType())
                 .isEqualTo(lastUpdated.getInvoiceTemplateUpdated().getDiff().getContext().getType());
     }
 
-    private List<MachineEvent> getEvents(String invoiceTemplateId, InvoiceTemplateChange invoiceTemplateChange) {
-        return List.of(getEvent(invoiceTemplateId, List.of(invoiceTemplateChange)));
+    @Test
+    public void shouldSkipDuplicatesWhenSequenceIdIsLessThanSequenceIdInStorage() throws Exception {
+        String invoiceTemplateId = "invoiceTemplateId";
+        MachineEvent message = getEvent(
+                invoiceTemplateId,
+                1,
+                List.of(
+                        getCreated(getInvoiceTemplate(getCart())),
+                        getCreated(getInvoiceTemplate(getCart()))));
+        invoiceTemplateListener.handleMessages(List.of(message));
+        InvoiceTemplateChange lastUpdated = getUpdated(getParams(getCart()));
+        invoiceTemplateListener.handleMessages(
+                getEvents(invoiceTemplateId, 2, lastUpdated));
+        // skip this
+        invoiceTemplateListener.handleMessages(
+                getEvents(invoiceTemplateId, 1, getUpdated(getParams(getCart()))));
+        assertThat(invoiceTemplateService.get(invoiceTemplateId).getInvoiceContextType())
+                .isEqualTo(lastUpdated.getInvoiceTemplateUpdated().getDiff().getContext().getType());
     }
 
-    private MachineEvent getEvent(String invoiceTemplateId, InvoiceTemplateChange invoiceTemplateChange) {
-        return getEvent(invoiceTemplateId, List.of(invoiceTemplateChange));
+    @Test
+    public void shouldReWriteDuplicatesByProtocolOpportunityAndWillBeFine() throws Exception {
+        String invoiceTemplateId = "invoiceTemplateId";
+        InvoiceTemplateChange updated = getUpdated(getParams(getCart()));
+        invoiceTemplateListener.handleMessages(
+                List.of(
+                        getEvent(
+                                invoiceTemplateId,
+                                1,
+                                List.of(
+                                        getCreated(getInvoiceTemplate(getCart())),
+                                        getUpdated(getParams(getCart())))),
+                        getEvent(
+                                invoiceTemplateId,
+                                1,
+                                List.of(
+                                        getCreated(getInvoiceTemplate(getCart())),
+                                        updated))));
+        assertThat(invoiceTemplateService.get(invoiceTemplateId).getInvoiceContextType())
+                .isEqualTo(updated.getInvoiceTemplateUpdated().getDiff().getContext().getType());
     }
 
-    private MachineEvent getEvent(String invoiceTemplateId, List<InvoiceTemplateChange> invoiceTemplateChanges) {
+    private List<MachineEvent> getEvents(
+            String invoiceTemplateId,
+            long sequenceId,
+            InvoiceTemplateChange invoiceTemplateChange) {
+        return List.of(getEvent(invoiceTemplateId, sequenceId, List.of(invoiceTemplateChange)));
+    }
+
+    private MachineEvent getEvent(
+            String invoiceTemplateId,
+            long sequenceId,
+            InvoiceTemplateChange invoiceTemplateChange) {
+        return getEvent(invoiceTemplateId, sequenceId, List.of(invoiceTemplateChange));
+    }
+
+    private MachineEvent getEvent(
+            String invoiceTemplateId,
+            long sequenceId,
+            List<InvoiceTemplateChange> invoiceTemplateChanges) {
         MachineEvent message = new MachineEvent();
         message.setData(toByteArray(EventPayload.invoice_template_changes(invoiceTemplateChanges)));
         message.setCreatedAt(Instant.now().toString());
-        message.setEventId(1L);
+        message.setEventId(sequenceId);
         message.setSourceNs("source_ns");
         message.setSourceId(invoiceTemplateId);
         return message;
