@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceTemplate.INVOICE_TEMPLATE;
-import static com.rbkmoney.testcontainers.annotations.util.ThriftUtil.fillThriftObject;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.fillThriftObject;
 import static com.rbkmoney.testcontainers.annotations.util.ThriftUtil.toByteArray;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
