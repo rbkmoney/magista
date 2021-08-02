@@ -32,6 +32,7 @@ import static com.rbkmoney.magista.util.ThriftUtil.fillThriftObject;
 import static com.rbkmoney.magista.util.ThriftUtil.toByteArray;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
@@ -157,10 +158,14 @@ public class InvoiceListenerTest {
         invoicePaymentCaptureParams.setCart(invoiceCart);
         invoicePaymentCaptureParams.setCash(new Cash(5L, new CurrencyRef("USD")));
 
+        AllocationTransaction allocationTransaction = new AllocationTransaction();
+        allocationTransaction = fillThriftObject(allocationTransaction, AllocationTransaction.class);
+        Allocation allocation = new Allocation().setTransactions(List.of(allocationTransaction));
+
         EventPayload eventPayload = EventPayload.invoice_changes(
                 Arrays.asList(
                         InvoiceChange.invoice_created(
-                                new InvoiceCreated(invoice)),
+                                new InvoiceCreated(invoice.setAllocation(allocation))),
                         InvoiceChange.invoice_status_changed(
                                 new InvoiceStatusChanged(InvoiceStatus.paid(new InvoicePaid()))),
                         InvoiceChange.invoice_payment_change(
@@ -171,7 +176,8 @@ public class InvoiceListenerTest {
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_status_changed(
                                                 new InvoicePaymentStatusChanged(
-                                                        InvoicePaymentStatus.captured(new InvoicePaymentCaptured()))))),
+                                                        InvoicePaymentStatus.captured(new InvoicePaymentCaptured()
+                                                                .setAllocation(allocation)))))),
                         InvoiceChange.invoice_payment_change(
                                 new InvoicePaymentChange(payment.getId(),
                                         InvoicePaymentChangePayload.invoice_payment_refund_change(
@@ -222,13 +228,14 @@ public class InvoiceListenerTest {
                                                         TestData.buildInvoiceChargebackChangePayload()))))));
         message.setData(toByteArray(eventPayload));
 
-        invoicingListener.handleMessages(Arrays.asList(message));
+        invoicingListener.handleMessages(List.of(message));
 
         verify(invoiceService).saveInvoices(any());
         verify(paymentService).savePayments(any());
         verify(paymentRefundService).saveRefunds(any());
         verify(paymentAdjustmentService).saveAdjustments(any());
         verify(paymentChargebackService).saveChargeback(any());
+        verify(allocationService, times(2)).saveAllocations(any());
     }
 
     private InvoicePaymentRefundChange getInvoicePaymentRefundChange(InvoicePaymentRefund invoicePaymentRefund) {

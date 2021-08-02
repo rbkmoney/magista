@@ -4,11 +4,10 @@ import com.rbkmoney.damsel.domain.InvoiceCart;
 import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.magista.util.DamselUtil;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
 
 public class DamselUtilTest {
 
@@ -23,7 +22,7 @@ public class DamselUtilTest {
         cart = mockTBaseProcessor.process(cart, new TBaseHandler<>(InvoiceCart.class));
 
         String jsonCart = DamselUtil.toJsonString(cart);
-        assertEquals(cart, DamselUtil.fromJson(jsonCart, InvoiceCart.class));
+        Assertions.assertEquals(cart, DamselUtil.fromJson(jsonCart, InvoiceCart.class));
 
     }
 
