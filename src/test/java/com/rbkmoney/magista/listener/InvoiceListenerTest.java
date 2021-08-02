@@ -26,8 +26,9 @@ import org.springframework.test.context.ContextConfiguration;
 import java.time.Instant;
 import java.util.*;
 
-import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.fillThriftObject;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.randomThriftOnlyRequiredFields;
 import static com.rbkmoney.testcontainers.annotations.util.ThriftUtil.toByteArray;
+import static com.rbkmoney.testcontainers.annotations.util.ValuesGenerator.generateString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -95,38 +96,6 @@ public class InvoiceListenerTest {
         message.setSourceNs(SOURCE_NS);
         message.setSourceId(SOURCE_ID);
 
-        Invoice invoice = new Invoice()
-                .setId(SOURCE_ID)
-                .setOwnerId(UUID.randomUUID().toString())
-                .setCreatedAt(Instant.now().toString())
-                .setDue(Instant.now().toString());
-        invoice = fillThriftObject(invoice, Invoice.class);
-
-        InvoicePayment payment = new InvoicePayment()
-                .setId(SOURCE_ID)
-                .setOwnerId(UUID.randomUUID().toString())
-                .setFlow(InvoicePaymentFlow.instant(new InvoicePaymentFlowInstant()))
-                .setPayer(
-                        Payer.payment_resource(
-                                new PaymentResourcePayer().setResource(
-                                        new DisposablePaymentResource().setPaymentTool(
-                                                PaymentTool.bank_card(new BankCard()
-                                                )
-                                        )
-                                )
-                        )
-                )
-                .setCreatedAt(Instant.now().toString());
-        payment = fillThriftObject(payment, InvoicePayment.class);
-
-        InvoicePaymentRefund invoicePaymentRefund = new InvoicePaymentRefund()
-                .setCreatedAt(Instant.now().toString());
-        invoicePaymentRefund = fillThriftObject(invoicePaymentRefund, InvoicePaymentRefund.class);
-
-        InvoicePaymentAdjustment invoicePaymentAdjustment = new InvoicePaymentAdjustment()
-                .setCreatedAt(Instant.now().toString());
-        invoicePaymentAdjustment = fillThriftObject(invoicePaymentAdjustment, InvoicePaymentAdjustment.class);
-
         TransactionInfo transactionInfo = new TransactionInfo();
         transactionInfo.setId("3542543");
         transactionInfo.setExtra(Collections.emptyMap());
@@ -148,6 +117,26 @@ public class InvoiceListenerTest {
         invoicePaymentCaptureParams.setCart(invoiceCart);
         invoicePaymentCaptureParams.setCash(new Cash(5L, new CurrencyRef("USD")));
 
+        Invoice invoice = randomThriftOnlyRequiredFields(Invoice.class)
+                .setId(SOURCE_ID)
+                .setOwnerId(UUID.randomUUID().toString())
+                .setCreatedAt(Instant.now().toString())
+                .setDue(Instant.now().toString());
+        InvoicePayment payment = randomThriftOnlyRequiredFields(InvoicePayment.class)
+                .setId(SOURCE_ID)
+                .setOwnerId(UUID.randomUUID().toString())
+                .setFlow(InvoicePaymentFlow.instant(new InvoicePaymentFlowInstant()))
+                .setPayer(Payer.payment_resource(new PaymentResourcePayer()
+                        .setResource(new DisposablePaymentResource()
+                                .setPaymentTool(PaymentTool.bank_card(
+                                        new BankCard(generateString(), generateString(), generateString()))))
+                        .setContactInfo(new ContactInfo())))
+                .setCreatedAt(Instant.now().toString());
+        InvoicePaymentRefund invoicePaymentRefund = randomThriftOnlyRequiredFields(InvoicePaymentRefund.class)
+                .setCreatedAt(Instant.now().toString());
+        InvoicePaymentAdjustment invoicePaymentAdjustment =
+                randomThriftOnlyRequiredFields(InvoicePaymentAdjustment.class)
+                        .setCreatedAt(Instant.now().toString());
         EventPayload eventPayload = EventPayload.invoice_changes(
                 Arrays.asList(
                         InvoiceChange.invoice_created(
