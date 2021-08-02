@@ -61,7 +61,7 @@ public class PayoutListenerTest {
         event.setPayoutChange(PayoutChange.created(new PayoutCreated(payout)));
         event.setPayout(payout);
         testThriftKafkaProducer.send(payoutTopicName, event);
-        verify(payoutService, timeout(3000).times(1)).handleEvents(arg.capture());
+        verify(payoutService, timeout(5000).times(1)).handleEvents(arg.capture());
         assertThat(arg.getValue().get(0))
                 .isEqualTo(event);
     }
