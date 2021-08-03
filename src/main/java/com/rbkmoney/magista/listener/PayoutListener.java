@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.listener;
 
-import com.rbkmoney.magista.service.PayoutMapperService;
+import com.rbkmoney.magista.service.PayoutHandlerService;
 import com.rbkmoney.payout.manager.Event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class PayoutListener {
     @Value("${kafka.consumer.throttling-timeout-ms}")
     private int throttlingTimeout;
 
-    private final PayoutMapperService payoutService;
+    private final PayoutHandlerService payoutService;
 
     @KafkaListener(
             autoStartup = "${kafka.topics.pm-events-payout.consume.enabled}",

@@ -4,9 +4,7 @@ import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.tables.pojos.Payout;
-import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.Processor;
-import com.rbkmoney.magista.event.mapper.PayoutMapper;
+import com.rbkmoney.magista.event.handler.PayoutHandler;
 import com.rbkmoney.magista.service.PayoutService;
 import com.rbkmoney.payout.manager.Event;
 import com.rbkmoney.payout.manager.PayoutChange;
@@ -14,16 +12,16 @@ import com.rbkmoney.payout.manager.PayoutStatusChanged;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PayoutStatusChangedMapper implements PayoutMapper {
+public class PayoutStatusChangedHandler implements PayoutHandler {
 
     private final PayoutService payoutEventService;
 
-    public PayoutStatusChangedMapper(PayoutService payoutEventService) {
+    public PayoutStatusChangedHandler(PayoutService payoutEventService) {
         this.payoutEventService = payoutEventService;
     }
 
     @Override
-    public Processor map(PayoutChange change, Event event) {
+    public void handle(PayoutChange change, Event event) {
         Payout payout = payoutEventService.getPayout(event.getPayoutId());
 
         payout.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
@@ -35,12 +33,7 @@ public class PayoutStatusChangedMapper implements PayoutMapper {
         if (statusChanged.getStatus().isSetCancelled()) {
             payout.setCancelledDetails(statusChanged.getStatus().getCancelled().getDetails());
         }
-        return () -> payoutEventService.updatePayout(payout);
-    }
-
-    @Override
-    public ChangeType getChangeType() {
-        throw new UnsupportedOperationException();
+        payoutEventService.updatePayout(payout);
     }
 
     @Override
