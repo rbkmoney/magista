@@ -1,9 +1,8 @@
 package com.rbkmoney.magista.config;
 
 import com.rbkmoney.testcontainers.annotations.KafkaSpringBootTest;
-import com.rbkmoney.testcontainers.annotations.kafka.KafkaTestcontainer;
-import com.rbkmoney.testcontainers.annotations.postgresql.PostgresqlTestcontainer;
-import org.springframework.transaction.annotation.Transactional;
+import com.rbkmoney.testcontainers.annotations.kafka.KafkaTestcontainerSingleton;
+import com.rbkmoney.testcontainers.annotations.postgresql.PostgresqlTestcontainerSingleton;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,8 +11,8 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@PostgresqlTestcontainer
-@KafkaTestcontainer(
+@PostgresqlTestcontainerSingleton
+@KafkaTestcontainerSingleton(
         properties = {
                 "kafka.topics.invoicing.consume.enabled=true",
                 "kafka.topics.invoice-template.consume.enabled=true",
@@ -24,6 +23,5 @@ import java.lang.annotation.Target;
                 "kafka.topics.invoice-template.id",
                 "kafka.topics.pm-events-payout.id"})
 @KafkaSpringBootTest
-@Transactional
 public @interface KafkaPostgresqlSpringBootITest {
 }
