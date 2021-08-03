@@ -2,7 +2,7 @@ package com.rbkmoney.magista.config;
 
 import com.rbkmoney.testcontainers.annotations.KafkaSpringBootTest;
 import com.rbkmoney.testcontainers.annotations.kafka.KafkaTestcontainer;
-import com.rbkmoney.testcontainers.annotations.postgresql.PostgresqlTestcontainerSingleton;
+import com.rbkmoney.testcontainers.annotations.postgresql.PostgresqlTestcontainer;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@PostgresqlTestcontainerSingleton
+@PostgresqlTestcontainer
 @KafkaTestcontainer(
         properties = {
                 "kafka.topics.invoicing.consume.enabled=true",
