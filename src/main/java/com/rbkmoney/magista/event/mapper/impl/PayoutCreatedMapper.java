@@ -72,6 +72,11 @@ public class PayoutCreatedMapper implements PayoutMapper {
 
     @Override
     public ChangeType getChangeType() {
-        return ChangeType.PAYOUT_CREATED;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean accept(PayoutChange change) {
+        return change.isSetCreated();
     }
 }

@@ -40,6 +40,11 @@ public class PayoutStatusChangedMapper implements PayoutMapper {
 
     @Override
     public ChangeType getChangeType() {
-        return ChangeType.PAYOUT_STATUS_CHANGED;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean accept(PayoutChange change) {
+        return change.isSetStatusChanged();
     }
 }
