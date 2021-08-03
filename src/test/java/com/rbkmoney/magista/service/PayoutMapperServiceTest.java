@@ -1,5 +1,6 @@
 package com.rbkmoney.magista.service;
 
+import com.rbkmoney.magista.config.PostgresqlSpringBootITest;
 import com.rbkmoney.magista.event.mapper.impl.PayoutCreatedMapper;
 import com.rbkmoney.magista.event.mapper.impl.PayoutStatusChangedMapper;
 import com.rbkmoney.payout.manager.Event;
@@ -19,7 +20,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@DefaultSpringBootTest
+@PostgresqlSpringBootITest
 public class PayoutMapperServiceTest {
 
     @MockBean
