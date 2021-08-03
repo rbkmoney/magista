@@ -44,7 +44,7 @@ public class PayoutStatusChangedMapper implements PayoutMapper {
     }
 
     @Override
-    public boolean accept(PayoutChange change){
+    public boolean accept(PayoutChange change) {
         return change.isSetStatusChanged();
     }
 }

@@ -76,7 +76,7 @@ public class PayoutCreatedMapper implements PayoutMapper {
     }
 
     @Override
-    public boolean accept(PayoutChange change){
+    public boolean accept(PayoutChange change) {
         return change.isSetCreated();
     }
 }
