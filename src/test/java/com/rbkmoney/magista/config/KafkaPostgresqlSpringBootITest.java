@@ -3,6 +3,7 @@ package com.rbkmoney.magista.config;
 import com.rbkmoney.testcontainers.annotations.KafkaSpringBootTest;
 import com.rbkmoney.testcontainers.annotations.kafka.KafkaTestcontainer;
 import com.rbkmoney.testcontainers.annotations.postgresql.PostgresqlTestcontainer;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,5 +24,6 @@ import java.lang.annotation.Target;
                 "kafka.topics.invoice-template.id",
                 "kafka.topics.pm-events-payout.id"})
 @KafkaSpringBootTest
+@Transactional
 public @interface KafkaPostgresqlSpringBootITest {
 }
