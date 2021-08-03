@@ -58,8 +58,6 @@ public enum ChangeType {
     INVOICE_PAYMENT_CHARGEBACK_CASH_FLOW_CHANGED(
             "invoice_payment_change.payload.invoice_payment_chargeback_change.payload.invoice_payment_chargeback_cash_flow_changed",
             new IsNullCondition().not()),
-    PAYOUT_CREATED("payout_created", new IsNullCondition().not()),
-    PAYOUT_STATUS_CHANGED("payout_status_changed", new IsNullCondition().not()),
     INVOICE_TEMPLATE_CREATED("invoice_template_created", new IsNullCondition().not()),
     INVOICE_TEMPLATE_UPDATED("invoice_template_updated", new IsNullCondition().not()),
     INVOICE_TEMPLATE_DELETED("invoice_template_deleted", new IsNullCondition().not());
