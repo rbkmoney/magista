@@ -5,10 +5,10 @@ import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.msgpack.Value;
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
+import com.rbkmoney.magista.config.PostgresqlSpringBootITest;
 import com.rbkmoney.magista.domain.enums.InvoiceTemplateEventType;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.service.InvoiceTemplateService;
-import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceTemplate.INVOICE_TEMPLATE;
-import static com.rbkmoney.magista.util.ThriftUtil.fillThriftObject;
-import static com.rbkmoney.magista.util.ThriftUtil.toByteArray;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.randomThriftOnlyRequiredFields;
+import static com.rbkmoney.testcontainers.annotations.util.ThriftUtil.toByteArray;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@WithPostgresqlSingletonSpringBootITest
+@PostgresqlSpringBootITest
 public class InvoiceTemplateServiceTest {
 
     private static final String TABLE_NAME = INVOICE_TEMPLATE.getSchema().getName() + "." + INVOICE_TEMPLATE.getName();
@@ -162,8 +162,7 @@ public class InvoiceTemplateServiceTest {
     }
 
     private InvoiceTemplate getInvoiceTemplate(InvoiceTemplateDetails details) {
-        InvoiceTemplate invoiceTemplate = new InvoiceTemplate();
-        invoiceTemplate = fillThriftObject(invoiceTemplate, InvoiceTemplate.class);
+        InvoiceTemplate invoiceTemplate = randomThriftOnlyRequiredFields(InvoiceTemplate.class);
         invoiceTemplate.setId("setId");
         invoiceTemplate.setDescription("setDescription");
         short date = 12;
@@ -191,21 +190,17 @@ public class InvoiceTemplateServiceTest {
     }
 
     private Content getContent() {
-        Content context = new Content();
-        context = fillThriftObject(context, Content.class);
-        return context;
+        return randomThriftOnlyRequiredFields(Content.class);
     }
 
     private InvoiceTemplateDetails getCart() {
-        InvoiceLine invoiceLine = new InvoiceLine();
-        invoiceLine = fillThriftObject(invoiceLine, InvoiceLine.class);
+        InvoiceLine invoiceLine = randomThriftOnlyRequiredFields(InvoiceLine.class);
         invoiceLine.setMetadata(Map.of("meta", Value.str("data")));
         return InvoiceTemplateDetails.cart(new InvoiceCart(List.of(invoiceLine, invoiceLine)));
     }
 
     private InvoiceTemplateDetails getProduct() {
-        InvoiceTemplateProduct invoiceTemplateProduct = new InvoiceTemplateProduct();
-        invoiceTemplateProduct = fillThriftObject(invoiceTemplateProduct, InvoiceTemplateProduct.class);
+        InvoiceTemplateProduct invoiceTemplateProduct = randomThriftOnlyRequiredFields(InvoiceTemplateProduct.class);
         invoiceTemplateProduct.setMetadata(Map.of("meta", Value.str("data")));
         return InvoiceTemplateDetails.product(invoiceTemplateProduct);
     }

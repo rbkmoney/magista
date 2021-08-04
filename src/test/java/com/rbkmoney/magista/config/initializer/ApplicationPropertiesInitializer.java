@@ -11,8 +11,7 @@ public class ApplicationPropertiesInitializer extends ConfigDataApplicationConte
         TestPropertyValues.of(
                 "token-gen.key=" + "jXnZr4u7x!A%D*G-KaPvSgVkYp3s5v8t/B?E(H+MbQeThWmZq4t7w9z$C&F)J@Nc",
                 "cache.invoiceData.size=10000",
-                "cache.paymentData.size=10000",
-                "payouter.pooling.enabled=false")
+                "cache.paymentData.size=10000")
                 .applyTo(configurableApplicationContext);
     }
 }

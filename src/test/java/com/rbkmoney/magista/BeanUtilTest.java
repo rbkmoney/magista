@@ -4,7 +4,7 @@ import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.util.BeanUtil;
 import org.junit.jupiter.api.Test;
 
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.random;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BeanUtilTest {

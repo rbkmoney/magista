@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.dao;
 
+import com.rbkmoney.magista.config.PostgresqlSpringBootITest;
 import com.rbkmoney.magista.domain.tables.pojos.AllocationTransactionData;
-import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import io.github.benas.randombeans.EnhancedRandomBuilder;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@WithPostgresqlSingletonSpringBootITest
+@PostgresqlSpringBootITest
 public class AllocationDaoTest {
 
     private final EnhancedRandom enhancedRandom = EnhancedRandomBuilder.aNewEnhancedRandom();
