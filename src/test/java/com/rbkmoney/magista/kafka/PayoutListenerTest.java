@@ -2,7 +2,7 @@ package com.rbkmoney.magista.kafka;
 
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.config.KafkaPostgresqlSpringBootITest;
-import com.rbkmoney.magista.service.PayoutMapperService;
+import com.rbkmoney.magista.service.PayoutHandlerService;
 import com.rbkmoney.payout.manager.*;
 import com.rbkmoney.payout.manager.domain.CurrencyRef;
 import com.rbkmoney.testcontainers.annotations.kafka.config.KafkaProducer;
@@ -31,7 +31,7 @@ public class PayoutListenerTest {
     private String payoutTopicName;
 
     @MockBean
-    private PayoutMapperService payoutService;
+    private PayoutHandlerService payoutService;
 
     @Autowired
     private KafkaProducer<TBase<?, ?>> testThriftKafkaProducer;
