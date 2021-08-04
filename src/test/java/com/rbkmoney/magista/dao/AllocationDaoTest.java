@@ -4,13 +4,15 @@ import com.rbkmoney.magista.domain.tables.pojos.AllocationTransactionData;
 import com.rbkmoney.testcontainers.annotations.postgresql.WithPostgresqlSingletonSpringBootITest;
 import io.github.benas.randombeans.EnhancedRandomBuilder;
 import io.github.benas.randombeans.api.EnhancedRandom;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WithPostgresqlSingletonSpringBootITest
 public class AllocationDaoTest {
@@ -31,7 +33,7 @@ public class AllocationDaoTest {
                 .get(allocationTrxData.getInvoiceId(), allocationTrxData.getAllocationId());
 
         // Then
-        Assertions.assertTrue(new ReflectionEquals(allocationTrxData, "id").matches(foundedAllocationTrxData));
+        assertTrue(new ReflectionEquals(allocationTrxData, "id").matches(foundedAllocationTrxData));
     }
 
     @Test
@@ -48,14 +50,14 @@ public class AllocationDaoTest {
         List<AllocationTransactionData> foundedAllocationTransactions = allocationDao.get("testInvoiceId");
 
         // Then
-        Assertions.assertEquals(allocationTransactions.size(),
+        assertEquals(allocationTransactions.size(),
                 foundedAllocationTransactions.size(), "Allocation count not equals");
         for (AllocationTransactionData allocationTransaction : allocationTransactions) {
             AllocationTransactionData foundedAllocationTrx = foundedAllocationTransactions.stream()
                     .filter(allocationTransactionData -> allocationTransactionData.getAllocationId()
                             .equals(allocationTransaction.getAllocationId()))
                     .findFirst().orElseThrow();
-            Assertions.assertTrue(new ReflectionEquals(allocationTransaction, "id").matches(foundedAllocationTrx));
+            assertTrue(new ReflectionEquals(allocationTransaction, "id").matches(foundedAllocationTrx));
         }
     }
 

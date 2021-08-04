@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class DamselUtilTest {
 
     @Test
@@ -22,7 +24,7 @@ public class DamselUtilTest {
         cart = mockTBaseProcessor.process(cart, new TBaseHandler<>(InvoiceCart.class));
 
         String jsonCart = DamselUtil.toJsonString(cart);
-        Assertions.assertEquals(cart, DamselUtil.fromJson(jsonCart, InvoiceCart.class));
+        assertEquals(cart, DamselUtil.fromJson(jsonCart, InvoiceCart.class));
 
     }
 
