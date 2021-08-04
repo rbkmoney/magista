@@ -107,7 +107,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
-            <version>SNAPSHOT</version>
+            <version>1.508-cd5ebac-epic</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
