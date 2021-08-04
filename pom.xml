@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.rbkmoney</groupId>
         <artifactId>service-parent-pom</artifactId>
-        <version>1.2.13</version>
+        <version>1.2.14</version>
     </parent>
 
     <groupId>com.rbkmoney.magista</groupId>
@@ -106,7 +106,6 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
-            <version>1.500-07c365a-epic</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.woody</groupId>
