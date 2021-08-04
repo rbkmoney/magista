@@ -265,20 +265,22 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         toEnumFields(parameters.getPayoutStatuses(),
                                 PayoutStatus.class))
                 .addValue(PAYOUT.CREATED_AT, whereTime, LESS);
-        switch (parameters.getPayoutType()) {
-            case "bank_account":
-                conditionParameterSource.addOrCondition(
-                        PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.russian_bank_account),
-                        PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.international_bank_account));
-                break;
-            case "wallet_info":
-            case "payment_institution_account":
-                conditionParameterSource.addValue(PAYOUT.PAYOUT_TOOL_TYPE,
-                        toEnumField(parameters.getPayoutType(), PayoutToolType.class),
-                        EQUALS);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown payout_type " + parameters.getPayoutType());
+        if (parameters.getPayoutType() != null) {
+            switch (parameters.getPayoutType()) {
+                case "bank_account":
+                    conditionParameterSource.addOrCondition(
+                            PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.russian_bank_account),
+                            PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.international_bank_account));
+                    break;
+                case "wallet_info":
+                case "payment_institution_account":
+                    conditionParameterSource.addValue(PAYOUT.PAYOUT_TOOL_TYPE,
+                            toEnumField(parameters.getPayoutType(), PayoutToolType.class),
+                            EQUALS);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown payout_type " + parameters.getPayoutType());
+            }
         }
         return conditionParameterSource;
     }

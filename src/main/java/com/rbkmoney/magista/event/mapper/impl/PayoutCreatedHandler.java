@@ -9,22 +9,20 @@ import com.rbkmoney.payout.manager.*;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
-import com.rbkmoney.magista.event.ChangeType;
-import com.rbkmoney.magista.event.Processor;
-import com.rbkmoney.magista.event.mapper.PayoutMapper;
+import com.rbkmoney.magista.event.handler.PayoutHandler;
 import com.rbkmoney.magista.service.PayoutService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PayoutCreatedMapper implements PayoutMapper {
+public class PayoutCreatedHandler implements PayoutHandler {
 
     private final PayoutService payoutEventService;
     private final PartyManagementService partyManagementService;
 
     @Override
-    public Processor map(PayoutChange change, Event event) {
+    public void handle(PayoutChange change, Event event) {
         var payout = new com.rbkmoney.magista.domain.tables.pojos.Payout();
         payout.setEventCreatedAt(TypeUtil.stringToLocalDateTime(event.getCreatedAt()));
         payout.setPayoutId(event.getPayoutId());
@@ -67,11 +65,11 @@ public class PayoutCreatedMapper implements PayoutMapper {
             payout.setPayoutToolWalletId(payoutToolInfo.getWalletInfo().getWalletId());
         }
 
-        return () -> payoutEventService.savePayout(payout);
+        payoutEventService.savePayout(payout);
     }
 
     @Override
-    public ChangeType getChangeType() {
-        return ChangeType.PAYOUT_CREATED;
+    public boolean accept(PayoutChange change) {
+        return change.isSetCreated();
     }
 }

@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.rbkmoney</groupId>
         <artifactId>service-parent-pom</artifactId>
-        <version>1.2.12</version>
+        <version>1.2.13</version>
     </parent>
 
     <groupId>com.rbkmoney.magista</groupId>
@@ -109,6 +109,10 @@
             <version>1.500-07c365a-epic</version>
         </dependency>
         <dependency>
+            <groupId>com.rbkmoney.woody</groupId>
+            <artifactId>woody-thrift</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>mamsel</artifactId>
         </dependency>
@@ -154,12 +158,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.github.benas</groupId>
-            <artifactId>random-beans</artifactId>
-            <version>3.9.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams-test-utils</artifactId>
             <scope>test</scope>
@@ -167,7 +165,8 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>testcontainers-annotations</artifactId>
-            <version>1.0.2</version>
+            <version>1.2.3</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

@@ -3,7 +3,6 @@ package com.rbkmoney.magista.service;
 import com.rbkmoney.magista.config.properties.TokenGenProperties;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.QueryParameters;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -17,8 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @EnableConfigurationProperties
@@ -35,7 +33,7 @@ public class TokenGenServiceTest {
         final QueryParameters queryParameters = new QueryParameters(parameters, null);
 
         final String token = tokenGenService.generateToken(queryParameters, LocalDateTime.now());
-        Assert.assertTrue(tokenGenService.validToken(queryParameters, token));
+        assertTrue(tokenGenService.validToken(queryParameters, token));
     }
 
     @Test
@@ -46,7 +44,7 @@ public class TokenGenServiceTest {
         final QueryParameters queryParameters = new QueryParameters(parameters, null);
 
         final String token = tokenGenService.generateToken(queryParameters, LocalDateTime.now());
-        Assert.assertTrue(
+        assertTrue(
                 tokenGenService.validToken(queryParameters, URLDecoder.decode(token, StandardCharsets.UTF_8)));
     }
 
@@ -64,7 +62,7 @@ public class TokenGenServiceTest {
                 .generateToken(new QueryParameters(parameters, new QueryParameters(derivedParameters, null)),
                         LocalDateTime.now());
 
-        Assert.assertFalse(tokenGenService.validToken(queryParameters, secondToken));
+        assertFalse(tokenGenService.validToken(queryParameters, secondToken));
     }
 
     @Test
@@ -76,7 +74,7 @@ public class TokenGenServiceTest {
         final LocalDateTime nowDateTime = LocalDateTime.now();
         final String token = tokenGenService.generateToken(queryParameters, nowDateTime);
         final Optional<LocalDateTime> tokenDateOptional = tokenGenService.extractTime(token);
-        Assert.assertTrue(tokenDateOptional.isPresent());
+        assertTrue(tokenDateOptional.isPresent());
         final String token2 = tokenGenService.generateToken(queryParameters, tokenDateOptional.get());
         assertEquals(token, token2);
     }
@@ -91,7 +89,7 @@ public class TokenGenServiceTest {
                 new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
         final boolean validToken = tokenGenService
                 .validToken(queryParameters, "mH6CM2lOiArjXgVjEdKvQdQ0FpSF_AtmOXTkuoG5bZw;2019-08-07T16:26:39.611932Z");
-        Assert.assertTrue(validToken);
+        assertTrue(validToken);
 
     }
 
