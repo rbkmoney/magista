@@ -126,9 +126,6 @@ public class InvoiceListenerTest {
         invoicePaymentCaptureParams.setCart(invoiceCart);
         invoicePaymentCaptureParams.setCash(new Cash(5L, new CurrencyRef("USD")));
 
-        AllocationTransaction allocationTransaction = randomThriftOnlyRequiredFields(AllocationTransaction.class);
-        Allocation allocation = new Allocation().setTransactions(List.of(allocationTransaction));
-
         Invoice invoice = randomThriftOnlyRequiredFields(Invoice.class)
                 .setId(SOURCE_ID)
                 .setOwnerId(UUID.randomUUID().toString())
@@ -149,6 +146,10 @@ public class InvoiceListenerTest {
         InvoicePaymentAdjustment invoicePaymentAdjustment =
                 randomThriftOnlyRequiredFields(InvoicePaymentAdjustment.class)
                         .setCreatedAt(Instant.now().toString());
+
+        AllocationTransaction allocationTransaction = randomThriftOnlyRequiredFields(AllocationTransaction.class);
+        Allocation allocation = new Allocation().setTransactions(List.of(allocationTransaction));
+
         EventPayload eventPayload = EventPayload.invoice_changes(
                 Arrays.asList(
                         InvoiceChange.invoice_created(
