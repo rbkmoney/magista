@@ -7,8 +7,13 @@ import com.rbkmoney.magista.config.PostgresqlSpringBootITest;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +23,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@PostgresqlSpringBootITest
+@ExtendWith(SpringExtension.class)
+@TestPropertySource("classpath:application.yml")
+@DirtiesContext
+@ContextConfiguration(classes = PartyManagementService.class)
 public class PartyManagementServiceTest {
 
     private static final String SHOP_ID_1 = "shop_id_1";
