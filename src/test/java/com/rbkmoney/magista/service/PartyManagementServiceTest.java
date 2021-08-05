@@ -40,7 +40,7 @@ public class PartyManagementServiceTest {
 
     @SneakyThrows
     @BeforeEach
-    public void setup(){
+    public void setup() {
 
         given(partyManagementClient.getShop(any(), any(), eq(SHOP_ID_1)))
                 .willReturn(new Shop().setContractId(CONTRACT_ID_1));
@@ -54,7 +54,7 @@ public class PartyManagementServiceTest {
         given(partyManagementClient.getContract(any(), any(), eq(CONTRACT_ID_2)))
                 .willReturn(new Contract().setPayoutTools(List.of()));
 
-        given(partyManagementClient.getRevision(any(), any())).willReturn(3l);
+        given(partyManagementClient.getRevision(any(), any())).willReturn(3L);
         given(partyManagementClient.checkout(any(), any(), eq(PartyRevisionParam.revision(2))))
                 .willReturn(new Party()
                         .setShops(Map.of(SHOP_ID_2, new Shop().setContractId("kek_contract_id")))
