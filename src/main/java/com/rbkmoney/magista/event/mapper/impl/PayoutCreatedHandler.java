@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
 import com.rbkmoney.damsel.domain.InternationalBankAccount;
+import com.rbkmoney.damsel.domain.InternationalBankDetails;
 import com.rbkmoney.damsel.domain.PayoutToolInfo;
 import com.rbkmoney.damsel.domain.RussianBankAccount;
 import com.rbkmoney.magista.domain.enums.PayoutToolType;
@@ -52,14 +53,18 @@ public class PayoutCreatedHandler implements PayoutHandler {
         } else if (payoutToolInfo.isSetInternationalBankAccount()) {
             InternationalBankAccount internationalBankAccount = payoutToolInfo.getInternationalBankAccount();
             payout.setPayoutToolInternationalBankAccountNumber(internationalBankAccount.getNumber());
-            payout.setPayoutToolInternationalBankAccountBankBic(internationalBankAccount.getBank().getBic());
-            payout.setPayoutToolInternationalBankAccountBankCountryCode(
-                    internationalBankAccount.getBank().getCountry().name());
-            payout.setPayoutToolInternationalBankAccountBankName(internationalBankAccount.getBank().getName());
-            payout.setPayoutToolInternationalBankAccountBankAddress(internationalBankAccount.getBank().getAddress());
-            payout.setPayoutToolInternationalBankAccountBankAbaRtn(internationalBankAccount.getBank().getAbaRtn());
-            payout.setPayoutToolInternationalBankAccountCorrAccount(
-                    internationalBankAccount.getCorrespondentAccount().getNumber());
+            if (internationalBankAccount.isSetBank()) {
+                InternationalBankDetails bank = internationalBankAccount.getBank();
+                payout.setPayoutToolInternationalBankAccountBankBic(bank.getBic());
+                payout.setPayoutToolInternationalBankAccountBankCountryCode(bank.getCountry().name());
+                payout.setPayoutToolInternationalBankAccountBankName(bank.getName());
+                payout.setPayoutToolInternationalBankAccountBankAddress(bank.getAddress());
+                payout.setPayoutToolInternationalBankAccountBankAbaRtn(bank.getAbaRtn());
+            }
+            if (internationalBankAccount.isSetCorrespondentAccount()) {
+                payout.setPayoutToolInternationalBankAccountCorrAccount(
+                        internationalBankAccount.getCorrespondentAccount().getNumber());
+            }
             payout.setPayoutToolInternationalBankAccountIban(internationalBankAccount.getIban());
         } else if (payoutToolInfo.isSetWalletInfo()) {
             payout.setPayoutToolWalletId(payoutToolInfo.getWalletInfo().getWalletId());
