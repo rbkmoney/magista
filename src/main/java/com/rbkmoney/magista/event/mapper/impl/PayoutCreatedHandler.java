@@ -56,7 +56,9 @@ public class PayoutCreatedHandler implements PayoutHandler {
             if (internationalBankAccount.isSetBank()) {
                 InternationalBankDetails bank = internationalBankAccount.getBank();
                 payout.setPayoutToolInternationalBankAccountBankBic(bank.getBic());
-                payout.setPayoutToolInternationalBankAccountBankCountryCode(bank.getCountry().name());
+                if (bank.getCountry() != null) {
+                    payout.setPayoutToolInternationalBankAccountBankCountryCode(bank.getCountry().name());
+                }
                 payout.setPayoutToolInternationalBankAccountBankName(bank.getName());
                 payout.setPayoutToolInternationalBankAccountBankAddress(bank.getAddress());
                 payout.setPayoutToolInternationalBankAccountBankAbaRtn(bank.getAbaRtn());
