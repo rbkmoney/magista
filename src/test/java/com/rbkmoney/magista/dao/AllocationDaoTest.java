@@ -1,27 +1,25 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.magista.dao.impl.AllocationDaoImpl;
+import com.rbkmoney.magista.config.PostgresqlSpringBootITest;
 import com.rbkmoney.magista.domain.tables.pojos.AllocationTransactionData;
 import io.github.benas.randombeans.EnhancedRandomBuilder;
 import io.github.benas.randombeans.api.EnhancedRandom;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-@ContextConfiguration(classes = {AllocationDaoImpl.class})
-public class AllocationDaoTest extends AbstractDaoTest {
-
-    @Autowired
-    private AllocationDao allocationDao;
+@PostgresqlSpringBootITest
+public class AllocationDaoTest {
 
     private final EnhancedRandom enhancedRandom = EnhancedRandomBuilder.aNewEnhancedRandom();
+    @Autowired
+    private AllocationDao allocationDao;
 
     @Test
     public void saveAllocationTest() {

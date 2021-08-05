@@ -1,10 +1,7 @@
 package com.rbkmoney.magista.event.mapper.impl;
 
-import com.rbkmoney.damsel.cash_flow.CashFlow;
-import com.rbkmoney.damsel.cash_flow.CashFlowTransaction;
 import com.rbkmoney.damsel.domain.FinalCashFlowPosting;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
-import com.rbkmoney.damsel.payment_processing.InvoicePaymentCashFlowChanged;
 import com.rbkmoney.damsel.payment_processing.InvoicePaymentChange;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
@@ -33,31 +30,16 @@ public class InvoicePaymentCashFlowChangedEventMapper implements PaymentMapper {
         InvoicePaymentChange invoicePaymentChange = change.getInvoicePaymentChange();
         paymentData.setPaymentId(invoicePaymentChange.getId());
 
-        InvoicePaymentCashFlowChanged invoicePaymentCashFlowChanged = invoicePaymentChange
+        List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentChange
                 .getPayload()
-                .getInvoicePaymentCashFlowChanged();
-        if (invoicePaymentCashFlowChanged.isSetDeprecatedCashFlow()) {
-            List<FinalCashFlowPosting> finalCashFlowPostings = invoicePaymentChange
-                    .getPayload()
-                    .getInvoicePaymentCashFlowChanged()
-                    .getDeprecatedCashFlow();
-            Map<FeeType, Long> fees = DamselUtil.getFees(finalCashFlowPostings);
-            paymentData.setPaymentAmount(fees.getOrDefault(FeeType.AMOUNT, 0L));
-            paymentData.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
-            paymentData.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
-            paymentData.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
-        } else if (invoicePaymentCashFlowChanged.isSetCashFlow()) {
-            List<CashFlowTransaction> newCashFlow = invoicePaymentChange
-                    .getPayload()
-                    .getInvoicePaymentCashFlowChanged()
-                    .getCashFlow()
-                    .getTransactions();
-            Map<FeeType, Long> fees = DamselUtil.getCashFlowFees(newCashFlow);
-            paymentData.setPaymentAmount(fees.getOrDefault(FeeType.AMOUNT, 0L));
-            paymentData.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
-            paymentData.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
-            paymentData.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
-        }
+                .getInvoicePaymentCashFlowChanged()
+                .getCashFlow();
+
+        Map<FeeType, Long> fees = DamselUtil.getFees(finalCashFlowPostings);
+        paymentData.setPaymentAmount(fees.getOrDefault(FeeType.AMOUNT, 0L));
+        paymentData.setPaymentFee(fees.getOrDefault(FeeType.FEE, 0L));
+        paymentData.setPaymentExternalFee(fees.getOrDefault(FeeType.EXTERNAL_FEE, 0L));
+        paymentData.setPaymentProviderFee(fees.getOrDefault(FeeType.PROVIDER_FEE, 0L));
 
         return paymentData;
     }

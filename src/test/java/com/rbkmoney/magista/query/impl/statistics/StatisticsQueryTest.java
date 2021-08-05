@@ -2,19 +2,26 @@ package com.rbkmoney.magista.query.impl.statistics;
 
 import com.rbkmoney.damsel.merch_stat.StatRequest;
 import com.rbkmoney.damsel.merch_stat.StatResponse;
-import com.rbkmoney.magista.query.AbstractQueryTest;
+import com.rbkmoney.magista.config.PostgresqlSpringBootITest;
+import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
+import com.rbkmoney.magista.query.QueryProcessor;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Transactional
-public class StatisticsQueryTest extends AbstractQueryTest {
+@PostgresqlSpringBootITest
+@Import(QueryProcessorConfig.class)
+public class StatisticsQueryTest {
+
+    @Autowired
+    private QueryProcessor<StatRequest, StatResponse> queryProcessor;
 
     @Test
     @Sql("classpath:data/sql/statistics/payments_geo_stat_data.sql")
@@ -94,7 +101,7 @@ public class StatisticsQueryTest extends AbstractQueryTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     @Sql("classpath:data/sql/statistics/payments_conversion_stat_data.sql")
     public void testPaymentsConversionStat() {
         String json =

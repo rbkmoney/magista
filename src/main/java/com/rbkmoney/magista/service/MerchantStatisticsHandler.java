@@ -15,7 +15,7 @@ import java.util.Arrays;
 @Slf4j
 public class MerchantStatisticsHandler implements StatisticsServletIface {
 
-    private QueryProcessor<StatRequest, StatResponse> queryProcessor;
+    private final QueryProcessor<StatRequest, StatResponse> queryProcessor;
 
     public MerchantStatisticsHandler(QueryProcessor<StatRequest, StatResponse> queryProcessor) {
         this.queryProcessor = queryProcessor;
@@ -23,6 +23,11 @@ public class MerchantStatisticsHandler implements StatisticsServletIface {
 
     @Override
     public StatResponse getPayments(StatRequest statRequest) throws TException {
+        return getStatResponse(statRequest);
+    }
+
+    @Override
+    public StatResponse getRefunds(StatRequest statRequest) throws TException {
         return getStatResponse(statRequest);
     }
 

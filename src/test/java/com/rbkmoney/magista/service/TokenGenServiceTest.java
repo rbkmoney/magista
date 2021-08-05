@@ -3,14 +3,11 @@ package com.rbkmoney.magista.service;
 import com.rbkmoney.magista.config.properties.TokenGenProperties;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.QueryParameters;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -19,9 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @EnableConfigurationProperties
 @ContextConfiguration(classes = {TokenGenProperties.class, TokenGenService.class})
@@ -37,7 +33,7 @@ public class TokenGenServiceTest {
         final QueryParameters queryParameters = new QueryParameters(parameters, null);
 
         final String token = tokenGenService.generateToken(queryParameters, LocalDateTime.now());
-        Assert.assertTrue(tokenGenService.validToken(queryParameters, token));
+        assertTrue(tokenGenService.validToken(queryParameters, token));
     }
 
     @Test
@@ -48,7 +44,7 @@ public class TokenGenServiceTest {
         final QueryParameters queryParameters = new QueryParameters(parameters, null);
 
         final String token = tokenGenService.generateToken(queryParameters, LocalDateTime.now());
-        Assert.assertTrue(
+        assertTrue(
                 tokenGenService.validToken(queryParameters, URLDecoder.decode(token, StandardCharsets.UTF_8)));
     }
 
@@ -66,7 +62,7 @@ public class TokenGenServiceTest {
                 .generateToken(new QueryParameters(parameters, new QueryParameters(derivedParameters, null)),
                         LocalDateTime.now());
 
-        Assert.assertFalse(tokenGenService.validToken(queryParameters, secondToken));
+        assertFalse(tokenGenService.validToken(queryParameters, secondToken));
     }
 
     @Test
@@ -78,7 +74,7 @@ public class TokenGenServiceTest {
         final LocalDateTime nowDateTime = LocalDateTime.now();
         final String token = tokenGenService.generateToken(queryParameters, nowDateTime);
         final Optional<LocalDateTime> tokenDateOptional = tokenGenService.extractTime(token);
-        Assert.assertTrue(tokenDateOptional.isPresent());
+        assertTrue(tokenDateOptional.isPresent());
         final String token2 = tokenGenService.generateToken(queryParameters, tokenDateOptional.get());
         assertEquals(token, token2);
     }
@@ -93,11 +89,11 @@ public class TokenGenServiceTest {
                 new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
         final boolean validToken = tokenGenService
                 .validToken(queryParameters, "mH6CM2lOiArjXgVjEdKvQdQ0FpSF_AtmOXTkuoG5bZw;2019-08-07T16:26:39.611932Z");
-        Assert.assertTrue(validToken);
+        assertTrue(validToken);
 
     }
 
-    @Test(expected = BadTokenException.class)
+    @Test
     public void invalidTokenTest() {
         final Map<String, Object> parameters = new HashMap<>();
         parameters.put("test", 64);
@@ -105,7 +101,9 @@ public class TokenGenServiceTest {
         derivedParameters.put("test_2", 64);
         final QueryParameters queryParameters =
                 new QueryParameters(parameters, new QueryParameters(derivedParameters, null));
-        tokenGenService.validToken(queryParameters, "2019-08-07T16:26:39.611932Z");
+        assertThrows(
+                BadTokenException.class,
+                () -> tokenGenService.validToken(queryParameters, "2019-08-07T16:26:39.611932Z"));
     }
 
     @Test

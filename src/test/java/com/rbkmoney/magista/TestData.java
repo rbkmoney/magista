@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.util.ArrayList;
 
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.random;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TestData {
 
@@ -29,7 +31,7 @@ public class TestData {
     }
 
     public static InvoicePaymentChargeback buildChargebackCreate() {
-        InvoicePaymentChargeback invoicePaymentChargeback = EnhancedRandom.random(
+        InvoicePaymentChargeback invoicePaymentChargeback = random(
                 InvoicePaymentChargeback.class, "status", "reason", "stage", "created_at", "context");
         invoicePaymentChargeback
                 .setStatus(InvoicePaymentChargebackStatus.accepted(new InvoicePaymentChargebackAccepted()));

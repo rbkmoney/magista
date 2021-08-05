@@ -7,7 +7,6 @@ import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-
 import java.util.Optional;
 
 import static com.rbkmoney.magista.domain.tables.PayoutData.PAYOUT_DATA;

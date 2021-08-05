@@ -1,32 +1,27 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.magista.dao.AbstractDaoTest;
+import com.rbkmoney.magista.config.PostgresqlSpringBootITest;
 import com.rbkmoney.magista.dao.AllocationDao;
-import com.rbkmoney.magista.dao.impl.AllocationDaoImpl;
 import com.rbkmoney.magista.domain.tables.pojos.AllocationTransactionData;
 import io.github.benas.randombeans.EnhancedRandomBuilder;
 import io.github.benas.randombeans.api.EnhancedRandom;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ContextConfiguration(classes = {AllocationService.class, AllocationDaoImpl.class})
-public class AllocationServiceTest extends AbstractDaoTest {
-
-    @Autowired
-    public AllocationService allocationService;
-
-    @Autowired
-    public AllocationDao allocationDao;
+@PostgresqlSpringBootITest
+public class AllocationServiceTest {
 
     private final EnhancedRandom enhancedRandom = EnhancedRandomBuilder.aNewEnhancedRandom();
+    @Autowired
+    public AllocationService allocationService;
+    @Autowired
+    public AllocationDao allocationDao;
 
     @Test
     public void saveAllocations() {
@@ -68,8 +63,8 @@ public class AllocationServiceTest extends AbstractDaoTest {
 
         // Then
         List<AllocationTransactionData> foundedAllocationTrx = allocationDao.get(invoiceId);
-        Assert.assertEquals(1, foundedAllocationTrx.size());
-        Assert.assertEquals(modifiedAllocationTransaction, foundedAllocationTrx.get(0));
+        assertEquals(1, foundedAllocationTrx.size());
+        assertEquals(modifiedAllocationTransaction, foundedAllocationTrx.get(0));
     }
 
     @Test
@@ -85,7 +80,7 @@ public class AllocationServiceTest extends AbstractDaoTest {
         for (AllocationTransactionData allocationTransaction : allocationTransactions) {
             AllocationTransactionData allocation = allocationService
                     .getAllocation(allocationTransaction.getInvoiceId(), allocationTransaction.getAllocationId());
-            Assert.assertEquals(allocationTransaction, allocation);
+            assertEquals(allocationTransaction, allocation);
         }
     }
 

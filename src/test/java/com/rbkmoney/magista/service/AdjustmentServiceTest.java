@@ -1,38 +1,25 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.magista.config.CacheConfig;
-import com.rbkmoney.magista.dao.AbstractDaoTest;
-import com.rbkmoney.magista.dao.impl.AdjustmentDaoImpl;
-import com.rbkmoney.magista.dao.impl.InvoiceDaoImpl;
-import com.rbkmoney.magista.dao.impl.PaymentDaoImpl;
+import com.rbkmoney.magista.config.PostgresqlSpringBootITest;
 import com.rbkmoney.magista.domain.enums.AdjustmentStatus;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.tables.pojos.AdjustmentData;
 import com.rbkmoney.magista.domain.tables.pojos.InvoiceData;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static io.github.benas.randombeans.api.EnhancedRandom.randomStreamOf;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.random;
+import static com.rbkmoney.testcontainers.annotations.util.RandomBeans.randomStreamOf;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ContextConfiguration(classes = {
-        PaymentAdjustmentService.class,
-        AdjustmentDaoImpl.class,
-        PaymentService.class,
-        PaymentDaoImpl.class,
-        InvoiceService.class,
-        InvoiceDaoImpl.class,
-        CacheConfig.class
-})
-public class AdjustmentServiceTest extends AbstractDaoTest {
+@PostgresqlSpringBootITest
+public class AdjustmentServiceTest {
 
     @Autowired
     public PaymentAdjustmentService paymentAdjustmentService;
@@ -85,7 +72,7 @@ public class AdjustmentServiceTest extends AbstractDaoTest {
 
         PaymentData savedPaymentData =
                 paymentService.getPaymentData(paymentData.getInvoiceId(), paymentData.getPaymentId());
-        Assert.assertEquals(adjustmentData.getPaymentStatus(), savedPaymentData.getPaymentStatus());
+        assertEquals(adjustmentData.getPaymentStatus(), savedPaymentData.getPaymentStatus());
     }
 
     @Test
@@ -109,7 +96,6 @@ public class AdjustmentServiceTest extends AbstractDaoTest {
 
         PaymentData savedPaymentData =
                 paymentService.getPaymentData(paymentData.getInvoiceId(), paymentData.getPaymentId());
-        Assert.assertEquals(paymentData.getPaymentStatus(), savedPaymentData.getPaymentStatus());
+        assertEquals(paymentData.getPaymentStatus(), savedPaymentData.getPaymentStatus());
     }
-
 }

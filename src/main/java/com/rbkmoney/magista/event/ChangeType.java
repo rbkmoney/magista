@@ -65,7 +65,10 @@ public enum ChangeType {
             "invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_created.refund.allocation",
             new IsNullCondition().not()),
     PAYOUT_CREATED("payout_created", new IsNullCondition().not()),
-    PAYOUT_STATUS_CHANGED("payout_status_changed", new IsNullCondition().not());
+    PAYOUT_STATUS_CHANGED("payout_status_changed", new IsNullCondition().not()),
+    INVOICE_TEMPLATE_CREATED("invoice_template_created", new IsNullCondition().not()),
+    INVOICE_TEMPLATE_UPDATED("invoice_template_updated", new IsNullCondition().not()),
+    INVOICE_TEMPLATE_DELETED("invoice_template_deleted", new IsNullCondition().not());
 
     Filter filter;
 

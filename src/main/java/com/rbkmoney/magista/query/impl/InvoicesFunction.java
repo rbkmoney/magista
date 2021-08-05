@@ -154,7 +154,7 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
     }
 
     public static class InvoicesParser extends AbstractQueryParser {
-        private InvoicesValidator validator = new InvoicesValidator();
+        private final InvoicesValidator validator = new InvoicesValidator();
 
         public static String getMainDescriptor() {
             return FUNC_NAME;
@@ -181,7 +181,7 @@ public class InvoicesFunction extends PagedBaseFunction<Map.Entry<Long, StatInvo
     }
 
     public static class InvoicesBuilder extends AbstractQueryBuilder {
-        private InvoicesValidator validator = new InvoicesValidator();
+        private final InvoicesValidator validator = new InvoicesValidator();
 
         @Override
         public Query buildQuery(QueryContext queryContext, List<QueryPart> queryParts, String continuationToken,

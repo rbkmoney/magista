@@ -168,7 +168,7 @@ public class ChargebacksFunction
     }
 
     public static class ChargebacksParser extends AbstractQueryParser {
-        private ChargebacksValidator validator = new ChargebacksValidator();
+        private final ChargebacksValidator validator = new ChargebacksValidator();
 
         public static String getMainDescriptor() {
             return FUNC_NAME;
@@ -194,7 +194,7 @@ public class ChargebacksFunction
     }
 
     public static class ChargebacksBuilder extends AbstractQueryBuilder {
-        private ChargebacksValidator validator = new ChargebacksValidator();
+        private final ChargebacksValidator validator = new ChargebacksValidator();
 
         @Override
         public Query buildQuery(QueryContext queryContext,

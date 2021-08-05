@@ -6,7 +6,6 @@ import org.apache.tomcat.util.codec.binary.Base64;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 
