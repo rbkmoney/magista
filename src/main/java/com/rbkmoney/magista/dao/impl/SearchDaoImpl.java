@@ -1,13 +1,10 @@
 package com.rbkmoney.magista.dao.impl;
 
 import com.rbkmoney.damsel.merch_stat.*;
-import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.*;
-import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
-import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.query.impl.*;
 import org.jooq.*;
@@ -61,7 +58,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         Condition condition = appendDateTimeRangeConditions(
                 appendConditions(DSL.trueCondition(), Operator.AND,
                         new ConditionParameterSource()
-                                .addValue(INVOICE_DATA.PARTY_ID,
+                                .addValue(
+                                        INVOICE_DATA.PARTY_ID,
                                         Optional.ofNullable(parameters.getMerchantId())
                                                 .map(UUID::fromString)
                                                 .orElse(null),
@@ -72,11 +70,11 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                 .addInConditionValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceIds())
                                 .addValue(INVOICE_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS)
                                 .addValue(INVOICE_DATA.INVOICE_CREATED_AT, whereTime, LESS)
-                                .addValue(INVOICE_DATA.INVOICE_STATUS,
+                                .addValue(
+                                        INVOICE_DATA.INVOICE_STATUS,
                                         toEnumField(
                                                 parameters.getInvoiceStatus(),
-                                                com.rbkmoney.magista.domain.enums.InvoiceStatus.class
-                                        ),
+                                                com.rbkmoney.magista.domain.enums.InvoiceStatus.class),
                                         EQUALS)
                                 .addValue(INVOICE_DATA.INVOICE_AMOUNT, parameters.getInvoiceAmount(), EQUALS)),
                 INVOICE_DATA.INVOICE_CREATED_AT,
@@ -84,65 +82,21 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 toTime
         );
 
-        ConditionParameterSource paymentParameterSource = new ConditionParameterSource()
-                .addValue(PAYMENT_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_FLOW,
-                        TypeUtil.toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
-                        EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6, parameters.getPaymentBankCardFirst6(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4, parameters.getPaymentBankCardLast4(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_STATUS,
-                        TypeUtil.toEnumField(parameters.getPaymentStatus(), InvoicePaymentStatus.class),
-                        EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(),
-                        GREATER_OR_EQUAL)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
-                .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS)
-                .addValue(PAYMENT_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS);
-        if (!ObjectUtils.isEmpty(parameters.getPaymentBankCardTokenProvider())) {
-            paymentParameterSource.addOrCondition(
-                    PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER
-                            .eq(parameters.getPaymentBankCardTokenProvider()),
-                    PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER_LEGACY.eq(
-                            toEnumField(parameters.getPaymentBankCardTokenProvider(),
-                                    com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class)));
-        }
+        ConditionParameterSource paymentParameterSource = preparePaymentsCondition(parameters);
         if (!paymentParameterSource.getConditionFields().isEmpty()
                 || !paymentParameterSource.getOrConditions().isEmpty()) {
-            condition = condition.and(
-                    DSL.exists(
-                            getDslContext().select(DSL.field("1")).from(PAYMENT_DATA)
-                                    .where(
-                                            appendDateTimeRangeConditions(
-                                                    appendConditions(
-                                                            INVOICE_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID),
-                                                            Operator.AND,
-                                                            paymentParameterSource
-                                                                    .addValue(PAYMENT_DATA.PARTY_ID,
-                                                                            Optional.ofNullable(
-                                                                                    parameters.getMerchantId())
-                                                                                    .map(UUID::fromString)
-                                                                                    .orElse(null),
-                                                                            EQUALS)
-                                                                    .addValue(PAYMENT_DATA.PARTY_SHOP_ID,
-                                                                            parameters.getShopId(), EQUALS)
-                                                    ),
-                                                    PAYMENT_DATA.PAYMENT_CREATED_AT,
-                                                    fromTime,
-                                                    toTime
-                                            )
-                                    )
-                    )
-            );
+            condition = condition.and(DSL.exists(getDslContext()
+                    .select(DSL.field("1"))
+                    .from(PAYMENT_DATA)
+                    .where(
+                            appendDateTimeRangeConditions(
+                                    appendConditions(
+                                            INVOICE_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID),
+                                            Operator.AND,
+                                            paymentParameterSource),
+                                    PAYMENT_DATA.PAYMENT_CREATED_AT,
+                                    fromTime,
+                                    toTime))));
         }
 
         Query query = getDslContext()
@@ -161,7 +115,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
             LocalDateTime whereTime,
             int limit
     ) {
-        ConditionParameterSource conditionParameterSource = preparePaymentsCondition(parameters, whereTime);
+        ConditionParameterSource conditionParameterSource = preparePaymentsCondition(parameters)
+                .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime, LESS);
 
         SelectConditionStep<Record> conditionStep = getDslContext()
                 .select()
@@ -274,6 +229,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                     break;
                 case "wallet_info":
                 case "payment_institution_account":
+                case "russian_bank_account":
+                case "international_bank_account":
                     conditionParameterSource.addValue(PAYOUT.PAYOUT_TOOL_TYPE,
                             toEnumField(parameters.getPayoutType(), PayoutToolType.class),
                             EQUALS);
@@ -304,6 +261,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                                 .addInConditionValue(CHARGEBACK_DATA.PARTY_SHOP_ID,
                                                         parameters.getShopIds())
                                                 .addValue(CHARGEBACK_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                                                .addInConditionValue(CHARGEBACK_DATA.INVOICE_ID, parameters.getInvoiceIds())
                                                 .addValue(CHARGEBACK_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
                                                 .addValue(CHARGEBACK_DATA.CHARGEBACK_ID, parameters.getChargebackId(),
                                                         EQUALS)
@@ -399,8 +357,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         return fetch(query, enrichedStatInvoiceMapper);
     }
 
-    private ConditionParameterSource preparePaymentsCondition(PaymentsFunction.PaymentsParameters parameters,
-                                                              LocalDateTime whereTime) {
+    private ConditionParameterSource preparePaymentsCondition(PaymentsFunction.PaymentsParameters parameters) {
         ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
                 .addValue(
                         PAYMENT_DATA.PARTY_ID,
@@ -437,7 +394,6 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(),
                         GREATER_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
-                .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime, LESS)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmountFrom(), GREATER_OR_EQUAL)
