@@ -133,6 +133,10 @@ public class ChargebacksFunction
             return getStringParameter(INVOICE_ID_PARAM, false);
         }
 
+        public List<String> getInvoiceIds() {
+            return getArrayParameter(INVOICE_IDS_PARAM, false);
+        }
+
         public String getPaymentId() {
             return getStringParameter(PAYMENT_ID_PARAM, false);
         }
