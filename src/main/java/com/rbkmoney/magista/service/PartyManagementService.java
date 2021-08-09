@@ -1,17 +1,13 @@
 package com.rbkmoney.magista.service;
 
-import com.rbkmoney.damsel.domain.Contract;
-import com.rbkmoney.damsel.domain.PayoutTool;
-import com.rbkmoney.damsel.domain.PayoutToolInfo;
-import com.rbkmoney.damsel.domain.Shop;
-import com.rbkmoney.damsel.payment_processing.InternalUser;
-import com.rbkmoney.damsel.payment_processing.PartyManagementSrv;
-import com.rbkmoney.damsel.payment_processing.UserInfo;
-import com.rbkmoney.damsel.payment_processing.UserType;
+import com.rbkmoney.damsel.domain.*;
+import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.magista.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,12 +20,30 @@ public class PartyManagementService {
     public PayoutToolInfo getPayoutToolInfo(String partyId, String shopId, String payoutToolId) {
         Shop shop = partyManagementClient.getShop(userInfo, partyId, shopId);
         Contract contract = partyManagementClient.getContract(userInfo, partyId, shop.getContractId());
+        return extractPayoutToolInfo(payoutToolId, contract)
+                .orElseGet(() -> getDeepPayoutToolInfo(partyId, shopId, payoutToolId));
+    }
+
+    private Optional<PayoutToolInfo> extractPayoutToolInfo(String payoutToolId, Contract contract) {
         return contract.getPayoutTools().stream()
                 .filter(pt -> payoutToolId.equals(pt.getId()))
                 .findAny()
-                .map(PayoutTool::getPayoutToolInfo)
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("PayoutToolInfo not found for partyId=%s, shopId=%s, payoutToolId=%s",
-                                partyId, shopId, payoutToolId)));
+                .map(PayoutTool::getPayoutToolInfo);
+    }
+
+    @SneakyThrows
+    private PayoutToolInfo getDeepPayoutToolInfo(String partyId, String shopId, String payoutToolId) {
+        long currentRevision = partyManagementClient.getRevision(userInfo, partyId);
+        for (long revision = currentRevision - 1; revision >= 0; --revision) {
+            Party party = partyManagementClient.checkout(userInfo, partyId, PartyRevisionParam.revision(revision));
+            Shop shop = party.getShops().get(shopId);
+            Contract contract = party.getContracts().get(shop.getContractId());
+            Optional<PayoutToolInfo> payoutToolInfo = extractPayoutToolInfo(payoutToolId, contract);
+            if (payoutToolInfo.isPresent()) {
+                return payoutToolInfo.get();
+            }
+        }
+        throw new NotFoundException(String.format("PayoutToolInfo not found for partyId=%s, shopId=%s, payoutToolId=%s",
+                partyId, shopId, payoutToolId));
     }
 }

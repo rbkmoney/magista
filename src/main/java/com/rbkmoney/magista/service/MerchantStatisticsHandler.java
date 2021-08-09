@@ -27,6 +27,11 @@ public class MerchantStatisticsHandler implements StatisticsServletIface {
     }
 
     @Override
+    public StatResponse getRefunds(StatRequest statRequest) throws TException {
+        return getStatResponse(statRequest);
+    }
+
+    @Override
     public StatResponse getInvoices(StatRequest statRequest) throws TException {
         return getStatResponse(statRequest);
     }
