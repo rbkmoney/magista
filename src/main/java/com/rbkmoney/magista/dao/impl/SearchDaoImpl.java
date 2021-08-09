@@ -261,7 +261,9 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                                 .addInConditionValue(CHARGEBACK_DATA.PARTY_SHOP_ID,
                                                         parameters.getShopIds())
                                                 .addValue(CHARGEBACK_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                                                .addInConditionValue(CHARGEBACK_DATA.INVOICE_ID, parameters.getInvoiceIds())
+                                                .addInConditionValue(
+                                                        CHARGEBACK_DATA.INVOICE_ID,
+                                                        parameters.getInvoiceIds())
                                                 .addValue(CHARGEBACK_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
                                                 .addValue(CHARGEBACK_DATA.CHARGEBACK_ID, parameters.getChargebackId(),
                                                         EQUALS)
