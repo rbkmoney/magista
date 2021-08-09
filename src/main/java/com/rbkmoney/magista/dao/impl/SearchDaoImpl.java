@@ -182,6 +182,12 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .collect(Collectors.groupingBy(
                         Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
                 ));
+        return enrichInvoices(allocationGroupedByInvoice, statInvoices);
+    }
+
+    private List<Map.Entry<Long, StatInvoice>> enrichInvoices(
+            Map<String, Set<AllocationTransaction>> allocationGroupedByInvoice,
+            List<Map.Entry<Long, StatInvoice>> statInvoices) {
         return statInvoices.stream().map(entry -> {
             StatInvoice statInvoice = new StatInvoice(entry.getValue());
 
@@ -249,6 +255,12 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .collect(Collectors.groupingBy(
                         Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
                 ));
+        return enrichPayments(allocationGroupedByPayment, statPayments);
+    }
+
+    private List<Map.Entry<Long, StatPayment>> enrichPayments(
+            Map<String, Set<AllocationTransaction>> allocationGroupedByPayment,
+            List<Map.Entry<Long, StatPayment>> statPayments) {
         return statPayments.stream().map(entry -> {
             StatPayment statPayment = new StatPayment(entry.getValue());
 
@@ -318,7 +330,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         toEnumField(parameters.getRefundStatus(), RefundStatus.class),
                         EQUALS);
     }
-    
+
     private List<Map.Entry<Long, StatRefund>> fillAllocationTransactionsToRefunds(
             List<Map.Entry<String, AllocationTransaction>> allocationTransactions,
             List<Map.Entry<Long, StatRefund>> statRefunds
@@ -327,6 +339,12 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .collect(Collectors.groupingBy(
                         Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
                 ));
+        return enrichRefunds(allocationGroupedByRefund, statRefunds);
+    }
+
+    private List<Map.Entry<Long, StatRefund>> enrichRefunds(
+            Map<String, Set<AllocationTransaction>> allocationGroupedByRefund,
+            List<Map.Entry<Long, StatRefund>> statRefunds) {
         return statRefunds.stream().map(entry -> {
             StatRefund statRefund = new StatRefund(entry.getValue());
 
