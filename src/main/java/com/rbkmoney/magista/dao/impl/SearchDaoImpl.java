@@ -160,7 +160,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         List<Map.Entry<Long, StatInvoice>> statInvoices = fetch(invoiceQuery, statInvoiceMapper);
 
         List<String> invoiceIds = statInvoices.stream()
-                .map(longStatInvoiceEntry -> longStatInvoiceEntry.getValue().getId()).collect(Collectors.toList());
+                .map(longStatInvoiceEntry -> longStatInvoiceEntry.getValue().getId())
+                .collect(Collectors.toList());
         Query allocationQuery = getDslContext().selectFrom(ALLOCATION_TRANSACTION_DATA)
                 .where(ALLOCATION_TRANSACTION_DATA.INVOICE_ID.in(invoiceIds));
         List<Map.Entry<String, AllocationTransaction>>
@@ -225,7 +226,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
 
         List<Map.Entry<Long, StatPayment>> statPayments = fetch(query, statPaymentMapper);
         List<String> paymentIds = statPayments.stream()
-                .map(longStatPaymentEntry -> longStatPaymentEntry.getValue().getId()).collect(Collectors.toList());
+                .map(longStatPaymentEntry -> longStatPaymentEntry.getValue().getId())
+                .collect(Collectors.toList());
 
         Query allocationQuery = getDslContext().selectFrom(ALLOCATION_TRANSACTION_DATA)
                 .where(ALLOCATION_TRANSACTION_DATA.PAYMENT_ID.in(paymentIds));
@@ -285,7 +287,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
 
         List<Map.Entry<Long, StatRefund>> statRefunds = fetch(query, statRefundMapper);
         List<String> refundIds = statRefunds.stream()
-                .map(longStatRefundEntry -> longStatRefundEntry.getValue().getId()).collect(Collectors.toList());
+                .map(longStatRefundEntry -> longStatRefundEntry.getValue().getId())
+                .collect(Collectors.toList());
 
         Query allocationQuery = getDslContext().selectFrom(ALLOCATION_TRANSACTION_DATA)
                 .where(ALLOCATION_TRANSACTION_DATA.REFUND_ID.in(refundIds));
