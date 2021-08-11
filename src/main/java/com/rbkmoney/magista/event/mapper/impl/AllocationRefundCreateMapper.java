@@ -25,13 +25,15 @@ public class AllocationRefundCreateMapper extends BaseAllocationMapper {
         InvoicePaymentRefundCreated invoicePaymentRefundCreated =
                 invoicePaymentStatusChanged.getPayload().getInvoicePaymentRefundCreated();
         Allocation allocation = invoicePaymentRefundCreated.getRefund().getAllocation();
+        String refundId = invoicePaymentStatusChanged.getId();
 
         return allocation.getTransactions().stream()
                 .map(allocationTransaction ->
                         mapAllocationTransaction(
                                 machineEvent,
                                 InvoiceEventType.INVOICE_PAYMENT_REFUND_CREATED,
-                                allocationTransaction
+                                allocationTransaction,
+                                refundId
                         ))
                 .collect(Collectors.toList());
     }

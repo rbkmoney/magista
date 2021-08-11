@@ -9,10 +9,8 @@ import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.*;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
-import com.rbkmoney.magista.domain.enums.PayoutType;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.query.impl.*;
-import lombok.val;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
@@ -162,7 +160,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         List<Map.Entry<Long, StatInvoice>> statInvoices = fetch(invoiceQuery, statInvoiceMapper);
 
         List<String> invoiceIds = statInvoices.stream()
-                .map(longStatInvoiceEntry -> longStatInvoiceEntry.getValue().getId()).collect(Collectors.toList());
+                .map(longStatInvoiceEntry -> longStatInvoiceEntry.getValue().getId())
+                .collect(Collectors.toList());
         Query allocationQuery = getDslContext().selectFrom(ALLOCATION_TRANSACTION_DATA)
                 .where(ALLOCATION_TRANSACTION_DATA.INVOICE_ID.in(invoiceIds));
         List<Map.Entry<String, AllocationTransaction>>
@@ -183,6 +182,12 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .collect(Collectors.groupingBy(
                         Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
                 ));
+        return enrichInvoices(allocationGroupedByInvoice, statInvoices);
+    }
+
+    private List<Map.Entry<Long, StatInvoice>> enrichInvoices(
+            Map<String, Set<AllocationTransaction>> allocationGroupedByInvoice,
+            List<Map.Entry<Long, StatInvoice>> statInvoices) {
         return statInvoices.stream().map(entry -> {
             StatInvoice statInvoice = new StatInvoice(entry.getValue());
 
@@ -225,7 +230,49 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         Query query = conditionStep.orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
                 .limit(limit);
 
-        return fetch(query, statPaymentMapper);
+        List<Map.Entry<Long, StatPayment>> statPayments = fetch(query, statPaymentMapper);
+        List<String> paymentIds = statPayments.stream()
+                .map(longStatPaymentEntry -> longStatPaymentEntry.getValue().getId())
+                .collect(Collectors.toList());
+
+        Query allocationQuery = getDslContext().selectFrom(ALLOCATION_TRANSACTION_DATA)
+                .where(ALLOCATION_TRANSACTION_DATA.PAYMENT_ID.in(paymentIds));
+        List<Map.Entry<String, AllocationTransaction>>
+                allocationTransactions = fetch(allocationQuery, allocationDataRowMapper);
+
+        if (!allocationTransactions.isEmpty()) {
+            statPayments = fillAllocationTransactionsToPayments(allocationTransactions, statPayments);
+        }
+
+        return statPayments;
+    }
+
+    private List<Map.Entry<Long, StatPayment>> fillAllocationTransactionsToPayments(
+            List<Map.Entry<String, AllocationTransaction>> allocationTransactions,
+            List<Map.Entry<Long, StatPayment>> statPayments
+    ) {
+        Map<String, Set<AllocationTransaction>> allocationGroupedByPayment = allocationTransactions.stream()
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
+                ));
+        return enrichPayments(allocationGroupedByPayment, statPayments);
+    }
+
+    private List<Map.Entry<Long, StatPayment>> enrichPayments(
+            Map<String, Set<AllocationTransaction>> allocationGroupedByPayment,
+            List<Map.Entry<Long, StatPayment>> statPayments) {
+        return statPayments.stream().map(entry -> {
+            StatPayment statPayment = new StatPayment(entry.getValue());
+
+            Set<AllocationTransaction> allocationTransactionSet = allocationGroupedByPayment.get(
+                    entry.getValue().getId()
+            );
+            if (!CollectionUtils.isEmpty(allocationTransactionSet)) {
+                statPayment.setAllocation(new Allocation(new ArrayList<>(allocationTransactionSet)));
+            }
+
+            return new AbstractMap.SimpleEntry<>(entry.getKey(), statPayment);
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -249,7 +296,22 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 )
                 .orderBy(REFUND_DATA.REFUND_CREATED_AT.desc())
                 .limit(limit);
-        return fetch(query, statRefundMapper);
+
+        List<Map.Entry<Long, StatRefund>> statRefunds = fetch(query, statRefundMapper);
+        List<String> refundIds = statRefunds.stream()
+                .map(longStatRefundEntry -> longStatRefundEntry.getValue().getId())
+                .collect(Collectors.toList());
+
+        Query allocationQuery = getDslContext().selectFrom(ALLOCATION_TRANSACTION_DATA)
+                .where(ALLOCATION_TRANSACTION_DATA.REFUND_ID.in(refundIds));
+        List<Map.Entry<String, AllocationTransaction>>
+                allocationTransactions = fetch(allocationQuery, allocationDataRowMapper);
+
+        if (!allocationTransactions.isEmpty()) {
+            statRefunds = fillAllocationTransactionsToRefunds(allocationTransactions, statRefunds);
+        }
+
+        return statRefunds;
     }
 
     private ConditionParameterSource prepareRefundCondition(RefundsFunction.RefundsParameters parameters,
@@ -267,6 +329,34 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(REFUND_DATA.REFUND_STATUS,
                         toEnumField(parameters.getRefundStatus(), RefundStatus.class),
                         EQUALS);
+    }
+
+    private List<Map.Entry<Long, StatRefund>> fillAllocationTransactionsToRefunds(
+            List<Map.Entry<String, AllocationTransaction>> allocationTransactions,
+            List<Map.Entry<Long, StatRefund>> statRefunds
+    ) {
+        Map<String, Set<AllocationTransaction>> allocationGroupedByRefund = allocationTransactions.stream()
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toSet())
+                ));
+        return enrichRefunds(allocationGroupedByRefund, statRefunds);
+    }
+
+    private List<Map.Entry<Long, StatRefund>> enrichRefunds(
+            Map<String, Set<AllocationTransaction>> allocationGroupedByRefund,
+            List<Map.Entry<Long, StatRefund>> statRefunds) {
+        return statRefunds.stream().map(entry -> {
+            StatRefund statRefund = new StatRefund(entry.getValue());
+
+            Set<AllocationTransaction> allocationTransactionSet = allocationGroupedByRefund.get(
+                    entry.getValue().getId()
+            );
+            if (!CollectionUtils.isEmpty(allocationTransactionSet)) {
+                statRefund.setAllocation(new Allocation(new ArrayList<>(allocationTransactionSet)));
+            }
+
+            return new AbstractMap.SimpleEntry<>(entry.getKey(), statRefund);
+        }).collect(Collectors.toList());
     }
 
     @Override

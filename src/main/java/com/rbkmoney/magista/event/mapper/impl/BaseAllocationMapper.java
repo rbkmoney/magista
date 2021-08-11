@@ -15,13 +15,25 @@ public abstract class BaseAllocationMapper implements AllocationMapper {
     protected AllocationTransactionData mapAllocationTransaction(
             MachineEvent machineEvent,
             InvoiceEventType eventType,
-            AllocationTransaction allocationTransaction
+            AllocationTransaction allocationTransaction,
+            String externalId
     ) {
         AllocationTransactionData allocationData = new AllocationTransactionData();
         allocationData.setEventId(machineEvent.getEventId());
         allocationData.setEventCreatedAt(TypeUtil.stringToLocalDateTime(machineEvent.getCreatedAt()));
         allocationData.setEventType(eventType);
         allocationData.setInvoiceId(machineEvent.getSourceId());
+        switch (eventType) {
+            case INVOICE_PAYMENT_STATUS_CHANGED:
+                allocationData.setPaymentId(externalId);
+                break;
+            case INVOICE_PAYMENT_REFUND_CREATED:
+                allocationData.setRefundId(externalId);
+                break;
+            default:
+                //no need to set any field
+                break;
+        }
         allocationData.setAllocationId(allocationTransaction.getId());
         if (allocationTransaction.getTarget().isSetShop()) {
             allocationData.setTargetOwnerId(allocationTransaction.getTarget().getShop().getOwnerId());

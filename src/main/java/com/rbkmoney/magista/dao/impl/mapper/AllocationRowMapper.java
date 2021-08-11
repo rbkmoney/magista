@@ -91,7 +91,7 @@ public class AllocationRowMapper implements RowMapper<Map.Entry<String, Allocati
                 )
         );
         String feeRoundingMethod = rs.getString(ALLOCATION_TRANSACTION_DATA.FEE_ROUNDING_METHOD.getName());
-        if (!StringUtils.isEmpty(feeRoundingMethod)) {
+        if (StringUtils.hasLength(feeRoundingMethod)) {
             allocationTransactionFee.setRoundingMethod(TypeUtil.toEnumField(feeRoundingMethod, RoundingMethod.class));
         }
 

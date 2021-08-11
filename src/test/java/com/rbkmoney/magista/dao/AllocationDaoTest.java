@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PostgresqlSpringBootITest
 public class AllocationDaoTest {
@@ -50,8 +50,8 @@ public class AllocationDaoTest {
         List<AllocationTransactionData> foundedAllocationTransactions = allocationDao.get("testInvoiceId");
 
         // Then
-        assertEquals("Allocation count not equals", allocationTransactions.size(),
-                foundedAllocationTransactions.size());
+        assertEquals(allocationTransactions.size(),
+                foundedAllocationTransactions.size(), "Allocation count not equals");
         for (AllocationTransactionData allocationTransaction : allocationTransactions) {
             AllocationTransactionData foundedAllocationTrx = foundedAllocationTransactions.stream()
                     .filter(allocationTransactionData -> allocationTransactionData.getAllocationId()
