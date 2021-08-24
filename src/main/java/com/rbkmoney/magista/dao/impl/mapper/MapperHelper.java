@@ -279,7 +279,7 @@ public class MapperHelper {
                 com.rbkmoney.magista.domain.enums.PayoutToolType.class);
         switch (payoutType) {
             case russian_bank_account:
-                return PayoutToolInfo.russian_bank_account(new RussianBankAccount()
+                return PayoutToolInfo.russian_bank_account(new com.rbkmoney.damsel.domain.RussianBankAccount()
                         .setAccount(rs.getString(PAYOUT.PAYOUT_TOOL_RUSSIAN_BANK_ACCOUNT_ACCOUNT.getName()))
                         .setBankName(rs.getString(PAYOUT.PAYOUT_TOOL_RUSSIAN_BANK_ACCOUNT_BANK_NAME.getName()))
                         .setBankBik(rs.getString(PAYOUT.PAYOUT_TOOL_RUSSIAN_BANK_ACCOUNT_BANK_BIK.getName()))
@@ -287,8 +287,9 @@ public class MapperHelper {
                                 rs.getString(PAYOUT.PAYOUT_TOOL_RUSSIAN_BANK_ACCOUNT_BANK_POST_ACCOUNT.getName()))
                 );
             case international_bank_account:
-                return PayoutToolInfo.international_bank_account(new InternationalBankAccount()
-                        .setBank(new InternationalBankDetails()
+                return PayoutToolInfo.international_bank_account(
+                        new com.rbkmoney.damsel.domain.InternationalBankAccount()
+                        .setBank(new com.rbkmoney.damsel.domain.InternationalBankDetails()
                                 .setName(rs.getString(
                                         PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_NAME.getName()))
                                 .setCountry(TypeUtil.toEnumField(
@@ -301,7 +302,7 @@ public class MapperHelper {
                                         PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_ABA_RTN.getName())))
                         .setIban(rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_IBAN.getName()))
                         .setNumber(rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_NUMBER.getName()))
-                        .setCorrespondentAccount(new InternationalBankAccount()
+                        .setCorrespondentAccount(new com.rbkmoney.damsel.domain.InternationalBankAccount()
                                 .setNumber(rs.getString(
                                         PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_CORR_ACCOUNT.getName())))
                 );
