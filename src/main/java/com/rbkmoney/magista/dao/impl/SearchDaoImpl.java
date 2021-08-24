@@ -118,7 +118,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         ConditionParameterSource conditionParameterSource = preparePaymentsCondition(parameters)
                 .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime, LESS);
 
-        SelectConditionStep<Record> conditionStep = getDslContext()
+        SelectConditionStep<org.jooq.Record> conditionStep = getDslContext()
                 .select()
                 .from(PAYMENT_DATA)
                 .where(
