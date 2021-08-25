@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.dao.impl.mapper;
 
-import com.rbkmoney.damsel.merch_stat.EnrichedStatInvoice;
+import com.rbkmoney.magista.okko.EnrichedStatInvoice;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.util.ObjectUtils;
 
@@ -40,6 +40,4 @@ public class EnrichedStatInvoiceMapper implements RowMapper<Map.Entry<Long, Enri
                                 ? List.of() : List.of(statRefundMapper.mapRow(resultSet, i).getValue())
                 ));
     }
-
-
 }

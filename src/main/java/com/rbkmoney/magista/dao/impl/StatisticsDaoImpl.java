@@ -1,5 +1,4 @@
 package com.rbkmoney.magista.dao.impl;
-
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
@@ -240,6 +239,8 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                         )
                 ).groupBy(spValField, paymentSystemField)
                 .orderBy(spValField);
+
+
 
         return fetch(query, (rs, i) -> {
             Map<String, String> map = new HashMap<>();

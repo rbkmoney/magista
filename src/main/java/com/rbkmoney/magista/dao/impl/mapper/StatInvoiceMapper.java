@@ -2,9 +2,9 @@ package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.InvoiceCart;
-import com.rbkmoney.damsel.merch_stat.InvoiceStatus;
-import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.InvoiceStatus;
+import com.rbkmoney.magista.StatInvoice;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.jdbc.core.RowMapper;
 

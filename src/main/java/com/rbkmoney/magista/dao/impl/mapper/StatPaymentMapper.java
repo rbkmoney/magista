@@ -4,10 +4,10 @@ import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.AdditionalTransactionInfo;
 import com.rbkmoney.damsel.domain.ProviderRef;
 import com.rbkmoney.damsel.domain.TerminalRef;
-import com.rbkmoney.damsel.merch_stat.InvoicePaymentStatus;
-import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.InvoicePaymentStatus;
+import com.rbkmoney.magista.StatPayment;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -83,6 +83,4 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
         statPayment.setTerminalId(new TerminalRef(rs.getInt(PAYMENT_DATA.PAYMENT_TERMINAL_ID.getName())));
         return new AbstractMap.SimpleEntry<>(rs.getLong(PAYMENT_DATA.ID.getName()), statPayment);
     }
-
-
 }

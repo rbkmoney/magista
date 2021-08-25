@@ -1,11 +1,12 @@
 package com.rbkmoney.magista.dao.impl;
 
-import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.magista.*;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.*;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.*;
+import com.rbkmoney.magista.okko.EnrichedStatInvoice;
 import com.rbkmoney.magista.query.impl.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -48,28 +49,23 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
 
     @Override
     public Collection<Map.Entry<Long, StatInvoice>> getInvoices(
-            InvoicesFunction.InvoicesParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
+            InvoiceSearchQuery invoiceSearchQuery
     ) {
 
+        CommonSearchQueryParams commonParams = invoiceSearchQuery.getCommonSearchQueryParams();
         Condition condition = appendDateTimeRangeConditions(
                 appendConditions(DSL.trueCondition(), Operator.AND,
                         new ConditionParameterSource()
                                 .addValue(
                                         INVOICE_DATA.PARTY_ID,
-                                        Optional.ofNullable(parameters.getMerchantId())
+                                        Optional.ofNullable(commonParams.getPartyId())
                                                 .map(UUID::fromString)
                                                 .orElse(null),
                                         EQUALS)
-                                .addValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                                .addInConditionValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopIds())
-                                .addValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                                .addInConditionValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceIds())
-                                .addValue(INVOICE_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS)
-                                .addValue(INVOICE_DATA.INVOICE_CREATED_AT, whereTime, LESS)
+                                .addInConditionValue(INVOICE_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
+                                .addInConditionValue(INVOICE_DATA.INVOICE_ID, invoiceSearchQuery.getInvoiceIds())
+                                .addValue(INVOICE_DATA.EXTERNAL_ID, invoiceSearchQuery.getExternalId(), EQUALS)
+                                .addValue(INVOICE_DATA.INVOICE_CREATED_AT, commonParams.get, LESS)
                                 .addValue(
                                         INVOICE_DATA.INVOICE_STATUS,
                                         toEnumField(

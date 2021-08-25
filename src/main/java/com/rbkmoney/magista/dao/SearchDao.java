@@ -1,6 +1,8 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.magista.*;
+import com.rbkmoney.magista.okko.EnrichedStatInvoice;
+import com.rbkmoney.magista.okko.StatEnrichedStatInvoiceResponse;
 import com.rbkmoney.magista.query.impl.*;
 
 import java.time.LocalDateTime;
@@ -10,11 +12,7 @@ import java.util.Map;
 public interface SearchDao {
 
     Collection<Map.Entry<Long, StatInvoice>> getInvoices(
-            InvoicesFunction.InvoicesParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
+            InvoiceSearchQuery invoiceSearchQuery
     );
 
     Collection<Map.Entry<Long, StatPayment>> getPayments(

@@ -105,7 +105,8 @@
         <!--RBK libs-->
         <dependency>
             <groupId>com.rbkmoney</groupId>
-            <artifactId>damsel</artifactId>
+            <artifactId>magista-proto</artifactId>
+            <version>1.5-a8d44f6</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.woody</groupId>
