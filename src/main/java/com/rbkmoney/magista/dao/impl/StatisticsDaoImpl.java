@@ -1,4 +1,5 @@
 package com.rbkmoney.magista.dao.impl;
+
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;

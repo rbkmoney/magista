@@ -12,15 +12,13 @@ import java.nio.ByteBuffer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.AbstractMap;
-import java.util.Map;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 
-public class StatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>> {
+public class StatInvoiceMapper implements RowMapper<StatInvoice> {
 
     @Override
-    public Map.Entry<Long, StatInvoice> mapRow(ResultSet rs, int i) throws SQLException {
+    public StatInvoice mapRow(ResultSet rs, int i) throws SQLException {
         StatInvoice statInvoice = new StatInvoice();
         statInvoice.setId(rs.getString(INVOICE_DATA.INVOICE_ID.getName()));
         statInvoice.setOwnerId(rs.getString(INVOICE_DATA.PARTY_ID.getName()));
@@ -67,7 +65,6 @@ public class StatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>
                     )
             );
         }
-        return new AbstractMap.SimpleEntry<>(rs.getLong(INVOICE_DATA.ID.getName()), statInvoice);
+        return statInvoice;
     }
-
 }

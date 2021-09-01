@@ -7,15 +7,13 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.AbstractMap;
-import java.util.Map;
 
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 
-public class StatRefundMapper implements RowMapper<Map.Entry<Long, StatRefund>> {
+public class StatRefundMapper implements RowMapper<StatRefund> {
 
     @Override
-    public Map.Entry<Long, StatRefund> mapRow(ResultSet rs, int i) throws SQLException {
+    public StatRefund mapRow(ResultSet rs, int i) throws SQLException {
         StatRefund statRefund = new StatRefund();
         statRefund.setId(rs.getString(REFUND_DATA.REFUND_ID.getName()));
         statRefund.setInvoiceId(rs.getString(REFUND_DATA.INVOICE_ID.getName()));
@@ -30,7 +28,6 @@ public class StatRefundMapper implements RowMapper<Map.Entry<Long, StatRefund>> 
         statRefund.setCreatedAt(
                 TypeUtil.temporalToString(rs.getObject(REFUND_DATA.REFUND_CREATED_AT.getName(), LocalDateTime.class)));
         statRefund.setExternalId(rs.getString(REFUND_DATA.EXTERNAL_ID.getName()));
-        return new AbstractMap.SimpleEntry<>(rs.getLong(REFUND_DATA.ID.getName()), statRefund);
+        return statRefund;
     }
-
 }

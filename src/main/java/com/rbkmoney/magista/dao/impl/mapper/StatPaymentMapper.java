@@ -15,15 +15,13 @@ import java.nio.ByteBuffer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.AbstractMap;
-import java.util.Map;
 
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 
-public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>> {
+public class StatPaymentMapper implements RowMapper<StatPayment> {
 
     @Override
-    public Map.Entry<Long, StatPayment> mapRow(ResultSet rs, int i) throws SQLException {
+    public StatPayment mapRow(ResultSet rs, int i) throws SQLException {
         StatPayment statPayment = new StatPayment();
         statPayment.setId(rs.getString(PAYMENT_DATA.PAYMENT_ID.getName()));
         statPayment.setInvoiceId(rs.getString(PAYMENT_DATA.INVOICE_ID.getName()));
@@ -81,6 +79,6 @@ public class StatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>
         }
         statPayment.setProviderId(new ProviderRef(rs.getInt(PAYMENT_DATA.PAYMENT_PROVIDER_ID.getName())));
         statPayment.setTerminalId(new TerminalRef(rs.getInt(PAYMENT_DATA.PAYMENT_TERMINAL_ID.getName())));
-        return new AbstractMap.SimpleEntry<>(rs.getLong(PAYMENT_DATA.ID.getName()), statPayment);
+        return statPayment;
     }
 }

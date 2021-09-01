@@ -7,15 +7,13 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.AbstractMap;
-import java.util.Map;
 
 import static com.rbkmoney.magista.domain.tables.Payout.PAYOUT;
 
-public class StatPayoutMapper implements RowMapper<Map.Entry<Long, StatPayout>> {
+public class StatPayoutMapper implements RowMapper<StatPayout> {
 
     @Override
-    public Map.Entry<Long, StatPayout> mapRow(ResultSet rs, int i) throws SQLException {
+    public StatPayout mapRow(ResultSet rs, int i) throws SQLException {
         StatPayout statPayout = new StatPayout();
         statPayout.setId(rs.getString(PAYOUT.PAYOUT_ID.getName()));
         statPayout.setPartyId(rs.getString(PAYOUT.PARTY_ID.getName()));
@@ -29,6 +27,6 @@ public class StatPayoutMapper implements RowMapper<Map.Entry<Long, StatPayout>> 
         );
         statPayout.setPayoutToolInfo(MapperHelper.toPayoutToolInfo(rs));
 
-        return new AbstractMap.SimpleEntry<>(rs.getLong(PAYOUT.ID.getName()), statPayout);
+        return statPayout;
     }
 }

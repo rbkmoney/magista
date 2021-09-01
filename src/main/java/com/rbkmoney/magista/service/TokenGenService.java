@@ -1,48 +1,42 @@
 package com.rbkmoney.magista.service;
 
+import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.geck.serializer.Geck;
+import com.rbkmoney.magista.*;
 import com.rbkmoney.magista.config.properties.TokenGenProperties;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.exception.TokenGeneratorException;
-import com.rbkmoney.magista.query.QueryParameters;
 import com.rbkmoney.magista.util.HmacUtil;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.thrift.TBase;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.function.Function;
+
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TokenGenService {
 
     private final TokenGenProperties tokenGenProperties;
 
-    public TokenGenService(TokenGenProperties tokenGenProperties) {
-        this.tokenGenProperties = tokenGenProperties;
+    public LocalDateTime extractTime(String token) {
+        return extractToken(token).getTimestamp();
     }
 
-    public Optional<LocalDateTime> extractTime(String token) {
-        if (token == null) {
-            return Optional.empty();
-        }
-        try {
-            final String timestamp = extractToken(token).getTimestamp();
-            return Optional.of(LocalDateTime.ofInstant(Instant.parse(timestamp), ZoneOffset.UTC));
-        } catch (Exception e) {
-            log.error("Exception while extract dateTime from: " + token, e);
-            return Optional.empty();
-        }
-    }
-
-    public String generateToken(QueryParameters queryParameters, LocalDateTime createdAt) {
-        String val = queryParamsToString(queryParameters);
+    @SneakyThrows
+    private String generateToken(TBase query, LocalDateTime createdAt) {
+        String val = Geck.toJson(query);
         try {
             String token = String.format("%s;%s",
                     HmacUtil.encode(tokenGenProperties.getKey(), val.getBytes(StandardCharsets.UTF_8)),
@@ -55,48 +49,57 @@ public class TokenGenService {
         }
     }
 
-    public boolean validToken(QueryParameters queryParameters, String validateToken) {
+
+    public <T> String generateToken(TBase query,
+                                    CommonSearchQueryParams commonParams,
+                                    List<T> objects,
+                                    Function<List<T>, T> lastElementFunction,
+                                    Function<T, String> dateTimeFunction) {
+        return generateToken(query, commonParams, objects, dateTimeFunction.compose(lastElementFunction));
+    }
+
+    public <T> String generateToken(TBase query,
+                                    CommonSearchQueryParams commonParams,
+                                    List<T> objects,
+                                    Function<List<T>, String> dateTimeFunction) {
+        if (!CollectionUtils.isEmpty(objects) && commonParams.isSetLimit()
+                && objects.size() == commonParams.getLimit()) {
+            final String createdAt = dateTimeFunction.apply(objects);
+            return generateToken(query, TypeUtil.stringToLocalDateTime(createdAt));
+        }
+        return null;
+    }
+
+    public void validateToken(TBase query, String validateToken) {
         TokenHolder validateTokenHolder = extractToken(validateToken);
-        LocalDateTime createdAt =
-                LocalDateTime.ofInstant(Instant.parse(validateTokenHolder.getTimestamp()), ZoneOffset.UTC);
-        String generatedToken = generateToken(queryParameters, createdAt);
+        LocalDateTime createdAt = validateTokenHolder.getTimestamp();
+        String generatedToken = generateToken(query, createdAt);
         TokenHolder generatedTokenHolder = extractToken(generatedToken);
-
-        return generatedTokenHolder.getToken().equals(validateTokenHolder.getToken());
-    }
-
-    private String queryParamsToString(QueryParameters queryParameters) {
-        final StringBuilder sb = new StringBuilder();
-        do {
-            String result = mapToString(queryParameters.getParametersMap());
-            sb.append(result);
-            queryParameters = queryParameters.getDerivedParameters();
-        } while (queryParameters != null);
-
-        return sb.toString();
-    }
-
-    private String mapToString(Map<String, ?> map) {
-        return map.keySet().stream()
-                .map(key -> key + "=" + map.get(key))
-                .collect(Collectors.joining(",", "{", "}"));
+        if (!generatedTokenHolder.getToken().equals(validateTokenHolder.getToken())) {
+            throw new BadTokenException("Token validation failure");
+        }
     }
 
     private TokenHolder extractToken(String token) {
+        if (token == null) {
+            return null;
+        }
         String[] tokenSplit = token.split(";");
         if (tokenSplit.length != 2) {
             throw new BadTokenException("Bad token format: " + token);
         }
-        return new TokenHolder(tokenSplit[0], tokenSplit[1]);
+        LocalDateTime timestamp = null;
+        try {
+            timestamp = TypeUtil.stringToLocalDateTime(tokenSplit[1]);
+        } catch (IllegalArgumentException e) {
+            log.error("Exception while extract dateTime from: " + token, e);
+        }
+        return new TokenHolder(tokenSplit[0], timestamp);
     }
 
     @Data
     private static final class TokenHolder {
-
         private final String token;
-
-        private final String timestamp;
-
+        private final LocalDateTime timestamp;
     }
-
 }
