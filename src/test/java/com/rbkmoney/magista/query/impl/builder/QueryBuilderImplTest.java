@@ -8,6 +8,7 @@ import com.rbkmoney.magista.query.impl.FunctionQueryContext;
 import com.rbkmoney.magista.query.impl.RootQuery;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
 import com.rbkmoney.magista.query.parser.QueryPart;
+import com.rbkmoney.magista.service.DeprecatedTokenGenService;
 import com.rbkmoney.magista.service.TokenGenService;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +33,7 @@ public class QueryBuilderImplTest {
         TokenGenProperties tokenGenPropertiesMock = mock(TokenGenProperties.class);
         when(tokenGenPropertiesMock.getKey())
                 .thenReturn("jXnZr4u7x!A%D*G-KaPvSgVkYp3s5v8t/B?E(H+MbQeThWmZq4t7w9z$C&F)J@Nc");
-        TokenGenService tokenGenService = new TokenGenService(tokenGenPropertiesMock);
+        DeprecatedTokenGenService tokenGenService = new DeprecatedTokenGenService(tokenGenPropertiesMock);
         this.queryContext = mock(FunctionQueryContext.class);
         when(queryContext.getTokenGenService()).thenReturn(tokenGenService);
     }
