@@ -32,7 +32,7 @@ public class TokenGenService {
 
     public LocalDateTime extractTime(String token) {
         TokenHolder tokenHolder = extractToken(token);
-        return tokenHolder != null? tokenHolder.getTimestamp() : null;
+        return tokenHolder != null ? tokenHolder.getTimestamp() : null;
     }
 
     @SneakyThrows
