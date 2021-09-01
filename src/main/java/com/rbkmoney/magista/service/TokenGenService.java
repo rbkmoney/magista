@@ -73,14 +73,16 @@ public class TokenGenService {
 
     public void validateToken(TBase query, String validateToken) {
         TokenHolder validateTokenHolder = extractToken(validateToken);
-        LocalDateTime createdAt = validateTokenHolder.getTimestamp();
-        String generatedToken = generateToken(query, createdAt);
-        TokenHolder generatedTokenHolder = extractToken(generatedToken);
-        if (generatedTokenHolder != null
-                && generatedTokenHolder.getToken() != null
-                && validateTokenHolder.getToken() != null
-                && !generatedTokenHolder.getToken().equals(validateTokenHolder.getToken())) {
-            throw new BadTokenException("Token validation failure");
+        if (validateTokenHolder != null) {
+            LocalDateTime createdAt = validateTokenHolder.getTimestamp();
+            String generatedToken = generateToken(query, createdAt);
+            TokenHolder generatedTokenHolder = extractToken(generatedToken);
+            if (generatedTokenHolder != null
+                    && generatedTokenHolder.getToken() != null
+                    && validateTokenHolder.getToken() != null
+                    && !generatedTokenHolder.getToken().equals(validateTokenHolder.getToken())) {
+                throw new BadTokenException("Token validation failure");
+            }
         }
     }
 
