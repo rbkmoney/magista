@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @EnableConfigurationProperties
-@ContextConfiguration(classes = {TokenGenProperties.class, TokenGenService.class})
+@ContextConfiguration(classes = {TokenGenProperties.class, DeprecatedTokenGenService.class})
 public class DeprecatedTokenGenServiceTest {
 
     @Autowired
