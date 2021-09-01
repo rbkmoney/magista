@@ -123,6 +123,22 @@ public class DamselUtil {
         return jsonProcessor.process(jsonNode, new TBaseHandler<>(type));
     }
 
+    @Deprecated
+    public static com.rbkmoney.damsel.merch_stat.OperationFailure toOperationFailureDeprecated(
+            FailureClass failureClass, String failure, String failureDescription) {
+        switch (failureClass) {
+            case operation_timeout:
+                return com.rbkmoney.damsel.merch_stat.OperationFailure.operation_timeout(
+                        new com.rbkmoney.damsel.merch_stat.OperationTimeout());
+            case failure:
+                Failure externalFailure = TErrorUtil.toGeneral(failure);
+                externalFailure.setReason(failureDescription);
+                return com.rbkmoney.damsel.merch_stat.OperationFailure.failure(externalFailure);
+            default:
+                throw new NotFoundException(String.format("Failure type '%s' not found", failureClass));
+        }
+    }
+
     public static OperationFailure toOperationFailure(FailureClass failureClass, String failure,
                                                       String failureDescription) {
         switch (failureClass) {

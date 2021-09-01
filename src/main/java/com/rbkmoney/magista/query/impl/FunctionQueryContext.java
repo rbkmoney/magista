@@ -1,8 +1,10 @@
 package com.rbkmoney.magista.query.impl;
 
+import com.rbkmoney.magista.dao.DeprecatedSearchDao;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.query.QueryContext;
+import com.rbkmoney.magista.service.DeprecatedTokenGenService;
 import com.rbkmoney.magista.service.TokenGenService;
 
 /**
@@ -12,11 +14,13 @@ public class FunctionQueryContext implements QueryContext {
 
     private final StatisticsDao statisticsDao;
 
-    private final SearchDao searchDao;
+    private final DeprecatedSearchDao searchDao;
 
-    private final TokenGenService tokenGenService;
+    private final DeprecatedTokenGenService tokenGenService;
 
-    public FunctionQueryContext(StatisticsDao statisticsDao, SearchDao searchDao, TokenGenService tokenGenService) {
+    public FunctionQueryContext(StatisticsDao statisticsDao,
+                                DeprecatedSearchDao searchDao,
+                                DeprecatedTokenGenService tokenGenService) {
         this.statisticsDao = statisticsDao;
         this.searchDao = searchDao;
         this.tokenGenService = tokenGenService;
@@ -26,11 +30,11 @@ public class FunctionQueryContext implements QueryContext {
         return statisticsDao;
     }
 
-    public SearchDao getSearchDao() {
+    public DeprecatedSearchDao getSearchDao() {
         return searchDao;
     }
 
-    public TokenGenService getTokenGenService() {
+    public DeprecatedTokenGenService getTokenGenService() {
         return tokenGenService;
     }
 }
