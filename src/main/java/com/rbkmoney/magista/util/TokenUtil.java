@@ -21,7 +21,7 @@ public class TokenUtil {
                 .flatMap(enrichedStatInvoice -> enrichedStatInvoice.getPayments().stream())
                 .map(TokenUtil::extractEventOccuredAtTime)
                 .min(String::compareTo)
-                .get();
+                .orElse(null);
     }
 
     public static String getEnrichedRefundsDateTime(List<EnrichedStatInvoice> invoices) {
@@ -30,7 +30,7 @@ public class TokenUtil {
                 .flatMap(enrichedStatInvoice -> enrichedStatInvoice.getRefunds().stream())
                 .map(TokenUtil::extractEventOccuredAtTime)
                 .min(String::compareTo)
-                .get();
+                .orElse(null);
     }
 
     public static String extractEventOccuredAtTime(StatRefund o) {

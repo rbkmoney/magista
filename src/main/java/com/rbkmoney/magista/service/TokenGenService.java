@@ -31,7 +31,8 @@ public class TokenGenService {
     private final TokenGenProperties tokenGenProperties;
 
     public LocalDateTime extractTime(String token) {
-        return extractToken(token).getTimestamp();
+        TokenHolder tokenHolder = extractToken(token);
+        return tokenHolder != null? tokenHolder.getTimestamp() : null;
     }
 
     @SneakyThrows
@@ -75,7 +76,10 @@ public class TokenGenService {
         LocalDateTime createdAt = validateTokenHolder.getTimestamp();
         String generatedToken = generateToken(query, createdAt);
         TokenHolder generatedTokenHolder = extractToken(generatedToken);
-        if (!generatedTokenHolder.getToken().equals(validateTokenHolder.getToken())) {
+        if (generatedTokenHolder != null
+                && generatedTokenHolder.getToken() != null
+                && validateTokenHolder.getToken() != null
+                && !generatedTokenHolder.getToken().equals(validateTokenHolder.getToken())) {
             throw new BadTokenException("Token validation failure");
         }
     }
