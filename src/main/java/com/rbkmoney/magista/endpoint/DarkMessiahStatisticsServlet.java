@@ -8,7 +8,7 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import java.io.IOException;
 
-@WebServlet("/v3/stat")
+@WebServlet("/v3/dark/stat")
 public class DarkMessiahStatisticsServlet extends GenericServlet {
 
     private Servlet thriftServlet;

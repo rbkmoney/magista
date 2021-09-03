@@ -1,6 +1,5 @@
 package com.rbkmoney.magista.endpoint;
 
-import com.rbkmoney.damsel.merch_stat.MerchantStatisticsSrv;
 import com.rbkmoney.magista.MerchantStatisticsServiceSrv;
 import com.rbkmoney.woody.thrift.impl.http.THServiceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;

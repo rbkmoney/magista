@@ -1,8 +1,8 @@
 package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.base.Content;
-import com.rbkmoney.magista.StatChargeback;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.StatChargeback;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

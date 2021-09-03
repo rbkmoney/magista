@@ -20,7 +20,8 @@ public class MerchantStatisticsService {
     public StatInvoiceResponse getInvoices(InvoiceSearchQuery searchQuery) {
         InvoiceSearchQuery queryCopyWithNullToken = new InvoiceSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
-        tokenGenService.validateToken(queryCopyWithNullToken,
+        tokenGenService.validateToken(
+                queryCopyWithNullToken,
                 searchQuery.getCommonSearchQueryParams().getContinuationToken());
         List<StatInvoice> invoices = searchDao.getInvoices(searchQuery);
         return new StatInvoiceResponse()
@@ -37,7 +38,8 @@ public class MerchantStatisticsService {
     public StatPaymentResponse getPayments(PaymentSearchQuery searchQuery) {
         PaymentSearchQuery queryCopyWithNullToken = new PaymentSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
-        tokenGenService.validateToken(queryCopyWithNullToken,
+        tokenGenService.validateToken(
+                queryCopyWithNullToken,
                 searchQuery.getCommonSearchQueryParams().getContinuationToken());
         List<StatPayment> payments = searchDao.getPayments(searchQuery);
         return new StatPaymentResponse()
@@ -54,7 +56,8 @@ public class MerchantStatisticsService {
     public StatRefundResponse getRefunds(RefundSearchQuery searchQuery) {
         RefundSearchQuery queryCopyWithNullToken = new RefundSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
-        tokenGenService.validateToken(queryCopyWithNullToken,
+        tokenGenService.validateToken(
+                queryCopyWithNullToken,
                 searchQuery.getCommonSearchQueryParams().getContinuationToken());
         List<StatRefund> refunds = searchDao.getRefunds(searchQuery);
         return new StatRefundResponse()
@@ -71,7 +74,8 @@ public class MerchantStatisticsService {
     public StatPayoutResponse getPayouts(PayoutSearchQuery searchQuery) {
         PayoutSearchQuery queryCopyWithNullToken = new PayoutSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
-        tokenGenService.validateToken(queryCopyWithNullToken,
+        tokenGenService.validateToken(
+                queryCopyWithNullToken,
                 searchQuery.getCommonSearchQueryParams().getContinuationToken());
         List<StatPayout> payouts = searchDao.getPayouts(searchQuery);
         return new StatPayoutResponse()
@@ -88,7 +92,8 @@ public class MerchantStatisticsService {
     public StatChargebackResponse getChargebacks(ChargebackSearchQuery searchQuery) {
         ChargebackSearchQuery queryCopyWithNullToken = new ChargebackSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
-        tokenGenService.validateToken(queryCopyWithNullToken,
+        tokenGenService.validateToken(
+                queryCopyWithNullToken,
                 searchQuery.getCommonSearchQueryParams().getContinuationToken());
         List<StatChargeback> chargebacks = searchDao.getChargebacks(searchQuery);
         return new StatChargebackResponse()
@@ -107,7 +112,8 @@ public class MerchantStatisticsService {
             com.rbkmoney.magista.okko.PaymentSearchQuery searchQuery) {
         var queryCopyWithNullToken = new com.rbkmoney.magista.okko.PaymentSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
-        tokenGenService.validateToken(queryCopyWithNullToken,
+        tokenGenService.validateToken(
+                queryCopyWithNullToken,
                 searchQuery.getCommonSearchQueryParams().getContinuationToken());
         List<EnrichedStatInvoice> invoices = searchDao.getEnrichedInvoices(searchQuery);
         return new StatEnrichedStatInvoiceResponse()
@@ -124,7 +130,8 @@ public class MerchantStatisticsService {
             com.rbkmoney.magista.okko.RefundSearchQuery searchQuery) {
         var queryCopyWithNullToken = new com.rbkmoney.magista.okko.RefundSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
-        tokenGenService.validateToken(queryCopyWithNullToken,
+        tokenGenService.validateToken(
+                queryCopyWithNullToken,
                 searchQuery.getCommonSearchQueryParams().getContinuationToken());
         List<EnrichedStatInvoice> invoices = searchDao.getEnrichedInvoices(searchQuery);
         return new StatEnrichedStatInvoiceResponse()

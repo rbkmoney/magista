@@ -13,13 +13,18 @@ import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.okko.EnrichedStatInvoice;
 import com.rbkmoney.magista.service.TimeHolder;
 import com.rbkmoney.magista.service.TokenGenService;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.Operator;
+import org.jooq.Query;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import javax.sql.DataSource;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;

@@ -2,7 +2,7 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.Geck;
-import com.rbkmoney.magista.*;
+import com.rbkmoney.magista.CommonSearchQueryParams;
 import com.rbkmoney.magista.config.properties.TokenGenProperties;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.exception.TokenGeneratorException;

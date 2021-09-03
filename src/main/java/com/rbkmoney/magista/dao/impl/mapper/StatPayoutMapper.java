@@ -1,7 +1,7 @@
 package com.rbkmoney.magista.dao.impl.mapper;
 
-import com.rbkmoney.magista.StatPayout;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.StatPayout;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

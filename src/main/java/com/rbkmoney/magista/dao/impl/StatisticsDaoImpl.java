@@ -241,8 +241,6 @@ public class StatisticsDaoImpl extends AbstractDao implements StatisticsDao {
                 ).groupBy(spValField, paymentSystemField)
                 .orderBy(spValField);
 
-
-
         return fetch(query, (rs, i) -> {
             Map<String, String> map = new HashMap<>();
             map.put("offset", (rs.getLong(spValField.getName()) * splitInterval) + "");

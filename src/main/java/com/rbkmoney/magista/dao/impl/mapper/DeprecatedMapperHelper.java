@@ -46,12 +46,9 @@ import io.micrometer.core.instrument.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static com.rbkmoney.magista.domain.Tables.CHARGEBACK_DATA;
@@ -59,7 +56,6 @@ import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.Payout.PAYOUT;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
-import static com.rbkmoney.magista.util.DamselUtil.jsonToTBase;
 
 @Deprecated
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

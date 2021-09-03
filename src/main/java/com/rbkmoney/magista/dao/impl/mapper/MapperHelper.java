@@ -2,7 +2,6 @@ package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.*;
 import com.rbkmoney.magista.BankCard;
 import com.rbkmoney.magista.CryptoCurrency;
 import com.rbkmoney.magista.CustomerPayer;
@@ -39,6 +38,7 @@ import com.rbkmoney.magista.PaymentTool;
 import com.rbkmoney.magista.PayoutStatus;
 import com.rbkmoney.magista.RecurrentParentPayment;
 import com.rbkmoney.magista.RecurrentPayer;
+import com.rbkmoney.magista.*;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.util.DamselUtil;
@@ -46,12 +46,9 @@ import io.micrometer.core.instrument.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static com.rbkmoney.magista.domain.Tables.CHARGEBACK_DATA;
@@ -59,7 +56,6 @@ import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.Payout.PAYOUT;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
-import static com.rbkmoney.magista.util.DamselUtil.jsonToTBase;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MapperHelper {
