@@ -1,44 +1,44 @@
 package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.domain.*;
+import com.rbkmoney.damsel.merch_stat.BankCard;
+import com.rbkmoney.damsel.merch_stat.CryptoCurrency;
+import com.rbkmoney.damsel.merch_stat.CustomerPayer;
+import com.rbkmoney.damsel.merch_stat.DigitalWallet;
+import com.rbkmoney.damsel.merch_stat.InvoiceCancelled;
+import com.rbkmoney.damsel.merch_stat.InvoiceFulfilled;
+import com.rbkmoney.damsel.merch_stat.InvoicePaid;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentCancelled;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentCaptured;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentChargedBack;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentFailed;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentFlow;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentFlowHold;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentFlowInstant;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentPending;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentProcessed;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundFailed;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundPending;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundStatus;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefundSucceeded;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentRefunded;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentStatus;
+import com.rbkmoney.damsel.merch_stat.InvoiceStatus;
+import com.rbkmoney.damsel.merch_stat.InvoiceUnpaid;
+import com.rbkmoney.damsel.merch_stat.MobileCommerce;
+import com.rbkmoney.damsel.merch_stat.MobileOperator;
+import com.rbkmoney.damsel.merch_stat.MobilePhone;
+import com.rbkmoney.damsel.merch_stat.OnHoldExpiration;
+import com.rbkmoney.damsel.merch_stat.OperationFailure;
+import com.rbkmoney.damsel.merch_stat.Payer;
+import com.rbkmoney.damsel.merch_stat.PaymentResourcePayer;
+import com.rbkmoney.damsel.merch_stat.PaymentTerminal;
+import com.rbkmoney.damsel.merch_stat.PaymentTool;
+import com.rbkmoney.damsel.merch_stat.PayoutStatus;
+import com.rbkmoney.damsel.merch_stat.RecurrentParentPayment;
+import com.rbkmoney.damsel.merch_stat.RecurrentPayer;
+import com.rbkmoney.damsel.merch_stat.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.BankCard;
-import com.rbkmoney.magista.CryptoCurrency;
-import com.rbkmoney.magista.CustomerPayer;
-import com.rbkmoney.magista.DigitalWallet;
-import com.rbkmoney.magista.InvoiceCancelled;
-import com.rbkmoney.magista.InvoiceFulfilled;
-import com.rbkmoney.magista.InvoicePaid;
-import com.rbkmoney.magista.InvoicePaymentCancelled;
-import com.rbkmoney.magista.InvoicePaymentCaptured;
-import com.rbkmoney.magista.InvoicePaymentChargedBack;
-import com.rbkmoney.magista.InvoicePaymentFailed;
-import com.rbkmoney.magista.InvoicePaymentFlow;
-import com.rbkmoney.magista.InvoicePaymentFlowHold;
-import com.rbkmoney.magista.InvoicePaymentFlowInstant;
-import com.rbkmoney.magista.InvoicePaymentPending;
-import com.rbkmoney.magista.InvoicePaymentProcessed;
-import com.rbkmoney.magista.InvoicePaymentRefundFailed;
-import com.rbkmoney.magista.InvoicePaymentRefundPending;
-import com.rbkmoney.magista.InvoicePaymentRefundStatus;
-import com.rbkmoney.magista.InvoicePaymentRefundSucceeded;
-import com.rbkmoney.magista.InvoicePaymentRefunded;
-import com.rbkmoney.magista.InvoicePaymentStatus;
-import com.rbkmoney.magista.InvoiceStatus;
-import com.rbkmoney.magista.InvoiceUnpaid;
-import com.rbkmoney.magista.MobileCommerce;
-import com.rbkmoney.magista.MobileOperator;
-import com.rbkmoney.magista.MobilePhone;
-import com.rbkmoney.magista.OnHoldExpiration;
-import com.rbkmoney.magista.OperationFailure;
-import com.rbkmoney.magista.Payer;
-import com.rbkmoney.magista.PaymentResourcePayer;
-import com.rbkmoney.magista.PaymentTerminal;
-import com.rbkmoney.magista.PaymentTool;
-import com.rbkmoney.magista.PayoutStatus;
-import com.rbkmoney.magista.RecurrentParentPayment;
-import com.rbkmoney.magista.RecurrentPayer;
-import com.rbkmoney.magista.*;
 import com.rbkmoney.magista.domain.enums.*;
 import com.rbkmoney.magista.exception.NotFoundException;
 import com.rbkmoney.magista.util.DamselUtil;
@@ -57,8 +57,9 @@ import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.Payout.PAYOUT;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
 
+@Deprecated
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class MapperHelper {
+public class DeprecatedMapperHelper {
 
     static InvoiceStatus mapInvoiceStatus(ResultSet rs,
                                           com.rbkmoney.magista.domain.enums.InvoiceStatus invoiceStatusType,
@@ -167,12 +168,12 @@ public class MapperHelper {
                 paymentResourcePayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
                 paymentResourcePayer.setSessionId(rs.getString(PAYMENT_DATA.PAYMENT_SESSION_ID.getName()));
 
-                paymentResourcePayer.setPaymentTool(MapperHelper.buildPaymentTool(rs));
+                paymentResourcePayer.setPaymentTool(buildPaymentTool(rs));
                 return Payer.payment_resource(paymentResourcePayer);
             case customer:
                 CustomerPayer customerPayer = new CustomerPayer();
                 customerPayer.setCustomerId(rs.getString(PAYMENT_DATA.PAYMENT_CUSTOMER_ID.getName()));
-                customerPayer.setPaymentTool(MapperHelper.buildPaymentTool(rs));
+                customerPayer.setPaymentTool(buildPaymentTool(rs));
                 customerPayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
                 customerPayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
                 return Payer.customer(customerPayer);
@@ -181,7 +182,7 @@ public class MapperHelper {
                 recurrentPayer.setEmail(rs.getString(PAYMENT_DATA.PAYMENT_EMAIL.getName()));
                 recurrentPayer.setPhoneNumber(rs.getString(PAYMENT_DATA.PAYMENT_PHONE_NUMBER.getName()));
 
-                recurrentPayer.setPaymentTool(MapperHelper.buildPaymentTool(rs));
+                recurrentPayer.setPaymentTool(buildPaymentTool(rs));
 
                 RecurrentParentPayment recurrentParentPayment = new RecurrentParentPayment();
                 recurrentParentPayment
@@ -234,7 +235,7 @@ public class MapperHelper {
             case failed:
                 InvoicePaymentFailed invoicePaymentFailed = new InvoicePaymentFailed();
                 invoicePaymentFailed.setAt(eventCreatedAtString);
-                OperationFailure operationFailure = DamselUtil.toOperationFailure(
+                OperationFailure operationFailure = DamselUtil.toOperationFailureDeprecated(
                         TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_OPERATION_FAILURE_CLASS.getName()),
                                 FailureClass.class),
                         rs.getString(PAYMENT_DATA.PAYMENT_EXTERNAL_FAILURE.getName()),
@@ -285,22 +286,24 @@ public class MapperHelper {
             case international_bank_account:
                 return PayoutToolInfo.international_bank_account(
                         new com.rbkmoney.damsel.domain.InternationalBankAccount()
-                        .setBank(new com.rbkmoney.damsel.domain.InternationalBankDetails()
-                                .setName(rs.getString(
-                                        PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_NAME.getName()))
-                                .setCountry(TypeUtil.toEnumField(
-                                        rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_NAME.getName()),
-                                        CountryCode.class))
-                                .setBic(rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_BIC.getName()))
-                                .setAddress(rs.getString(
-                                        PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_ADDRESS.getName()))
-                                .setAbaRtn(rs.getString(
-                                        PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_ABA_RTN.getName())))
-                        .setIban(rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_IBAN.getName()))
-                        .setNumber(rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_NUMBER.getName()))
-                        .setCorrespondentAccount(new com.rbkmoney.damsel.domain.InternationalBankAccount()
-                                .setNumber(rs.getString(
-                                        PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_CORR_ACCOUNT.getName())))
+                                .setBank(new com.rbkmoney.damsel.domain.InternationalBankDetails()
+                                        .setName(rs.getString(
+                                                PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_NAME.getName()))
+                                        .setCountry(TypeUtil.toEnumField(
+                                                rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_NAME
+                                                        .getName()),
+                                                CountryCode.class))
+                                        .setBic(rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_BIC
+                                                .getName()))
+                                        .setAddress(rs.getString(
+                                                PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_ADDRESS.getName()))
+                                        .setAbaRtn(rs.getString(
+                                                PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_BANK_ABA_RTN.getName())))
+                                .setIban(rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_IBAN.getName()))
+                                .setNumber(rs.getString(PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_NUMBER.getName()))
+                                .setCorrespondentAccount(new com.rbkmoney.damsel.domain.InternationalBankAccount()
+                                        .setNumber(rs.getString(
+                                                PAYOUT.PAYOUT_TOOL_INTERNATIONAL_BANK_ACCOUNT_CORR_ACCOUNT.getName())))
                 );
             case wallet_info:
                 return PayoutToolInfo.wallet_info(new WalletInfo(rs.getString(PAYOUT.PAYOUT_TOOL_WALLET_ID.getName())));
@@ -342,7 +345,7 @@ public class MapperHelper {
                 ));
             case failed:
                 return InvoicePaymentRefundStatus.failed(new InvoicePaymentRefundFailed(
-                        DamselUtil.toOperationFailure(
+                        DamselUtil.toOperationFailureDeprecated(
                                 TypeUtil.toEnumField(rs.getString(REFUND_DATA.REFUND_OPERATION_FAILURE_CLASS.getName()),
                                         FailureClass.class),
                                 rs.getString(REFUND_DATA.REFUND_EXTERNAL_FAILURE.getName()),

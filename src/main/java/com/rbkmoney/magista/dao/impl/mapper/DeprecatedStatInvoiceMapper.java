@@ -2,9 +2,9 @@ package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.InvoiceCart;
+import com.rbkmoney.damsel.merch_stat.InvoiceStatus;
+import com.rbkmoney.damsel.merch_stat.StatInvoice;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.InvoiceStatus;
-import com.rbkmoney.magista.StatInvoice;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -12,13 +12,16 @@ import java.nio.ByteBuffer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.Map;
 
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 
-public class StatInvoiceMapper implements RowMapper<StatInvoice> {
+@Deprecated
+public class DeprecatedStatInvoiceMapper implements RowMapper<Map.Entry<Long, StatInvoice>> {
 
     @Override
-    public StatInvoice mapRow(ResultSet rs, int i) throws SQLException {
+    public Map.Entry<Long, StatInvoice> mapRow(ResultSet rs, int i) throws SQLException {
         StatInvoice statInvoice = new StatInvoice();
         statInvoice.setId(rs.getString(INVOICE_DATA.INVOICE_ID.getName()));
         statInvoice.setOwnerId(rs.getString(INVOICE_DATA.PARTY_ID.getName()));
@@ -48,7 +51,8 @@ public class StatInvoiceMapper implements RowMapper<StatInvoice> {
                 rs.getObject(INVOICE_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class)
         );
 
-        InvoiceStatus invoiceStatus = MapperHelper.mapInvoiceStatus(rs, invoiceStatusType, eventCreatedAtString);
+        InvoiceStatus invoiceStatus = DeprecatedMapperHelper.mapInvoiceStatus(
+                rs, invoiceStatusType, eventCreatedAtString);
         statInvoice.setStatus(invoiceStatus);
 
         String invoiceCartJson = rs.getString(INVOICE_DATA.INVOICE_CART_JSON.getName());
@@ -65,6 +69,7 @@ public class StatInvoiceMapper implements RowMapper<StatInvoice> {
                     )
             );
         }
-        return statInvoice;
+        return new AbstractMap.SimpleEntry<>(rs.getLong(INVOICE_DATA.ID.getName()), statInvoice);
     }
+
 }

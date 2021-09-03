@@ -4,10 +4,10 @@ import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.domain.AdditionalTransactionInfo;
 import com.rbkmoney.damsel.domain.ProviderRef;
 import com.rbkmoney.damsel.domain.TerminalRef;
+import com.rbkmoney.damsel.merch_stat.InvoicePaymentStatus;
+import com.rbkmoney.damsel.merch_stat.StatPayment;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.InvoicePaymentStatus;
-import com.rbkmoney.magista.StatPayment;
 import com.rbkmoney.magista.domain.enums.PaymentFlow;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -15,13 +15,16 @@ import java.nio.ByteBuffer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.Map;
 
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 
-public class StatPaymentMapper implements RowMapper<StatPayment> {
+@Deprecated
+public class DeprecatedStatPaymentMapper implements RowMapper<Map.Entry<Long, StatPayment>> {
 
     @Override
-    public StatPayment mapRow(ResultSet rs, int i) throws SQLException {
+    public Map.Entry<Long, StatPayment> mapRow(ResultSet rs, int i) throws SQLException {
         StatPayment statPayment = new StatPayment();
         statPayment.setId(rs.getString(PAYMENT_DATA.PAYMENT_ID.getName()));
         statPayment.setInvoiceId(rs.getString(PAYMENT_DATA.INVOICE_ID.getName()));
@@ -46,14 +49,15 @@ public class StatPaymentMapper implements RowMapper<StatPayment> {
         );
 
         InvoicePaymentStatus paymentStatus;
-        paymentStatus = MapperHelper.buildInvoicePaymentStatus(rs, eventCreatedAtString, invoicePaymentStatus);
+        paymentStatus = DeprecatedMapperHelper.buildInvoicePaymentStatus(
+                rs, eventCreatedAtString, invoicePaymentStatus);
         statPayment.setStatus(paymentStatus);
-        statPayment.setPayer(MapperHelper.buildPayer(rs));
+        statPayment.setPayer(DeprecatedMapperHelper.buildPayer(rs));
 
         PaymentFlow paymentFlow =
                 TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_FLOW.getName()), PaymentFlow.class);
 
-        MapperHelper.buildStatPaymentFlow(rs, statPayment, paymentFlow);
+        DeprecatedMapperHelper.buildStatPaymentFlow(rs, statPayment, paymentFlow);
 
         statPayment.setMakeRecurrent(rs.getBoolean(PAYMENT_DATA.PAYMENT_MAKE_RECURRENT_FLAG.getName()));
 
@@ -79,6 +83,8 @@ public class StatPaymentMapper implements RowMapper<StatPayment> {
         }
         statPayment.setProviderId(new ProviderRef(rs.getInt(PAYMENT_DATA.PAYMENT_PROVIDER_ID.getName())));
         statPayment.setTerminalId(new TerminalRef(rs.getInt(PAYMENT_DATA.PAYMENT_TERMINAL_ID.getName())));
-        return statPayment;
+        return new AbstractMap.SimpleEntry<>(rs.getLong(PAYMENT_DATA.ID.getName()), statPayment);
     }
+
+
 }

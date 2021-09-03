@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.endpoint;
 
-import com.rbkmoney.magista.okko.OkkoMerchantStatisticsServiceSrv;
+import com.rbkmoney.damsel.merch_stat.DarkMessiahStatisticsSrv;
 import com.rbkmoney.woody.thrift.impl.http.THServiceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -8,19 +8,20 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import java.io.IOException;
 
-@WebServlet("/v3/dark/stat")
-public class DarkMessiahStatisticsServlet extends GenericServlet {
+@Deprecated
+@WebServlet("/v2/stat")
+public class DeprecatedDarkMessiahStatisticsServlet extends GenericServlet {
 
     private Servlet thriftServlet;
 
     @Autowired
-    private OkkoMerchantStatisticsServiceSrv.Iface requestHandler;
+    private DarkMessiahStatisticsSrv.Iface requestHandler;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         thriftServlet = new THServiceBuilder()
-                .build(OkkoMerchantStatisticsServiceSrv.Iface.class, requestHandler);
+                .build(DarkMessiahStatisticsSrv.Iface.class, requestHandler);
     }
 
     @Override

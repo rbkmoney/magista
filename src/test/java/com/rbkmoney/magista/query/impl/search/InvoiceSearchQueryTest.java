@@ -9,7 +9,7 @@ import com.rbkmoney.magista.config.testconfiguration.QueryProcessorConfig;
 import com.rbkmoney.magista.exception.BadTokenException;
 import com.rbkmoney.magista.query.QueryProcessor;
 import com.rbkmoney.magista.query.parser.QueryParserException;
-import com.rbkmoney.magista.service.TokenGenService;
+import com.rbkmoney.magista.service.DeprecatedTokenGenService;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class InvoiceSearchQueryTest {
     private QueryProcessor<StatRequest, StatResponse> queryProcessor;
 
     @Autowired
-    private TokenGenService tokenGenService;
+    private DeprecatedTokenGenService tokenGenService;
 
     @Test
     public void testInvoices() {

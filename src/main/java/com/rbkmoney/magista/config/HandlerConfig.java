@@ -2,15 +2,15 @@ package com.rbkmoney.magista.config;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rbkmoney.magista.dao.SearchDao;
+import com.rbkmoney.magista.dao.DeprecatedSearchDao;
 import com.rbkmoney.magista.dao.StatisticsDao;
 import com.rbkmoney.magista.endpoint.StatisticsServletIface;
 import com.rbkmoney.magista.query.impl.QueryContextFactoryImpl;
 import com.rbkmoney.magista.query.impl.QueryProcessorImpl;
 import com.rbkmoney.magista.query.impl.builder.QueryBuilderImpl;
 import com.rbkmoney.magista.query.impl.parser.JsonQueryParser;
-import com.rbkmoney.magista.service.MerchantStatisticsHandler;
-import com.rbkmoney.magista.service.TokenGenService;
+import com.rbkmoney.magista.service.DeprecatedMerchantStatisticsHandler;
+import com.rbkmoney.magista.service.DeprecatedTokenGenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,10 +23,10 @@ public class HandlerConfig {
     @Bean
     public StatisticsServletIface statisticsHandler(
             StatisticsDao statisticsDao,
-            SearchDao searchDao,
-            TokenGenService tokenGenService
+            DeprecatedSearchDao searchDao,
+            DeprecatedTokenGenService tokenGenService
     ) {
-        return new MerchantStatisticsHandler(new QueryProcessorImpl(new JsonQueryParser() {
+        return new DeprecatedMerchantStatisticsHandler(new QueryProcessorImpl(new JsonQueryParser() {
             @Override
             protected ObjectMapper getMapper() {
                 ObjectMapper mapper = super.getMapper();

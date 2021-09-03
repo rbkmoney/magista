@@ -1,25 +1,28 @@
 package com.rbkmoney.magista.dao.impl.mapper;
 
+import com.rbkmoney.damsel.merch_stat.StatPayout;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.StatPayout;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.Map;
 
 import static com.rbkmoney.magista.domain.tables.Payout.PAYOUT;
 
-public class StatPayoutMapper implements RowMapper<StatPayout> {
+@Deprecated
+public class DeprecatedStatPayoutMapper implements RowMapper<Map.Entry<Long, StatPayout>> {
 
     @Override
-    public StatPayout mapRow(ResultSet rs, int i) throws SQLException {
+    public Map.Entry<Long, StatPayout> mapRow(ResultSet rs, int i) throws SQLException {
         StatPayout statPayout = new StatPayout();
         statPayout.setId(rs.getString(PAYOUT.PAYOUT_ID.getName()));
         statPayout.setPartyId(rs.getString(PAYOUT.PARTY_ID.getName()));
         statPayout.setShopId(rs.getString(PAYOUT.SHOP_ID.getName()));
         statPayout.setAmount(rs.getLong(PAYOUT.AMOUNT.getName()));
-        statPayout.setStatus(MapperHelper.toPayoutStatus(rs));
+        statPayout.setStatus(DeprecatedMapperHelper.toPayoutStatus(rs));
         statPayout.setFee(rs.getLong(PAYOUT.FEE.getName()));
         statPayout.setCurrencySymbolicCode(rs.getString(PAYOUT.CURRENCY_CODE.getName()));
         statPayout.setCreatedAt(
@@ -27,6 +30,6 @@ public class StatPayoutMapper implements RowMapper<StatPayout> {
         );
         statPayout.setPayoutToolInfo(MapperHelper.toPayoutToolInfo(rs));
 
-        return statPayout;
+        return new AbstractMap.SimpleEntry<>(rs.getLong(PAYOUT.ID.getName()), statPayout);
     }
 }

@@ -1,68 +1,24 @@
 package com.rbkmoney.magista.dao;
 
-import com.rbkmoney.damsel.merch_stat.*;
-import com.rbkmoney.magista.query.impl.*;
+import com.rbkmoney.magista.*;
+import com.rbkmoney.magista.okko.EnrichedStatInvoice;
 
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 public interface SearchDao {
 
-    Collection<Map.Entry<Long, StatInvoice>> getInvoices(
-            InvoicesFunction.InvoicesParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    );
+    List<StatInvoice> getInvoices(InvoiceSearchQuery invoiceSearchQuery);
 
-    Collection<Map.Entry<Long, StatPayment>> getPayments(
-            PaymentsFunction.PaymentsParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    );
+    List<StatPayment> getPayments(PaymentSearchQuery paymentSearchQuery);
 
-    Collection<Map.Entry<Long, StatRefund>> getRefunds(
-            RefundsFunction.RefundsParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    );
+    List<StatRefund> getRefunds(RefundSearchQuery refundSearchQuery);
 
-    Collection<Map.Entry<Long, StatPayout>> getPayouts(
-            PayoutsFunction.PayoutsParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    );
+    List<StatPayout> getPayouts(PayoutSearchQuery payoutSearchQuery);
 
-    Collection<Map.Entry<Long, StatChargeback>> getChargebacks(
-            ChargebacksFunction.ChargebacksParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    );
+    List<StatChargeback> getChargebacks(ChargebackSearchQuery chargebackSearchQuery);
 
-    Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(
-            RefundsFunction.RefundsParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    );
+    List<EnrichedStatInvoice> getEnrichedInvoices(com.rbkmoney.magista.okko.PaymentSearchQuery paymentSearchQuery);
 
-    Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(
-            PaymentsFunction.PaymentsParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    );
+    List<EnrichedStatInvoice> getEnrichedInvoices(com.rbkmoney.magista.okko.RefundSearchQuery refundSearchQuery);
 
 }

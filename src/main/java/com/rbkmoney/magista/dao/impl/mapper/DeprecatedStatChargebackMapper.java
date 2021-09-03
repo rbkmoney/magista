@@ -1,20 +1,23 @@
 package com.rbkmoney.magista.dao.impl.mapper;
 
 import com.rbkmoney.damsel.base.Content;
+import com.rbkmoney.damsel.merch_stat.StatChargeback;
 import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.magista.StatChargeback;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.Map;
 
 import static com.rbkmoney.magista.domain.Tables.CHARGEBACK_DATA;
 
-public class StatChargebackMapper implements RowMapper<StatChargeback> {
+@Deprecated
+public class DeprecatedStatChargebackMapper implements RowMapper<Map.Entry<Long, StatChargeback>> {
 
     @Override
-    public StatChargeback mapRow(ResultSet rs, int i) throws SQLException {
+    public Map.Entry<Long, StatChargeback> mapRow(ResultSet rs, int i) throws SQLException {
         StatChargeback chargeback = new StatChargeback()
                 .setInvoiceId(rs.getString(CHARGEBACK_DATA.INVOICE_ID.getName()))
                 .setPaymentId(rs.getString(CHARGEBACK_DATA.PAYMENT_ID.getName()))
@@ -48,6 +51,7 @@ public class StatChargebackMapper implements RowMapper<StatChargeback> {
         if (content != null) {
             chargeback.setContent(new Content().setData(content).setType(""));
         }
-        return chargeback;
+        return new AbstractMap.SimpleEntry<>(rs.getLong(CHARGEBACK_DATA.ID.getName()), chargeback);
     }
+
 }

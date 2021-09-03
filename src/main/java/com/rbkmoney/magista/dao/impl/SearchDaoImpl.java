@@ -1,20 +1,31 @@
 package com.rbkmoney.magista.dao.impl;
 
-import com.rbkmoney.damsel.merch_stat.*;
+import com.rbkmoney.geck.common.util.TBaseUtil;
+import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.*;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.*;
+import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
+import com.rbkmoney.magista.domain.enums.PaymentTool;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.*;
-import com.rbkmoney.magista.query.impl.*;
-import org.jooq.*;
+import com.rbkmoney.magista.okko.EnrichedStatInvoice;
+import com.rbkmoney.magista.service.TimeHolder;
+import com.rbkmoney.magista.service.TokenGenService;
+import org.jooq.Condition;
+import org.jooq.Operator;
+import org.jooq.Query;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import javax.sql.DataSource;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;
 import static com.rbkmoney.geck.common.util.TypeUtil.toEnumFields;
@@ -23,7 +34,6 @@ import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.Payout.PAYOUT;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
-import static com.rbkmoney.magista.query.impl.Parameters.SHOP_ID_PARAM;
 import static org.jooq.Comparator.*;
 
 @Component
@@ -35,9 +45,11 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     private final StatPayoutMapper statPayoutMapper;
     private final StatChargebackMapper statChargebackMapper;
     private final EnrichedStatInvoiceMapper enrichedStatInvoiceMapper;
+    private final TokenGenService tokenGenService;
 
-    public SearchDaoImpl(DataSource ds) {
+    public SearchDaoImpl(DataSource ds, TokenGenService tokenGenService) {
         super(ds);
+        this.tokenGenService = tokenGenService;
         statInvoiceMapper = new StatInvoiceMapper();
         statPaymentMapper = new StatPaymentMapper();
         statRefundMapper = new StatRefundMapper();
@@ -47,42 +59,42 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     }
 
     @Override
-    public Collection<Map.Entry<Long, StatInvoice>> getInvoices(
-            InvoicesFunction.InvoicesParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    ) {
-
+    public List<StatInvoice> getInvoices(InvoiceSearchQuery searchQuery) {
+        CommonSearchQueryParams commonParams = searchQuery.getCommonSearchQueryParams();
+        TimeHolder timeHolder = buildTimeHolder(commonParams);
         Condition condition = appendDateTimeRangeConditions(
                 appendConditions(DSL.trueCondition(), Operator.AND,
                         new ConditionParameterSource()
                                 .addValue(
                                         INVOICE_DATA.PARTY_ID,
-                                        Optional.ofNullable(parameters.getMerchantId())
+                                        Optional.ofNullable(commonParams.getPartyId())
                                                 .map(UUID::fromString)
                                                 .orElse(null),
                                         EQUALS)
-                                .addValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                                .addInConditionValue(INVOICE_DATA.PARTY_SHOP_ID, parameters.getShopIds())
-                                .addValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                                .addInConditionValue(INVOICE_DATA.INVOICE_ID, parameters.getInvoiceIds())
-                                .addValue(INVOICE_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS)
-                                .addValue(INVOICE_DATA.INVOICE_CREATED_AT, whereTime, LESS)
+                                .addInConditionValue(INVOICE_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
+                                .addInConditionValue(INVOICE_DATA.INVOICE_ID, searchQuery.getInvoiceIds())
+                                .addValue(INVOICE_DATA.EXTERNAL_ID, searchQuery.getExternalId(), EQUALS)
+                                .addValue(INVOICE_DATA.INVOICE_CREATED_AT, timeHolder.getWhereTime(), LESS)
                                 .addValue(
                                         INVOICE_DATA.INVOICE_STATUS,
-                                        toEnumField(
-                                                parameters.getInvoiceStatus(),
-                                                com.rbkmoney.magista.domain.enums.InvoiceStatus.class),
+                                        searchQuery.isSetInvoiceStatus()
+                                                ? TBaseUtil.unionFieldToEnum(
+                                                searchQuery.getInvoiceStatus(),
+                                                com.rbkmoney.magista.domain.enums.InvoiceStatus.class)
+                                                : null,
                                         EQUALS)
-                                .addValue(INVOICE_DATA.INVOICE_AMOUNT, parameters.getInvoiceAmount(), EQUALS)),
+                                .addValue(INVOICE_DATA.INVOICE_AMOUNT,
+                                        searchQuery.isSetInvoiceAmount() ? searchQuery.getInvoiceAmount() : null,
+                                        EQUALS)
+                ),
                 INVOICE_DATA.INVOICE_CREATED_AT,
-                fromTime,
-                toTime
+                timeHolder.getFromTime(),
+                timeHolder.getToTime()
         );
 
-        ConditionParameterSource paymentParameterSource = preparePaymentsCondition(parameters);
+        ConditionParameterSource paymentParameterSource = preparePaymentsCondition(commonParams,
+                searchQuery.getPaymentParams(), searchQuery.getInvoiceIds(),
+                searchQuery.getExternalId());
         if (!paymentParameterSource.getConditionFields().isEmpty()
                 || !paymentParameterSource.getOrConditions().isEmpty()) {
             condition = condition.and(DSL.exists(getDslContext()
@@ -95,28 +107,29 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                             Operator.AND,
                                             paymentParameterSource),
                                     PAYMENT_DATA.PAYMENT_CREATED_AT,
-                                    fromTime,
-                                    toTime))));
+                                    timeHolder.getFromTime(),
+                                    timeHolder.getToTime()))));
         }
 
         Query query = getDslContext()
                 .selectFrom(INVOICE_DATA)
                 .where(condition)
                 .orderBy(INVOICE_DATA.INVOICE_CREATED_AT.desc())
-                .limit(limit);
+                .limit(commonParams.getLimit());
         return fetch(query, statInvoiceMapper);
     }
 
     @Override
-    public Collection<Map.Entry<Long, StatPayment>> getPayments(
-            PaymentsFunction.PaymentsParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    ) {
-        ConditionParameterSource conditionParameterSource = preparePaymentsCondition(parameters)
-                .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime, LESS);
+    public List<StatPayment> getPayments(PaymentSearchQuery searchQuery) {
+        CommonSearchQueryParams commonParams = searchQuery.getCommonSearchQueryParams();
+        TimeHolder timeHolder = buildTimeHolder(commonParams);
+        PaymentParams paymentParams = searchQuery.getPaymentParams();
+        ConditionParameterSource conditionParameterSource =
+                preparePaymentsCondition(commonParams,
+                        paymentParams,
+                        searchQuery.getInvoiceIds(),
+                        searchQuery.getExternalId())
+                .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, timeHolder.getWhereTime(), LESS);
 
         SelectConditionStep<org.jooq.Record> conditionStep = getDslContext()
                 .select()
@@ -125,165 +138,163 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         appendDateTimeRangeConditions(
                                 appendConditions(DSL.trueCondition(), Operator.AND, conditionParameterSource),
                                 PAYMENT_DATA.PAYMENT_CREATED_AT,
-                                fromTime,
-                                toTime
+                                timeHolder.getFromTime(),
+                                timeHolder.getToTime()
                         )
                 );
-        Condition excludeCondition = prepareExcludeCondition(parameters);
-        if (excludeCondition != null) {
-            conditionStep.and(excludeCondition);
+        if (searchQuery.isSetExcludedShopIds()) {
+            conditionStep.and(PAYMENT_DATA.PARTY_SHOP_ID.notIn(searchQuery.getExcludedShopIds()));
         }
         Query query = conditionStep.orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
-                .limit(limit);
+                .limit(commonParams.getLimit());
 
         return fetch(query, statPaymentMapper);
     }
 
     @Override
-    public Collection<Map.Entry<Long, StatRefund>> getRefunds(
-            RefundsFunction.RefundsParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    ) {
-        ConditionParameterSource refundParameterSource = prepareRefundCondition(parameters, whereTime);
-
+    public List<StatRefund> getRefunds(RefundSearchQuery refundSearchQuery) {
+        CommonSearchQueryParams commonParams = refundSearchQuery.getCommonSearchQueryParams();
+        TimeHolder timeHolder = buildTimeHolder(commonParams);
+        ConditionParameterSource refundParameterSource = prepareRefundCondition(refundSearchQuery, timeHolder);
         Query query = getDslContext().selectFrom(REFUND_DATA)
                 .where(
                         appendDateTimeRangeConditions(
                                 appendConditions(DSL.trueCondition(), Operator.AND, refundParameterSource),
                                 REFUND_DATA.REFUND_CREATED_AT,
-                                fromTime,
-                                toTime
+                                timeHolder.getFromTime(),
+                                timeHolder.getToTime()
                         )
                 )
                 .orderBy(REFUND_DATA.REFUND_CREATED_AT.desc())
-                .limit(limit);
+                .limit(commonParams.getLimit());
         return fetch(query, statRefundMapper);
     }
 
-    private ConditionParameterSource prepareRefundCondition(RefundsFunction.RefundsParameters parameters,
-                                                            LocalDateTime whereTime) {
+    private ConditionParameterSource prepareRefundCondition(RefundSearchQuery searchQuery, TimeHolder timeHolder) {
+        CommonSearchQueryParams commonParams = searchQuery.getCommonSearchQueryParams();
         return new ConditionParameterSource()
-                .addValue(REFUND_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
-                .addValue(REFUND_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                .addInConditionValue(REFUND_DATA.PARTY_SHOP_ID, parameters.getShopIds())
-                .addValue(REFUND_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                .addInConditionValue(REFUND_DATA.INVOICE_ID, parameters.getInvoiceIds())
-                .addValue(REFUND_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
-                .addValue(REFUND_DATA.REFUND_ID, parameters.getRefundId(), EQUALS)
-                .addValue(REFUND_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS)
-                .addValue(REFUND_DATA.REFUND_CREATED_AT, whereTime, LESS)
+                .addValue(REFUND_DATA.PARTY_ID, commonParams.getPartyId(), EQUALS)
+                .addInConditionValue(REFUND_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
+                .addInConditionValue(REFUND_DATA.INVOICE_ID, searchQuery.getInvoiceIds())
+                .addValue(REFUND_DATA.PAYMENT_ID, searchQuery.getPaymentId(), EQUALS)
+                .addValue(REFUND_DATA.REFUND_ID, searchQuery.getRefundId(), EQUALS)
+                .addValue(REFUND_DATA.EXTERNAL_ID, searchQuery.getExternalId(), EQUALS)
+                .addValue(REFUND_DATA.REFUND_CREATED_AT, timeHolder.getWhereTime(), LESS)
                 .addValue(REFUND_DATA.REFUND_STATUS,
-                        toEnumField(parameters.getRefundStatus(), RefundStatus.class),
+                        searchQuery.isSetRefundStatus()
+                                ? TBaseUtil.unionFieldToEnum(searchQuery.getRefundStatus(), RefundStatus.class)
+                                : null,
                         EQUALS);
     }
 
     @Override
-    public Collection<Map.Entry<Long, StatPayout>> getPayouts(
-            PayoutsFunction.PayoutsParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    ) {
+    public List<StatPayout> getPayouts(PayoutSearchQuery payoutSearchQuery) {
+        CommonSearchQueryParams commonParams = payoutSearchQuery.getCommonSearchQueryParams();
+        TimeHolder timeHolder = buildTimeHolder(commonParams);
         Query query = getDslContext().selectFrom(PAYOUT)
                 .where(
                         appendDateTimeRangeConditions(
                                 appendConditions(
                                         DSL.trueCondition(),
                                         Operator.AND,
-                                        preparePayoutCondition(parameters, whereTime)
+                                        preparePayoutCondition(payoutSearchQuery, timeHolder)
                                 ),
                                 PAYOUT.CREATED_AT,
-                                fromTime,
-                                toTime
+                                timeHolder.getFromTime(),
+                                timeHolder.getToTime()
                         )
                 ).orderBy(PAYOUT.CREATED_AT.desc())
-                .limit(limit);
+                .limit(commonParams.getLimit());
 
         return fetch(query, statPayoutMapper);
     }
 
-    private ConditionParameterSource preparePayoutCondition(PayoutsFunction.PayoutsParameters parameters,
-                                                            LocalDateTime whereTime) {
+    private ConditionParameterSource preparePayoutCondition(PayoutSearchQuery payoutSearchQuery,
+                                                            TimeHolder timeHolder) {
+        CommonSearchQueryParams commonParams = payoutSearchQuery.getCommonSearchQueryParams();
         ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
-                .addValue(PAYOUT.PARTY_ID, parameters.getMerchantId(), EQUALS)
-                .addValue(PAYOUT.SHOP_ID, parameters.getShopId(), EQUALS)
-                .addInConditionValue(PAYOUT.SHOP_ID, parameters.getShopIds())
-                .addValue(PAYOUT.PAYOUT_ID, parameters.getPayoutId(), EQUALS)
-                .addValue(PAYOUT.STATUS,
-                        toEnumField(parameters.getPayoutStatus(), PayoutStatus.class),
-                        EQUALS)
+                .addValue(PAYOUT.PARTY_ID, commonParams.getPartyId(), EQUALS)
+                .addInConditionValue(PAYOUT.SHOP_ID, commonParams.getShopIds())
+                .addValue(PAYOUT.PAYOUT_ID, payoutSearchQuery.getPayoutId(), EQUALS)
                 .addInConditionValue(PAYOUT.STATUS,
-                        toEnumFields(parameters.getPayoutStatuses(),
-                                PayoutStatus.class))
-                .addValue(PAYOUT.CREATED_AT, whereTime, LESS);
-        if (parameters.getPayoutType() != null) {
-            switch (parameters.getPayoutType()) {
-                case "bank_account":
-                    conditionParameterSource.addOrCondition(
-                            PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.russian_bank_account),
-                            PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.international_bank_account));
-                    break;
-                case "wallet_info":
-                case "payment_institution_account":
-                case "russian_bank_account":
-                case "international_bank_account":
-                    conditionParameterSource.addValue(PAYOUT.PAYOUT_TOOL_TYPE,
-                            toEnumField(parameters.getPayoutType(), PayoutToolType.class),
-                            EQUALS);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown payout_type " + parameters.getPayoutType());
+                        payoutSearchQuery.isSetPayoutStatuses()
+                                ? toEnumFields(payoutSearchQuery.getPayoutStatuses().stream()
+                                        .map(ps -> ps.getSetField().getFieldName())
+                                        .collect(Collectors.toList()),
+                                PayoutStatus.class)
+                                : null)
+                .addValue(PAYOUT.CREATED_AT, timeHolder.getWhereTime(), LESS);
+        if (payoutSearchQuery.getPayoutType() != null) {
+            switch (payoutSearchQuery.getPayoutType().getSetField().getFieldName()) {
+                case "bank_account" -> conditionParameterSource.addOrCondition(
+                        PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.russian_bank_account),
+                        PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.international_bank_account));
+                case "wallet_info",
+                        "payment_institution_account",
+                        "russian_bank_account",
+                        "international_bank_account" -> conditionParameterSource.addValue(PAYOUT.PAYOUT_TOOL_TYPE,
+                        TBaseUtil.unionFieldToEnum(payoutSearchQuery.getPayoutType(), PayoutToolType.class),
+                        EQUALS);
+                default -> throw new IllegalArgumentException("Unknown payout_type " +
+                        payoutSearchQuery.getPayoutType());
             }
         }
         return conditionParameterSource;
     }
 
     @Override
-    public Collection<Map.Entry<Long, StatChargeback>> getChargebacks(
-            ChargebacksFunction.ChargebacksParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit) {
-        Query query = getDslContext().selectFrom(CHARGEBACK_DATA)
-                .where(
-                        appendDateTimeRangeConditions(
-                                appendConditions(
-                                        DSL.trueCondition(),
-                                        Operator.AND,
-                                        new ConditionParameterSource()
-                                                .addValue(CHARGEBACK_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
-                                                .addValue(CHARGEBACK_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                                                .addInConditionValue(CHARGEBACK_DATA.PARTY_SHOP_ID,
-                                                        parameters.getShopIds())
-                                                .addValue(CHARGEBACK_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                                                .addInConditionValue(
-                                                        CHARGEBACK_DATA.INVOICE_ID,
-                                                        parameters.getInvoiceIds())
-                                                .addValue(CHARGEBACK_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
-                                                .addValue(CHARGEBACK_DATA.CHARGEBACK_ID, parameters.getChargebackId(),
-                                                        EQUALS)
-                                                .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_STATUS,
-                                                        toEnumFields(parameters.getChargebackStatuses(),
-                                                                ChargebackStatus.class))
-                                                .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_STAGE,
-                                                        toEnumFields(parameters.getChargebackStages(),
-                                                                ChargebackStage.class))
-                                                .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_REASON_CATEGORY,
-                                                        toEnumFields(parameters.getChargebackCategories(),
-                                                                ChargebackCategory.class))
-                                                .addValue(CHARGEBACK_DATA.CHARGEBACK_CREATED_AT, whereTime, LESS)
-                                ),
-                                CHARGEBACK_DATA.CHARGEBACK_CREATED_AT,
-                                fromTime,
-                                toTime
-                        )
-                ).orderBy(CHARGEBACK_DATA.CHARGEBACK_CREATED_AT.desc())
-                .limit(limit);
+    public List<StatChargeback> getChargebacks(ChargebackSearchQuery chargebackSearchQuery) {
+        CommonSearchQueryParams commonParams = chargebackSearchQuery.getCommonSearchQueryParams();
+        TimeHolder timeHolder = buildTimeHolder(commonParams);
+        Query query = getDslContext().selectFrom(CHARGEBACK_DATA).where(
+                appendDateTimeRangeConditions(appendConditions(
+                        DSL.trueCondition(),
+                        Operator.AND,
+                        new ConditionParameterSource()
+                                .addValue(CHARGEBACK_DATA.PARTY_ID, commonParams.getPartyId(), EQUALS)
+                                .addInConditionValue(CHARGEBACK_DATA.PARTY_SHOP_ID,
+                                        commonParams.getShopIds())
+                                .addInConditionValue(
+                                        CHARGEBACK_DATA.INVOICE_ID,
+                                        chargebackSearchQuery.getInvoiceIds())
+                                .addValue(CHARGEBACK_DATA.PAYMENT_ID,
+                                        chargebackSearchQuery.getPaymentId(), EQUALS)
+                                .addValue(CHARGEBACK_DATA.CHARGEBACK_ID,
+                                        chargebackSearchQuery.getChargebackId(),
+                                        EQUALS)
+                                .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_STATUS,
+                                        chargebackSearchQuery.isSetChargebackStatuses()
+                                                ? toEnumFields(
+                                                        chargebackSearchQuery.getChargebackStatuses()
+                                                                .stream()
+                                                                .map(cs -> cs.getSetField().getFieldName())
+                                                                .collect(Collectors.toList()),
+                                                        ChargebackStatus.class)
+                                                : null)
+                                .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_STAGE,
+                                        chargebackSearchQuery.isSetChargebackStages()
+                                                ? toEnumFields(chargebackSearchQuery.getChargebackStages()
+                                                                .stream()
+                                                                .map(cs -> cs.getSetField().getFieldName())
+                                                                .collect(Collectors.toList()),
+                                                        ChargebackStage.class)
+                                                : null)
+                                .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_REASON_CATEGORY,
+                                        chargebackSearchQuery.isSetChargebackCategories()
+                                                ? toEnumFields(chargebackSearchQuery.getChargebackCategories()
+                                                                .stream()
+                                                                .map(cc -> cc.getSetField().getFieldName())
+                                                                .collect(Collectors.toList()),
+                                                        ChargebackCategory.class)
+                                                : null)
+                                .addValue(CHARGEBACK_DATA.CHARGEBACK_CREATED_AT, timeHolder.getWhereTime(), LESS)
+                        ),
+                        CHARGEBACK_DATA.CHARGEBACK_CREATED_AT,
+                        timeHolder.getFromTime(),
+                        timeHolder.getToTime()
+                )
+        ).orderBy(CHARGEBACK_DATA.CHARGEBACK_CREATED_AT.desc())
+                .limit(commonParams.getLimit());
 
         return fetch(query, statChargebackMapper);
     }
@@ -291,18 +302,14 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     /**
      * merchant OKKO-specific, in general shouldn't be touched.
      *
-     * @author n.pospolita
+     * @author n.pospolitych
      */
     @Override
-    public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(
-            RefundsFunction.RefundsParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    ) {
-        ConditionParameterSource refundParameterSource = prepareEnrichedRefundCondition(parameters, whereTime);
-
+    public List<EnrichedStatInvoice> getEnrichedInvoices(
+            com.rbkmoney.magista.okko.RefundSearchQuery refundSearchQuery) {
+        CommonSearchQueryParams commonParams = refundSearchQuery.getCommonSearchQueryParams();
+        TimeHolder timeHolder = buildTimeHolder(commonParams);
+        ConditionParameterSource refundParameterSource = prepareEnrichedRefundCondition(refundSearchQuery, timeHolder);
         Query query = getDslContext()
                 .selectFrom(REFUND_DATA
                         .join(PAYMENT_DATA).on(PAYMENT_DATA.INVOICE_ID.eq(REFUND_DATA.INVOICE_ID),
@@ -313,12 +320,12 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         appendDateTimeRangeConditions(
                                 appendConditions(DSL.trueCondition(), Operator.AND, refundParameterSource),
                                 REFUND_DATA.EVENT_CREATED_AT,
-                                fromTime,
-                                toTime
+                                timeHolder.getFromTime(),
+                                timeHolder.getToTime()
                         )
                 )
                 .orderBy(REFUND_DATA.EVENT_CREATED_AT.desc())
-                .limit(limit);
+                .limit(commonParams.getLimit());
 
         return fetch(query, enrichedStatInvoiceMapper);
     }
@@ -329,15 +336,11 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
      * @author n.pospolita
      */
     @Override
-    public Collection<Map.Entry<Long, EnrichedStatInvoice>> getEnrichedInvoices(
-            PaymentsFunction.PaymentsParameters parameters,
-            LocalDateTime fromTime,
-            LocalDateTime toTime,
-            LocalDateTime whereTime,
-            int limit
-    ) {
-        ConditionParameterSource conditionParameterSource = prepareEnrichedPaymentsCondition(parameters, whereTime);
-
+    public List<EnrichedStatInvoice> getEnrichedInvoices(
+            com.rbkmoney.magista.okko.PaymentSearchQuery paymentSearchQuery) {
+        CommonSearchQueryParams commonParams = paymentSearchQuery.getCommonSearchQueryParams();
+        TimeHolder timeHolder = buildTimeHolder(commonParams);
+        var conditionParameterSource = prepareEnrichedPaymentsCondition(paymentSearchQuery, timeHolder);
         Query query = getDslContext()
                 .select()
                 .from(PAYMENT_DATA
@@ -349,64 +352,76 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         appendDateTimeRangeConditions(
                                 appendConditions(DSL.trueCondition(), Operator.AND, conditionParameterSource),
                                 PAYMENT_DATA.EVENT_CREATED_AT,
-                                fromTime,
-                                toTime
+                                timeHolder.getFromTime(),
+                                timeHolder.getToTime()
                         )
                 )
                 .orderBy(PAYMENT_DATA.EVENT_CREATED_AT.desc())
-                .limit(limit);
+                .limit(commonParams.getLimit());
 
         return fetch(query, enrichedStatInvoiceMapper);
     }
 
-    private ConditionParameterSource preparePaymentsCondition(PaymentsFunction.PaymentsParameters parameters) {
+    private ConditionParameterSource preparePaymentsCondition(CommonSearchQueryParams commonParams,
+                                                              PaymentParams paymentParams,
+                                                              List<String> invoiceIds,
+                                                              String externalId) {
         ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
                 .addValue(
                         PAYMENT_DATA.PARTY_ID,
-                        Optional.ofNullable(parameters.getMerchantId())
+                        Optional.ofNullable(commonParams.getPartyId())
                                 .map(UUID::fromString)
                                 .orElse(null),
                         EQUALS
                 )
-                .addValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                .addInConditionValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopIds())
-                .addValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                .addInConditionValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceIds())
-                .addValue(PAYMENT_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
+                .addInConditionValue(PAYMENT_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
+                .addInConditionValue(PAYMENT_DATA.INVOICE_ID, invoiceIds)
+                .addValue(PAYMENT_DATA.PAYMENT_ID, paymentParams.getPaymentId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_STATUS,
-                        toEnumField(parameters.getPaymentStatus(),
-                                com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
+                        paymentParams.isSetPaymentStatus()
+                                ? TBaseUtil.unionFieldToEnum(paymentParams.getPaymentStatus(),
+                                InvoicePaymentStatus.class)
+                                : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_FLOW,
-                        toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
+                        TBaseUtil.unionFieldToEnum(paymentParams.getPaymentFlow(), PaymentFlow.class),
                         EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6, parameters.getPaymentBankCardFirst6(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM, parameters.getPaymentBankCardSystem(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4, parameters.getPaymentBankCardLast4(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_PROVIDER_ID, parameters.getPaymentProviderId(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_ID, parameters.getPaymentTerminalId(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(),
+                .addValue(PAYMENT_DATA.PAYMENT_TOOL,
+                        TBaseUtil.unionFieldToEnum(paymentParams.getPaymentTool(), PaymentTool.class),
+                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER,
+                        paymentParams.getPaymentTerminalProvider().name(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_EMAIL, paymentParams.getPaymentEmail(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_IP, paymentParams.getPaymentIp(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_FINGERPRINT, paymentParams.getPaymentFingerprint(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6, paymentParams.getPaymentFirst6(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM, paymentParams.getPaymentSystem().name(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4, paymentParams.getPaymentLast4(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, paymentParams.getPaymentCustomerId(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_PROVIDER_ID, paymentParams.getPaymentProviderId() != null
+                        ? Integer.valueOf(paymentParams.getPaymentProviderId())
+                        : null, EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_ID, paymentParams.getPaymentTerminalId() != null
+                        ? Integer.valueOf(paymentParams.getPaymentTerminalId())
+                        : null, EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, paymentParams.getPaymentAmount(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, paymentParams.getPaymentDomainRevision(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, paymentParams.getFromPaymentDomainRevision(),
                         GREATER_OR_EQUAL)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
-                .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmountFrom(), GREATER_OR_EQUAL)
-                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmountTo(), LESS_OR_EQUAL)
-                .addValue(PAYMENT_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS);
-        if (!ObjectUtils.isEmpty(parameters.getPaymentBankCardTokenProvider())) {
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION,
+                        paymentParams.getToPaymentDomainRevision(),
+                        LESS_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_RRN, paymentParams.getPaymentRrn(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, paymentParams.getPaymentApprovalCode(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, paymentParams.getPaymentAmountFrom(), GREATER_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, paymentParams.getPaymentAmountTo(), LESS_OR_EQUAL)
+                .addValue(PAYMENT_DATA.EXTERNAL_ID, externalId, EQUALS);
+        if (paymentParams.isSetPaymentTokenProvider()) {
             conditionParameterSource.addOrCondition(
                     PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER
-                            .eq(parameters.getPaymentBankCardTokenProvider()),
+                            .eq(paymentParams.getPaymentTokenProvider().name()),
                     PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER_LEGACY.eq(
-                            toEnumField(parameters.getPaymentBankCardTokenProvider(),
+                            toEnumField(paymentParams.getPaymentTokenProvider().name(),
                                     com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class)));
         }
         return conditionParameterSource;
@@ -417,50 +432,71 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
      *
      * @author n.pospolita
      */
-    private ConditionParameterSource prepareEnrichedPaymentsCondition(PaymentsFunction.PaymentsParameters parameters,
-                                                                      LocalDateTime whereTime) {
+    private ConditionParameterSource prepareEnrichedPaymentsCondition(
+            com.rbkmoney.magista.okko.PaymentSearchQuery paymentSearchQuery,
+            TimeHolder timeHolder) {
+        CommonSearchQueryParams commonParams = paymentSearchQuery.getCommonSearchQueryParams();
         ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
                 .addValue(
                         PAYMENT_DATA.PARTY_ID,
-                        Optional.ofNullable(parameters.getMerchantId())
+                        Optional.ofNullable(commonParams.getPartyId())
                                 .map(UUID::fromString)
                                 .orElse(null),
                         EQUALS
                 )
-                .addValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                .addValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
+                .addInConditionValue(PAYMENT_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
+                .addValue(PAYMENT_DATA.INVOICE_ID, paymentSearchQuery.getInvoiceId(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_ID, paymentSearchQuery.getPaymentId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_STATUS,
-                        toEnumField(parameters.getPaymentStatus(),
+                        TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentStatus(),
                                 com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_FLOW,
-                        toEnumField(parameters.getPaymentFlow(), PaymentFlow.class),
+                        TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentFlow(), PaymentFlow.class),
                         EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_TOOL, parameters.getPaymentMethod(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER, parameters.getPaymentTerminalProvider(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_EMAIL, parameters.getPaymentEmail(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_IP, parameters.getPaymentIp(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_FINGERPRINT, parameters.getPaymentFingerprint(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6, parameters.getPaymentBankCardFirst6(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM, parameters.getPaymentBankCardSystem(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4, parameters.getPaymentBankCardLast4(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, parameters.getPaymentCustomerId(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, parameters.getPaymentAmount(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getPaymentDomainRevision(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getFromPaymentDomainRevision(),
+                .addValue(PAYMENT_DATA.PAYMENT_TOOL,
+                        TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentTool(), PaymentTool.class),
+                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER,
+                        paymentSearchQuery.getPaymentTerminalProvider().name(),
+                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_EMAIL, paymentSearchQuery.getPaymentEmail(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_IP, paymentSearchQuery.getPaymentIp(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_FINGERPRINT, paymentSearchQuery.getPaymentFingerprint(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6, paymentSearchQuery.getPaymentFirst6(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM, paymentSearchQuery.getPaymentSystem().name(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4, paymentSearchQuery.getPaymentLast4(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, paymentSearchQuery.getPaymentCustomerId(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT,
+                        paymentSearchQuery.isSetPaymentAmount()
+                                ? paymentSearchQuery.getPaymentAmount()
+                                : null,
+                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION,
+                        paymentSearchQuery.isSetPaymentDomainRevision()
+                                ? paymentSearchQuery.getPaymentDomainRevision()
+                                : null,
+                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION,
+                        paymentSearchQuery.isSetFromPaymentDomainRevision()
+                                ? paymentSearchQuery.getFromPaymentDomainRevision()
+                                : null,
                         GREATER_OR_EQUAL)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, parameters.getToPaymentDomainRevision(), LESS_OR_EQUAL)
-                .addValue(PAYMENT_DATA.EVENT_CREATED_AT, whereTime, LESS)
-                .addValue(PAYMENT_DATA.PAYMENT_RRN, parameters.getPaymentRrn(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, parameters.getPaymentApproveCode(), EQUALS)
-                .addValue(PAYMENT_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS);
-        if (!ObjectUtils.isEmpty(parameters.getPaymentBankCardTokenProvider())) {
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION,
+                        paymentSearchQuery.isSetToPaymentDomainRevision()
+                                ? paymentSearchQuery.getToPaymentDomainRevision()
+                                : null,
+                        LESS_OR_EQUAL)
+                .addValue(PAYMENT_DATA.EVENT_CREATED_AT, timeHolder.getWhereTime(), LESS)
+                .addValue(PAYMENT_DATA.PAYMENT_RRN, paymentSearchQuery.getPaymentRrn(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, paymentSearchQuery.getPaymentApprovalCode(), EQUALS)
+                .addValue(PAYMENT_DATA.EXTERNAL_ID, paymentSearchQuery.getExternalId(), EQUALS);
+        if (!ObjectUtils.isEmpty(paymentSearchQuery.getPaymentTokenProvider())) {
             conditionParameterSource.addOrCondition(
                     PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER
-                            .eq(parameters.getPaymentBankCardTokenProvider()),
+                            .eq(paymentSearchQuery.getPaymentTokenProvider().name()),
                     PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER_LEGACY.eq(
-                            toEnumField(parameters.getPaymentBankCardTokenProvider(),
+                            toEnumField(paymentSearchQuery.getPaymentTokenProvider().name(),
                                     com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class)));
         }
 
@@ -472,31 +508,30 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
      *
      * @author n.pospolita
      */
-    private ConditionParameterSource prepareEnrichedRefundCondition(RefundsFunction.RefundsParameters parameters,
-                                                                    LocalDateTime whereTime) {
+    private ConditionParameterSource prepareEnrichedRefundCondition(
+            com.rbkmoney.magista.okko.RefundSearchQuery refundSearchQuery,
+            TimeHolder timeHolder) {
+        CommonSearchQueryParams commonParams = refundSearchQuery.getCommonSearchQueryParams();
         return new ConditionParameterSource()
-                .addValue(REFUND_DATA.PARTY_ID, parameters.getMerchantId(), EQUALS)
-                .addValue(REFUND_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                .addValue(REFUND_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                .addValue(REFUND_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
-                .addValue(REFUND_DATA.REFUND_ID, parameters.getRefundId(), EQUALS)
-                .addValue(REFUND_DATA.EXTERNAL_ID, parameters.getExternalId(), EQUALS)
-                .addValue(REFUND_DATA.EVENT_CREATED_AT, whereTime, LESS)
+                .addValue(REFUND_DATA.PARTY_ID, commonParams.getPartyId(), EQUALS)
+                .addInConditionValue(REFUND_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
+                .addValue(REFUND_DATA.INVOICE_ID, refundSearchQuery.getInvoiceId(), EQUALS)
+                .addValue(REFUND_DATA.PAYMENT_ID, refundSearchQuery.getPaymentId(), EQUALS)
+                .addValue(REFUND_DATA.REFUND_ID, refundSearchQuery.getRefundId(), EQUALS)
+                .addValue(REFUND_DATA.EXTERNAL_ID, refundSearchQuery.getExternalId(), EQUALS)
+                .addValue(REFUND_DATA.EVENT_CREATED_AT, timeHolder.getWhereTime(), LESS)
                 .addValue(REFUND_DATA.REFUND_STATUS,
-                        toEnumField(parameters.getRefundStatus(), RefundStatus.class),
+                        refundSearchQuery.isSetRefundStatus()
+                                ? TBaseUtil.unionFieldToEnum(refundSearchQuery.getRefundStatus(), RefundStatus.class)
+                                : null,
                         EQUALS);
     }
 
-    private Condition prepareExcludeCondition(PaymentsFunction.PaymentsParameters parameters) {
-        Object paramObject = parameters.getExclude();
-        Map excludeParam = paramObject instanceof Map ? ((Map) paramObject) : null;
-        if (excludeParam != null) {
-            Object shopIdParam = excludeParam.get(SHOP_ID_PARAM);
-            List<String> excludeShopIds = shopIdParam instanceof List ? ((List) shopIdParam) : null;
-            if (excludeShopIds != null && !excludeShopIds.isEmpty()) {
-                return PAYMENT_DATA.PARTY_SHOP_ID.notIn(excludeShopIds);
-            }
-        }
-        return null;
+    private TimeHolder buildTimeHolder(CommonSearchQueryParams commonParams) {
+        return TimeHolder.builder()
+                .fromTime(TypeUtil.stringToLocalDateTime(commonParams.getFromTime()))
+                .toTime(TypeUtil.stringToLocalDateTime(commonParams.getToTime()))
+                .whereTime(tokenGenService.extractTime(commonParams.getContinuationToken()))
+                .build();
     }
 }
