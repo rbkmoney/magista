@@ -360,7 +360,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         return fetch(query, enrichedStatInvoiceMapper);
     }
 
-    private void preparePaymentsCondition(ConditionParameterSource conditionParameterSource,
+    private ConditionParameterSource preparePaymentsCondition(ConditionParameterSource conditionParameterSource,
                                                               PaymentParams paymentParams,
                                                               String externalId) {
         conditionParameterSource
@@ -412,15 +412,17 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                             toEnumField(paymentParams.getPaymentTokenProvider().name(),
                                     com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class)));
         }
+        return conditionParameterSource;
     }
 
-    private void prepareInvoicePaymentsCondition(ConditionParameterSource paymentParameterSource,
+    private ConditionParameterSource prepareInvoicePaymentsCondition(ConditionParameterSource paymentParameterSource,
                                                                      CommonSearchQueryParams commonParams,
                                                                      List<String> invoiceIds) {
         paymentParameterSource
                 .addValue(PAYMENT_DATA.PARTY_ID, UUID.fromString(commonParams.getPartyId()), EQUALS)
                 .addInConditionValue(PAYMENT_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
                 .addInConditionValue(PAYMENT_DATA.INVOICE_ID, invoiceIds);
+        return paymentParameterSource;
     }
 
     /**

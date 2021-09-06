@@ -96,8 +96,10 @@ public class DeprecatedSearchDaoImpl extends AbstractDao implements DeprecatedSe
                     .from(PAYMENT_DATA)
                     .where(
                             appendDateTimeRangeConditions(
-                                    appendConditions(INVOICE_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID),
-                                            Operator.AND, paymentParameterSource),
+                                    appendConditions(
+                                            INVOICE_DATA.INVOICE_ID.eq(PAYMENT_DATA.INVOICE_ID),
+                                            Operator.AND,
+                                            paymentParameterSource),
                                     PAYMENT_DATA.PAYMENT_CREATED_AT,
                                     fromTime,
                                     toTime))));
