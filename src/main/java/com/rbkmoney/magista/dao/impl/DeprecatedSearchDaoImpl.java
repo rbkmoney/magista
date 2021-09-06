@@ -86,9 +86,11 @@ public class DeprecatedSearchDaoImpl extends AbstractDao implements DeprecatedSe
                 toTime
         );
 
-        ConditionParameterSource paymentParameterSource = preparePaymentsCondition(parameters);
+        ConditionParameterSource paymentParameterSource = new ConditionParameterSource();
+        preparePaymentsCondition(paymentParameterSource, parameters);
         if (!paymentParameterSource.getConditionFields().isEmpty()
                 || !paymentParameterSource.getOrConditions().isEmpty()) {
+            prepareInvoicePaymentsCondition(paymentParameterSource, parameters);
             condition = condition.and(DSL.exists(getDslContext()
                     .select(DSL.field("1"))
                     .from(PAYMENT_DATA)
@@ -119,8 +121,10 @@ public class DeprecatedSearchDaoImpl extends AbstractDao implements DeprecatedSe
             LocalDateTime whereTime,
             int limit
     ) {
-        ConditionParameterSource conditionParameterSource = preparePaymentsCondition(parameters)
-                .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime, LESS);
+        ConditionParameterSource conditionParameterSource = new ConditionParameterSource();
+        prepareInvoicePaymentsCondition(conditionParameterSource, parameters);
+        preparePaymentsCondition(conditionParameterSource, parameters);
+        conditionParameterSource.addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, whereTime, LESS);
 
         SelectConditionStep<org.jooq.Record> conditionStep = getDslContext()
                 .select()
@@ -363,19 +367,10 @@ public class DeprecatedSearchDaoImpl extends AbstractDao implements DeprecatedSe
         return fetch(query, enrichedStatInvoiceMapper);
     }
 
-    private ConditionParameterSource preparePaymentsCondition(PaymentsFunction.PaymentsParameters parameters) {
-        ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
-                .addValue(
-                        PAYMENT_DATA.PARTY_ID,
-                        Optional.ofNullable(parameters.getMerchantId())
-                                .map(UUID::fromString)
-                                .orElse(null),
-                        EQUALS
-                )
-                .addValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
-                .addInConditionValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopIds())
-                .addValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
-                .addInConditionValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceIds())
+    private ConditionParameterSource preparePaymentsCondition(
+            ConditionParameterSource conditionParameterSource,
+            PaymentsFunction.PaymentsParameters parameters) {
+        conditionParameterSource
                 .addValue(PAYMENT_DATA.PAYMENT_ID, parameters.getPaymentId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_STATUS,
                         toEnumField(parameters.getPaymentStatus(),
@@ -413,6 +408,24 @@ public class DeprecatedSearchDaoImpl extends AbstractDao implements DeprecatedSe
                             toEnumField(parameters.getPaymentBankCardTokenProvider(),
                                     com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class)));
         }
+        return conditionParameterSource;
+    }
+
+    private ConditionParameterSource prepareInvoicePaymentsCondition(
+            ConditionParameterSource conditionParameterSource,
+            PaymentsFunction.PaymentsParameters parameters) {
+        conditionParameterSource
+                .addValue(
+                        PAYMENT_DATA.PARTY_ID,
+                        Optional.ofNullable(parameters.getMerchantId())
+                                .map(UUID::fromString)
+                                .orElse(null),
+                        EQUALS
+                )
+                .addValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopId(), EQUALS)
+                .addInConditionValue(PAYMENT_DATA.PARTY_SHOP_ID, parameters.getShopIds())
+                .addValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceId(), EQUALS)
+                .addInConditionValue(PAYMENT_DATA.INVOICE_ID, parameters.getInvoiceIds());
         return conditionParameterSource;
     }
 
