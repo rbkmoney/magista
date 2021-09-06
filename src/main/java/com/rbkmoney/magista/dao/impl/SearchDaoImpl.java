@@ -92,11 +92,11 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 timeHolder.getToTime()
         );
 
-        ConditionParameterSource paymentParameterSource = preparePaymentsCondition(commonParams,
-                searchQuery.getPaymentParams(), searchQuery.getInvoiceIds(),
-                searchQuery.getExternalId());
+        ConditionParameterSource paymentParameterSource = new ConditionParameterSource();
+        preparePaymentsCondition(paymentParameterSource, searchQuery.getPaymentParams(), searchQuery.getExternalId());
         if (!paymentParameterSource.getConditionFields().isEmpty()
                 || !paymentParameterSource.getOrConditions().isEmpty()) {
+            prepareInvoicePaymentsCondition(paymentParameterSource, commonParams, searchQuery.getInvoiceIds());
             condition = condition.and(DSL.exists(getDslContext()
                     .select(DSL.field("1"))
                     .from(PAYMENT_DATA)
@@ -124,12 +124,10 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         CommonSearchQueryParams commonParams = searchQuery.getCommonSearchQueryParams();
         TimeHolder timeHolder = buildTimeHolder(commonParams);
         PaymentParams paymentParams = searchQuery.getPaymentParams();
-        ConditionParameterSource conditionParameterSource =
-                preparePaymentsCondition(commonParams,
-                        paymentParams,
-                        searchQuery.getInvoiceIds(),
-                        searchQuery.getExternalId())
-                .addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, timeHolder.getWhereTime(), LESS);
+        ConditionParameterSource conditionParameterSource = new ConditionParameterSource();
+        prepareInvoicePaymentsCondition(conditionParameterSource, commonParams, searchQuery.getInvoiceIds());
+        preparePaymentsCondition(conditionParameterSource, paymentParams, searchQuery.getExternalId());
+        conditionParameterSource.addValue(PAYMENT_DATA.PAYMENT_CREATED_AT, timeHolder.getWhereTime(), LESS);
 
         SelectConditionStep<org.jooq.Record> conditionStep = getDslContext()
                 .select()
@@ -362,20 +360,10 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         return fetch(query, enrichedStatInvoiceMapper);
     }
 
-    private ConditionParameterSource preparePaymentsCondition(CommonSearchQueryParams commonParams,
+    private void preparePaymentsCondition(ConditionParameterSource conditionParameterSource,
                                                               PaymentParams paymentParams,
-                                                              List<String> invoiceIds,
                                                               String externalId) {
-        ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
-                .addValue(
-                        PAYMENT_DATA.PARTY_ID,
-                        Optional.ofNullable(commonParams.getPartyId())
-                                .map(UUID::fromString)
-                                .orElse(null),
-                        EQUALS
-                )
-                .addInConditionValue(PAYMENT_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
-                .addInConditionValue(PAYMENT_DATA.INVOICE_ID, invoiceIds)
+        conditionParameterSource
                 .addValue(PAYMENT_DATA.PAYMENT_ID, paymentParams.getPaymentId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_STATUS,
                         paymentParams.isSetPaymentStatus()
@@ -424,7 +412,15 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                             toEnumField(paymentParams.getPaymentTokenProvider().name(),
                                     com.rbkmoney.magista.domain.enums.BankCardTokenProvider.class)));
         }
-        return conditionParameterSource;
+    }
+
+    private void prepareInvoicePaymentsCondition(ConditionParameterSource paymentParameterSource,
+                                                                     CommonSearchQueryParams commonParams,
+                                                                     List<String> invoiceIds) {
+        paymentParameterSource
+                .addValue(PAYMENT_DATA.PARTY_ID, UUID.fromString(commonParams.getPartyId()), EQUALS)
+                .addInConditionValue(PAYMENT_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
+                .addInConditionValue(PAYMENT_DATA.INVOICE_ID, invoiceIds);
     }
 
     /**
