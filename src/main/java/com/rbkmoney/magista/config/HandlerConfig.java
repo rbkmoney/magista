@@ -24,15 +24,17 @@ public class HandlerConfig {
     public StatisticsServletIface statisticsHandler(
             StatisticsDao statisticsDao,
             DeprecatedSearchDao searchDao,
-            DeprecatedTokenGenService tokenGenService
-    ) {
-        return new DeprecatedMerchantStatisticsHandler(new QueryProcessorImpl(new JsonQueryParser() {
-            @Override
-            protected ObjectMapper getMapper() {
-                ObjectMapper mapper = super.getMapper();
-                mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-                return mapper;
-            }
-        }, new QueryBuilderImpl(), new QueryContextFactoryImpl(statisticsDao, searchDao, tokenGenService)));
+            DeprecatedTokenGenService tokenGenService) {
+        return new DeprecatedMerchantStatisticsHandler(new QueryProcessorImpl(
+                new JsonQueryParser() {
+                    @Override
+                    protected ObjectMapper getMapper() {
+                        ObjectMapper mapper = super.getMapper();
+                        mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+                        return mapper;
+                    }
+                },
+                new QueryBuilderImpl(),
+                new QueryContextFactoryImpl(statisticsDao, searchDao, tokenGenService)));
     }
 }

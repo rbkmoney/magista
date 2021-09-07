@@ -40,14 +40,10 @@ public class InvoiceTemplateUpdatedEventMapper implements InvoiceTemplateMapper 
         if (updateParams.isSetDetails()) {
             var details = updateParams.getDetails();
             switch (details.getSetField()) {
-                case CART:
-                    invoiceTemplate.setInvoiceDetailsCartJson(DamselUtil.toJsonString(details.getCart()));
-                    break;
-                case PRODUCT:
-                    invoiceTemplate.setInvoiceDetailsProductJson(DamselUtil.toJsonString(details.getProduct()));
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown field parameter, details=" + details);
+                case CART -> invoiceTemplate.setInvoiceDetailsCartJson(DamselUtil.toJsonString(details.getCart()));
+                case PRODUCT -> invoiceTemplate.setInvoiceDetailsProductJson(
+                        DamselUtil.toJsonString(details.getProduct()));
+                default -> throw new IllegalArgumentException("Unknown field parameter, details=" + details);
             }
         }
         if (updateParams.isSetContext()) {

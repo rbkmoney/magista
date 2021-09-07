@@ -9,6 +9,7 @@ import java.util.Map;
 
 @Deprecated
 public interface DeprecatedSearchDao {
+
     Collection<Map.Entry<Long, StatInvoice>> getInvoices(
             InvoicesFunction.InvoicesParameters parameters,
             LocalDateTime fromTime,

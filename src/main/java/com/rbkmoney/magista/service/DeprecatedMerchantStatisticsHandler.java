@@ -57,6 +57,11 @@ public class DeprecatedMerchantStatisticsHandler implements StatisticsServletIfa
         return getStatResponse(statRequest);
     }
 
+    @Override
+    public StatResponse getByQuery(StatRequest statRequest) throws TException {
+        return getStatResponse(statRequest);
+    }
+
     private StatResponse getStatResponse(StatRequest statRequest) throws InvalidRequest, BadToken {
         log.info("New stat request: {}", statRequest);
         try {
@@ -69,10 +74,5 @@ public class DeprecatedMerchantStatisticsHandler implements StatisticsServletIfa
             log.error("Failed to process stat request", e);
             throw new InvalidRequest(Arrays.asList(e.getMessage()));
         }
-    }
-
-    @Override
-    public StatResponse getByQuery(StatRequest statRequest) throws TException {
-        return getStatResponse(statRequest);
     }
 }

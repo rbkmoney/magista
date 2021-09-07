@@ -6,11 +6,11 @@ import com.rbkmoney.magista.*;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.*;
+import com.rbkmoney.magista.dark.messiah.EnrichedStatInvoice;
 import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.*;
-import com.rbkmoney.magista.okko.EnrichedStatInvoice;
 import com.rbkmoney.magista.service.TimeHolder;
 import com.rbkmoney.magista.service.TokenGenService;
 import org.jooq.Condition;
@@ -303,8 +303,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
      * @author n.pospolitych
      */
     @Override
-    public List<EnrichedStatInvoice> getEnrichedInvoices(
-            com.rbkmoney.magista.okko.RefundSearchQuery refundSearchQuery) {
+    public List<EnrichedStatInvoice> getEnrichedRefundInvoices(
+            com.rbkmoney.magista.dark.messiah.RefundSearchQuery refundSearchQuery) {
         CommonSearchQueryParams commonParams = refundSearchQuery.getCommonSearchQueryParams();
         TimeHolder timeHolder = buildTimeHolder(commonParams);
         ConditionParameterSource refundParameterSource = prepareEnrichedRefundCondition(refundSearchQuery, timeHolder);
@@ -334,8 +334,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
      * @author n.pospolita
      */
     @Override
-    public List<EnrichedStatInvoice> getEnrichedInvoices(
-            com.rbkmoney.magista.okko.PaymentSearchQuery paymentSearchQuery) {
+    public List<EnrichedStatInvoice> getEnrichedPaymentInvoices(
+            com.rbkmoney.magista.dark.messiah.PaymentSearchQuery paymentSearchQuery) {
         CommonSearchQueryParams commonParams = paymentSearchQuery.getCommonSearchQueryParams();
         TimeHolder timeHolder = buildTimeHolder(commonParams);
         var conditionParameterSource = prepareEnrichedPaymentsCondition(paymentSearchQuery, timeHolder);
@@ -431,7 +431,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
      * @author n.pospolita
      */
     private ConditionParameterSource prepareEnrichedPaymentsCondition(
-            com.rbkmoney.magista.okko.PaymentSearchQuery paymentSearchQuery,
+            com.rbkmoney.magista.dark.messiah.PaymentSearchQuery paymentSearchQuery,
             TimeHolder timeHolder) {
         CommonSearchQueryParams commonParams = paymentSearchQuery.getCommonSearchQueryParams();
         ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
@@ -507,7 +507,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
      * @author n.pospolita
      */
     private ConditionParameterSource prepareEnrichedRefundCondition(
-            com.rbkmoney.magista.okko.RefundSearchQuery refundSearchQuery,
+            com.rbkmoney.magista.dark.messiah.RefundSearchQuery refundSearchQuery,
             TimeHolder timeHolder) {
         CommonSearchQueryParams commonParams = refundSearchQuery.getCommonSearchQueryParams();
         return new ConditionParameterSource()

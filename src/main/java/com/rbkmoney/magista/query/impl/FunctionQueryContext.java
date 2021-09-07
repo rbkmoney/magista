@@ -16,9 +16,10 @@ public class FunctionQueryContext implements QueryContext {
 
     private final DeprecatedTokenGenService tokenGenService;
 
-    public FunctionQueryContext(StatisticsDao statisticsDao,
-                                DeprecatedSearchDao searchDao,
-                                DeprecatedTokenGenService tokenGenService) {
+    public FunctionQueryContext(
+            StatisticsDao statisticsDao,
+            DeprecatedSearchDao searchDao,
+            DeprecatedTokenGenService tokenGenService) {
         this.statisticsDao = statisticsDao;
         this.searchDao = searchDao;
         this.tokenGenService = tokenGenService;

@@ -23,33 +23,24 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-/**
- * Created by tolkonepiu on 23/06/2017.
- */
 public class DamselUtil {
 
     public static final JsonProcessor jsonProcessor = new JsonProcessor();
 
     public static LocalDateTime getAdjustmentStatusCreatedAt(InvoicePaymentAdjustmentStatus adjustmentStatus) {
-        switch (adjustmentStatus.getSetField()) {
-            case CAPTURED:
-                return TypeUtil.stringToLocalDateTime(adjustmentStatus.getCaptured().getAt());
-            case CANCELLED:
-                return TypeUtil.stringToLocalDateTime(adjustmentStatus.getCancelled().getAt());
-            default:
-                return null;
-        }
+        return switch (adjustmentStatus.getSetField()) {
+            case CAPTURED -> TypeUtil.stringToLocalDateTime(adjustmentStatus.getCaptured().getAt());
+            case CANCELLED -> TypeUtil.stringToLocalDateTime(adjustmentStatus.getCancelled().getAt());
+            default -> null;
+        };
     }
 
     public static String getInvoiceStatusDetails(com.rbkmoney.damsel.domain.InvoiceStatus invoiceStatus) {
-        switch (invoiceStatus.getSetField()) {
-            case FULFILLED:
-                return invoiceStatus.getFulfilled().getDetails();
-            case CANCELLED:
-                return invoiceStatus.getCancelled().getDetails();
-            default:
-                return null;
-        }
+        return switch (invoiceStatus.getSetField()) {
+            case FULFILLED -> invoiceStatus.getFulfilled().getDetails();
+            case CANCELLED -> invoiceStatus.getCancelled().getDetails();
+            default -> null;
+        };
     }
 
     public static String toJsonString(TBase tBase) {
@@ -72,8 +63,9 @@ public class DamselUtil {
         }
     }
 
-    public static long getAmount(List<FinalCashFlowPosting> finalCashFlowPostings,
-                                 Predicate<FinalCashFlowPosting> predicate) {
+    public static long getAmount(
+            List<FinalCashFlowPosting> finalCashFlowPostings,
+            Predicate<FinalCashFlowPosting> predicate) {
         return finalCashFlowPostings.stream()
                 .filter(predicate)
                 .mapToLong(posting -> posting.getVolume().getAmount())
@@ -125,7 +117,9 @@ public class DamselUtil {
 
     @Deprecated
     public static com.rbkmoney.damsel.merch_stat.OperationFailure toOperationFailureDeprecated(
-            FailureClass failureClass, String failure, String failureDescription) {
+            FailureClass failureClass,
+            String failure,
+            String failureDescription) {
         switch (failureClass) {
             case operation_timeout:
                 return com.rbkmoney.damsel.merch_stat.OperationFailure.operation_timeout(
@@ -139,8 +133,9 @@ public class DamselUtil {
         }
     }
 
-    public static OperationFailure toOperationFailure(FailureClass failureClass, String failure,
-                                                      String failureDescription) {
+    public static OperationFailure toOperationFailure(
+            FailureClass failureClass, String failure,
+            String failureDescription) {
         switch (failureClass) {
             case operation_timeout:
                 return OperationFailure.operation_timeout(new OperationTimeout());

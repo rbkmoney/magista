@@ -28,7 +28,7 @@ public class DeprecatedStatPayoutMapper implements RowMapper<Map.Entry<Long, Sta
         statPayout.setCreatedAt(
                 TypeUtil.temporalToString(rs.getObject(PAYOUT.CREATED_AT.getName(), LocalDateTime.class))
         );
-        statPayout.setPayoutToolInfo(MapperHelper.toPayoutToolInfo(rs));
+        statPayout.setPayoutToolInfo(DeprecatedMapperHelper.toPayoutToolInfo(rs));
 
         return new AbstractMap.SimpleEntry<>(rs.getLong(PAYOUT.ID.getName()), statPayout);
     }

@@ -1,11 +1,10 @@
 package com.rbkmoney.magista.dao;
 
 import com.rbkmoney.magista.*;
-import com.rbkmoney.magista.okko.EnrichedStatInvoice;
 
 import java.util.List;
 
-public interface SearchDao {
+public interface SearchDao extends DarkMessiahSearchDao {
 
     List<StatInvoice> getInvoices(InvoiceSearchQuery invoiceSearchQuery);
 
@@ -16,9 +15,5 @@ public interface SearchDao {
     List<StatPayout> getPayouts(PayoutSearchQuery payoutSearchQuery);
 
     List<StatChargeback> getChargebacks(ChargebackSearchQuery chargebackSearchQuery);
-
-    List<EnrichedStatInvoice> getEnrichedInvoices(com.rbkmoney.magista.okko.PaymentSearchQuery paymentSearchQuery);
-
-    List<EnrichedStatInvoice> getEnrichedInvoices(com.rbkmoney.magista.okko.RefundSearchQuery refundSearchQuery);
 
 }

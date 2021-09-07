@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.dao.impl.mapper;
 
-import com.rbkmoney.magista.okko.EnrichedStatInvoice;
+import com.rbkmoney.magista.dark.messiah.EnrichedStatInvoice;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.util.ObjectUtils;
 

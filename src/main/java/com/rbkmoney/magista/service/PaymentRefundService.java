@@ -1,6 +1,7 @@
 package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.dao.RefundDao;
+import com.rbkmoney.magista.domain.enums.InvoiceEventType;
 import com.rbkmoney.magista.domain.tables.pojos.PaymentData;
 import com.rbkmoney.magista.domain.tables.pojos.RefundData;
 import com.rbkmoney.magista.exception.DaoException;
@@ -46,25 +47,22 @@ public class PaymentRefundService {
         log.info("Trying to save refund events, size={}", refundEvents.size());
         Map<String, RefundData> refundDataCacheMap = new HashMap<>();
         List<RefundData> enrichedRefundEvents = refundEvents.stream()
-                .map(refund -> {
-                    switch (refund.getEventType()) {
-                        case INVOICE_PAYMENT_REFUND_CREATED:
-                            PaymentData paymentData =
-                                    paymentService.getPaymentData(refund.getInvoiceId(), refund.getPaymentId());
-                            refund.setPartyId(paymentData.getPartyId().toString());
-                            refund.setPartyShopId(paymentData.getPartyShopId());
-                            if (refund.getRefundAmount() == null) {
-                                refund.setRefundAmount(paymentData.getPaymentAmount());
-                                refund.setRefundCurrencyCode(paymentData.getPaymentCurrencyCode());
-                            }
-                            return refund;
-                        default:
-                            RefundData previousRefund = refundDataCacheMap.computeIfAbsent(
-                                    refund.getInvoiceId() + refund.getPaymentId() + refund.getRefundId(),
-                                    key -> getRefund(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId())
-                            );
-                            BeanUtil.merge(previousRefund, refund);
-                            return refund;
+                .peek(refund -> {
+                    if (refund.getEventType() == InvoiceEventType.INVOICE_PAYMENT_REFUND_CREATED) {
+                        PaymentData paymentData =
+                                paymentService.getPaymentData(refund.getInvoiceId(), refund.getPaymentId());
+                        refund.setPartyId(paymentData.getPartyId().toString());
+                        refund.setPartyShopId(paymentData.getPartyShopId());
+                        if (refund.getRefundAmount() == null) {
+                            refund.setRefundAmount(paymentData.getPaymentAmount());
+                            refund.setRefundCurrencyCode(paymentData.getPaymentCurrencyCode());
+                        }
+                    } else {
+                        RefundData previousRefund = refundDataCacheMap.computeIfAbsent(
+                                refund.getInvoiceId() + refund.getPaymentId() + refund.getRefundId(),
+                                key -> getRefund(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId())
+                        );
+                        BeanUtil.merge(previousRefund, refund);
                     }
                 })
                 .peek(refundData -> refundDataCacheMap

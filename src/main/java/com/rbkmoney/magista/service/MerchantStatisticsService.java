@@ -2,8 +2,8 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.magista.*;
 import com.rbkmoney.magista.dao.SearchDao;
-import com.rbkmoney.magista.okko.EnrichedStatInvoice;
-import com.rbkmoney.magista.okko.StatEnrichedStatInvoiceResponse;
+import com.rbkmoney.magista.dark.messiah.EnrichedStatInvoice;
+import com.rbkmoney.magista.dark.messiah.StatEnrichedStatInvoiceResponse;
 import com.rbkmoney.magista.util.TokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class MerchantStatisticsService {
     private final TokenGenService tokenGenService;
 
     public StatInvoiceResponse getInvoices(InvoiceSearchQuery searchQuery) {
-        InvoiceSearchQuery queryCopyWithNullToken = new InvoiceSearchQuery(searchQuery);
+        var queryCopyWithNullToken = new InvoiceSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
         tokenGenService.validateToken(
                 queryCopyWithNullToken,
@@ -36,7 +36,7 @@ public class MerchantStatisticsService {
     }
 
     public StatPaymentResponse getPayments(PaymentSearchQuery searchQuery) {
-        PaymentSearchQuery queryCopyWithNullToken = new PaymentSearchQuery(searchQuery);
+        var queryCopyWithNullToken = new PaymentSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
         tokenGenService.validateToken(
                 queryCopyWithNullToken,
@@ -54,7 +54,7 @@ public class MerchantStatisticsService {
     }
 
     public StatRefundResponse getRefunds(RefundSearchQuery searchQuery) {
-        RefundSearchQuery queryCopyWithNullToken = new RefundSearchQuery(searchQuery);
+        var queryCopyWithNullToken = new RefundSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
         tokenGenService.validateToken(
                 queryCopyWithNullToken,
@@ -72,7 +72,7 @@ public class MerchantStatisticsService {
     }
 
     public StatPayoutResponse getPayouts(PayoutSearchQuery searchQuery) {
-        PayoutSearchQuery queryCopyWithNullToken = new PayoutSearchQuery(searchQuery);
+        var queryCopyWithNullToken = new PayoutSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
         tokenGenService.validateToken(
                 queryCopyWithNullToken,
@@ -90,7 +90,7 @@ public class MerchantStatisticsService {
     }
 
     public StatChargebackResponse getChargebacks(ChargebackSearchQuery searchQuery) {
-        ChargebackSearchQuery queryCopyWithNullToken = new ChargebackSearchQuery(searchQuery);
+        var queryCopyWithNullToken = new ChargebackSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
         tokenGenService.validateToken(
                 queryCopyWithNullToken,
@@ -109,13 +109,13 @@ public class MerchantStatisticsService {
     }
 
     public StatEnrichedStatInvoiceResponse getEnrichedPaymentInvoices(
-            com.rbkmoney.magista.okko.PaymentSearchQuery searchQuery) {
-        var queryCopyWithNullToken = new com.rbkmoney.magista.okko.PaymentSearchQuery(searchQuery);
+            com.rbkmoney.magista.dark.messiah.PaymentSearchQuery searchQuery) {
+        var queryCopyWithNullToken = new com.rbkmoney.magista.dark.messiah.PaymentSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
         tokenGenService.validateToken(
                 queryCopyWithNullToken,
                 searchQuery.getCommonSearchQueryParams().getContinuationToken());
-        List<EnrichedStatInvoice> invoices = searchDao.getEnrichedInvoices(searchQuery);
+        List<EnrichedStatInvoice> invoices = searchDao.getEnrichedPaymentInvoices(searchQuery);
         return new StatEnrichedStatInvoiceResponse()
                 .setEnrichedInvoices(invoices)
                 .setContinuationToken(
@@ -127,13 +127,13 @@ public class MerchantStatisticsService {
     }
 
     public StatEnrichedStatInvoiceResponse getEnrichedRefundInvoices(
-            com.rbkmoney.magista.okko.RefundSearchQuery searchQuery) {
-        var queryCopyWithNullToken = new com.rbkmoney.magista.okko.RefundSearchQuery(searchQuery);
+            com.rbkmoney.magista.dark.messiah.RefundSearchQuery searchQuery) {
+        var queryCopyWithNullToken = new com.rbkmoney.magista.dark.messiah.RefundSearchQuery(searchQuery);
         queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
         tokenGenService.validateToken(
                 queryCopyWithNullToken,
                 searchQuery.getCommonSearchQueryParams().getContinuationToken());
-        List<EnrichedStatInvoice> invoices = searchDao.getEnrichedInvoices(searchQuery);
+        List<EnrichedStatInvoice> invoices = searchDao.getEnrichedRefundInvoices(searchQuery);
         return new StatEnrichedStatInvoiceResponse()
                 .setEnrichedInvoices(invoices)
                 .setContinuationToken(
@@ -141,7 +141,6 @@ public class MerchantStatisticsService {
                                 queryCopyWithNullToken,
                                 searchQuery.getCommonSearchQueryParams(),
                                 invoices,
-                                TokenUtil::getEnrichedRefundsDateTime)
-                );
+                                TokenUtil::getEnrichedRefundsDateTime));
     }
 }

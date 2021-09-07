@@ -49,23 +49,20 @@ public class PaymentAdjustmentService {
 
         Map<String, AdjustmentData> adjustmentDataCacheMap = new HashMap<>();
         List<AdjustmentData> enrichedAdjustmentEvents = adjustments.stream()
-                .map(adjustment -> {
-                    switch (adjustment.getEventType()) {
-                        case INVOICE_PAYMENT_ADJUSTMENT_CREATED:
-                            PaymentData paymentData =
-                                    paymentService.getPaymentData(adjustment.getInvoiceId(), adjustment.getPaymentId());
-                            adjustment.setPartyId(paymentData.getPartyId().toString());
-                            adjustment.setPartyShopId(paymentData.getPartyShopId());
-                            return adjustment;
-                        default:
-                            AdjustmentData previousAdjustmentEvent = adjustmentDataCacheMap.computeIfAbsent(
-                                    adjustment.getInvoiceId() + adjustment.getPaymentId() +
-                                            adjustment.getAdjustmentId(),
-                                    key -> getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(),
-                                            adjustment.getAdjustmentId())
-                            );
-                            BeanUtil.merge(previousAdjustmentEvent, adjustment);
-                            return adjustment;
+                .peek(adjustment -> {
+                    if (adjustment.getEventType() == InvoiceEventType.INVOICE_PAYMENT_ADJUSTMENT_CREATED) {
+                        PaymentData paymentData =
+                                paymentService.getPaymentData(adjustment.getInvoiceId(), adjustment.getPaymentId());
+                        adjustment.setPartyId(paymentData.getPartyId().toString());
+                        adjustment.setPartyShopId(paymentData.getPartyShopId());
+                    } else {
+                        AdjustmentData previousAdjustmentEvent = adjustmentDataCacheMap.computeIfAbsent(
+                                adjustment.getInvoiceId() + adjustment.getPaymentId() +
+                                        adjustment.getAdjustmentId(),
+                                key -> getAdjustment(adjustment.getInvoiceId(), adjustment.getPaymentId(),
+                                        adjustment.getAdjustmentId())
+                        );
+                        BeanUtil.merge(previousAdjustmentEvent, adjustment);
                     }
                 })
                 .peek(adjustmentData -> adjustmentDataCacheMap
