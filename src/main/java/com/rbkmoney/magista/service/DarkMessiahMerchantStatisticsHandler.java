@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class OkkoMerchantStatisticsHandler implements DarkMessiahMerchantStatisticsServiceSrv.Iface {
+public class DarkMessiahMerchantStatisticsHandler implements DarkMessiahMerchantStatisticsServiceSrv.Iface {
 
     private final MerchantStatisticsService merchantStatisticsService;
 
