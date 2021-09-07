@@ -25,11 +25,11 @@ public class DeprecatedStatChargebackMapper implements RowMapper<Map.Entry<Long,
                 .setExternalId(rs.getString(CHARGEBACK_DATA.EXTERNAL_ID.getName()))
                 .setPartyId(rs.getString(CHARGEBACK_DATA.PARTY_ID.getName()))
                 .setShopId(rs.getString(CHARGEBACK_DATA.PARTY_SHOP_ID.getName()))
-                .setChargebackStatus(MapperHelper.toInvoicePaymentChargebackStatus(rs))
+                .setChargebackStatus(DeprecatedMapperHelper.toInvoicePaymentChargebackStatus(rs))
                 .setCreatedAt(TypeUtil.temporalToString(
                         rs.getObject(CHARGEBACK_DATA.CHARGEBACK_CREATED_AT.getName(), LocalDateTime.class))
                 )
-                .setChargebackReason(MapperHelper.toInvoicePaymentChargebackReason(rs))
+                .setChargebackReason(DeprecatedMapperHelper.toInvoicePaymentChargebackReason(rs))
                 .setLevyAmount(rs.getLong(CHARGEBACK_DATA.CHARGEBACK_LEVY_AMOUNT.getName()))
                 .setLevyCurrencyCode(new com.rbkmoney.damsel.domain.Currency()
                         .setName(rs.getString(CHARGEBACK_DATA.CHARGEBACK_LEVY_CURRENCY_CODE.getName()))
@@ -45,7 +45,7 @@ public class DeprecatedStatChargebackMapper implements RowMapper<Map.Entry<Long,
                 .setFee(rs.getLong(CHARGEBACK_DATA.CHARGEBACK_FEE.getName()))
                 .setProviderFee(rs.getLong(CHARGEBACK_DATA.CHARGEBACK_PROVIDER_FEE.getName()))
                 .setExternalFee(rs.getLong(CHARGEBACK_DATA.CHARGEBACK_EXTERNAL_FEE.getName()))
-                .setStage(MapperHelper.toInvoicePaymentChargebackStage(rs));
+                .setStage(DeprecatedMapperHelper.toInvoicePaymentChargebackStage(rs));
 
         byte[] content = rs.getBytes(CHARGEBACK_DATA.CHARGEBACK_CONTEXT.getName());
         if (content != null) {
@@ -53,5 +53,4 @@ public class DeprecatedStatChargebackMapper implements RowMapper<Map.Entry<Long,
         }
         return new AbstractMap.SimpleEntry<>(rs.getLong(CHARGEBACK_DATA.ID.getName()), chargeback);
     }
-
 }

@@ -17,9 +17,10 @@ public class QueryContextFactoryImpl implements QueryContextFactory {
 
     private final DeprecatedTokenGenService tokenGenService;
 
-    public QueryContextFactoryImpl(StatisticsDao statisticsDao,
-                                   DeprecatedSearchDao searchDao,
-                                   DeprecatedTokenGenService tokenGenService) {
+    public QueryContextFactoryImpl(
+            StatisticsDao statisticsDao,
+            DeprecatedSearchDao searchDao,
+            DeprecatedTokenGenService tokenGenService) {
         this.statisticsDao = statisticsDao;
         this.searchDao = searchDao;
         this.tokenGenService = tokenGenService;

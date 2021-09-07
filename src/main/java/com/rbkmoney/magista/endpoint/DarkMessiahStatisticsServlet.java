@@ -1,6 +1,6 @@
 package com.rbkmoney.magista.endpoint;
 
-import com.rbkmoney.magista.okko.OkkoMerchantStatisticsServiceSrv;
+import com.rbkmoney.magista.dark.messiah.DarkMessiahMerchantStatisticsServiceSrv;
 import com.rbkmoney.woody.thrift.impl.http.THServiceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,13 +14,13 @@ public class DarkMessiahStatisticsServlet extends GenericServlet {
     private Servlet thriftServlet;
 
     @Autowired
-    private OkkoMerchantStatisticsServiceSrv.Iface requestHandler;
+    private DarkMessiahMerchantStatisticsServiceSrv.Iface requestHandler;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         thriftServlet = new THServiceBuilder()
-                .build(OkkoMerchantStatisticsServiceSrv.Iface.class, requestHandler);
+                .build(DarkMessiahMerchantStatisticsServiceSrv.Iface.class, requestHandler);
     }
 
     @Override

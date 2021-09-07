@@ -51,18 +51,20 @@ public class TokenGenService {
     }
 
 
-    public <T> String generateToken(TBase query,
-                                    CommonSearchQueryParams commonParams,
-                                    List<T> objects,
-                                    Function<List<T>, T> lastElementFunction,
-                                    Function<T, String> dateTimeFunction) {
+    public <T> String generateToken(
+            TBase query,
+            CommonSearchQueryParams commonParams,
+            List<T> objects,
+            Function<List<T>, T> lastElementFunction,
+            Function<T, String> dateTimeFunction) {
         return generateToken(query, commonParams, objects, dateTimeFunction.compose(lastElementFunction));
     }
 
-    public <T> String generateToken(TBase query,
-                                    CommonSearchQueryParams commonParams,
-                                    List<T> objects,
-                                    Function<List<T>, String> dateTimeFunction) {
+    public <T> String generateToken(
+            TBase query,
+            CommonSearchQueryParams commonParams,
+            List<T> objects,
+            Function<List<T>, String> dateTimeFunction) {
         if (!CollectionUtils.isEmpty(objects) && commonParams.isSetLimit()
                 && objects.size() == commonParams.getLimit()) {
             final String createdAt = dateTimeFunction.apply(objects);
@@ -105,7 +107,9 @@ public class TokenGenService {
 
     @Data
     private static final class TokenHolder {
+
         private final String token;
         private final LocalDateTime timestamp;
+
     }
 }

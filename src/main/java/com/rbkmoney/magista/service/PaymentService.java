@@ -51,23 +51,19 @@ public class PaymentService {
     public void savePayments(List<PaymentData> paymentEvents) throws NotFoundException, StorageException {
         Map<String, PaymentData> paymentDataCacheMap = new LinkedHashMap<>();
         List<PaymentData> enrichedPaymentEvents = paymentEvents.stream()
-                .map(payment -> {
-                    switch (payment.getEventType()) {
-                        case INVOICE_PAYMENT_STARTED:
-                            if (payment.getPartyId() == null) {
-                                InvoiceData invoiceData = invoiceService.getInvoiceData(payment.getInvoiceId());
-                                payment.setPartyId(invoiceData.getPartyId());
-                                payment.setPartyShopId(invoiceData.getPartyShopId());
-                            }
-                            return payment;
-                        default:
-                            PaymentData previousPaymentData = paymentDataCacheMap.computeIfAbsent(
-                                    payment.getInvoiceId() + payment.getPaymentId(),
-                                    key -> getPaymentData(payment.getInvoiceId(), payment.getPaymentId())
-                            );
-
-                            BeanUtil.merge(previousPaymentData, payment);
-                            return payment;
+                .peek(payment -> {
+                    if (payment.getEventType() == InvoiceEventType.INVOICE_PAYMENT_STARTED) {
+                        if (payment.getPartyId() == null) {
+                            InvoiceData invoiceData = invoiceService.getInvoiceData(payment.getInvoiceId());
+                            payment.setPartyId(invoiceData.getPartyId());
+                            payment.setPartyShopId(invoiceData.getPartyShopId());
+                        }
+                    } else {
+                        PaymentData previousPaymentData = paymentDataCacheMap.computeIfAbsent(
+                                payment.getInvoiceId() + payment.getPaymentId(),
+                                key -> getPaymentData(payment.getInvoiceId(), payment.getPaymentId())
+                        );
+                        BeanUtil.merge(previousPaymentData, payment);
                     }
                 })
                 .peek(payment -> paymentDataCacheMap.put(payment.getInvoiceId() + payment.getPaymentId(), payment))

@@ -4,7 +4,7 @@ import com.rbkmoney.magista.InvoicePaymentRefundStatus;
 import com.rbkmoney.magista.InvoicePaymentStatus;
 import com.rbkmoney.magista.StatPayment;
 import com.rbkmoney.magista.StatRefund;
-import com.rbkmoney.magista.okko.EnrichedStatInvoice;
+import com.rbkmoney.magista.dark.messiah.EnrichedStatInvoice;
 
 import java.util.List;
 

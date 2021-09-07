@@ -39,14 +39,9 @@ public class InvoiceTemplateCreatedEventMapper implements InvoiceTemplateMapper 
         invoiceTemplate.setDescription(invoiceTemplateThrift.getDescription());
         var details = invoiceTemplateThrift.getDetails();
         switch (details.getSetField()) {
-            case CART:
-                invoiceTemplate.setInvoiceDetailsCartJson(DamselUtil.toJsonString(details.getCart()));
-                break;
-            case PRODUCT:
-                invoiceTemplate.setInvoiceDetailsProductJson(DamselUtil.toJsonString(details.getProduct()));
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown field parameter, details=" + details);
+            case CART -> invoiceTemplate.setInvoiceDetailsCartJson(DamselUtil.toJsonString(details.getCart()));
+            case PRODUCT -> invoiceTemplate.setInvoiceDetailsProductJson(DamselUtil.toJsonString(details.getProduct()));
+            default -> throw new IllegalArgumentException("Unknown field parameter, details=" + details);
         }
         if (invoiceTemplateThrift.isSetContext()) {
             var content = invoiceTemplateThrift.getContext();
