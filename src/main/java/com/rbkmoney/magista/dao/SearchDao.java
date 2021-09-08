@@ -16,4 +16,6 @@ public interface SearchDao extends DarkMessiahSearchDao {
 
     List<StatChargeback> getChargebacks(ChargebackSearchQuery chargebackSearchQuery);
 
+    List<StatInvoiceTemplate> getInvoiceTemplates(InvoiceTemplateSearchQuery invoiceTemplateSearchQuery);
+
 }

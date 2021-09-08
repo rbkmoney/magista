@@ -31,6 +31,7 @@ import static com.rbkmoney.geck.common.util.TypeUtil.toEnumField;
 import static com.rbkmoney.geck.common.util.TypeUtil.toEnumFields;
 import static com.rbkmoney.magista.domain.tables.ChargebackData.CHARGEBACK_DATA;
 import static com.rbkmoney.magista.domain.tables.InvoiceData.INVOICE_DATA;
+import static com.rbkmoney.magista.domain.tables.InvoiceTemplate.INVOICE_TEMPLATE;
 import static com.rbkmoney.magista.domain.tables.PaymentData.PAYMENT_DATA;
 import static com.rbkmoney.magista.domain.tables.Payout.PAYOUT;
 import static com.rbkmoney.magista.domain.tables.RefundData.REFUND_DATA;
@@ -45,6 +46,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     private final StatPayoutMapper statPayoutMapper;
     private final StatChargebackMapper statChargebackMapper;
     private final EnrichedStatInvoiceMapper enrichedStatInvoiceMapper;
+    private final StatInvoiceTemplateMapper statInvoiceTemplateMapper;
     private final TokenGenService tokenGenService;
 
     public SearchDaoImpl(DataSource ds, TokenGenService tokenGenService) {
@@ -56,6 +58,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         statPayoutMapper = new StatPayoutMapper();
         statChargebackMapper = new StatChargebackMapper();
         enrichedStatInvoiceMapper = new EnrichedStatInvoiceMapper();
+        statInvoiceTemplateMapper = new StatInvoiceTemplateMapper();
     }
 
     @Override
@@ -168,23 +171,6 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
         return fetch(query, statRefundMapper);
     }
 
-    private ConditionParameterSource prepareRefundCondition(RefundSearchQuery searchQuery, TimeHolder timeHolder) {
-        CommonSearchQueryParams commonParams = searchQuery.getCommonSearchQueryParams();
-        return new ConditionParameterSource()
-                .addValue(REFUND_DATA.PARTY_ID, commonParams.getPartyId(), EQUALS)
-                .addInConditionValue(REFUND_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
-                .addInConditionValue(REFUND_DATA.INVOICE_ID, searchQuery.getInvoiceIds())
-                .addValue(REFUND_DATA.PAYMENT_ID, searchQuery.getPaymentId(), EQUALS)
-                .addValue(REFUND_DATA.REFUND_ID, searchQuery.getRefundId(), EQUALS)
-                .addValue(REFUND_DATA.EXTERNAL_ID, searchQuery.getExternalId(), EQUALS)
-                .addValue(REFUND_DATA.REFUND_CREATED_AT, timeHolder.getWhereTime(), LESS)
-                .addValue(REFUND_DATA.REFUND_STATUS,
-                        searchQuery.isSetRefundStatus()
-                                ? TBaseUtil.unionFieldToEnum(searchQuery.getRefundStatus(), RefundStatus.class)
-                                : null,
-                        EQUALS);
-    }
-
     @Override
     public List<StatPayout> getPayouts(PayoutSearchQuery payoutSearchQuery) {
         CommonSearchQueryParams commonParams = payoutSearchQuery.getCommonSearchQueryParams();
@@ -205,39 +191,6 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .limit(commonParams.getLimit());
 
         return fetch(query, statPayoutMapper);
-    }
-
-    private ConditionParameterSource preparePayoutCondition(PayoutSearchQuery payoutSearchQuery,
-                                                            TimeHolder timeHolder) {
-        CommonSearchQueryParams commonParams = payoutSearchQuery.getCommonSearchQueryParams();
-        ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
-                .addValue(PAYOUT.PARTY_ID, commonParams.getPartyId(), EQUALS)
-                .addInConditionValue(PAYOUT.SHOP_ID, commonParams.getShopIds())
-                .addValue(PAYOUT.PAYOUT_ID, payoutSearchQuery.getPayoutId(), EQUALS)
-                .addInConditionValue(PAYOUT.STATUS,
-                        payoutSearchQuery.isSetPayoutStatuses()
-                                ? toEnumFields(payoutSearchQuery.getPayoutStatuses().stream()
-                                        .map(ps -> ps.getSetField().getFieldName())
-                                        .collect(Collectors.toList()),
-                                PayoutStatus.class)
-                                : null)
-                .addValue(PAYOUT.CREATED_AT, timeHolder.getWhereTime(), LESS);
-        if (payoutSearchQuery.getPayoutType() != null) {
-            switch (payoutSearchQuery.getPayoutType().getSetField().getFieldName()) {
-                case "bank_account" -> conditionParameterSource.addOrCondition(
-                        PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.russian_bank_account),
-                        PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.international_bank_account));
-                case "wallet_info",
-                        "payment_institution_account",
-                        "russian_bank_account",
-                        "international_bank_account" -> conditionParameterSource.addValue(PAYOUT.PAYOUT_TOOL_TYPE,
-                        TBaseUtil.unionFieldToEnum(payoutSearchQuery.getPayoutType(), PayoutToolType.class),
-                        EQUALS);
-                default -> throw new IllegalArgumentException("Unknown payout_type " +
-                        payoutSearchQuery.getPayoutType());
-            }
-        }
-        return conditionParameterSource;
     }
 
     @Override
@@ -263,27 +216,27 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                 .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_STATUS,
                                         chargebackSearchQuery.isSetChargebackStatuses()
                                                 ? toEnumFields(
-                                                        chargebackSearchQuery.getChargebackStatuses()
-                                                                .stream()
-                                                                .map(cs -> cs.getSetField().getFieldName())
-                                                                .collect(Collectors.toList()),
-                                                        ChargebackStatus.class)
+                                                chargebackSearchQuery.getChargebackStatuses()
+                                                        .stream()
+                                                        .map(cs -> cs.getSetField().getFieldName())
+                                                        .collect(Collectors.toList()),
+                                                ChargebackStatus.class)
                                                 : null)
                                 .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_STAGE,
                                         chargebackSearchQuery.isSetChargebackStages()
                                                 ? toEnumFields(chargebackSearchQuery.getChargebackStages()
-                                                                .stream()
-                                                                .map(cs -> cs.getSetField().getFieldName())
-                                                                .collect(Collectors.toList()),
-                                                        ChargebackStage.class)
+                                                        .stream()
+                                                        .map(cs -> cs.getSetField().getFieldName())
+                                                        .collect(Collectors.toList()),
+                                                ChargebackStage.class)
                                                 : null)
                                 .addInConditionValue(CHARGEBACK_DATA.CHARGEBACK_REASON_CATEGORY,
                                         chargebackSearchQuery.isSetChargebackCategories()
                                                 ? toEnumFields(chargebackSearchQuery.getChargebackCategories()
-                                                                .stream()
-                                                                .map(cc -> cc.getSetField().getFieldName())
-                                                                .collect(Collectors.toList()),
-                                                        ChargebackCategory.class)
+                                                        .stream()
+                                                        .map(cc -> cc.getSetField().getFieldName())
+                                                        .collect(Collectors.toList()),
+                                                ChargebackCategory.class)
                                                 : null)
                                 .addValue(CHARGEBACK_DATA.CHARGEBACK_CREATED_AT, timeHolder.getWhereTime(), LESS)
                         ),
@@ -295,6 +248,43 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .limit(commonParams.getLimit());
 
         return fetch(query, statChargebackMapper);
+    }
+
+    @Override
+    public List<StatInvoiceTemplate> getInvoiceTemplates(InvoiceTemplateSearchQuery invoiceTemplateSearchQuery) {
+        CommonSearchQueryParams commonParams = invoiceTemplateSearchQuery.getCommonSearchQueryParams();
+        TimeHolder timeHolder = buildTimeHolder(commonParams);
+        Query query = getDslContext()
+                .selectFrom(INVOICE_TEMPLATE)
+                .where(appendDateTimeRangeConditions(
+                        appendConditions(
+                                DSL.trueCondition(),
+                                Operator.AND,
+                                new ConditionParameterSource()
+                                        .addValue(INVOICE_TEMPLATE.PARTY_ID, commonParams.getPartyId(), EQUALS)
+                                        .addInConditionValue(INVOICE_TEMPLATE.SHOP_ID, commonParams.getShopIds())
+                                        .addValue(
+                                                INVOICE_TEMPLATE.INVOICE_TEMPLATE_ID,
+                                                invoiceTemplateSearchQuery.getInvoiceTemplateId(),
+                                                EQUALS)
+                                        .addValue(
+                                                INVOICE_TEMPLATE.INVOICE_VALID_UNTIL,
+                                                invoiceTemplateSearchQuery.isSetInvoiceValidUntil()
+                                                        ? TypeUtil.stringToLocalDateTime(
+                                                        invoiceTemplateSearchQuery.getInvoiceValidUntil())
+                                                        : null,
+                                                GREATER_OR_EQUAL)
+                                        .addValue(
+                                                INVOICE_TEMPLATE.PRODUCT,
+                                                invoiceTemplateSearchQuery.getProduct(),
+                                                EQUALS)
+                                        .addValue(INVOICE_TEMPLATE.EVENT_CREATED_AT, timeHolder.getWhereTime(), LESS)),
+                        INVOICE_TEMPLATE.EVENT_CREATED_AT,
+                        timeHolder.getFromTime(),
+                        timeHolder.getToTime()))
+                .orderBy(INVOICE_TEMPLATE.EVENT_CREATED_AT.desc())
+                .limit(commonParams.getLimit());
+        return fetch(query, statInvoiceTemplateMapper);
     }
 
     /**
@@ -358,6 +348,56 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .limit(commonParams.getLimit());
 
         return fetch(query, enrichedStatInvoiceMapper);
+    }
+
+    private ConditionParameterSource prepareRefundCondition(RefundSearchQuery searchQuery, TimeHolder timeHolder) {
+        CommonSearchQueryParams commonParams = searchQuery.getCommonSearchQueryParams();
+        return new ConditionParameterSource()
+                .addValue(REFUND_DATA.PARTY_ID, commonParams.getPartyId(), EQUALS)
+                .addInConditionValue(REFUND_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
+                .addInConditionValue(REFUND_DATA.INVOICE_ID, searchQuery.getInvoiceIds())
+                .addValue(REFUND_DATA.PAYMENT_ID, searchQuery.getPaymentId(), EQUALS)
+                .addValue(REFUND_DATA.REFUND_ID, searchQuery.getRefundId(), EQUALS)
+                .addValue(REFUND_DATA.EXTERNAL_ID, searchQuery.getExternalId(), EQUALS)
+                .addValue(REFUND_DATA.REFUND_CREATED_AT, timeHolder.getWhereTime(), LESS)
+                .addValue(REFUND_DATA.REFUND_STATUS,
+                        searchQuery.isSetRefundStatus()
+                                ? TBaseUtil.unionFieldToEnum(searchQuery.getRefundStatus(), RefundStatus.class)
+                                : null,
+                        EQUALS);
+    }
+
+    private ConditionParameterSource preparePayoutCondition(PayoutSearchQuery payoutSearchQuery,
+                                                            TimeHolder timeHolder) {
+        CommonSearchQueryParams commonParams = payoutSearchQuery.getCommonSearchQueryParams();
+        ConditionParameterSource conditionParameterSource = new ConditionParameterSource()
+                .addValue(PAYOUT.PARTY_ID, commonParams.getPartyId(), EQUALS)
+                .addInConditionValue(PAYOUT.SHOP_ID, commonParams.getShopIds())
+                .addValue(PAYOUT.PAYOUT_ID, payoutSearchQuery.getPayoutId(), EQUALS)
+                .addInConditionValue(PAYOUT.STATUS,
+                        payoutSearchQuery.isSetPayoutStatuses()
+                                ? toEnumFields(payoutSearchQuery.getPayoutStatuses().stream()
+                                        .map(ps -> ps.getSetField().getFieldName())
+                                        .collect(Collectors.toList()),
+                                PayoutStatus.class)
+                                : null)
+                .addValue(PAYOUT.CREATED_AT, timeHolder.getWhereTime(), LESS);
+        if (payoutSearchQuery.getPayoutType() != null) {
+            switch (payoutSearchQuery.getPayoutType().getSetField().getFieldName()) {
+                case "bank_account" -> conditionParameterSource.addOrCondition(
+                        PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.russian_bank_account),
+                        PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.international_bank_account));
+                case "wallet_info",
+                        "payment_institution_account",
+                        "russian_bank_account",
+                        "international_bank_account" -> conditionParameterSource.addValue(PAYOUT.PAYOUT_TOOL_TYPE,
+                        TBaseUtil.unionFieldToEnum(payoutSearchQuery.getPayoutType(), PayoutToolType.class),
+                        EQUALS);
+                default -> throw new IllegalArgumentException("Unknown payout_type " +
+                        payoutSearchQuery.getPayoutType());
+            }
+        }
+        return conditionParameterSource;
     }
 
     private ConditionParameterSource preparePaymentsCondition(ConditionParameterSource conditionParameterSource,

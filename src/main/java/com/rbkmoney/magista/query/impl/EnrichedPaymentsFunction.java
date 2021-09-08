@@ -12,7 +12,6 @@ import com.rbkmoney.magista.query.parser.QueryParserException;
 import com.rbkmoney.magista.query.parser.QueryPart;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -159,7 +158,7 @@ public class EnrichedPaymentsFunction extends PagedBaseFunction<Map.Entry<Long, 
         }
 
         private CompositeQuery createQuery(QueryPart queryPart, String continuationToken) {
-            List<Query> queries = Collections.singletonList(
+            List<Query> queries = List.of(
                     new GetDataFunction(queryPart.getDescriptor() + ":" + GetDataFunction.FUNC_NAME,
                             queryPart.getParameters(), continuationToken)
             );

@@ -35,22 +35,6 @@ public class TokenGenService {
         return tokenHolder != null ? tokenHolder.getTimestamp() : null;
     }
 
-    @SneakyThrows
-    private String generateToken(TBase query, LocalDateTime createdAt) {
-        String val = Geck.toJson(query);
-        try {
-            String token = String.format("%s;%s",
-                    HmacUtil.encode(tokenGenProperties.getKey(), val.getBytes(StandardCharsets.UTF_8)),
-                    createdAt.atZone(ZoneOffset.UTC).toInstant().toString()
-            );
-            log.debug("Generated token: {}", token);
-            return token;
-        } catch (GeneralSecurityException e) {
-            throw new TokenGeneratorException("Can't generate token", e);
-        }
-    }
-
-
     public <T> String generateToken(
             TBase query,
             CommonSearchQueryParams commonParams,
@@ -85,6 +69,21 @@ public class TokenGenService {
                     && !generatedTokenHolder.getToken().equals(validateTokenHolder.getToken())) {
                 throw new BadTokenException("Token validation failure");
             }
+        }
+    }
+
+    @SneakyThrows
+    private String generateToken(TBase query, LocalDateTime createdAt) {
+        String val = Geck.toJson(query);
+        try {
+            String token = String.format("%s;%s",
+                    HmacUtil.encode(tokenGenProperties.getKey(), val.getBytes(StandardCharsets.UTF_8)),
+                    createdAt.atZone(ZoneOffset.UTC).toInstant().toString()
+            );
+            log.debug("Generated token: {}", token);
+            return token;
+        } catch (GeneralSecurityException e) {
+            throw new TokenGeneratorException("Can't generate token", e);
         }
     }
 

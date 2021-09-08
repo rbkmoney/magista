@@ -143,4 +143,22 @@ public class MerchantStatisticsService {
                                 invoices,
                                 TokenUtil::getEnrichedRefundsDateTime));
     }
+
+    public StatInvoiceTemplateResponse getInvoiceTemplates(InvoiceTemplateSearchQuery searchQuery) {
+        var queryCopyWithNullToken = new InvoiceTemplateSearchQuery(searchQuery);
+        queryCopyWithNullToken.getCommonSearchQueryParams().setContinuationToken(null);
+        tokenGenService.validateToken(
+                queryCopyWithNullToken,
+                searchQuery.getCommonSearchQueryParams().getContinuationToken());
+        List<StatInvoiceTemplate> invoiceTemplates = searchDao.getInvoiceTemplates(searchQuery);
+        return new StatInvoiceTemplateResponse()
+                .setInvoiceTemplates(invoiceTemplates)
+                .setContinuationToken(
+                        tokenGenService.generateToken(
+                                queryCopyWithNullToken,
+                                searchQuery.getCommonSearchQueryParams(),
+                                invoiceTemplates,
+                                TokenUtil::getLastElement,
+                                StatInvoiceTemplate::getCreatedAt));
+    }
 }
