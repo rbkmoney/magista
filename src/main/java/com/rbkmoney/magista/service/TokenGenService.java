@@ -35,6 +35,21 @@ public class TokenGenService {
         return tokenHolder != null ? tokenHolder.getTimestamp() : null;
     }
 
+    public void validateToken(TBase query, String validateToken) {
+        TokenHolder validateTokenHolder = extractToken(validateToken);
+        if (validateTokenHolder != null) {
+            LocalDateTime createdAt = validateTokenHolder.getTimestamp();
+            String generatedToken = generateToken(query, createdAt);
+            TokenHolder generatedTokenHolder = extractToken(generatedToken);
+            if (generatedTokenHolder != null
+                    && generatedTokenHolder.getToken() != null
+                    && validateTokenHolder.getToken() != null
+                    && !generatedTokenHolder.getToken().equals(validateTokenHolder.getToken())) {
+                throw new BadTokenException("Token validation failure");
+            }
+        }
+    }
+
     public <T> String generateToken(
             TBase query,
             CommonSearchQueryParams commonParams,
@@ -55,21 +70,6 @@ public class TokenGenService {
             return generateToken(query, TypeUtil.stringToLocalDateTime(createdAt));
         }
         return null;
-    }
-
-    public void validateToken(TBase query, String validateToken) {
-        TokenHolder validateTokenHolder = extractToken(validateToken);
-        if (validateTokenHolder != null) {
-            LocalDateTime createdAt = validateTokenHolder.getTimestamp();
-            String generatedToken = generateToken(query, createdAt);
-            TokenHolder generatedTokenHolder = extractToken(generatedToken);
-            if (generatedTokenHolder != null
-                    && generatedTokenHolder.getToken() != null
-                    && validateTokenHolder.getToken() != null
-                    && !generatedTokenHolder.getToken().equals(validateTokenHolder.getToken())) {
-                throw new BadTokenException("Token validation failure");
-            }
-        }
     }
 
     @SneakyThrows

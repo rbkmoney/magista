@@ -5,7 +5,6 @@ import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.CommonSearchQueryParams;
 import com.rbkmoney.magista.InvoiceTemplateSearchQuery;
-import com.rbkmoney.magista.StatInvoiceTemplateResponse;
 import com.rbkmoney.magista.config.PostgresqlSpringBootITest;
 import com.rbkmoney.magista.listener.InvoiceTemplateListener;
 import lombok.SneakyThrows;
@@ -57,7 +56,7 @@ public class MerchantStatisticsServiceTest {
 //                LocalDateTime.now().minusMinutes(1),
 //                invoiceTemplate.getInvoiceLifetime())));
         searchQuery.setProduct(invoiceTemplate.getProduct());
-        StatInvoiceTemplateResponse statInvoiceTemplateResponse = merchantStatisticsService.getInvoiceTemplates(searchQuery);
+        var statInvoiceTemplateResponse = merchantStatisticsService.getInvoiceTemplates(searchQuery);
         assertEquals(1, statInvoiceTemplateResponse.getInvoiceTemplates().size());
     }
 }
