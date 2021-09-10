@@ -5,7 +5,9 @@ import com.rbkmoney.damsel.domain.InvoiceCart;
 import com.rbkmoney.damsel.domain.InvoiceTemplateDetails;
 import com.rbkmoney.damsel.domain.InvoiceTemplateProduct;
 import com.rbkmoney.geck.common.util.TypeUtil;
+import com.rbkmoney.magista.InvoiceTemplateStatus;
 import com.rbkmoney.magista.StatInvoiceTemplate;
+import com.rbkmoney.magista.domain.enums.InvoiceTemplateEventType;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -20,7 +22,7 @@ public class StatInvoiceTemplateMapper implements RowMapper<StatInvoiceTemplate>
     @Override
     public StatInvoiceTemplate mapRow(ResultSet rs, int i) throws SQLException {
         StatInvoiceTemplate statInvoiceTemplate = new StatInvoiceTemplate()
-                .setCreatedAt(TypeUtil.temporalToString(
+                .setEventCreatedAt(TypeUtil.temporalToString(
                         rs.getObject(INVOICE_TEMPLATE.EVENT_CREATED_AT.getName(), LocalDateTime.class)))
                 .setPartyId(rs.getString(INVOICE_TEMPLATE.PARTY_ID.getName()))
                 .setShopId(rs.getString(INVOICE_TEMPLATE.SHOP_ID.getName()))
@@ -45,6 +47,22 @@ public class StatInvoiceTemplateMapper implements RowMapper<StatInvoiceTemplate>
             context.setType(invoiceContextType);
             context.setData(invoiceContextData);
             statInvoiceTemplate.setContext(context);
+        }
+        statInvoiceTemplate.setName(rs.getString(INVOICE_TEMPLATE.NAME.getName()));
+        switch (TypeUtil.toEnumField(
+                rs.getString(INVOICE_TEMPLATE.EVENT_TYPE.getName()),
+                InvoiceTemplateEventType.class)) {
+            case INVOICE_TEMPLATE_CREATED, INVOICE_TEMPLATE_UPDATED -> statInvoiceTemplate.setInvoiceTemplateStatus(
+                    InvoiceTemplateStatus.created);
+            case INVOICE_TEMPLATE_DELETED -> statInvoiceTemplate.setInvoiceTemplateStatus(
+                    InvoiceTemplateStatus.deleted);
+            default -> throw new IllegalArgumentException("Unknown enum type");
+        }
+        LocalDateTime invoiceTemplateCreatedAt = rs.getObject(
+                INVOICE_TEMPLATE.INVOICE_TEMPLATE_CREATED_AT.getName(),
+                LocalDateTime.class);
+        if (invoiceTemplateCreatedAt != null) {
+            statInvoiceTemplate.setInvoiceTemplateCreatedAt(TypeUtil.temporalToString(invoiceTemplateCreatedAt));
         }
         return statInvoiceTemplate;
     }

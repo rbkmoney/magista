@@ -48,6 +48,9 @@ public class InvoiceTemplateCreatedEventMapper implements InvoiceTemplateMapper 
             invoiceTemplate.setInvoiceContextType(content.getType());
             invoiceTemplate.setInvoiceContextData(content.getData());
         }
+        invoiceTemplate.setName(invoiceTemplateThrift.getName());
+        invoiceTemplate.setInvoiceTemplateCreatedAt(
+                TypeUtil.stringToLocalDateTime(invoiceTemplateThrift.getCreatedAt()));
         return invoiceTemplate;
     }
 }

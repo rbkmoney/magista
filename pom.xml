@@ -105,8 +105,13 @@
         <!--RBK libs-->
         <dependency>
             <groupId>com.rbkmoney</groupId>
+            <artifactId>damsel</artifactId>
+            <version>1.513-fcb8e91</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
             <artifactId>magista-proto</artifactId>
-            <version>1.6-a3a5e93</version>
+            <version>1.8-fbb4f37</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.woody</groupId>
@@ -148,7 +153,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>payout-manager-proto</artifactId>
-            <version>1.17-8aa3eb8</version>
+            <version>1.20-608dd90</version>
         </dependency>
 
         <!--Test libs-->

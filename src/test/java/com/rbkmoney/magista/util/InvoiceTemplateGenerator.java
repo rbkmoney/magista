@@ -58,6 +58,8 @@ public class InvoiceTemplateGenerator {
         InvoiceTemplate invoiceTemplate = randomThriftOnlyRequiredFields(InvoiceTemplate.class);
         invoiceTemplate.setId("setId");
         invoiceTemplate.setDescription("setDescription");
+        invoiceTemplate.setName("setName");
+        invoiceTemplate.setCreatedAt(Instant.now().toString());
         short date = 12;
         invoiceTemplate.getInvoiceLifetime()
                 .setDays(date)

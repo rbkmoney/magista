@@ -4,6 +4,7 @@ import com.rbkmoney.damsel.domain.InvoiceTemplate;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.magista.CommonSearchQueryParams;
 import com.rbkmoney.magista.InvoiceTemplateSearchQuery;
+import com.rbkmoney.magista.InvoiceTemplateStatus;
 import com.rbkmoney.magista.config.PostgresqlSpringBootITest;
 import com.rbkmoney.magista.listener.InvoiceTemplateListener;
 import lombok.SneakyThrows;
@@ -54,7 +55,16 @@ public class MerchantStatisticsServiceTest {
         searchQuery.setInvoiceTemplateId(invoiceTemplateId);
         searchQuery.setInvoiceValidUntil(Instant.now().plusSeconds(30).toString());
         searchQuery.setProduct(invoiceTemplate.getProduct());
+        searchQuery.setName(invoiceTemplate.getName());
+        searchQuery.setInvoiceTemplateStatus(InvoiceTemplateStatus.created);
         var statInvoiceTemplateResponse = merchantStatisticsService.getInvoiceTemplates(searchQuery);
+        assertEquals(1, statInvoiceTemplateResponse.getInvoiceTemplates().size());
+        searchQuery.setInvoiceTemplateStatus(InvoiceTemplateStatus.deleted);
+        statInvoiceTemplateResponse = merchantStatisticsService.getInvoiceTemplates(searchQuery);
+        assertEquals(0, statInvoiceTemplateResponse.getInvoiceTemplates().size());
+        searchQuery.setInvoiceTemplateStatus(null);
+        searchQuery.setInvoiceValidUntil(null);
+        statInvoiceTemplateResponse = merchantStatisticsService.getInvoiceTemplates(searchQuery);
         assertEquals(1, statInvoiceTemplateResponse.getInvoiceTemplates().size());
     }
 }

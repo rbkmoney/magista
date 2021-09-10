@@ -51,6 +51,7 @@ public class InvoiceTemplateUpdatedEventMapper implements InvoiceTemplateMapper 
             invoiceTemplate.setInvoiceContextType(content.getType());
             invoiceTemplate.setInvoiceContextData(content.getData());
         }
+        invoiceTemplate.setName(updateParams.getName());
         return invoiceTemplate;
     }
 }

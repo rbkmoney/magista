@@ -159,6 +159,6 @@ public class MerchantStatisticsService {
                                 searchQuery.getCommonSearchQueryParams(),
                                 invoiceTemplates,
                                 TokenUtil::getLastElement,
-                                StatInvoiceTemplate::getCreatedAt));
+                                StatInvoiceTemplate::getEventCreatedAt));
     }
 }

@@ -1,10 +1,10 @@
 package com.rbkmoney.magista.kafka;
 
+import com.rbkmoney.damsel.domain.CurrencyRef;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.config.KafkaPostgresqlSpringBootITest;
 import com.rbkmoney.magista.service.PayoutHandlerService;
 import com.rbkmoney.payout.manager.*;
-import com.rbkmoney.payout.manager.domain.CurrencyRef;
 import com.rbkmoney.testcontainers.annotations.kafka.config.KafkaProducer;
 import org.apache.thrift.TBase;
 import org.junit.jupiter.api.Test;

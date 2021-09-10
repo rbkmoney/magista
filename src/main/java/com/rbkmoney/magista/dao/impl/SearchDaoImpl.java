@@ -254,11 +254,23 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     public List<StatInvoiceTemplate> getInvoiceTemplates(InvoiceTemplateSearchQuery invoiceTemplateSearchQuery) {
         CommonSearchQueryParams commonParams = invoiceTemplateSearchQuery.getCommonSearchQueryParams();
         TimeHolder timeHolder = buildTimeHolder(commonParams);
+        Condition invoiceTemplateStatus = DSL.trueCondition();
+        if (invoiceTemplateSearchQuery.isSetInvoiceTemplateStatus()) {
+            switch (invoiceTemplateSearchQuery.getInvoiceTemplateStatus()) {
+                case created -> invoiceTemplateStatus = INVOICE_TEMPLATE.EVENT_TYPE.in(
+                        InvoiceTemplateEventType.INVOICE_TEMPLATE_CREATED,
+                        InvoiceTemplateEventType.INVOICE_TEMPLATE_UPDATED);
+                case deleted -> invoiceTemplateStatus = INVOICE_TEMPLATE.EVENT_TYPE.eq(
+                        InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED);
+                default -> throw new IllegalArgumentException("Unknown enum type " +
+                        invoiceTemplateSearchQuery.getInvoiceTemplateStatus());
+            }
+        }
         Query query = getDslContext()
                 .selectFrom(INVOICE_TEMPLATE)
                 .where(appendDateTimeRangeConditions(
                         appendConditions(
-                                DSL.trueCondition(),
+                                DSL.condition(Operator.AND, DSL.trueCondition(), invoiceTemplateStatus),
                                 Operator.AND,
                                 new ConditionParameterSource()
                                         .addValue(INVOICE_TEMPLATE.PARTY_ID, commonParams.getPartyId(), EQUALS)
@@ -278,7 +290,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                                 INVOICE_TEMPLATE.PRODUCT,
                                                 invoiceTemplateSearchQuery.getProduct(),
                                                 EQUALS)
-                                        .addValue(INVOICE_TEMPLATE.EVENT_CREATED_AT, timeHolder.getWhereTime(), LESS)),
+                                        .addValue(INVOICE_TEMPLATE.EVENT_CREATED_AT, timeHolder.getWhereTime(), LESS)
+                                        .addValue(INVOICE_TEMPLATE.NAME, invoiceTemplateSearchQuery.getName(), EQUALS)),
                         INVOICE_TEMPLATE.EVENT_CREATED_AT,
                         timeHolder.getFromTime(),
                         timeHolder.getToTime()))
