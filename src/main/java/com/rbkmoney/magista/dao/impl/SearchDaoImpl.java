@@ -254,12 +254,12 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     public List<StatInvoiceTemplate> getInvoiceTemplates(InvoiceTemplateSearchQuery invoiceTemplateSearchQuery) {
         CommonSearchQueryParams commonParams = invoiceTemplateSearchQuery.getCommonSearchQueryParams();
         TimeHolder timeHolder = buildTimeHolder(commonParams);
-        Condition invoiceTemplateStatus = buildInvoiceTemplateStatusCondition(invoiceTemplateSearchQuery);
+        Condition invoiceTemplateStatusCondition = buildInvoiceTemplateStatusCondition(invoiceTemplateSearchQuery);
         Query query = getDslContext()
                 .selectFrom(INVOICE_TEMPLATE)
                 .where(appendDateTimeRangeConditions(
                         appendConditions(
-                                DSL.condition(Operator.AND, DSL.trueCondition(), invoiceTemplateStatus),
+                                invoiceTemplateStatusCondition,
                                 Operator.AND,
                                 new ConditionParameterSource()
                                         .addValue(INVOICE_TEMPLATE.PARTY_ID, commonParams.getPartyId(), EQUALS)
