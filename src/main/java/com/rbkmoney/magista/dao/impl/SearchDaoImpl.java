@@ -254,18 +254,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
     public List<StatInvoiceTemplate> getInvoiceTemplates(InvoiceTemplateSearchQuery invoiceTemplateSearchQuery) {
         CommonSearchQueryParams commonParams = invoiceTemplateSearchQuery.getCommonSearchQueryParams();
         TimeHolder timeHolder = buildTimeHolder(commonParams);
-        Condition invoiceTemplateStatus = DSL.trueCondition();
-        if (invoiceTemplateSearchQuery.isSetInvoiceTemplateStatus()) {
-            switch (invoiceTemplateSearchQuery.getInvoiceTemplateStatus()) {
-                case created -> invoiceTemplateStatus = INVOICE_TEMPLATE.EVENT_TYPE.in(
-                        InvoiceTemplateEventType.INVOICE_TEMPLATE_CREATED,
-                        InvoiceTemplateEventType.INVOICE_TEMPLATE_UPDATED);
-                case deleted -> invoiceTemplateStatus = INVOICE_TEMPLATE.EVENT_TYPE.eq(
-                        InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED);
-                default -> throw new IllegalArgumentException("Unknown enum type " +
-                        invoiceTemplateSearchQuery.getInvoiceTemplateStatus());
-            }
-        }
+        Condition invoiceTemplateStatus = buildInvoiceTemplateStatusCondition(invoiceTemplateSearchQuery);
         Query query = getDslContext()
                 .selectFrom(INVOICE_TEMPLATE)
                 .where(appendDateTimeRangeConditions(
@@ -476,6 +465,22 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addInConditionValue(PAYMENT_DATA.PARTY_SHOP_ID, commonParams.getShopIds())
                 .addInConditionValue(PAYMENT_DATA.INVOICE_ID, invoiceIds);
         return paymentParameterSource;
+    }
+
+    private Condition buildInvoiceTemplateStatusCondition(InvoiceTemplateSearchQuery invoiceTemplateSearchQuery) {
+        Condition invoiceTemplateStatus = DSL.trueCondition();
+        if (invoiceTemplateSearchQuery.isSetInvoiceTemplateStatus()) {
+            switch (invoiceTemplateSearchQuery.getInvoiceTemplateStatus()) {
+                case created -> invoiceTemplateStatus = INVOICE_TEMPLATE.EVENT_TYPE.in(
+                        InvoiceTemplateEventType.INVOICE_TEMPLATE_CREATED,
+                        InvoiceTemplateEventType.INVOICE_TEMPLATE_UPDATED);
+                case deleted -> invoiceTemplateStatus = INVOICE_TEMPLATE.EVENT_TYPE.eq(
+                        InvoiceTemplateEventType.INVOICE_TEMPLATE_DELETED);
+                default -> throw new IllegalArgumentException("Unknown enum type " +
+                        invoiceTemplateSearchQuery.getInvoiceTemplateStatus());
+            }
+        }
+        return invoiceTemplateStatus;
     }
 
     /**

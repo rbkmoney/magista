@@ -33,13 +33,12 @@ public class InvoiceTemplateGenerator {
             String invoiceTemplateId,
             long sequenceId,
             List<InvoiceTemplateChange> invoiceTemplateChanges) {
-        MachineEvent message = new MachineEvent();
-        message.setData(toByteArray(EventPayload.invoice_template_changes(invoiceTemplateChanges)));
-        message.setCreatedAt(Instant.now().toString());
-        message.setEventId(sequenceId);
-        message.setSourceNs("source_ns");
-        message.setSourceId(invoiceTemplateId);
-        return message;
+        return new MachineEvent()
+                .setData(toByteArray(EventPayload.invoice_template_changes(invoiceTemplateChanges)))
+                .setCreatedAt(Instant.now().toString())
+                .setEventId(sequenceId)
+                .setSourceNs("source_ns")
+                .setSourceId(invoiceTemplateId);
     }
 
     public static InvoiceTemplateChange getCreated(InvoiceTemplate invoiceTemplate) {
@@ -55,33 +54,31 @@ public class InvoiceTemplateGenerator {
     }
 
     public static InvoiceTemplate getInvoiceTemplate(InvoiceTemplateDetails details) {
-        InvoiceTemplate invoiceTemplate = randomThriftOnlyRequiredFields(InvoiceTemplate.class);
-        invoiceTemplate.setId("setId");
-        invoiceTemplate.setDescription("setDescription");
-        invoiceTemplate.setName("setName");
-        invoiceTemplate.setCreatedAt(Instant.now().toString());
         short date = 12;
-        invoiceTemplate.getInvoiceLifetime()
-                .setDays(date)
-                .setMinutes(date)
-                .setSeconds(date);
-        invoiceTemplate.setDetails(details);
-        invoiceTemplate.setContext(getContent());
-        return invoiceTemplate;
+        return randomThriftOnlyRequiredFields(InvoiceTemplate.class)
+                .setId("setId")
+                .setDescription("setDescription")
+                .setName("setName")
+                .setCreatedAt(Instant.now().toString())
+                .setInvoiceLifetime(new LifetimeInterval()
+                        .setDays(date)
+                        .setMinutes(date)
+                        .setSeconds(date))
+                .setDetails(details)
+                .setContext(getContent());
     }
 
     public static InvoiceTemplateUpdateParams getParams(InvoiceTemplateDetails details) {
-        InvoiceTemplateUpdateParams invoiceTemplateUpdateParams = new InvoiceTemplateUpdateParams();
         short date = 12;
-        invoiceTemplateUpdateParams.setInvoiceLifetime(new LifetimeInterval()
-                .setDays(date)
-                .setMinutes(date)
-                .setSeconds(date));
-        invoiceTemplateUpdateParams.setDescription("setDescription");
-        invoiceTemplateUpdateParams.setProduct("setProduct");
-        invoiceTemplateUpdateParams.setDetails(details);
-        invoiceTemplateUpdateParams.setContext(getContent());
-        return invoiceTemplateUpdateParams;
+        return new InvoiceTemplateUpdateParams()
+                .setInvoiceLifetime(new LifetimeInterval()
+                        .setDays(date)
+                        .setMinutes(date)
+                        .setSeconds(date))
+                .setDescription("setDescription")
+                .setProduct("setProduct")
+                .setDetails(details)
+                .setContext(getContent());
     }
 
     public static Content getContent() {
