@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
-import java.util.Collections;
+import java.util.Map;
 
 @Configuration
 public class RetryConfig {
@@ -19,7 +19,7 @@ public class RetryConfig {
     RetryTemplate retryTemplate() {
         RetryTemplate retryTemplate = new RetryTemplate();
         retryTemplate.setRetryPolicy(
-                new ConfigurableRetryPolicy(maxAttempts, Collections.singletonMap(RuntimeException.class, true))
+                new ConfigurableRetryPolicy(maxAttempts, Map.of(RuntimeException.class, true))
         );
         retryTemplate.setBackOffPolicy(new ExponentialBackOffPolicy());
 
