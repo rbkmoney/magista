@@ -539,24 +539,24 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.INVOICE_ID, paymentSearchQuery.getInvoiceId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_ID, paymentSearchQuery.getPaymentId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_STATUS,
-                        paymentSearchQuery.isSetPaymentStatus() ?
-                                TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentStatus(),
+                        paymentSearchQuery.isSetPaymentStatus()
+                                ? TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentStatus(),
                                         com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class)
                                 : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_FLOW,
-                        paymentSearchQuery.isSetPaymentFlow() ?
-                                TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentFlow(), PaymentFlow.class)
+                        paymentSearchQuery.isSetPaymentFlow()
+                                ? TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentFlow(), PaymentFlow.class)
                                 : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TOOL,
-                        paymentSearchQuery.isSetPaymentTool() ?
-                                TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentTool(), PaymentTool.class)
+                        paymentSearchQuery.isSetPaymentTool()
+                                ? TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentTool(), PaymentTool.class)
                                 : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER,
-                        paymentSearchQuery.isSetPaymentTerminalProvider() ?
-                                paymentSearchQuery.getPaymentTerminalProvider().name()
+                        paymentSearchQuery.isSetPaymentTerminalProvider()
+                                ? paymentSearchQuery.getPaymentTerminalProvider().name()
                                 : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, paymentSearchQuery.getPaymentEmail(), EQUALS)
@@ -564,8 +564,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_FINGERPRINT, paymentSearchQuery.getPaymentFingerprint(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6, paymentSearchQuery.getPaymentFirst6(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM,
-                        paymentSearchQuery.isSetPaymentSystem() ?
-                                paymentSearchQuery.getPaymentSystem().name()
+                        paymentSearchQuery.isSetPaymentSystem()
+                                ? paymentSearchQuery.getPaymentSystem().name()
                                 : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4, paymentSearchQuery.getPaymentLast4(), EQUALS)
