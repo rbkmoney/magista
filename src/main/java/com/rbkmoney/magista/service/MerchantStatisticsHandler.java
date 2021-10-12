@@ -2,6 +2,7 @@ package com.rbkmoney.magista.service;
 
 import com.rbkmoney.damsel.base.InvalidRequest;
 import com.rbkmoney.magista.*;
+import com.rbkmoney.magista.constant.SearchConstant;
 import com.rbkmoney.magista.exception.BadTokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,7 +18,6 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class MerchantStatisticsHandler implements MerchantStatisticsServiceSrv.Iface {
 
-    private static final int LIMIT = 1000;
     private final MerchantStatisticsService merchantStatisticsService;
 
     @Override
@@ -72,7 +72,7 @@ public class MerchantStatisticsHandler implements MerchantStatisticsServiceSrv.I
     private <T> T handleSearchQuery(
             Supplier<T> merchantStatisticsService,
             CommonSearchQueryParams commonSearchQueryParams) {
-        if (commonSearchQueryParams.getLimit() > LIMIT) {
+        if (commonSearchQueryParams.getLimit() > SearchConstant.LIMIT) {
             throw new LimitExceeded();
         }
         try {

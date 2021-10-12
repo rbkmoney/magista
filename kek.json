@@ -1,0 +1,57 @@
+{
+  "decisions": [
+    "list",
+    {
+      "if_": {
+        "condition": {
+          "party": {
+            "id": "16c67b2a-ac2c-4b2f-ab00-20b2a436d4f5",
+            "definition": {
+              "shop_is": "f5a273d0-abe5-4a0d-9982-cf04e1a01c83"
+            }
+          }
+        }
+      },
+      "then_": {
+        "value": [
+          "set",
+          {
+            "id": 1978,
+            "priority": 1000
+          }
+        ]
+      }
+    },
+    {
+      "if_": {
+        "condition": {
+          "party": {
+            "id": "f98c0f92-7f1f-4b48-ac13-19cfff2fc8fe",
+            "definition": {
+              "shop_is": "30ed9f2f-b29a-4b3c-916a-4db82abb90f1"
+            }
+          }
+        }
+      },
+      "then_": {
+        "value": [
+          "set",
+          {
+            "id": 1978,
+            "priority": 1000
+          }
+        ]
+      }
+    },
+    {
+      "if_": {
+        "constant": true
+      },
+      "then_": {
+        "value": [
+          "set"
+        ]
+      }
+    }
+  ]
+}

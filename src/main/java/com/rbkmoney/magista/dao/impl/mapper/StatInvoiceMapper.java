@@ -44,12 +44,10 @@ public class StatInvoiceMapper implements RowMapper<StatInvoice> {
                 com.rbkmoney.magista.domain.enums.InvoiceStatus.class
         );
 
-        String eventCreatedAtString = TypeUtil.temporalToString(
-                rs.getObject(INVOICE_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class)
-        );
-
-        InvoiceStatus invoiceStatus = MapperHelper.mapInvoiceStatus(rs, invoiceStatusType, eventCreatedAtString);
-        statInvoice.setStatus(invoiceStatus);
+        statInvoice.setStatusChangedAt(
+                TypeUtil.temporalToString(rs.getObject(INVOICE_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class)
+        ));
+        statInvoice.setStatus(MapperHelper.mapInvoiceStatus(rs, invoiceStatusType));
 
         String invoiceCartJson = rs.getString(INVOICE_DATA.INVOICE_CART_JSON.getName());
         if (invoiceCartJson != null) {

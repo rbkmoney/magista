@@ -3,6 +3,7 @@ package com.rbkmoney.magista.dao.impl;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.magista.*;
+import com.rbkmoney.magista.constant.SearchConstant;
 import com.rbkmoney.magista.dao.SearchDao;
 import com.rbkmoney.magista.dao.impl.field.ConditionParameterSource;
 import com.rbkmoney.magista.dao.impl.mapper.*;
@@ -11,6 +12,7 @@ import com.rbkmoney.magista.domain.enums.InvoicePaymentStatus;
 import com.rbkmoney.magista.domain.enums.PaymentTool;
 import com.rbkmoney.magista.domain.enums.PayoutStatus;
 import com.rbkmoney.magista.domain.enums.*;
+import com.rbkmoney.magista.domain.enums.PayoutToolType;
 import com.rbkmoney.magista.service.TimeHolder;
 import com.rbkmoney.magista.service.TokenGenService;
 import org.jooq.Condition;
@@ -81,8 +83,8 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                 .addValue(
                                         INVOICE_DATA.INVOICE_STATUS,
                                         searchQuery.isSetInvoiceStatus()
-                                                ? TBaseUtil.unionFieldToEnum(
-                                                searchQuery.getInvoiceStatus(),
+                                                ? TypeUtil.toEnumField(
+                                                searchQuery.getInvoiceStatus().name(),
                                                 com.rbkmoney.magista.domain.enums.InvoiceStatus.class)
                                                 : null,
                                         EQUALS)
@@ -118,7 +120,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .selectFrom(INVOICE_DATA)
                 .where(condition)
                 .orderBy(INVOICE_DATA.INVOICE_CREATED_AT.desc())
-                .limit(commonParams.getLimit());
+                .limit(commonParams.isSetLimit() ? commonParams.getLimit() : SearchConstant.LIMIT);
         return fetch(query, statInvoiceMapper);
     }
 
@@ -147,7 +149,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
             conditionStep.and(PAYMENT_DATA.PARTY_SHOP_ID.notIn(searchQuery.getExcludedShopIds()));
         }
         Query query = conditionStep.orderBy(PAYMENT_DATA.PAYMENT_CREATED_AT.desc())
-                .limit(commonParams.getLimit());
+                .limit(commonParams.isSetLimit() ? commonParams.getLimit() : SearchConstant.LIMIT);
 
         return fetch(query, statPaymentMapper);
     }
@@ -167,7 +169,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         )
                 )
                 .orderBy(REFUND_DATA.REFUND_CREATED_AT.desc())
-                .limit(commonParams.getLimit());
+                .limit(commonParams.isSetLimit() ? commonParams.getLimit() : SearchConstant.LIMIT);
         return fetch(query, statRefundMapper);
     }
 
@@ -188,7 +190,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                 timeHolder.getToTime()
                         )
                 ).orderBy(PAYOUT.CREATED_AT.desc())
-                .limit(commonParams.getLimit());
+                .limit(commonParams.isSetLimit() ? commonParams.getLimit() : SearchConstant.LIMIT);
 
         return fetch(query, statPayoutMapper);
     }
@@ -245,7 +247,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         timeHolder.getToTime()
                 )
         ).orderBy(CHARGEBACK_DATA.CHARGEBACK_CREATED_AT.desc())
-                .limit(commonParams.getLimit());
+                .limit(commonParams.isSetLimit() ? commonParams.getLimit() : SearchConstant.LIMIT);
 
         return fetch(query, statChargebackMapper);
     }
@@ -285,7 +287,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         timeHolder.getFromTime(),
                         timeHolder.getToTime()))
                 .orderBy(INVOICE_TEMPLATE.EVENT_CREATED_AT.desc())
-                .limit(commonParams.getLimit());
+                .limit(commonParams.isSetLimit() ? commonParams.getLimit() : SearchConstant.LIMIT);
         return fetch(query, statInvoiceTemplateMapper);
     }
 
@@ -315,7 +317,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         )
                 )
                 .orderBy(REFUND_DATA.EVENT_CREATED_AT.desc())
-                .limit(commonParams.getLimit());
+                .limit(commonParams.isSetLimit() ? commonParams.getLimit() : SearchConstant.LIMIT);
 
         return fetch(query, enrichedStatInvoiceMapper);
     }
@@ -347,7 +349,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                         )
                 )
                 .orderBy(PAYMENT_DATA.EVENT_CREATED_AT.desc())
-                .limit(commonParams.getLimit());
+                .limit(commonParams.isSetLimit() ? commonParams.getLimit() : SearchConstant.LIMIT);
 
         return fetch(query, enrichedStatInvoiceMapper);
     }
@@ -364,7 +366,7 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(REFUND_DATA.REFUND_CREATED_AT, timeHolder.getWhereTime(), LESS)
                 .addValue(REFUND_DATA.REFUND_STATUS,
                         searchQuery.isSetRefundStatus()
-                                ? TBaseUtil.unionFieldToEnum(searchQuery.getRefundStatus(), RefundStatus.class)
+                                ? TypeUtil.toEnumField(searchQuery.getRefundStatus().name(), RefundStatus.class)
                                 : null,
                         EQUALS);
     }
@@ -385,15 +387,17 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                                 : null)
                 .addValue(PAYOUT.CREATED_AT, timeHolder.getWhereTime(), LESS);
         if (payoutSearchQuery.getPayoutType() != null) {
-            switch (payoutSearchQuery.getPayoutType().getSetField().getFieldName()) {
-                case "bank_account" -> conditionParameterSource.addOrCondition(
+            switch (payoutSearchQuery.getPayoutType()) {
+                case payout_account -> conditionParameterSource.addOrCondition(
                         PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.russian_bank_account),
                         PAYOUT.PAYOUT_TOOL_TYPE.eq(PayoutToolType.international_bank_account));
-                case "wallet_info",
-                        "payment_institution_account",
-                        "russian_bank_account",
-                        "international_bank_account" -> conditionParameterSource.addValue(PAYOUT.PAYOUT_TOOL_TYPE,
-                        TBaseUtil.unionFieldToEnum(payoutSearchQuery.getPayoutType(), PayoutToolType.class),
+                case wallet -> conditionParameterSource.addValue(
+                        PAYOUT.PAYOUT_TOOL_TYPE,
+                        PayoutToolType.wallet_info,
+                        EQUALS);
+                case payment_institution_account -> conditionParameterSource.addValue(
+                        PAYOUT.PAYOUT_TOOL_TYPE,
+                        PayoutToolType.payment_institution_account,
                         EQUALS);
                 default -> throw new IllegalArgumentException("Unknown payout_type " +
                         payoutSearchQuery.getPayoutType());
@@ -409,42 +413,73 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.PAYMENT_ID, paymentParams.getPaymentId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_STATUS,
                         paymentParams.isSetPaymentStatus()
-                                ? TBaseUtil.unionFieldToEnum(paymentParams.getPaymentStatus(),
+                                ? TypeUtil.toEnumField(paymentParams.getPaymentStatus().name(),
                                 InvoicePaymentStatus.class)
                                 : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_FLOW,
-                        TBaseUtil.unionFieldToEnum(paymentParams.getPaymentFlow(), PaymentFlow.class),
+                        paymentParams.isSetPaymentFlow()
+                                ? TypeUtil.toEnumField(paymentParams.getPaymentFlow().name(), PaymentFlow.class)
+                                : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TOOL,
-                        TBaseUtil.unionFieldToEnum(paymentParams.getPaymentTool(), PaymentTool.class),
+                        paymentParams.isSetPaymentTool()
+                                ? TypeUtil.toEnumField(paymentParams.getPaymentTool().name(), PaymentTool.class)
+                                : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER,
-                        paymentParams.getPaymentTerminalProvider().name(), EQUALS)
+                        paymentParams.isSetPaymentTerminalProvider()
+                                ? paymentParams.getPaymentTerminalProvider().name()
+                                : null,
+                        EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, paymentParams.getPaymentEmail(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_IP, paymentParams.getPaymentIp(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_FINGERPRINT, paymentParams.getPaymentFingerprint(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6, paymentParams.getPaymentFirst6(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM, paymentParams.getPaymentSystem().name(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM,
+                        paymentParams.isSetPaymentSystem()
+                                ? paymentParams.getPaymentSystem().name()
+                                : null,
+                        EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4, paymentParams.getPaymentLast4(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, paymentParams.getPaymentCustomerId(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_PROVIDER_ID, paymentParams.getPaymentProviderId() != null
-                        ? Integer.valueOf(paymentParams.getPaymentProviderId())
-                        : null, EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_ID, paymentParams.getPaymentTerminalId() != null
-                        ? Integer.valueOf(paymentParams.getPaymentTerminalId())
-                        : null, EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, paymentParams.getPaymentAmount(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, paymentParams.getPaymentDomainRevision(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION, paymentParams.getFromPaymentDomainRevision(),
+                .addValue(PAYMENT_DATA.PAYMENT_PROVIDER_ID,
+                        paymentParams.isSetPaymentProviderId()
+                                ? Integer.valueOf(paymentParams.getPaymentProviderId())
+                                : null, EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_ID,
+                        paymentParams.isSetPaymentTerminalId()
+                                ? Integer.valueOf(paymentParams.getPaymentTerminalId())
+                                : null, EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT,
+                        paymentParams.isSetPaymentAmount() ? paymentParams.getPaymentAmount() : null, EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION,
+                        paymentParams.isSetPaymentDomainRevision()
+                                ? paymentParams.getPaymentDomainRevision()
+                                : null,
+                        EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION,
+                        paymentParams.isSetFromPaymentDomainRevision()
+                                ? paymentParams.getFromPaymentDomainRevision()
+                                : null,
                         GREATER_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION,
-                        paymentParams.getToPaymentDomainRevision(),
+                        paymentParams.isSetToPaymentDomainRevision()
+                                ? paymentParams.getToPaymentDomainRevision()
+                                : null,
                         LESS_OR_EQUAL)
                 .addValue(PAYMENT_DATA.PAYMENT_RRN, paymentParams.getPaymentRrn(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_APPROVAL_CODE, paymentParams.getPaymentApprovalCode(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, paymentParams.getPaymentAmountFrom(), GREATER_OR_EQUAL)
-                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT, paymentParams.getPaymentAmountTo(), LESS_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT,
+                        paymentParams.isSetPaymentAmountFrom()
+                                ? paymentParams.getPaymentAmountFrom()
+                                : null,
+                        GREATER_OR_EQUAL)
+                .addValue(PAYMENT_DATA.PAYMENT_AMOUNT,
+                        paymentParams.isSetPaymentAmountTo()
+                                ? paymentParams.getPaymentAmountTo()
+                                : null,
+                        LESS_OR_EQUAL)
                 .addValue(PAYMENT_DATA.EXTERNAL_ID, externalId, EQUALS);
         if (paymentParams.isSetPaymentTokenProvider()) {
             conditionParameterSource.addOrCondition(
@@ -504,23 +539,35 @@ public class SearchDaoImpl extends AbstractDao implements SearchDao {
                 .addValue(PAYMENT_DATA.INVOICE_ID, paymentSearchQuery.getInvoiceId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_ID, paymentSearchQuery.getPaymentId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_STATUS,
-                        TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentStatus(),
-                                com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class),
+                        paymentSearchQuery.isSetPaymentStatus() ?
+                                TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentStatus(),
+                                        com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class)
+                                : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_FLOW,
-                        TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentFlow(), PaymentFlow.class),
+                        paymentSearchQuery.isSetPaymentFlow() ?
+                                TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentFlow(), PaymentFlow.class)
+                                : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TOOL,
-                        TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentTool(), PaymentTool.class),
+                        paymentSearchQuery.isSetPaymentTool() ?
+                                TBaseUtil.unionFieldToEnum(paymentSearchQuery.getPaymentTool(), PaymentTool.class)
+                                : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER,
-                        paymentSearchQuery.getPaymentTerminalProvider().name(),
+                        paymentSearchQuery.isSetPaymentTerminalProvider() ?
+                                paymentSearchQuery.getPaymentTerminalProvider().name()
+                                : null,
                         EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_EMAIL, paymentSearchQuery.getPaymentEmail(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_IP, paymentSearchQuery.getPaymentIp(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_FINGERPRINT, paymentSearchQuery.getPaymentFingerprint(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6, paymentSearchQuery.getPaymentFirst6(), EQUALS)
-                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM, paymentSearchQuery.getPaymentSystem().name(), EQUALS)
+                .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM,
+                        paymentSearchQuery.isSetPaymentSystem() ?
+                                paymentSearchQuery.getPaymentSystem().name()
+                                : null,
+                        EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4, paymentSearchQuery.getPaymentLast4(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_CUSTOMER_ID, paymentSearchQuery.getPaymentCustomerId(), EQUALS)
                 .addValue(PAYMENT_DATA.PAYMENT_AMOUNT,

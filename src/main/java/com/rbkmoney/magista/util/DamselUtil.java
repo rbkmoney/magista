@@ -10,8 +10,6 @@ import com.rbkmoney.geck.serializer.kit.json.JsonProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
-import com.rbkmoney.magista.OperationFailure;
-import com.rbkmoney.magista.OperationTimeout;
 import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.exception.NotFoundException;
 import org.apache.thrift.TBase;

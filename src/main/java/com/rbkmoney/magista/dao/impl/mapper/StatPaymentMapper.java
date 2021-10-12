@@ -37,17 +37,15 @@ public class StatPaymentMapper implements RowMapper<StatPayment> {
         );
         statPayment.setDomainRevision(rs.getLong(PAYMENT_DATA.PAYMENT_DOMAIN_REVISION.getName()));
 
-        String eventCreatedAtString = TypeUtil.temporalToString(
-                rs.getObject(PAYMENT_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class)
+        statPayment.setStatusChangedAt(
+                TypeUtil.temporalToString(rs.getObject(PAYMENT_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class))
         );
         com.rbkmoney.magista.domain.enums.InvoicePaymentStatus invoicePaymentStatus = TypeUtil.toEnumField(
                 rs.getString(PAYMENT_DATA.PAYMENT_STATUS.getName()),
                 com.rbkmoney.magista.domain.enums.InvoicePaymentStatus.class
         );
 
-        InvoicePaymentStatus paymentStatus;
-        paymentStatus = MapperHelper.buildInvoicePaymentStatus(rs, eventCreatedAtString, invoicePaymentStatus);
-        statPayment.setStatus(paymentStatus);
+        statPayment.setStatus(MapperHelper.buildInvoicePaymentStatus(rs, invoicePaymentStatus));
         statPayment.setPayer(MapperHelper.buildPayer(rs));
 
         PaymentFlow paymentFlow =
