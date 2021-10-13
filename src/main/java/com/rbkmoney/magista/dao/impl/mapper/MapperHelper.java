@@ -37,18 +37,16 @@ public class MapperHelper {
     static com.rbkmoney.damsel.domain.InvoiceStatus mapInvoiceStatus(
             ResultSet rs,
             com.rbkmoney.magista.domain.enums.InvoiceStatus invoiceStatusType) throws SQLException {
-        com.rbkmoney.damsel.domain.InvoiceStatus invoiceStatus;
-        switch (invoiceStatusType) {
-            case cancelled -> invoiceStatus = com.rbkmoney.damsel.domain.InvoiceStatus.cancelled(new InvoiceCancelled()
+        return switch (invoiceStatusType) {
+            case cancelled -> com.rbkmoney.damsel.domain.InvoiceStatus.cancelled(new InvoiceCancelled()
                     .setDetails(rs.getString(INVOICE_DATA.INVOICE_STATUS_DETAILS.getName())));
-            case unpaid -> invoiceStatus = com.rbkmoney.damsel.domain.InvoiceStatus.unpaid(new InvoiceUnpaid());
-            case paid -> invoiceStatus = com.rbkmoney.damsel.domain.InvoiceStatus.paid(new InvoicePaid());
-            case fulfilled -> invoiceStatus = com.rbkmoney.damsel.domain.InvoiceStatus.fulfilled(new InvoiceFulfilled()
+            case unpaid -> com.rbkmoney.damsel.domain.InvoiceStatus.unpaid(new InvoiceUnpaid());
+            case paid -> com.rbkmoney.damsel.domain.InvoiceStatus.paid(new InvoicePaid());
+            case fulfilled -> com.rbkmoney.damsel.domain.InvoiceStatus.fulfilled(new InvoiceFulfilled()
                     .setDetails(rs.getString(INVOICE_DATA.INVOICE_STATUS_DETAILS.getName())));
             default -> throw new NotFoundException(
                     String.format("Invoice status '%s' not found", invoiceStatusType.getLiteral()));
-        }
-        return invoiceStatus;
+        };
     }
 
     static PaymentTool buildPaymentTool(ResultSet rs) throws SQLException {
@@ -57,44 +55,40 @@ public class MapperHelper {
                 com.rbkmoney.magista.domain.enums.PaymentTool.class
         );
 
-        switch (paymentToolType) {
-            case bank_card:
-                BankCard bankCard = new BankCard(
-                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN.getName()),
-                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6.getName()),
-                        rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4.getName())
-                );
-                bankCard.setPaymentSystem(
-                        new PaymentSystemRef(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()))
-                );
-                bankCard.setPaymentSystemDeprecated(
-                        Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()))
-                                .map(bankCardSystem ->
-                                        TypeUtil.toEnumField(bankCardSystem, LegacyBankCardPaymentSystem.class))
-                                .orElse(null)
-                );
-                String tokenProvider = rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName());
-                if (StringUtils.isNotEmpty(tokenProvider)) {
-                    bankCard.setPaymentToken(new BankCardTokenServiceRef(tokenProvider));
-                }
-                bankCard.setTokenProviderDeprecated(
-                        Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()))
-                                .map(bankCardTokenProvider ->
-                                        TypeUtil.toEnumField(bankCardTokenProvider, LegacyBankCardTokenProvider.class))
-                                .orElse(null)
-                );
-                return PaymentTool.bank_card(bankCard);
-            case payment_terminal:
-                return PaymentTool.payment_terminal(new PaymentTerminal()
-                        .setTerminalTypeDeprecated(
-                                Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER.getName()))
-                                        .map(terminalProvider -> TypeUtil.toEnumField(terminalProvider,
-                                                LegacyTerminalPaymentProvider.class))
-                                        .orElse(null)
-                        )
-                );
-            case digital_wallet:
-                return PaymentTool.digital_wallet(new DigitalWallet()
+        return switch (paymentToolType) {
+            case bank_card -> PaymentTool.bank_card(new BankCard()
+                    .setToken(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN.getName()))
+                    .setBin(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_FIRST6.getName()))
+                    .setLastDigits(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_LAST4.getName()))
+                    .setPaymentSystem(Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()))
+                            .map(PaymentSystemRef::new)
+                            .orElse(null))
+                    .setPaymentSystemDeprecated(
+                            Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_SYSTEM.getName()))
+                                    .map(bankCardSystem ->
+                                            TypeUtil.toEnumField(bankCardSystem, LegacyBankCardPaymentSystem.class))
+                                    .orElse(null)
+                    )
+                    .setPaymentToken(
+                            Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()))
+                                    .map(BankCardTokenServiceRef::new)
+                                    .orElse(null))
+                    .setTokenProviderDeprecated(
+                            Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_BANK_CARD_TOKEN_PROVIDER.getName()))
+                                    .map(tokenProvider ->
+                                            TypeUtil.toEnumField(tokenProvider, LegacyBankCardTokenProvider.class))
+                                    .orElse(null)
+                    )
+            );
+            case payment_terminal -> PaymentTool.payment_terminal(new PaymentTerminal()
+                    .setTerminalTypeDeprecated(
+                            Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_TERMINAL_PROVIDER.getName()))
+                                    .map(terminalProvider -> TypeUtil.toEnumField(terminalProvider,
+                                            LegacyTerminalPaymentProvider.class))
+                                    .orElse(null)
+                    )
+            );
+            case digital_wallet -> PaymentTool.digital_wallet(new DigitalWallet()
                         .setId(rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_ID.getName()))
                         .setProviderDeprecated(Optional.ofNullable(
                                 rs.getString(PAYMENT_DATA.PAYMENT_DIGITAL_WALLET_PROVIDER.getName()))
@@ -104,12 +98,10 @@ public class MapperHelper {
                                 .orElse(null)
                         )
                 );
-            case crypto_currency:
-                return PaymentTool.crypto_currency_deprecated(
+            case crypto_currency -> PaymentTool.crypto_currency_deprecated(
                         TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.CRYPTO_CURRENCY.getName()),
                                 LegacyCryptoCurrency.class));
-            case mobile_commerce:
-                return PaymentTool.mobile_commerce(new MobileCommerce()
+            case mobile_commerce -> PaymentTool.mobile_commerce(new MobileCommerce()
                         .setOperatorDeprecated(
                                 Optional.ofNullable(rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_OPERATOR.getName()))
                                         .map(mobileOperator ->
@@ -118,9 +110,8 @@ public class MapperHelper {
                         .setPhone(new MobilePhone(rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_PHONE_CC.getName()),
                                 rs.getString(PAYMENT_DATA.PAYMENT_MOBILE_PHONE_CTN.getName())))
                 );
-            default:
-                throw new NotFoundException(String.format("Payment tool '%s' not found", paymentToolType));
-        }
+            default -> throw new NotFoundException(String.format("Payment tool '%s' not found", paymentToolType));
+        };
     }
 
     static Payer buildPayer(ResultSet rs) throws SQLException {
@@ -129,29 +120,23 @@ public class MapperHelper {
                 PaymentPayerType.class
         );
 
-        switch (paymentPayerType) {
-            case payment_resource -> {
-                return Payer.payment_resource(
+        return switch (paymentPayerType) {
+            case payment_resource -> Payer.payment_resource(
                         new PaymentResourcePayer()
                                 .setContactInfo(buildContactInfo(rs))
                                 .setResource(new DisposablePaymentResource()
                                         .setPaymentTool(buildPaymentTool(rs))
                                         .setClientInfo(buildClientInfo(rs))));
-            }
-            case customer -> {
-                return Payer.customer(new CustomerPayer()
+            case customer -> Payer.customer(new CustomerPayer()
                         .setCustomerId(rs.getString(PAYMENT_DATA.PAYMENT_CUSTOMER_ID.getName()))
                         .setPaymentTool(buildPaymentTool(rs))
                         .setContactInfo(buildContactInfo(rs)));
-            }
-            case recurrent -> {
-                return Payer.recurrent(new RecurrentPayer()
+            case recurrent -> Payer.recurrent(new RecurrentPayer()
                         .setContactInfo(buildContactInfo(rs))
                         .setRecurrentParent(buildRecurrentParent(rs))
                         .setPaymentTool(buildPaymentTool(rs)));
-            }
             default -> throw new NotFoundException(String.format("Payment type '%s' not found", paymentPayerType));
-        }
+        };
     }
 
     private static RecurrentParentPayment buildRecurrentParent(ResultSet rs) throws SQLException {
@@ -195,29 +180,23 @@ public class MapperHelper {
     static InvoicePaymentStatus buildInvoicePaymentStatus(
             ResultSet rs,
             com.rbkmoney.magista.domain.enums.InvoicePaymentStatus invoicePaymentStatus) throws SQLException {
-        InvoicePaymentStatus paymentStatus;
-        switch (invoicePaymentStatus) {
-            case pending -> paymentStatus = InvoicePaymentStatus.pending(new InvoicePaymentPending());
-            case cancelled -> paymentStatus = InvoicePaymentStatus.cancelled(new InvoicePaymentCancelled());
-            case failed -> {
-                InvoicePaymentFailed invoicePaymentFailed = new InvoicePaymentFailed();
-                OperationFailure operationFailure = DamselUtil.toOperationFailure(
-                        TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_OPERATION_FAILURE_CLASS.getName()),
-                                FailureClass.class),
-                        rs.getString(PAYMENT_DATA.PAYMENT_EXTERNAL_FAILURE.getName()),
-                        rs.getString(PAYMENT_DATA.PAYMENT_EXTERNAL_FAILURE_REASON.getName())
-                );
-                invoicePaymentFailed.setFailure(operationFailure);
-                paymentStatus = InvoicePaymentStatus.failed(invoicePaymentFailed);
-            }
-            case captured -> paymentStatus = InvoicePaymentStatus.captured(new InvoicePaymentCaptured());
-            case refunded -> paymentStatus = InvoicePaymentStatus.refunded(new InvoicePaymentRefunded());
-            case processed -> paymentStatus = InvoicePaymentStatus.processed(new InvoicePaymentProcessed());
-            case charged_back -> paymentStatus = InvoicePaymentStatus.charged_back(new InvoicePaymentChargedBack());
+        return switch (invoicePaymentStatus) {
+            case pending -> InvoicePaymentStatus.pending(new InvoicePaymentPending());
+            case cancelled -> InvoicePaymentStatus.cancelled(new InvoicePaymentCancelled());
+            case failed -> InvoicePaymentStatus.failed(new InvoicePaymentFailed()
+                    .setFailure(DamselUtil.toOperationFailure(
+                            TypeUtil.toEnumField(rs.getString(PAYMENT_DATA.PAYMENT_OPERATION_FAILURE_CLASS.getName()),
+                                    FailureClass.class),
+                            rs.getString(PAYMENT_DATA.PAYMENT_EXTERNAL_FAILURE.getName()),
+                            rs.getString(PAYMENT_DATA.PAYMENT_EXTERNAL_FAILURE_REASON.getName())
+                    )));
+            case captured -> InvoicePaymentStatus.captured(new InvoicePaymentCaptured());
+            case refunded -> InvoicePaymentStatus.refunded(new InvoicePaymentRefunded());
+            case processed -> InvoicePaymentStatus.processed(new InvoicePaymentProcessed());
+            case charged_back -> InvoicePaymentStatus.charged_back(new InvoicePaymentChargedBack());
             default -> throw new NotFoundException(
                     String.format("Payment status '%s' not found", invoicePaymentStatus.getLiteral()));
-        }
-        return paymentStatus;
+        };
     }
 
     static PayoutToolInfo toPayoutToolInfo(ResultSet rs) throws SQLException {
@@ -256,6 +235,8 @@ public class MapperHelper {
                     new WalletInfo(rs.getString(PAYOUT.PAYOUT_TOOL_WALLET_ID.getName())));
             case payment_institution_account -> PayoutToolInfo.payment_institution_account(
                     new PaymentInstitutionAccount());
+            default -> throw new NotFoundException(
+                    String.format("Payout type %s not found", payoutType));
         };
     }
 
@@ -268,6 +249,8 @@ public class MapperHelper {
             case cancelled -> PayoutStatus
                     .cancelled(new PayoutCancelled(rs.getString(PAYOUT.CANCELLED_DETAILS.getName())));
             case confirmed -> PayoutStatus.confirmed(new PayoutConfirmed());
+            default -> throw new NotFoundException(
+                    String.format("Payout status %s not found", payoutStatus));
         };
     }
 
@@ -285,6 +268,8 @@ public class MapperHelper {
                             rs.getString(REFUND_DATA.REFUND_EXTERNAL_FAILURE_REASON.getName())
                     )
             ));
+            default -> throw new NotFoundException(
+                    String.format("Refund status %s not found", refundStatus));
         };
     }
 
@@ -295,50 +280,46 @@ public class MapperHelper {
                 TypeUtil.toEnumField(rs.getString(
                         CHARGEBACK_DATA.CHARGEBACK_REASON_CATEGORY.getName()),
                         ChargebackCategory.class);
-        InvoicePaymentChargebackCategory invoicePaymentChargebackCategory = new InvoicePaymentChargebackCategory();
-        switch (chargebackCategory) {
-            case fraud -> invoicePaymentChargebackCategory.setFraud(new InvoicePaymentChargebackCategoryFraud());
-            case dispute -> invoicePaymentChargebackCategory.setDispute(new InvoicePaymentChargebackCategoryDispute());
-            case authorisation -> invoicePaymentChargebackCategory.setAuthorisation(
-                    new InvoicePaymentChargebackCategoryAuthorisation());
-            case processing_error -> invoicePaymentChargebackCategory
-                    .setProcessingError(new InvoicePaymentChargebackCategoryProcessingError());
+        return switch (chargebackCategory) {
+            case fraud -> invoicePaymentChargebackReason.setCategory(
+                    InvoicePaymentChargebackCategory.fraud(new InvoicePaymentChargebackCategoryFraud()));
+            case dispute -> invoicePaymentChargebackReason.setCategory(
+                    InvoicePaymentChargebackCategory.dispute(new InvoicePaymentChargebackCategoryDispute()));
+            case authorisation -> invoicePaymentChargebackReason.setCategory(
+                    InvoicePaymentChargebackCategory.authorisation(
+                            new InvoicePaymentChargebackCategoryAuthorisation()));
+            case processing_error -> invoicePaymentChargebackReason.setCategory(InvoicePaymentChargebackCategory
+                    .processing_error(new InvoicePaymentChargebackCategoryProcessingError()));
             default -> throw new NotFoundException(
                     String.format("Chargeback category %s not found", chargebackCategory));
-        }
-        invoicePaymentChargebackReason.setCategory(invoicePaymentChargebackCategory);
-
-        return invoicePaymentChargebackReason;
+        };
     }
 
     public static InvoicePaymentChargebackStatus toInvoicePaymentChargebackStatus(ResultSet rs)
             throws SQLException {
-        InvoicePaymentChargebackStatus invoicePaymentChargebackStatus = new InvoicePaymentChargebackStatus();
         ChargebackStatus chargebackStatus = TypeUtil.toEnumField(rs.getString(
                 CHARGEBACK_DATA.CHARGEBACK_STATUS.getName()),
                 ChargebackStatus.class);
-        switch (chargebackStatus) {
-            case pending -> invoicePaymentChargebackStatus.setPending(new InvoicePaymentChargebackPending());
-            case accepted -> invoicePaymentChargebackStatus.setAccepted(new InvoicePaymentChargebackAccepted());
-            case rejected -> invoicePaymentChargebackStatus.setRejected(new InvoicePaymentChargebackRejected());
-            case cancelled -> invoicePaymentChargebackStatus.setCancelled(new InvoicePaymentChargebackCancelled());
+        return switch (chargebackStatus) {
+            case pending -> InvoicePaymentChargebackStatus.pending(new InvoicePaymentChargebackPending());
+            case accepted -> InvoicePaymentChargebackStatus.accepted(new InvoicePaymentChargebackAccepted());
+            case rejected -> InvoicePaymentChargebackStatus.rejected(new InvoicePaymentChargebackRejected());
+            case cancelled -> InvoicePaymentChargebackStatus.cancelled(new InvoicePaymentChargebackCancelled());
             default -> throw new NotFoundException(String.format("Chargeback status %s not found", chargebackStatus));
-        }
-        return invoicePaymentChargebackStatus;
+        };
     }
 
     public static InvoicePaymentChargebackStage toInvoicePaymentChargebackStage(ResultSet rs) throws SQLException {
-        InvoicePaymentChargebackStage chargebackStage = new InvoicePaymentChargebackStage();
         ChargebackStage stage = TypeUtil.toEnumField(rs.getString(
                 CHARGEBACK_DATA.CHARGEBACK_STAGE.getName()),
                 ChargebackStage.class);
-        switch (stage) {
-            case chargeback -> chargebackStage.setChargeback(new InvoicePaymentChargebackStageChargeback());
-            case pre_arbitration -> chargebackStage.setPreArbitration(
+        return switch (stage) {
+            case chargeback -> InvoicePaymentChargebackStage.chargeback(new InvoicePaymentChargebackStageChargeback());
+            case pre_arbitration -> InvoicePaymentChargebackStage.pre_arbitration(
                     new InvoicePaymentChargebackStagePreArbitration());
-            case arbitration -> chargebackStage.setArbitration(new InvoicePaymentChargebackStageArbitration());
+            case arbitration -> InvoicePaymentChargebackStage.arbitration(
+                    new InvoicePaymentChargebackStageArbitration());
             default -> throw new NotFoundException(String.format("Chargeback stage %s not found", stage));
-        }
-        return chargebackStage;
+        };
     }
 }
