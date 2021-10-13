@@ -21,6 +21,9 @@ public class StatRefundMapper implements RowMapper<StatRefund> {
         statRefund.setOwnerId(rs.getString(REFUND_DATA.PARTY_ID.getName()));
         statRefund.setShopId(rs.getString(REFUND_DATA.PARTY_SHOP_ID.getName()));
         statRefund.setCurrencySymbolicCode(rs.getString(REFUND_DATA.REFUND_CURRENCY_CODE.getName()));
+        statRefund.setStatusChangedAt(
+                TypeUtil.temporalToString(rs.getObject(REFUND_DATA.EVENT_CREATED_AT.getName(), LocalDateTime.class))
+        );
         statRefund.setStatus(MapperHelper.toRefundStatus(rs));
         statRefund.setAmount(rs.getLong(REFUND_DATA.REFUND_AMOUNT.getName()));
         statRefund.setFee(rs.getLong(REFUND_DATA.REFUND_FEE.getName()));

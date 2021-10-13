@@ -10,8 +10,6 @@ import com.rbkmoney.geck.serializer.kit.json.JsonProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TErrorUtil;
-import com.rbkmoney.magista.OperationFailure;
-import com.rbkmoney.magista.OperationTimeout;
 import com.rbkmoney.magista.domain.enums.FailureClass;
 import com.rbkmoney.magista.exception.NotFoundException;
 import org.apache.thrift.TBase;
@@ -120,32 +118,24 @@ public class DamselUtil {
             FailureClass failureClass,
             String failure,
             String failureDescription) {
-        switch (failureClass) {
-            case operation_timeout:
-                return com.rbkmoney.damsel.merch_stat.OperationFailure.operation_timeout(
-                        new com.rbkmoney.damsel.merch_stat.OperationTimeout());
-            case failure:
-                Failure externalFailure = TErrorUtil.toGeneral(failure);
-                externalFailure.setReason(failureDescription);
-                return com.rbkmoney.damsel.merch_stat.OperationFailure.failure(externalFailure);
-            default:
-                throw new NotFoundException(String.format("Failure type '%s' not found", failureClass));
-        }
+        return switch (failureClass) {
+            case operation_timeout -> com.rbkmoney.damsel.merch_stat.OperationFailure.operation_timeout(
+                    new com.rbkmoney.damsel.merch_stat.OperationTimeout());
+            case failure -> com.rbkmoney.damsel.merch_stat.OperationFailure.failure(
+                    TErrorUtil.toGeneral(failure)
+                            .setReason(failureDescription));
+            default -> throw new NotFoundException(String.format("Failure type '%s' not found", failureClass));
+        };
     }
 
     public static OperationFailure toOperationFailure(
             FailureClass failureClass, String failure,
             String failureDescription) {
-        switch (failureClass) {
-            case operation_timeout:
-                return OperationFailure.operation_timeout(new OperationTimeout());
-            case failure:
-                Failure externalFailure = TErrorUtil.toGeneral(failure);
-                externalFailure.setReason(failureDescription);
-                return OperationFailure.failure(externalFailure);
-            default:
-                throw new NotFoundException(String.format("Failure type '%s' not found", failureClass));
-        }
+        return switch (failureClass) {
+            case operation_timeout -> OperationFailure.operation_timeout(new OperationTimeout());
+            case failure -> OperationFailure.failure(TErrorUtil.toGeneral(failure).setReason(failureDescription));
+            default -> throw new NotFoundException(String.format("Failure type '%s' not found", failureClass));
+        };
     }
 
     public static String toPayoutSummaryStatString(
