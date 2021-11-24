@@ -3,7 +3,7 @@ package com.rbkmoney.magista.listener;
 import com.rbkmoney.damsel.payment_processing.InvoiceTemplateChange;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;
-import com.rbkmoney.magista.converter.SourceEventParser;
+import com.rbkmoney.magista.converter.SourceEventsParser;
 import com.rbkmoney.magista.service.HandlerManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import static com.rbkmoney.kafka.common.util.LogUtil.toSummaryStringWithSinkEven
 public class InvoiceTemplateListener {
 
     private final HandlerManager handlerManager;
-    private final SourceEventParser eventParser;
+    private final SourceEventsParser sourceEventsParser;
 
     @Value("${kafka.consumer.throttling-timeout-ms}")
     private int throttlingTimeout;
@@ -51,7 +51,8 @@ public class InvoiceTemplateListener {
     public void handleMessages(List<MachineEvent> machineEvents) throws InterruptedException {
         try {
             machineEvents.stream()
-                    .map(machineEvent -> Map.entry(eventParser.parseEvent(machineEvent), machineEvent))
+                    .flatMap(machineEvent -> sourceEventsParser.parseEvents(machineEvent).stream()
+                            .map(eventPayload -> Map.entry(eventPayload, machineEvent)))
                     .filter(entry -> entry.getKey().isSetInvoiceTemplateChanges())
                     .map(entry -> {
                         var entries = new ArrayList<Map.Entry<InvoiceTemplateChange, MachineEvent>>();

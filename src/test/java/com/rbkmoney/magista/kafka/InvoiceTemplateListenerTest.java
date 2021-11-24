@@ -4,7 +4,7 @@ import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.machinegun.eventsink.SinkEvent;
 import com.rbkmoney.magista.config.KafkaPostgresqlSpringBootITest;
-import com.rbkmoney.magista.converter.SourceEventParser;
+import com.rbkmoney.magista.converter.SourceEventsParser;
 import com.rbkmoney.magista.service.HandlerManager;
 import com.rbkmoney.testcontainers.annotations.kafka.config.KafkaProducer;
 import org.apache.thrift.TBase;
@@ -33,7 +33,7 @@ public class InvoiceTemplateListenerTest {
     private HandlerManager handlerManager;
 
     @MockBean
-    private SourceEventParser eventParser;
+    private SourceEventsParser sourceEventsParser;
 
     @Autowired
     private KafkaProducer<TBase<?, ?>> testThriftKafkaProducer;
@@ -53,9 +53,10 @@ public class InvoiceTemplateListenerTest {
         message.setData(data);
         var sinkEvent = new SinkEvent();
         sinkEvent.setEvent(message);
-        when(eventParser.parseEvent(any())).thenReturn(EventPayload.invoice_template_changes(List.of()));
+        when(sourceEventsParser.parseEvents(any()))
+                .thenReturn(List.of(EventPayload.invoice_template_changes(List.of())));
         testThriftKafkaProducer.send(invoiceTemplateTopicName, sinkEvent);
-        verify(eventParser, timeout(5000).times(1)).parseEvent(arg.capture());
+        verify(sourceEventsParser, timeout(5000).times(1)).parseEvents(arg.capture());
         assertThat(arg.getValue())
                 .isEqualTo(message);
     }

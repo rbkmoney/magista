@@ -20,7 +20,7 @@ public class SourceEventParser {
             return converter.convert(bin, EventPayload.class);
         } catch (Exception e) {
             log.error("Exception when parse message e: ", e);
-            throw new ParseException();
+            throw new ParseException(e);
         }
     }
 }
