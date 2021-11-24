@@ -9,6 +9,7 @@ import com.rbkmoney.magista.event.ChangeType;
 import com.rbkmoney.magista.event.mapper.InvoiceTemplateMapper;
 import com.rbkmoney.magista.util.DamselUtil;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import static com.rbkmoney.magista.util.LifetimeIntervalThriftUtil.getInvoiceValidUntil;
 
@@ -50,7 +51,9 @@ public class InvoiceTemplateCreatedEventMapper implements InvoiceTemplateMapper 
         }
         invoiceTemplate.setName(invoiceTemplateThrift.getName());
         invoiceTemplate.setInvoiceTemplateCreatedAt(
-                TypeUtil.stringToLocalDateTime(invoiceTemplateThrift.getCreatedAt()));
+                StringUtils.hasText(invoiceTemplateThrift.getCreatedAt())
+                        ? TypeUtil.stringToLocalDateTime(invoiceTemplateThrift.getCreatedAt())
+                        : null);
         return invoiceTemplate;
     }
 }
