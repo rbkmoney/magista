@@ -26,25 +26,28 @@ public class SourceEventsParser {
                 var bin = message.getData().getBin();
                 return List.of(converter.convert(bin, EventPayload.class));
             } else if (message.getData().isSetArr()) {
-                var errorValues = message.getData().getArr().stream()
-                        .filter(value -> !value.isSetBin())
-                        .map(TUnion::toString)
-                        .collect(Collectors.joining(", "));
-                if (StringUtils.hasText(errorValues)) {
-                    throw new ParseException(String.format("Cant parse type of messages=%s", errorValues));
-                } else {
-                    return message.getData().getArr().stream()
-                            .filter(Value::isSetBin)
-                            .map(Value::getBin)
-                            .map(bytes -> converter.convert(bytes, EventPayload.class))
-                            .collect(Collectors.toList());
-                }
+                validateBinaryData(message);
+                return message.getData().getArr().stream()
+                        .filter(Value::isSetBin)
+                        .map(Value::getBin)
+                        .map(bytes -> converter.convert(bytes, EventPayload.class))
+                        .collect(Collectors.toList());
             } else {
                 throw new ParseException(String.format("Cant parse type of message=%s", message.getData()));
             }
         } catch (Exception e) {
             log.error("Exception when parse message e: ", e);
             throw new ParseException(e);
+        }
+    }
+
+    private void validateBinaryData(MachineEvent message) {
+        var errorValues = message.getData().getArr().stream()
+                .filter(value -> !value.isSetBin())
+                .map(TUnion::toString)
+                .collect(Collectors.joining(", "));
+        if (StringUtils.hasText(errorValues)) {
+            throw new ParseException(String.format("Cant parse type of messages=%s", errorValues));
         }
     }
 }
