@@ -23,7 +23,7 @@ public class SourceEventsParser {
     public static final String TPL = "tpl";
     public static final String ID = "id";
 
-    private final UserInfo userInfo = new UserInfo("admin", UserType.internal_user(new InternalUser()));
+    private final UserInfo userInfo = new UserInfo("magista", UserType.internal_user(new InternalUser()));
 
     private final BinaryConverter<EventPayload> converter;
     private final InvoiceTemplatingSrv.Iface invoiceTemplatingClient;
