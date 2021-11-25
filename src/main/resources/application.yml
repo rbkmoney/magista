@@ -66,6 +66,9 @@ service:
   partyManagement:
     url: http://hellgate:8022/v1/processing/partymgmt
     networkTimeout: 5000
+  invoiceTemplating:
+    url: http://hellgate:8022/v1/processing/invoice_templating
+    networkTimeout: 5000
 kafka:
   bootstrap-servers: kenny-kafka1.bst1.rbkmoney.net:9092
   client-id: magista
