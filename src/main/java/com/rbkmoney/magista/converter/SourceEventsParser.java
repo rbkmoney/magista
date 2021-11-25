@@ -48,7 +48,7 @@ public class SourceEventsParser {
         var thriftArray = message.getData().getArr().stream()
                 .map(TUnion::toString)
                 .collect(Collectors.joining(", "));
-        log.error("MachineEvent contains an ARRAY! instead of a binary, topic typing error, " +
+        log.warn("MachineEvent contains an ARRAY! instead of a binary, topic typing error, " +
                 "thriftArray={}", thriftArray);
         return Stream.concat(getBinaries(message), getObjects(message))
                 .collect(Collectors.toList());
